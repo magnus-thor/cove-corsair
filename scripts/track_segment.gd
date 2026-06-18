@@ -18,6 +18,7 @@ func _ready() -> void:
 		notifier.screen_exited.connect(_on_screen_exited)
 	
 	spawn_obstacles()
+	spawn_scenery()
 
 func _on_screen_exited() -> void:
 	# Signal to the TrackManager that this segment is ready to be recycled
@@ -27,6 +28,7 @@ func _on_screen_exited() -> void:
 ## Resets and randomizes obstacles for a fresh pass.
 func recycle_segment() -> void:
 	spawn_obstacles()
+	spawn_scenery()
 
 ## Helper to clean up existing obstacles and spawn new barrels
 func spawn_obstacles() -> void:
@@ -52,3 +54,58 @@ func spawn_obstacles() -> void:
 		
 		barrel.position = Vector3(rand_x, rand_y, rand_z)
 
+## Spawns landscape scenery pieces along the segment shores
+func spawn_scenery() -> void:
+	var scenery_container = get_node_or_null("Scenery")
+	if not scenery_container:
+		return
+		
+	# Clean up any existing scenery from previous cycles (Scenery Recycling Clean Up)
+	for child in scenery_container.get_children():
+		scenery_container.remove_child(child)
+		child.queue_free()
+		
+	# Define paths to scenery models outside the river boundaries
+	var sand_island_path = "res://assets/models/patch-sand.glb"
+	var rock_island_path = "res://assets/models/rocks-sand-a.glb"
+	var palm_straight_path = "res://assets/models/palm-detailed-straight.glb"
+	var palm_bend_path = "res://assets/models/palm-detailed-bend.glb"
+	
+	# Z coordinates scatter evenly across the segment length (between -10.0 and -40.0)
+	var zones = [
+		Vector2(-40.0, -32.5),
+		Vector2(-32.5, -25.0),
+		Vector2(-25.0, -17.5),
+		Vector2(-17.5, -10.0)
+	]
+	
+	for zone in zones:
+		# Decide randomly to place scenery on left shoreline (-18.0 to -9.0), right shoreline (9.0 to 18.0), or skip
+		var shore = randi() % 3
+		if shore == 0:
+			continue
+			
+		var rand_x = 0.0
+		if shore == 1:
+			rand_x = randf_range(-18.0, -9.0)
+		else:
+			rand_x = randf_range(9.0, 18.0)
+			
+		var rand_z = randf_range(zone.x, zone.y)
+		
+		# Instantiate base island
+		var base_path = sand_island_path if randf() < 0.5 else rock_island_path
+		var base_scene = load(base_path)
+		if base_scene:
+			var base_inst = base_scene.instantiate() as Node3D
+			scenery_container.add_child(base_inst)
+			base_inst.position = Vector3(rand_x, 0.0, rand_z)
+			
+			# Optionally nest palm tree on top of the sand coordinates
+			if randf() < 0.6:
+				var palm_path = palm_straight_path if randf() < 0.5 else palm_bend_path
+				var palm_scene = load(palm_path)
+				if palm_scene:
+					var palm_inst = palm_scene.instantiate() as Node3D
+					base_inst.add_child(palm_inst)
+					palm_inst.rotation.y = randf_range(0.0, TAU)

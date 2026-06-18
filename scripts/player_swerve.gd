@@ -118,7 +118,7 @@ func _update_ship_mesh() -> void:
 				ShipTier.RAFT:
 					inst.scale = Vector3(1.0, 1.0, 1.0)
 				ShipTier.SLOOP:
-					inst.scale = Vector3(0.3, 0.3, 0.3)
+					inst.scale = Vector3(0.25, 0.25, 0.25)
 				ShipTier.GALLEON:
 					inst.scale = Vector3(0.25, 0.25, 0.25)
 

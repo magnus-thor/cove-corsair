@@ -2,7 +2,18 @@
 
 [ext_resource type="Script" uid="uid://c46ip4dchlkcr" path="res://scripts/track_segment.gd" id="1_script"]
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_water"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ocean"]
+albedo_color = Color(0.07843, 0.25882, 0.44706, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ocean"]
+material = SubResource("StandardMaterial3D_ocean")
+size = Vector2(200, 40)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_river"]
+albedo_color = Color(0.0, 0.70588, 0.84706, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_river"]
+material = SubResource("StandardMaterial3D_river")
 size = Vector2(12, 40)
 
 [node name="TrackSegment" type="Node3D" unique_id=87088833]
@@ -10,10 +21,16 @@ script = ExtResource("1_script")
 
 [node name="WaterPlane" type="MeshInstance3D" parent="." unique_id=1548549550]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -20)
-mesh = SubResource("PlaneMesh_water")
+mesh = SubResource("PlaneMesh_ocean")
+
+[node name="RiverLane" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, -20)
+mesh = SubResource("PlaneMesh_river")
 
 [node name="VisibleOnScreenNotifier3D" type="VisibleOnScreenNotifier3D" parent="." unique_id=1471931802]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -20)
 aabb = AABB(-6, -1, -20, 12, 2, 40)
 
 [node name="Obstacles" type="Node3D" parent="." unique_id=371182929]
+
+[node name="Scenery" type="Node3D" parent="."]
