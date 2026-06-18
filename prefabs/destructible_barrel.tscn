@@ -1,0 +1,17 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/destructible_obstacle.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/models/barrel.glb" id="2_model"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_barrel"]
+height = 1.2
+radius = 0.5
+
+[node name="DestructibleBarrel" type="Area3D" groups=["destructible"]]
+script = ExtResource("1_script")
+
+[node name="BarrelModel" parent="." instance=ExtResource("2_model")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+shape = SubResource("CylinderShape3D_barrel")
