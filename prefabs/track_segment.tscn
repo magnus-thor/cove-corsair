@@ -1,0 +1,30 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/track_segment.gd" id="1_script"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_water"]
+size = Vector2(12, 40)
+
+[sub_resource type="BoxMesh" id="BoxMesh_obstacle"]
+size = Vector3(1.5, 1.5, 1.5)
+
+[node name="TrackSegment" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="WaterPlane" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -20)
+mesh = SubResource("PlaneMesh_water")
+
+[node name="VisibleOnScreenNotifier3D" type="VisibleOnScreenNotifier3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -20)
+aabb = AABB(-6, -1, -20, 12, 2, 40)
+
+[node name="Obstacles" type="Node3D" parent="."]
+
+[node name="Obstacle1" type="MeshInstance3D" parent="Obstacles"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.75, -10)
+mesh = SubResource("BoxMesh_obstacle")
+
+[node name="Obstacle2" type="MeshInstance3D" parent="Obstacles"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.75, -25)
+mesh = SubResource("BoxMesh_obstacle")

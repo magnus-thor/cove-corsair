@@ -1,0 +1,37 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="PackedScene" path="res://prefabs/track_segment.tscn" id="1_track_segment"]
+[ext_resource type="PackedScene" path="res://prefabs/player_boat.tscn" id="2_player_boat"]
+[ext_resource type="Script" path="res://scripts/track_manager.gd" id="3_track_manager"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_sky"]
+sky_material = SubResource("ProceduralSkyMaterial_sky")
+
+[sub_resource type="Environment" id="Environment_main"]
+background_mode = 2
+sky = SubResource("Sky_sky")
+tonemap_mode = 2
+glow_enabled = true
+
+[node name="Main" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_main")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
+shadow_enabled = true
+
+[node name="TrackManager" type="Node3D" parent="."]
+script = ExtResource("3_track_manager")
+segment_scene = ExtResource("1_track_segment")
+
+[node name="PlayerBoat" parent="." instance=ExtResource("2_player_boat")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.906308, 0.422618, 0, -0.422618, 0.906308, 0, 5, 8)
