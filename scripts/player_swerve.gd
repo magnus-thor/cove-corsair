@@ -22,7 +22,10 @@ enum ShipTier {RAFT, SLOOP, GALLEON}
 @export var current_tier: ShipTier = ShipTier.RAFT
 
 ## Cooldown duration between automatic shots in seconds
-@export var shoot_cooldown: float = 0.15
+@export var shoot_cooldown: float = 0.45
+
+## The penalty to power_level when colliding with an obstacle
+@export var collision_penalty: int = 10
 
 ## The cannonball prefab scene to spawn
 @export var cannonball_scene: PackedScene = preload("res://prefabs/cannonball.tscn")
@@ -35,14 +38,35 @@ var half_width: float = 0.0
 
 var power_level: int = 0
 var shoot_timer: float = 0.0
+var score: int = 0
+var is_game_over: bool = false
+
+@export var end_game_ui_scene: PackedScene = preload("res://prefabs/end_game_ui.tscn")
 
 func _ready() -> void:
 	add_to_group("player")
 	target_x = global_position.x
 	half_width = river_width / 2.0
-	_update_ship_mesh()
+	_check_tier_updates(true)
+	
+	# Dynamically construct collision area to detect overlapping Area3D obstacles (like barrels)
+	var detection_area = Area3D.new()
+	detection_area.name = "CollisionArea"
+	add_child(detection_area)
+	
+	var col_shape = CollisionShape3D.new()
+	var box_shape = BoxShape3D.new()
+	box_shape.size = Vector3(1.4, 1.4, 2.7) # Slightly larger than boat collision shape
+	col_shape.shape = box_shape
+	detection_area.add_child(col_shape)
+	col_shape.position = Vector3(0, 0.6, 0)
+	
+	detection_area.area_entered.connect(_on_area_entered)
 
 func _unhandled_input(event: InputEvent) -> void:
+	if is_game_over:
+		return
+		
 	# Handle mouse input
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
@@ -59,6 +83,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			target_x = clamp(target_x, -half_width, half_width)
 
 func _physics_process(delta: float) -> void:
+	if is_game_over:
+		return
+		
 	# Calculate target position and interpolate along the X-axis
 	var current_pos = global_position
 	current_pos.x = lerp(current_pos.x, target_x, lerp_speed * delta)
@@ -83,13 +110,72 @@ func _physics_process(delta: float) -> void:
 		_shoot()
 
 func upgrade_ship(amount: int) -> void:
+	if is_game_over:
+		return
+		
 	power_level += amount
-	if power_level >= 10 and current_tier == ShipTier.RAFT:
-		current_tier = ShipTier.SLOOP
+	if amount > 0:
+		score += amount
+		if score >= 50:
+			game_over(true)
+			
+	_check_tier_updates()
+
+func _check_tier_updates(force_mesh_update: bool = false) -> void:
+	var target_tier = ShipTier.RAFT
+	if power_level >= 25:
+		target_tier = ShipTier.GALLEON
+	elif power_level >= 10:
+		target_tier = ShipTier.SLOOP
+		
+	var tier_changed = current_tier != target_tier
+	if tier_changed:
+		current_tier = target_tier
+		
+	if tier_changed or force_mesh_update:
 		_update_ship_mesh()
-	if power_level >= 25 and current_tier == ShipTier.SLOOP:
-		current_tier = ShipTier.GALLEON
-		_update_ship_mesh()
+		
+	# Dynamic shoot cooldown matching active ship tier
+	match current_tier:
+		ShipTier.RAFT:
+			shoot_cooldown = 0.45
+		ShipTier.SLOOP:
+			shoot_cooldown = 0.3
+		ShipTier.GALLEON:
+			shoot_cooldown = 0.18
+
+func _on_area_entered(area: Area3D) -> void:
+	if is_game_over:
+		return
+		
+	if area.is_in_group("destructible"):
+		# Reduce power level on direct collision
+		power_level -= collision_penalty
+		
+		# Check and apply demotions
+		_check_tier_updates()
+		
+		# Defeat condition
+		if power_level < 0:
+			game_over(false)
+			
+		# Despawn the collided barrel so it doesn't trigger damage multiple times
+		area.queue_free()
+
+func game_over(victory: bool) -> void:
+	if is_game_over:
+		return
+	is_game_over = true
+	
+	# Pause the entire gameplay tree
+	get_tree().paused = true
+	
+	# Instantiate and show End-Game UI Overlay
+	if end_game_ui_scene:
+		var ui = end_game_ui_scene.instantiate()
+		get_parent().add_child(ui)
+		if ui.has_method("set_result"):
+			ui.set_result(victory, score)
 
 func _update_ship_mesh() -> void:
 	if not visuals:
