@@ -40,17 +40,51 @@ func spawn_obstacles() -> void:
 		obstacles_container.remove_child(child)
 		child.queue_free()
 		
-	# Spawn between 1 and 3 barrels
-	var count = randi_range(1, 3)
+	# Find player score for dynamic difficulty scaling
+	var player = get_tree().get_first_node_in_group("player")
+	var score = 0
+	if player:
+		score = player.score
+		
+	var count = 1
+	var min_hp = 2
+	var max_hp = 3
+	var min_z = -50.0
+	var max_z = -20.0
+	
+	if score <= 15:
+		# Early Game
+		count = randi_range(1, 2)
+		min_hp = 2
+		max_hp = 3
+		min_z = -50.0
+		max_z = -20.0
+	elif score <= 30:
+		# Mid Game
+		count = randi_range(2, 3)
+		min_hp = 4
+		max_hp = 5
+		min_z = -45.0
+		max_z = -25.0
+	else:
+		# Late Game
+		count = randi_range(3, 4)
+		min_hp = 5
+		max_hp = 6
+		min_z = -40.0
+		max_z = -28.0
+		
 	for i in range(count):
-		var barrel = barrel_prefab.instantiate() as Node3D
+		var barrel = barrel_prefab.instantiate()
 		obstacles_container.add_child(barrel)
+		
+		# Set barrel HP
+		barrel.hp = randi_range(min_hp, max_hp)
 		
 		# Randomize position
 		var rand_x = randf_range(-4.0, 4.0)
 		var rand_y = 0.0
-		# Z position along the segment (further back to give the player more runway to react)
-		var rand_z = randf_range(-50.0, -20.0)
+		var rand_z = randf_range(min_z, max_z)
 		
 		barrel.position = Vector3(rand_x, rand_y, rand_z)
 

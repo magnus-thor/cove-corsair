@@ -39,9 +39,16 @@ func _ready() -> void:
 			push_warning("TrackManager: No pre-placed TrackSegment children found and 'segment_scene' is not assigned!")
 
 func _physics_process(delta: float) -> void:
+	# Read player score to dynamically increase track scroll speed slightly
+	var player = get_tree().get_first_node_in_group("player")
+	var speed = scroll_speed
+	if player:
+		# Add a speed bonus of 0.1 per barrel destroyed, up to +5.0 speed
+		speed += min(player.score * 0.1, 5.0)
+
 	# Move each segment backward along positive Z
 	for segment in active_segments:
-		segment.global_position.z += scroll_speed * delta
+		segment.global_position.z += speed * delta
 		
 		# Fallback: if a segment passes the cleanup threshold, recycle it
 		if segment.global_position.z > cleanup_z:

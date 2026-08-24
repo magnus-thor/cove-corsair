@@ -1,13 +1,20 @@
 class_name PlayerSwerve
 extends CharacterBody3D
 
+signal health_changed(current: int, max_hp: int)
+signal score_changed(new_score: int)
+
 enum ShipTier {RAFT, SLOOP, GALLEON}
 
 ## Width of the river channel boundaries. The boat can move within [-river_width/2, river_width/2]
-@export var river_width: float = 12.0
+@export var river_width: float = 11.0
 
 ## Touch/drag input sensitivity scaling factor.
-@export var sensitivity: float = 0.05
+@export var sensitivity: float = 0.015
+
+## Keyboard movement speed in units per second.
+@export var keyboard_speed: float = 15.0
+
 
 ## Interpolation speed for the horizontal translation. Higher values make the swerve more immediate.
 @export var lerp_speed: float = 12.0
@@ -35,6 +42,9 @@ enum ShipTier {RAFT, SLOOP, GALLEON}
 var dragging: bool = false
 var target_x: float = 0.0
 var half_width: float = 0.0
+
+var max_health: int = 3
+var current_health: int = 3
 
 var power_level: int = 0
 var shoot_timer: float = 0.0
@@ -86,6 +96,17 @@ func _physics_process(delta: float) -> void:
 	if is_game_over:
 		return
 		
+	# Process keyboard movement controls
+	var move_input := 0.0
+	if Input.is_key_pressed(KEY_LEFT) or Input.is_key_pressed(KEY_A):
+		move_input -= 1.0
+	if Input.is_key_pressed(KEY_RIGHT) or Input.is_key_pressed(KEY_D):
+		move_input += 1.0
+		
+	if move_input != 0.0:
+		target_x += move_input * keyboard_speed * delta
+		target_x = clamp(target_x, -half_width, half_width)
+		
 	# Calculate target position and interpolate along the X-axis
 	var current_pos = global_position
 	current_pos.x = lerp(current_pos.x, target_x, lerp_speed * delta)
@@ -116,6 +137,7 @@ func upgrade_ship(amount: int) -> void:
 	power_level += amount
 	if amount > 0:
 		score += amount
+		score_changed.emit(score)
 		if score >= 50:
 			game_over(true)
 			
@@ -149,14 +171,11 @@ func _on_area_entered(area: Area3D) -> void:
 		return
 		
 	if area.is_in_group("destructible"):
-		# Reduce power level on direct collision
-		power_level -= collision_penalty
-		
-		# Check and apply demotions
-		_check_tier_updates()
+		current_health -= 1
+		health_changed.emit(current_health, max_health)
 		
 		# Defeat condition
-		if power_level < 0:
+		if current_health <= 0:
 			game_over(false)
 			
 		# Despawn the collided barrel so it doesn't trigger damage multiple times
