@@ -46,6 +46,8 @@ var half_width: float = 0.0
 var max_health: int = 3
 var current_health: int = 3
 
+@export var target_score: int = 50
+
 var power_level: int = 0
 var shoot_timer: float = 0.0
 var score: int = 0
@@ -138,7 +140,7 @@ func upgrade_ship(amount: int) -> void:
 	if amount > 0:
 		score += amount
 		score_changed.emit(score)
-		if score >= 50:
+		if score >= target_score:
 			game_over(true)
 			
 	_check_tier_updates()

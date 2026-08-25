@@ -1,0 +1,82 @@
+[
+  {
+    "level_index": 1,
+    "target_score": 25,
+    "track_speed": 14.0,
+    "gate_frequency": 0.35,
+    "obstacle_rarities_allowed": ["common"],
+    "is_boss_level": false
+  },
+  {
+    "level_index": 2,
+    "target_score": 30,
+    "track_speed": 15.0,
+    "gate_frequency": 0.40,
+    "obstacle_rarities_allowed": ["common"],
+    "is_boss_level": false
+  },
+  {
+    "level_index": 3,
+    "target_score": 40,
+    "track_speed": 16.0,
+    "gate_frequency": 0.45,
+    "obstacle_rarities_allowed": ["common", "normal"],
+    "is_boss_level": true
+  },
+  {
+    "level_index": 4,
+    "target_score": 45,
+    "track_speed": 17.0,
+    "gate_frequency": 0.50,
+    "obstacle_rarities_allowed": ["common", "normal"],
+    "is_boss_level": false
+  },
+  {
+    "level_index": 5,
+    "target_score": 50,
+    "track_speed": 18.0,
+    "gate_frequency": 0.55,
+    "obstacle_rarities_allowed": ["common", "normal", "rare"],
+    "is_boss_level": true
+  },
+  {
+    "level_index": 6,
+    "target_score": 55,
+    "track_speed": 19.0,
+    "gate_frequency": 0.60,
+    "obstacle_rarities_allowed": ["common", "normal", "rare"],
+    "is_boss_level": false
+  },
+  {
+    "level_index": 7,
+    "target_score": 60,
+    "track_speed": 20.0,
+    "gate_frequency": 0.65,
+    "obstacle_rarities_allowed": ["common", "normal", "rare"],
+    "is_boss_level": false
+  },
+  {
+    "level_index": 8,
+    "target_score": 65,
+    "track_speed": 20.5,
+    "gate_frequency": 0.65,
+    "obstacle_rarities_allowed": ["common", "normal", "rare"],
+    "is_boss_level": true
+  },
+  {
+    "level_index": 9,
+    "target_score": 70,
+    "track_speed": 21.0,
+    "gate_frequency": 0.70,
+    "obstacle_rarities_allowed": ["common", "normal", "rare"],
+    "is_boss_level": false
+  },
+  {
+    "level_index": 10,
+    "target_score": 75,
+    "track_speed": 22.0,
+    "gate_frequency": 0.70,
+    "obstacle_rarities_allowed": ["common", "normal", "rare"],
+    "is_boss_level": true
+  }
+]

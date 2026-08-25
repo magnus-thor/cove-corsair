@@ -1,0 +1,60 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/multiplier_gate.gd" id="1_gate_script"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_gate"]
+size = Vector3(4.5, 3.5, 0.8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_frame"]
+albedo_color = Color(0.12, 0.45, 0.85, 1.0)
+metallic = 0.4
+roughness = 0.3
+
+[sub_resource type="BoxMesh" id="BoxMesh_pillar"]
+material = SubResource("StandardMaterial3D_frame")
+size = Vector3(0.4, 3.2, 0.4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_topbar"]
+material = SubResource("StandardMaterial3D_frame")
+size = Vector3(4.8, 0.4, 0.4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_arch_fill"]
+transparency = 1
+albedo_color = Color(0.2, 0.7, 1.0, 0.35)
+
+[sub_resource type="QuadMesh" id="QuadMesh_arch_field"]
+material = SubResource("StandardMaterial3D_arch_fill")
+size = Vector2(4.0, 2.8)
+
+[node name="MultiplierGate" type="Area3D" groups=["multiplier_gate"]]
+script = ExtResource("1_gate_script")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+shape = SubResource("BoxShape3D_gate")
+
+[node name="Visuals" type="Node3D" parent="."]
+
+[node name="LeftPillar" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2, 1.6, 0)
+mesh = SubResource("BoxMesh_pillar")
+
+[node name="RightPillar" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 1.6, 0)
+mesh = SubResource("BoxMesh_pillar")
+
+[node name="TopBar" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+mesh = SubResource("BoxMesh_topbar")
+
+[node name="EnergyField" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+mesh = SubResource("QuadMesh_arch_field")
+
+[node name="Label3D" type="Label3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1, 0)
+pixel_size = 0.015
+text = "+3"
+font_size = 64
+outline_size = 12
+modulate = Color(0.2, 0.85, 1, 1)
