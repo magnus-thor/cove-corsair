@@ -36,6 +36,8 @@ func update_visuals() -> void:
 		else:
 			label_3d.text = "x%d" % value
 			label_3d.modulate = Color(1.0, 0.8, 0.2)
+		label_3d.outline_size = 12
+		label_3d.outline_modulate = Color(0.0, 0.0, 0.0, 1.0)
 
 func _on_area_entered(area: Area3D) -> void:
 	if not is_active:

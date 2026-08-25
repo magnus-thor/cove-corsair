@@ -198,6 +198,11 @@ func game_over(victory: bool) -> void:
 		if ui.has_method("set_result"):
 			ui.set_result(victory, score)
 
+@export var dinghy_sprite_tex: Texture2D = preload("res://assets/sprites/The Dinghy.png")
+@export var sloop_sprite_tex: Texture2D = preload("res://assets/sprites/The Sloop.png")
+@export var ironclad_sprite_tex: Texture2D = preload("res://assets/sprites/The Ironclad.png")
+@export var use_sprite_boat: bool = false
+
 func _update_ship_mesh() -> void:
 	if not visuals:
 		return
@@ -206,6 +211,22 @@ func _update_ship_mesh() -> void:
 	for child in visuals.get_children():
 		child.queue_free()
 		
+	if use_sprite_boat:
+		var sprite = Sprite3D.new()
+		sprite.billboard = 2 # BILLBOARD_FIXED_Y
+		sprite.alpha_cut = 1 # ALPHA_CUT_DISCARD
+		sprite.pixel_size = 0.0018
+		sprite.position = Vector3(0, 0.8, 0)
+		match current_tier:
+			ShipTier.RAFT:
+				sprite.texture = dinghy_sprite_tex
+			ShipTier.SLOOP:
+				sprite.texture = sloop_sprite_tex
+			ShipTier.GALLEON:
+				sprite.texture = ironclad_sprite_tex
+		visuals.add_child(sprite)
+		return
+
 	var model_path: String = ""
 	match current_tier:
 		ShipTier.RAFT:

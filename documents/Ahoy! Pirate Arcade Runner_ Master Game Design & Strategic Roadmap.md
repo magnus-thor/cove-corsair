@@ -131,18 +131,18 @@ Plaintext
 
 | Asset Name | Rarity / Tier | Category | Concept Art (2D) | 3D Mesh (.glb) | Godot Prefab (.tscn) |
 | :---- | :---- | :---- | :---: | :---: | :---: |
-| **The Dinghy** | Starting Hull | Player Ship | \[ \] | \[ \] | \[ \] |
-| **The Sloop** | Tier 2 Hull | Player Ship | \[ \] | \[ \] | \[ \] |
-| **The Ironclad** | Tier 3 Hull | Player Ship | \[ \] | \[ \] | \[ \] |
-| **Wooden Barrel** | White (Common) | Destructible | \[ \] | \[ \] | \[ \] |
-| **Iron Barrel / Crate** | Green (Normal) | Destructible | \[ \] | \[ \] | \[ \] |
-| **Skeleton Rower** | Green (Normal) | Hostile Mob | \[ \] | \[ \] | \[ \] |
-| **Goblin Skiff** | Blue (Rare) | Hostile Mob | \[ \] | \[ \] | \[ \] |
-| **Armored Turtle-Raft** | Purple (Elite) | Hostile Mob | \[ \] | \[ \] | \[ \] |
-| **Ghost Sloop** | Purple (Elite) | Mini-Boss | \[ \] | \[ \] | \[ \] |
-| **Captain Bone-Beard** | Yellow (Legendary) | World 1 Boss | \[ \] | \[ \] | \[ \] |
-| **Spiked Sea Mine** | Black / Hazard | Indestructible | \[ \] | \[ \] | \[ \] |
-| **Coral Reef Spire** | Environment | Indestructible | \[ \] | \[ \] | \[ \] |
-| **Multiplier Gate Arch** | Interactive Prop | Gameplay Gate | \[ \] | \[ \] | \[ \] |
-| **Doubloon / Chest** | Reward | Loot Drop | \[ \] | \[ \] | \[ \] |
+| **The Dinghy** | Starting Hull | Player Ship | \[ x \] | \[ \] | \[ \] |
+| **The Sloop** | Tier 2 Hull | Player Ship | \[ x \] | \[ \] | \[ \] |
+| **The Ironclad** | Tier 3 Hull | Player Ship | \[ x \] | \[ \] | \[ \] |
+| **Wooden Barrel** | White (Common) | Destructible | \[ x \] | \[ \] | \[ \] |
+| **Iron Barrel / Crate** | Green (Normal) | Destructible | \[ x \] | \[ \] | \[ \] |
+| **Skeleton Rower** | Green (Normal) | Hostile Mob | \[ x \] | \[ \] | \[ \] |
+| **Goblin Skiff** | Blue (Rare) | Hostile Mob | \[ x \] | \[ \] | \[ \] |
+| **Armored Turtle-Raft** | Purple (Elite) | Hostile Mob | \[ x \] | \[ \] | \[ \] |
+| **Ghost Sloop** | Purple (Elite) | Mini-Boss | \[ x \] | \[ \] | \[ \] |
+| **Captain Bone-Beard** | Yellow (Legendary) | World 1 Boss | \[ x \] | \[ \] | \[ \] |
+| **Spiked Sea Mine** | Black / Hazard | Indestructible | \[ x \] | \[ \] | \[ \] |
+| **Coral Reef Spire** | Environment | Indestructible | \[ x \] | \[ \] | \[ \] |
+| **Multiplier Gate Arch** | Interactive Prop | Gameplay Gate | \[ x \] | \[ \] | \[ \] |
+| **Doubloon / Chest** | Reward | Loot Drop | \[ x \] | \[ \] | \[ \] |
 

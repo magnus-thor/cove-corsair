@@ -82,6 +82,8 @@ func spawn_obstacles() -> void:
 			barrel.hp = 12 + level_idx * 2
 			barrel.scale = Vector3(1.75, 1.75, 1.75)
 			barrel.position = Vector3(0.0, 0.0, -30.0)
+			if "obstacle_type" in barrel:
+				barrel.obstacle_type = DestructibleObstacle.ObstacleType.CORAL_REEF
 			continue
 			
 		# Regular / Rare barrel generation
@@ -89,10 +91,17 @@ func spawn_obstacles() -> void:
 		if "rare" in rarities and randf() < 0.25:
 			hp_mult = 2.0
 			barrel.scale = Vector3(1.3, 1.3, 1.3)
+			if "obstacle_type" in barrel:
+				barrel.obstacle_type = DestructibleObstacle.ObstacleType.RUNE_BARREL if randf() < 0.5 else DestructibleObstacle.ObstacleType.SEA_MINE
 		elif "normal" in rarities and randf() < 0.40:
 			hp_mult = 1.4
 			barrel.scale = Vector3(1.15, 1.15, 1.15)
-			
+			if "obstacle_type" in barrel:
+				barrel.obstacle_type = DestructibleObstacle.ObstacleType.FUSE_BARREL
+		else:
+			if "obstacle_type" in barrel:
+				barrel.obstacle_type = DestructibleObstacle.ObstacleType.WOODEN_BARREL
+				
 		barrel.hp = int(randi_range(base_min_hp, base_max_hp) * hp_mult)
 		
 		var rand_x = randf_range(-4.0, 4.0)
