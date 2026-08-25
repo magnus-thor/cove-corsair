@@ -1,29 +1,22 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/player_swerve.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/The Dinghy.png" id="2_dinghy_tex"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_boat"]
-size = Vector3(1.2, 1.2, 2.5)
-
-[sub_resource type="BoxMesh" id="BoxMesh_hull"]
-size = Vector3(1.2, 0.6, 2.5)
-
-[sub_resource type="BoxMesh" id="BoxMesh_cabin"]
-size = Vector3(0.8, 0.5, 1.0)
+size = Vector3(1.6, 1.0, 2.8)
 
 [node name="PlayerBoat" type="CharacterBody3D"]
 script = ExtResource("1_script")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
 shape = SubResource("BoxShape3D_boat")
 
 [node name="BoatVisuals" type="Node3D" parent="."]
 
-[node name="Hull" type="MeshInstance3D" parent="BoatVisuals"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
-mesh = SubResource("BoxMesh_hull")
-
-[node name="Cabin" type="MeshInstance3D" parent="BoatVisuals"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0.3)
-mesh = SubResource("BoxMesh_cabin")
+[node name="BoatSprite" type="Sprite3D" parent="BoatVisuals"]
+transform = Transform3D(1, 0, 0, 0, 0.258819, 0.965926, 0, -0.965926, 0.258819, 0, 0.2, 0)
+pixel_size = 0.0018
+alpha_cut = 1
+texture = ExtResource("2_dinghy_tex")

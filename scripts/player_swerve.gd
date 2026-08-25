@@ -201,22 +201,28 @@ func game_over(victory: bool) -> void:
 @export var dinghy_sprite_tex: Texture2D = preload("res://assets/sprites/The Dinghy.png")
 @export var sloop_sprite_tex: Texture2D = preload("res://assets/sprites/The Sloop.png")
 @export var ironclad_sprite_tex: Texture2D = preload("res://assets/sprites/The Ironclad.png")
-@export var use_sprite_boat: bool = false
+@export var use_sprite_boat: bool = true
 
 func _update_ship_mesh() -> void:
 	if not visuals:
 		return
 		
-	# Free any existing child nodes inside BoatVisuals
-	for child in visuals.get_children():
-		child.queue_free()
-		
+	var sprite = visuals.get_node_or_null("BoatSprite") as Sprite3D
 	if use_sprite_boat:
-		var sprite = Sprite3D.new()
-		sprite.billboard = 2 # BILLBOARD_FIXED_Y
-		sprite.alpha_cut = 1 # ALPHA_CUT_DISCARD
+		if not sprite:
+			for child in visuals.get_children():
+				child.queue_free()
+			sprite = Sprite3D.new()
+			sprite.name = "BoatSprite"
+			visuals.add_child(sprite)
+			
+		sprite.visible = true
+		sprite.billboard = 0
+		sprite.alpha_cut = 1
 		sprite.pixel_size = 0.0018
-		sprite.position = Vector3(0, 0.8, 0)
+		sprite.rotation_degrees = Vector3(-75, 0, 0)
+		sprite.position = Vector3(0, 0.2, 0)
+		
 		match current_tier:
 			ShipTier.RAFT:
 				sprite.texture = dinghy_sprite_tex
@@ -224,31 +230,37 @@ func _update_ship_mesh() -> void:
 				sprite.texture = sloop_sprite_tex
 			ShipTier.GALLEON:
 				sprite.texture = ironclad_sprite_tex
-		visuals.add_child(sprite)
 		return
-
-	var model_path: String = ""
-	match current_tier:
-		ShipTier.RAFT:
-			model_path = "res://assets/models/boat-row-large.glb"
-		ShipTier.SLOOP:
-			model_path = "res://assets/models/ship-small.glb"
-		ShipTier.GALLEON:
-			model_path = "res://assets/models/ship-pirate-large.glb"
+	else:
+		if sprite:
+			sprite.visible = false
 			
-	if model_path != "":
-		var scene = load(model_path)
-		if scene:
-			var inst = scene.instantiate() as Node3D
-			visuals.add_child(inst)
-			inst.rotation.y = PI
-			match current_tier:
-				ShipTier.RAFT:
-					inst.scale = Vector3(1.0, 1.0, 1.0)
-				ShipTier.SLOOP:
-					inst.scale = Vector3(0.25, 0.25, 0.25)
-				ShipTier.GALLEON:
-					inst.scale = Vector3(0.25, 0.25, 0.25)
+		for child in visuals.get_children():
+			if child != sprite:
+				child.queue_free()
+				
+		var model_path: String = ""
+		match current_tier:
+			ShipTier.RAFT:
+				model_path = "res://assets/models/boat-row-large.glb"
+			ShipTier.SLOOP:
+				model_path = "res://assets/models/ship-small.glb"
+			ShipTier.GALLEON:
+				model_path = "res://assets/models/ship-pirate-large.glb"
+				
+		if model_path != "":
+			var scene = load(model_path)
+			if scene:
+				var inst = scene.instantiate() as Node3D
+				visuals.add_child(inst)
+				inst.rotation.y = PI
+				match current_tier:
+					ShipTier.RAFT:
+						inst.scale = Vector3(1.0, 1.0, 1.0)
+					ShipTier.SLOOP:
+						inst.scale = Vector3(0.25, 0.25, 0.25)
+					ShipTier.GALLEON:
+						inst.scale = Vector3(0.25, 0.25, 0.25)
 
 func _shoot() -> void:
 	if not cannonball_scene:
