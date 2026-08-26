@@ -4,13 +4,13 @@ extends Area3D
 ## Value added to the player's doubloon/score count
 @export var value: int = 1
 
-## Rotation speed in radians per second
+## Rotation / spin speed in radians per second (for non-billboard or subtle tilt)
 @export var rotation_speed: float = 3.5
 
 ## Floating bobbing parameters on water
-@export var bob_speed: float = 4.0
-@export var bob_height: float = 0.08
-@export var base_water_y: float = 0.3
+@export var bob_speed: float = 3.5
+@export var bob_height: float = 0.02
+@export var base_water_y: float = 0.05
 
 ## VFX scene spawned upon pickup
 @export var pickup_vfx_scene: PackedScene = preload("res://prefabs/vfx/coin_pickup_vfx.tscn")
@@ -28,41 +28,44 @@ func _ready() -> void:
 	area_entered.connect(_on_area_entered)
 	body_entered.connect(_on_body_entered)
 	
-	_trigger_spawn_bounce()
+	# Default water Y clamping if not already set or bouncing
+	if not _is_bouncing:
+		global_position.y = base_water_y
 
-## Triggers an initial upward arc when dropped from defeated mobs
+## Triggers an initial upward arc and horizontal scatter when dropped from defeated mobs/barrels
 func _trigger_spawn_bounce(horizontal_scatter: Vector2 = Vector2.ZERO) -> void:
 	_is_bouncing = true
 	var start_pos = global_position
 	var target_y = base_water_y
-	var peak_y = start_pos.y + randf_range(1.0, 1.8)
+	var peak_y = base_water_y + randf_range(0.8, 1.4)
 	
 	var target_x = start_pos.x + horizontal_scatter.x
 	var target_z = start_pos.z + horizontal_scatter.y
 	
 	var tween = create_tween().set_parallel(false)
 	# Arc up
-	tween.tween_property(self, "global_position:y", peak_y, 0.22).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
-	# Land onto water
-	tween.tween_property(self, "global_position:y", target_y, 0.28).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_BOUNCE)
+	tween.tween_property(self, "global_position:y", peak_y, 0.20).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+	# Land onto water surface strictly at base_water_y
+	tween.tween_property(self, "global_position:y", target_y, 0.25).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_BOUNCE)
 	
 	# Horizontal scatter tween
 	if horizontal_scatter != Vector2.ZERO:
 		var h_tween = create_tween().set_parallel(true)
-		h_tween.tween_property(self, "global_position:x", target_x, 0.5).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
-		h_tween.tween_property(self, "global_position:z", target_z, 0.5).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+		h_tween.tween_property(self, "global_position:x", target_x, 0.45).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+		h_tween.tween_property(self, "global_position:z", target_z, 0.45).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
 	
-	tween.finished.connect(func(): _is_bouncing = false)
+	tween.finished.connect(func():
+		_is_bouncing = false
+		global_position.y = base_water_y
+	)
 
 func _physics_process(delta: float) -> void:
 	_time += delta
 	
-	# Rotate continuously
-	if visual_container:
-		visual_container.rotate_y(rotation_speed * delta)
-		
-		# Water bobbing when not in the middle of a spawn bounce
-		if not _is_bouncing:
+	# Water bobbing when not in the middle of a spawn bounce
+	if not _is_bouncing:
+		global_position.y = base_water_y
+		if visual_container:
 			var bob_offset = sin(_time * bob_speed) * bob_height
 			visual_container.position.y = bob_offset
 			

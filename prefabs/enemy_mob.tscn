@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/Skeleton Rower.png" id="2_skeleton_tex"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_mob"]
-size = Vector3(1.6, 1.4, 2.0)
+size = Vector3(1.6, 1.2, 1.8)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
 bg_color = Color(0.1, 0.1, 0.12, 0.8)
@@ -31,9 +31,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
 shape = SubResource("BoxShape3D_mob")
 
 [node name="EnemySprite" type="Sprite3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
-pixel_size = 0.0016
-billboard = 2
+transform = Transform3D(1, 0, 0, 0, 0.766044, 0.642788, 0, -0.642788, 0.766044, 0, 1.188, 0)
+pixel_size = 0.0025
 alpha_cut = 1
 texture = ExtResource("2_skeleton_tex")
 
@@ -66,7 +65,7 @@ value = 3.0
 show_percentage = false
 
 [node name="HealthBarSprite" type="Sprite3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.05, 0)
 billboard = 1
 no_depth_test = true
 texture = SubResource("ViewportTexture_health")

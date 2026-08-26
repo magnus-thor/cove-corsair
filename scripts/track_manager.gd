@@ -50,6 +50,16 @@ func _ready() -> void:
 	var player = get_tree().get_first_node_in_group("player")
 	if player and "target_score" in player and current_level_data.has("target_score"):
 		player.target_score = int(current_level_data["target_score"])
+		
+	# Clear obstacles if calibration mode is active
+	if player and "is_calibration_mode" in player and player.is_calibration_mode:
+		for segment in active_segments:
+			if segment.has_node("Obstacles"):
+				for child in segment.get_node("Obstacles").get_children():
+					child.queue_free()
+			if segment.has_node("Gates"):
+				for child in segment.get_node("Gates").get_children():
+					child.queue_free()
 
 func load_level_config(level_num: int) -> void:
 	var path = "res://data/level_config.json"
@@ -77,6 +87,9 @@ func load_level_config(level_num: int) -> void:
 func _physics_process(delta: float) -> void:
 	# Read player score to dynamically increase track scroll speed slightly
 	var player = get_tree().get_first_node_in_group("player")
+	if player and "is_calibration_mode" in player and player.is_calibration_mode:
+		return
+		
 	var speed = scroll_speed
 	if player:
 		# Add a speed bonus of 0.1 per barrel destroyed, up to +5.0 speed

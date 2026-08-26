@@ -62,6 +62,10 @@ func spawn_obstacles() -> void:
 		obstacles_container.remove_child(child)
 		child.queue_free()
 		
+	var player = get_tree().get_first_node_in_group("player")
+	if player and "is_calibration_mode" in player and player.is_calibration_mode:
+		return
+		
 	var level_idx = int(level_config_data.get("level_index", 1))
 	var rarities: Array = level_config_data.get("obstacle_rarities_allowed", ["common"])
 	var is_boss: bool = bool(level_config_data.get("is_boss_level", false))
@@ -123,12 +127,15 @@ func _spawn_enemy_mobs(level_idx: int) -> void:
 	if not mob_prefab or not obstacles_container:
 		return
 		
+	var is_boss: bool = bool(level_config_data.get("is_boss_level", false))
 	var mob_count = randi_range(1, 1 + int(level_idx / 4.0))
 	var possible_types: Array[String] = ["skeleton_rower"]
 	if level_idx >= 2:
 		possible_types.append("goblin_skiff")
 	if level_idx >= 3:
 		possible_types.append("turtle_raft")
+	if is_boss:
+		possible_types.append("bone_beard")
 		
 	for m in range(mob_count):
 		var enemy = mob_prefab.instantiate() as Area3D
@@ -138,19 +145,27 @@ func _spawn_enemy_mobs(level_idx: int) -> void:
 		obstacles_container.add_child(enemy)
 		
 		var chosen_type = possible_types.pick_random()
+		if is_boss and m == 0:
+			chosen_type = "bone_beard"
+			
 		if "mob_type" in enemy:
 			enemy.mob_type = chosen_type
 			
 		# Scale enemy HP slightly with level progression
 		if "max_hp" in enemy:
-			enemy.max_hp += int(level_idx * 0.5)
+			if chosen_type != "bone_beard":
+				enemy.max_hp += int(level_idx * 0.5)
+			else:
+				enemy.max_hp = 18 + level_idx * 2
 			if "current_hp" in enemy:
 				enemy.current_hp = enemy.max_hp
 			if enemy.has_method("_update_health_bar"):
 				enemy._update_health_bar()
 			
-		# Lane placement in designated lanes X in [-3.5, 3.5]
+		# Lane placement in designated lanes
 		var rand_x = randf_range(-3.5, 3.5)
+		if chosen_type == "bone_beard":
+			rand_x = randf_range(-1.0, 1.0) # Center the multi-lane boss
 		var rand_z = randf_range(-38.0, -15.0)
 		enemy.position = Vector3(rand_x, 0.0, rand_z)
 
@@ -166,6 +181,10 @@ func spawn_gates() -> void:
 	for child in gates_container.get_children():
 		gates_container.remove_child(child)
 		child.queue_free()
+		
+	var player = get_tree().get_first_node_in_group("player")
+	if player and "is_calibration_mode" in player and player.is_calibration_mode:
+		return
 		
 	if not multiplier_gate_prefab:
 		return

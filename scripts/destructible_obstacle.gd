@@ -11,6 +11,9 @@ enum ObstacleType { WOODEN_BARREL, FUSE_BARREL, RUNE_BARREL, SEA_MINE, CORAL_REE
 		if is_node_ready():
 			update_obstacle_visuals()
 
+@export var doubloons_drop: int = 1
+@export var doubloon_scene: PackedScene = preload("res://prefabs/collectible_doubloon.tscn")
+
 @export var wooden_barrel_tex: Texture2D = preload("res://assets/sprites/wooden barrell.png")
 @export var fuse_barrel_tex: Texture2D = preload("res://assets/sprites/Barrell with fuse.png")
 @export var rune_barrel_tex: Texture2D = preload("res://assets/sprites/Barrell with runes.png")
@@ -22,6 +25,8 @@ enum ObstacleType { WOODEN_BARREL, FUSE_BARREL, RUNE_BARREL, SEA_MINE, CORAL_REE
 
 @onready var obstacle_sprite: Sprite3D = get_node_or_null("ObstacleSprite") as Sprite3D
 @onready var barrel_model: Node3D = get_node_or_null("BarrelModel")
+
+var _is_destroyed: bool = false
 
 func _ready() -> void:
 	update_obstacle_visuals()
@@ -38,18 +43,23 @@ func update_obstacle_visuals() -> void:
 			ObstacleType.WOODEN_BARREL:
 				tex = wooden_barrel_tex
 				p_size = 0.0012
+				doubloons_drop = 1
 			ObstacleType.FUSE_BARREL:
 				tex = fuse_barrel_tex
 				p_size = 0.00125
+				doubloons_drop = 2
 			ObstacleType.RUNE_BARREL:
 				tex = rune_barrel_tex
 				p_size = 0.00125
+				doubloons_drop = 3
 			ObstacleType.SEA_MINE:
 				tex = sea_mine_tex
 				p_size = 0.0013
+				doubloons_drop = 2
 			ObstacleType.CORAL_REEF:
 				tex = coral_reef_tex
 				p_size = 0.0015
+				doubloons_drop = 4
 				
 		obstacle_sprite.texture = tex
 		obstacle_sprite.pixel_size = p_size
@@ -57,15 +67,25 @@ func update_obstacle_visuals() -> void:
 		obstacle_sprite.alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
 
 func take_damage(amount: int) -> void:
+	if _is_destroyed:
+		return
 	hp -= amount
 	if hp <= 0:
-		print("Target destroyed! Score added.")
-		AudioManager.play_sfx("barrel_breaks")
-		_spawn_explosion()
-		var player = get_tree().get_first_node_in_group("player")
-		if player:
-			player.upgrade_ship(1)
-		queue_free()
+		die()
+
+func die() -> void:
+	if _is_destroyed:
+		return
+	_is_destroyed = true
+	
+	AudioManager.play_sfx("barrel_breaks")
+	_spawn_explosion()
+	_spawn_doubloons()
+	
+	var player = get_tree().get_first_node_in_group("player")
+	if player and player.has_method("upgrade_ship"):
+		player.upgrade_ship(1)
+	queue_free()
 
 func _spawn_explosion() -> void:
 	if barrel_explosion_scene:
@@ -76,3 +96,23 @@ func _spawn_explosion() -> void:
 		elif get_parent():
 			get_parent().add_child(vfx)
 		vfx.global_position = global_position
+
+func _spawn_doubloons() -> void:
+	if not doubloon_scene or doubloons_drop <= 0:
+		return
+		
+	var root = get_tree().current_scene
+	var spawn_parent = root if root else get_parent()
+	if not spawn_parent:
+		return
+		
+	for i in range(doubloons_drop):
+		var doubloon = doubloon_scene.instantiate() as Area3D
+		if doubloon:
+			spawn_parent.add_child(doubloon)
+			doubloon.global_position = Vector3(global_position.x, 0.05, global_position.z)
+			
+			# Radial outward scatter on X and Z
+			var scatter = Vector2(randf_range(-0.6, 0.6), randf_range(-0.6, 0.6))
+			if doubloon.has_method("_trigger_spawn_bounce"):
+				doubloon._trigger_spawn_bounce(scatter)
