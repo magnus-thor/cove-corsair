@@ -47,11 +47,11 @@ func _on_area_entered(area: Area3D) -> void:
 	if not area.is_in_group("cannonballs") and not (area is Cannonball):
 		return
 		
-	if area in _processed_cannonballs:
-		return
-		
 	_processed_cannonballs[area] = true
 	AudioManager.play_sfx("gate_passes")
+	
+	var mode_str = "+" if operation == OperationType.ADD else "x"
+	GameState.set_multiplier(float(value), mode_str)
 	
 	# Play bounce animation
 	_play_bounce_tween()

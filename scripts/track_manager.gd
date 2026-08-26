@@ -82,6 +82,8 @@ func _physics_process(delta: float) -> void:
 		# Add a speed bonus of 0.1 per barrel destroyed, up to +5.0 speed
 		speed += min(player.score * 0.1, 5.0)
 
+	GameState.update_distance(speed * delta)
+
 	# Move each segment backward along positive Z
 	for segment in active_segments:
 		segment.global_position.z += speed * delta

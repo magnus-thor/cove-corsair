@@ -101,10 +101,9 @@ func _find_player(node: Node) -> PlayerSwerve:
 func _collect(player: PlayerSwerve) -> void:
 	_is_collected = true
 	
-	if player.has_method("add_doubloons"):
+	GameState.add_doubloons(value)
+	if player and player.has_method("add_doubloons"):
 		player.add_doubloons(value)
-	elif player.has_method("upgrade_ship"):
-		player.upgrade_ship(value)
 		
 	AudioManager.play_sfx("coin_pickups")
 	_spawn_pickup_vfx()
