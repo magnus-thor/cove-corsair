@@ -26,11 +26,13 @@ func _physics_process(delta: float) -> void:
 	
 	lifetime -= delta
 	if lifetime <= 0.0:
+		AudioManager.play_sfx("water_splashes")
 		_spawn_splash()
 		queue_free()
 
 func _on_area_entered(area: Area3D) -> void:
 	if area.is_in_group("destructible"):
+		AudioManager.play_sfx("barrel_hits")
 		if area.has_method("take_damage"):
 			area.take_damage(damage)
 			

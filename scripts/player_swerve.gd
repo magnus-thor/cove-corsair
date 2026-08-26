@@ -281,3 +281,4 @@ func _shoot() -> void:
 	get_parent().add_child(ball)
 	# Position slightly further ahead at the front of the ship to prevent self-collision or lag
 	ball.global_position = global_position + Vector3(0, 0.5, -3.0)
+	AudioManager.play_sfx("cannon_shots")

@@ -60,6 +60,7 @@ func take_damage(amount: int) -> void:
 	hp -= amount
 	if hp <= 0:
 		print("Target destroyed! Score added.")
+		AudioManager.play_sfx("barrel_breaks")
 		_spawn_explosion()
 		var player = get_tree().get_first_node_in_group("player")
 		if player:

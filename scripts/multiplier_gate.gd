@@ -51,6 +51,7 @@ func _on_area_entered(area: Area3D) -> void:
 		return
 		
 	_processed_cannonballs[area] = true
+	AudioManager.play_sfx("gate_passes")
 	
 	# Play bounce animation
 	_play_bounce_tween()
