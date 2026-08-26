@@ -17,6 +17,9 @@ enum ObstacleType { WOODEN_BARREL, FUSE_BARREL, RUNE_BARREL, SEA_MINE, CORAL_REE
 @export var sea_mine_tex: Texture2D = preload("res://assets/sprites/Spiked Sea Mine.png")
 @export var coral_reef_tex: Texture2D = preload("res://assets/sprites/Indestructible Coral Reef.png")
 
+## Barrel destruction explosion VFX to spawn when destroyed
+@export var barrel_explosion_scene: PackedScene = preload("res://prefabs/vfx/barrel_explosion.tscn")
+
 @onready var obstacle_sprite: Sprite3D = get_node_or_null("ObstacleSprite") as Sprite3D
 @onready var barrel_model: Node3D = get_node_or_null("BarrelModel")
 
@@ -57,7 +60,18 @@ func take_damage(amount: int) -> void:
 	hp -= amount
 	if hp <= 0:
 		print("Target destroyed! Score added.")
+		_spawn_explosion()
 		var player = get_tree().get_first_node_in_group("player")
 		if player:
 			player.upgrade_ship(1)
 		queue_free()
+
+func _spawn_explosion() -> void:
+	if barrel_explosion_scene:
+		var vfx = barrel_explosion_scene.instantiate() as Node3D
+		var root = get_tree().current_scene
+		if root:
+			root.add_child(vfx)
+		elif get_parent():
+			get_parent().add_child(vfx)
+		vfx.global_position = global_position

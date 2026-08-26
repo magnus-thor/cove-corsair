@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/player_swerve.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://assets/sprites/The Dinghy.png" id="2_dinghy_tex"]
+[ext_resource type="PackedScene" path="res://prefabs/vfx/boat_wake.tscn" id="3_wake"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_boat"]
 size = Vector3(1.6, 1.0, 2.8)
@@ -20,3 +21,6 @@ transform = Transform3D(1, 0, 0, 0, 0.258819, 0.965926, 0, -0.965926, 0.258819, 
 pixel_size = 0.0018
 alpha_cut = 1
 texture = ExtResource("2_dinghy_tex")
+
+[node name="BoatWake" parent="." instance=ExtResource("3_wake")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 1.2)

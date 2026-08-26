@@ -13,6 +13,9 @@ extends Area3D
 ## Splash radius multiplier applied when cannonballs exceed soft cap
 @export var splash_radius_multiplier: float = 1.0
 
+## Hit splash VFX to spawn on impact or expiration
+@export var hit_splash_scene: PackedScene = preload("res://prefabs/vfx/hit_splash.tscn")
+
 func _ready() -> void:
 	add_to_group("cannonballs")
 	area_entered.connect(_on_area_entered)
@@ -23,6 +26,7 @@ func _physics_process(delta: float) -> void:
 	
 	lifetime -= delta
 	if lifetime <= 0.0:
+		_spawn_splash()
 		queue_free()
 
 func _on_area_entered(area: Area3D) -> void:
@@ -34,7 +38,18 @@ func _on_area_entered(area: Area3D) -> void:
 			if splash_radius_multiplier > 1.0:
 				_apply_splash_damage()
 				
+		_spawn_splash()
 		queue_free()
+
+func _spawn_splash() -> void:
+	if hit_splash_scene:
+		var splash = hit_splash_scene.instantiate() as Node3D
+		var root = get_tree().current_scene
+		if root:
+			root.add_child(splash)
+		elif get_parent():
+			get_parent().add_child(splash)
+		splash.global_position = global_position
 
 func _apply_splash_damage() -> void:
 	var radius = 2.5 * splash_radius_multiplier
