@@ -19,11 +19,12 @@ enum ShipTier {RAFT, SLOOP, GALLEON}
 ## Interpolation speed for the horizontal translation. Higher values make the swerve more immediate.
 @export var lerp_speed: float = 12.0
 
-## Factor controlling how much the boat visuals roll and yaw during turns.
-@export var tilt_amount: float = 0.25
-
-## Interpolation speed for return-to-center visual tilt stabilization.
-@export var tilt_lerp_speed: float = 6.0
+## Configurable floating and bobbing parameters
+@export var bob_frequency: float = 2.2
+@export var bob_amplitude: float = 0.02
+@export var pitch_amplitude_deg: float = 1.2
+@export var roll_max_deg: float = 10.0
+@export var roll_lerp_speed: float = 10.0
 
 ## The active ship tier
 @export var current_tier: ShipTier = ShipTier.RAFT
@@ -52,6 +53,7 @@ var power_level: int = 0
 var shoot_timer: float = 0.0
 var score: int = 0
 var is_game_over: bool = false
+var float_time: float = 0.0
 
 @export var end_game_ui_scene: PackedScene = preload("res://prefabs/end_game_ui.tscn")
 
@@ -114,17 +116,32 @@ func _physics_process(delta: float) -> void:
 	current_pos.x = lerp(current_pos.x, target_x, lerp_speed * delta)
 	global_position = current_pos
 	
+	# Accumulate floating time accumulator
+	float_time += delta
+	
 	# Polish: Calculate tilting angle based on visual offset delta
 	var x_offset = target_x - global_position.x
 	
-	# Z-Rotation (Roll): Tilts the boat side-to-side when steering
-	var target_roll = - x_offset * tilt_amount
-	# Y-Rotation (Yaw): Slices the nose of the boat slightly towards the direction of movement
-	var target_yaw = x_offset * (tilt_amount * 0.4)
+	# Z-Rotation (Roll): Banking angle tilting into the swerve, clamped to roll_max_deg
+	var normalized_steer = clamp(-x_offset * 1.5, -1.0, 1.0)
+	var target_roll_deg = normalized_steer * roll_max_deg
+	
+	# Y-Rotation (Yaw): Slices the nose of the boat slightly towards direction of movement
+	var target_yaw_deg = x_offset * 8.0
 	
 	if visuals:
-		visuals.rotation.z = lerp(visuals.rotation.z, target_roll, tilt_lerp_speed * delta)
-		visuals.rotation.y = lerp(visuals.rotation.y, target_yaw, tilt_lerp_speed * delta)
+		# 1. Procedural Y-axis wave bobbing (buoyed above water line)
+		visuals.position.y = (sin(float_time * bob_frequency) * 0.5 + 0.5) * bob_amplitude
+		
+		# 2. Pitch rocking (X-axis rotation degrees)
+		var target_pitch_deg = sin(float_time * bob_frequency * 0.8) * pitch_amplitude_deg
+		visuals.rotation_degrees.x = lerp(visuals.rotation_degrees.x, target_pitch_deg, roll_lerp_speed * delta)
+		
+		# 3. Roll banking (Z-axis rotation degrees)
+		visuals.rotation_degrees.z = lerp(visuals.rotation_degrees.z, target_roll_deg, roll_lerp_speed * delta)
+		
+		# 4. Yaw turn (Y-axis rotation degrees)
+		visuals.rotation_degrees.y = lerp(visuals.rotation_degrees.y, target_yaw_deg, roll_lerp_speed * delta)
 		
 	# Automatic shooting loop
 	shoot_timer += delta
