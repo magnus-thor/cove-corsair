@@ -31,7 +31,7 @@ func _physics_process(delta: float) -> void:
 		queue_free()
 
 func _on_area_entered(area: Area3D) -> void:
-	if area.is_in_group("destructible"):
+	if area.is_in_group("destructible") or area.is_in_group("enemies") or area.has_method("take_damage"):
 		AudioManager.play_sfx("barrel_hits")
 		if area.has_method("take_damage"):
 			area.take_damage(damage)
@@ -55,10 +55,15 @@ func _spawn_splash() -> void:
 
 func _apply_splash_damage() -> void:
 	var radius = 2.5 * splash_radius_multiplier
-	var destructibles = get_tree().get_nodes_in_group("destructible")
-	for obj in destructibles:
-		if obj != null and is_instance_valid(obj) and obj != self:
-			if obj is Area3D:
-				var dist = obj.global_position.distance_to(global_position)
+	var targets: Array[Node] = []
+	targets.append_array(get_tree().get_nodes_in_group("destructible"))
+	targets.append_array(get_tree().get_nodes_in_group("enemies"))
+	
+	var processed: Dictionary = {}
+	for obj in targets:
+		if obj != null and is_instance_valid(obj) and obj != self and not processed.has(obj):
+			processed[obj] = true
+			if obj is Node3D:
+				var dist = (obj as Node3D).global_position.distance_to(global_position)
 				if dist <= radius and obj.has_method("take_damage"):
 					obj.take_damage(damage)

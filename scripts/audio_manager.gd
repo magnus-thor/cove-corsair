@@ -110,12 +110,7 @@ func _scan_and_load_sfx() -> void:
 	print("AudioManager: Loaded " + ", ".join(summary_parts))
 
 ## Play a sound effect from the specified category with randomized pitch variation
-static func play_sfx(category: String, min_pitch: float = 0.93, max_pitch: float = 1.07, volume_db: float = 0.0) -> void:
-	if instance == null:
-		return
-	instance._play_sfx_internal(category, min_pitch, max_pitch, volume_db)
-
-func _play_sfx_internal(category: String, min_pitch: float = 0.93, max_pitch: float = 1.07, volume_db: float = 0.0) -> void:
+func play_sfx(category: String, min_pitch: float = 0.93, max_pitch: float = 1.07, volume_db: float = 0.0) -> void:
 	if not sfx_library.has(category):
 		push_warning("AudioManager: Category '%s' does not exist in sfx_library." % category)
 		return
@@ -146,12 +141,7 @@ func _play_sfx_internal(category: String, min_pitch: float = 0.93, max_pitch: fl
 		target_player.play()
 
 ## Play background music stream
-static func play_music(music_path: String = "res://assets/audio/music/gameplay_theme.mp3", volume_db: float = 0.0) -> void:
-	if instance == null:
-		return
-	instance._play_music_internal(music_path, volume_db)
-
-func _play_music_internal(music_path: String = "res://assets/audio/music/gameplay_theme.mp3", volume_db: float = 0.0) -> void:
+func play_music(music_path: String = "res://assets/audio/music/gameplay_theme.mp3", volume_db: float = 0.0) -> void:
 	if not music_player:
 		return
 
@@ -180,11 +170,6 @@ func _play_music_internal(music_path: String = "res://assets/audio/music/gamepla
 		push_warning("AudioManager: Music file not found at %s" % music_path)
 
 ## Stop background music
-static func stop_music() -> void:
-	if instance == null:
-		return
-	instance._stop_music_internal()
-
-func _stop_music_internal() -> void:
+func stop_music() -> void:
 	if music_player and music_player.playing:
 		music_player.stop()

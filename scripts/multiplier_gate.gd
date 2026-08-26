@@ -86,12 +86,12 @@ func _on_area_entered(area: Area3D) -> void:
 		if not parent:
 			parent = get_parent()
 			
+		var origin_pos = area.global_position if (area and is_instance_valid(area) and area.is_inside_tree()) else global_position
 		for i in range(can_spawn):
 			var new_ball = cannonball_scene.instantiate() as Area3D
 			if new_ball:
 				var spread_x = randf_range(-0.7, 0.7)
 				var spread_y = randf_range(-0.2, 0.2)
-				new_ball.global_position = area.global_position + Vector3(spread_x, spread_y, -0.2 * (i + 1))
 				
 				if "speed" in area and "speed" in new_ball:
 					new_ball.speed = area.speed
@@ -102,6 +102,7 @@ func _on_area_entered(area: Area3D) -> void:
 					
 				_processed_cannonballs[new_ball] = true
 				parent.add_child(new_ball)
+				new_ball.global_position = origin_pos + Vector3(spread_x, spread_y, -0.2 * (i + 1))
 
 func _play_bounce_tween() -> void:
 	if not visuals:

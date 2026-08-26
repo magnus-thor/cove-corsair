@@ -53,8 +53,8 @@ func update_obstacle_visuals() -> void:
 				
 		obstacle_sprite.texture = tex
 		obstacle_sprite.pixel_size = p_size
-		obstacle_sprite.billboard = 2
-		obstacle_sprite.alpha_cut = 1
+		obstacle_sprite.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
+		obstacle_sprite.alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
 
 func take_damage(amount: int) -> void:
 	hp -= amount

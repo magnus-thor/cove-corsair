@@ -10,6 +10,10 @@ extends Node3D
 ## The multiplier gate prefab to instantiate dynamically
 @export var multiplier_gate_prefab: PackedScene = preload("res://prefabs/multiplier_gate.tscn")
 
+## The enemy mob scenes / prefabs to instantiate dynamically
+@export var enemy_mob_scenes: Array[PackedScene] = [preload("res://prefabs/enemy_mob.tscn")]
+@export var enemy_mob_prefab: PackedScene = preload("res://prefabs/enemy_mob.tscn")
+
 @onready var obstacles_container: Node3D = $Obstacles
 
 ## Signal emitted when this segment moves off-screen and needs recycling.
@@ -53,7 +57,7 @@ func spawn_obstacles() -> void:
 	if not obstacles_container or not barrel_prefab:
 		return
 		
-	# Clean up any existing obstacles from previous cycles
+	# Clean up any existing obstacles and enemies from previous cycles
 	for child in obstacles_container.get_children():
 		obstacles_container.remove_child(child)
 		child.queue_free()
@@ -63,7 +67,7 @@ func spawn_obstacles() -> void:
 	var is_boss: bool = bool(level_config_data.get("is_boss_level", false))
 	
 	# Determine barrel count based on level index and boss status
-	var count = randi_range(2, 2 + int(level_idx / 3))
+	var count = randi_range(2, 2 + int(level_idx / 3.0))
 	if is_boss:
 		count += 1
 		
@@ -107,6 +111,48 @@ func spawn_obstacles() -> void:
 		var rand_x = randf_range(-4.0, 4.0)
 		var rand_z = randf_range(-45.0, -20.0)
 		barrel.position = Vector3(rand_x, 0.0, rand_z)
+
+	# Randomly spawn 1-2 enemy mobs in designated lanes
+	_spawn_enemy_mobs(level_idx)
+
+func _spawn_enemy_mobs(level_idx: int) -> void:
+	var mob_prefab = enemy_mob_prefab
+	if not mob_prefab and not enemy_mob_scenes.is_empty():
+		mob_prefab = enemy_mob_scenes.pick_random()
+		
+	if not mob_prefab or not obstacles_container:
+		return
+		
+	var mob_count = randi_range(1, 1 + int(level_idx / 4.0))
+	var possible_types: Array[String] = ["skeleton_rower"]
+	if level_idx >= 2:
+		possible_types.append("goblin_skiff")
+	if level_idx >= 3:
+		possible_types.append("turtle_raft")
+		
+	for m in range(mob_count):
+		var enemy = mob_prefab.instantiate() as Area3D
+		if not enemy:
+			continue
+			
+		obstacles_container.add_child(enemy)
+		
+		var chosen_type = possible_types.pick_random()
+		if "mob_type" in enemy:
+			enemy.mob_type = chosen_type
+			
+		# Scale enemy HP slightly with level progression
+		if "max_hp" in enemy:
+			enemy.max_hp += int(level_idx * 0.5)
+			if "current_hp" in enemy:
+				enemy.current_hp = enemy.max_hp
+			if enemy.has_method("_update_health_bar"):
+				enemy._update_health_bar()
+			
+		# Lane placement in designated lanes X in [-3.5, 3.5]
+		var rand_x = randf_range(-3.5, 3.5)
+		var rand_z = randf_range(-38.0, -15.0)
+		enemy.position = Vector3(rand_x, 0.0, rand_z)
 
 ## Intermittently spawns Multiplier Gates based on level config gate frequency
 func spawn_gates() -> void:

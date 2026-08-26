@@ -3,6 +3,7 @@ extends CharacterBody3D
 
 signal health_changed(current: int, max_hp: int)
 signal score_changed(new_score: int)
+signal doubloons_changed(new_doubloons: int)
 
 enum ShipTier {RAFT, SLOOP, GALLEON}
 
@@ -51,6 +52,7 @@ var current_health: int = 3
 var power_level: int = 0
 var shoot_timer: float = 0.0
 var score: int = 0
+var doubloons: int = 0
 var is_game_over: bool = false
 var float_time: float = 0.0
 
@@ -142,6 +144,13 @@ func _physics_process(delta: float) -> void:
 		shoot_timer = 0.0
 		_shoot()
 
+func add_doubloons(amount: int) -> void:
+	if is_game_over:
+		return
+	doubloons += amount
+	doubloons_changed.emit(doubloons)
+	upgrade_ship(amount)
+
 func upgrade_ship(amount: int) -> void:
 	if is_game_over:
 		return
@@ -182,7 +191,7 @@ func _on_area_entered(area: Area3D) -> void:
 	if is_game_over:
 		return
 		
-	if area.is_in_group("destructible"):
+	if area.is_in_group("destructible") or area.is_in_group("enemies"):
 		current_health -= 1
 		health_changed.emit(current_health, max_health)
 		
@@ -190,8 +199,11 @@ func _on_area_entered(area: Area3D) -> void:
 		if current_health <= 0:
 			game_over(false)
 			
-		# Despawn the collided barrel so it doesn't trigger damage multiple times
-		area.queue_free()
+		# Destroy the collided obstacle or enemy
+		if area.has_method("die"):
+			area.die()
+		else:
+			area.queue_free()
 
 func game_over(victory: bool) -> void:
 	if is_game_over:
@@ -227,8 +239,8 @@ func _update_ship_mesh() -> void:
 			visuals.add_child(sprite)
 			
 		sprite.visible = true
-		sprite.billboard = 0
-		sprite.alpha_cut = 1
+		sprite.billboard = BaseMaterial3D.BILLBOARD_DISABLED
+		sprite.alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
 		sprite.pixel_size = 0.0018
 		sprite.rotation_degrees = Vector3(-75, 0, 0)
 		sprite.position = Vector3(0, 0.2, 0)
