@@ -6,9 +6,10 @@ signal doubloons_changed(new_amount: int)
 signal multiplier_changed(new_multiplier: float, mode: String)
 signal progress_changed(current_distance: float, total_distance: float)
 signal distance_target_reached
-signal level_completed
+signal level_completed(doubloons: int, targets: int)
 
 var doubloons: int = 0
+var targets_destroyed: int = 0
 var active_multiplier: float = 1.0
 var multiplier_mode: String = "x" # "x" for multiply, "+" for add
 var current_level: int = 1
@@ -38,10 +39,14 @@ func update_distance(delta_distance: float) -> void:
 		distance_target_reached.emit()
 
 func reset_level() -> void:
+	doubloons = 0
+	targets_destroyed = 0
 	distance_traveled = 0.0
 	boss_spawned = false
 	active_multiplier = 1.0
 	multiplier_mode = "x"
+	doubloons_changed.emit(doubloons)
 	progress_changed.emit(distance_traveled, level_distance_target)
 	multiplier_changed.emit(active_multiplier, multiplier_mode)
+
 

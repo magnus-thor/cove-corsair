@@ -200,8 +200,8 @@ func upgrade_ship(amount: int) -> void:
 			
 	_check_tier_updates()
 
-func _on_level_completed() -> void:
-	game_over(true)
+func _on_level_completed(_doubloons: int = 0, _targets: int = 0) -> void:
+	is_game_over = true
 
 func _check_tier_updates(force_mesh_update: bool = false) -> void:
 	var target_tier = ShipTier.RAFT

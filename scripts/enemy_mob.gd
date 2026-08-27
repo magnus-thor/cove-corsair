@@ -219,6 +219,7 @@ func die() -> void:
 		return
 	_is_dead = true
 	
+	GameState.targets_destroyed += 1
 	AudioManager.play_sfx("barrel_breaks")
 	_spawn_death_explosion()
 	_spawn_doubloons()

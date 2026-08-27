@@ -117,6 +117,8 @@ func boss_defeat() -> void:
 	_is_defeated = true
 	current_state = State.DYING
 	
+	GameState.targets_destroyed += 1
+	
 	# Safe collision disabling using deferred calls
 	set_deferred("monitoring", false)
 	set_deferred("monitorable", false)
@@ -134,7 +136,10 @@ func boss_defeat() -> void:
 		
 	tween.tween_callback(func():
 		_spawn_doubloon_fountain()
-		GameState.level_completed.emit()
+	)
+	tween.tween_interval(1.5)
+	tween.tween_callback(func():
+		GameState.level_completed.emit(GameState.doubloons, GameState.targets_destroyed)
 		queue_free()
 	)
 
