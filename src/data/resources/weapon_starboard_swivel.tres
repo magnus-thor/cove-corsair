@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/data/weapon_data.gd" id="1_script"]
+[ext_resource type="Resource" path="res://src/data/resources/ammo_grape_shot.tres" id="2_ammo"]
+
+[resource]
+script = ExtResource("1_script")
+weapon_name = "Starboard Swivel"
+weapon_type = "swivel_gun"
+pixel_size = 0.005
+fire_rate = 0.2
+spread_angle_deg = 18.0
+default_ammo = ExtResource("2_ammo")

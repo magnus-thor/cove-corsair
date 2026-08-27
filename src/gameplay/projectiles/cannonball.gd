@@ -16,18 +16,54 @@ extends Area3D
 ## Hit splash VFX to spawn on impact or expiration
 @export var hit_splash_scene: PackedScene = preload("res://src/gameplay/vfx/hit_splash.tscn")
 
+## Custom ammo data assigned at initialization (optional)
+var ammo_data: AmmoData:
+	set(val):
+		ammo_data = val
+		if is_node_ready():
+			_apply_ammo_data()
+
 var _is_destroyed: bool = false
 
 func _ready() -> void:
 	add_to_group("cannonballs")
 	area_entered.connect(_on_hit)
 	body_entered.connect(_on_hit)
+	if ammo_data:
+		_apply_ammo_data()
+
+func _apply_ammo_data() -> void:
+	if not ammo_data:
+		return
+	damage = ammo_data.damage
+	speed = ammo_data.projectile_speed
+	
+	if ammo_data.splash_radius > 0.0:
+		splash_radius_multiplier = ammo_data.splash_radius / 2.5
+	
+	if ammo_data.scale_multiplier != 1.0:
+		scale = Vector3.ONE * ammo_data.scale_multiplier
+		
+	if ammo_data.sprite_texture:
+		var model = get_node_or_null("CannonBallModel")
+		if model:
+			model.visible = false
+			
+		var sprite_node = get_node_or_null("Sprite3D")
+		if not sprite_node:
+			sprite_node = Sprite3D.new()
+			sprite_node.name = "Sprite3D"
+			sprite_node.billboard = BaseMaterial3D.BILLBOARD_PARTICLES
+			sprite_node.alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
+			add_child(sprite_node)
+		sprite_node.texture = ammo_data.sprite_texture
+		sprite_node.pixel_size = 0.005
 
 func _physics_process(delta: float) -> void:
 	if _is_destroyed:
 		return
-	# Move forward along the negative Z-axis
-	global_position.z -= speed * delta
+	# Move forward along the local negative Z-axis
+	global_position += -global_transform.basis.z * speed * delta
 	
 	lifetime -= delta
 	if lifetime <= 0.0:
