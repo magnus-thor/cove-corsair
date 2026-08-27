@@ -37,7 +37,7 @@ script = ExtResource("3_track_manager")
 segment_scene = ExtResource("1_track_segment")
 
 [node name="PlayerBoat" parent="." unique_id=1076449957 instance=ExtResource("2_player_boat")]
-is_calibration_mode = true
+is_calibration_mode = false
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=456464510]
 transform = Transform3D(1, 0, 0, 0, 0.90107703, 0.4336591, 0, -0.4336591, 0.90107703, 0, 9.851, 11.32)

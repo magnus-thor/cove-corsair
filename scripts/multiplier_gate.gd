@@ -11,7 +11,10 @@ enum OperationType { ADD, MULTIPLY }
 
 @export var value: int = 3:
 	set(val):
-		value = val
+		if operation == OperationType.ADD:
+			value = clamp(val, 1, 5)
+		else:
+			value = clamp(val, 2, 3)
 		if is_node_ready():
 			update_visuals()
 
@@ -26,6 +29,11 @@ var _processed_cannonballs: Dictionary = {}
 func _ready() -> void:
 	add_to_group("multiplier_gate")
 	area_entered.connect(_on_area_entered)
+	# Enforce value clamping on ready
+	if operation == OperationType.ADD:
+		value = clamp(value, 1, 5)
+	else:
+		value = clamp(value, 2, 3)
 	update_visuals()
 
 func update_visuals() -> void:
@@ -67,7 +75,7 @@ func _on_area_entered(area: Area3D) -> void:
 		
 	var active_balls = get_tree().get_nodes_in_group("cannonballs")
 	var current_count: int = active_balls.size()
-	var max_simultaneous: int = 30
+	var max_simultaneous: int = 8
 	
 	var can_spawn: int = max(0, min(extra_needed, max_simultaneous - current_count))
 	var overflow: int = extra_needed - can_spawn

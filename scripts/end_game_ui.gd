@@ -53,7 +53,7 @@ func _update_ui() -> void:
 		title_label.text = "DEFEAT!"
 		title_label.add_theme_color_override("font_color", Color(0.95, 0.26, 0.26)) # Premium Coral/Red
 	
-	score_label.text = "Barrels Sunk: %d / 50" % _score
+	score_label.text = "Barrels Sunk: %d" % _score
 
 func _on_play_again_button_pressed() -> void:
 	get_tree().paused = false

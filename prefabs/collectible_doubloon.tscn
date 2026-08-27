@@ -4,9 +4,11 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/coin_icon.svg" id="2_coin_tex"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_doubloon"]
-radius = 0.55
+radius = 0.8
 
 [node name="CollectibleDoubloon" type="Area3D" groups=["collectibles", "doubloons"]]
+collision_layer = 8
+collision_mask = 1
 script = ExtResource("1_script")
 
 [node name="Visuals" type="Node3D" parent="."]

@@ -23,6 +23,8 @@ enum ObstacleType { WOODEN_BARREL, FUSE_BARREL, RUNE_BARREL, SEA_MINE, CORAL_REE
 ## Barrel destruction explosion VFX to spawn when destroyed
 @export var barrel_explosion_scene: PackedScene = preload("res://prefabs/vfx/barrel_explosion.tscn")
 
+@export var forward_speed: float = 0.0
+
 @onready var obstacle_sprite: Sprite3D = get_node_or_null("ObstacleSprite") as Sprite3D
 @onready var barrel_model: Node3D = get_node_or_null("BarrelModel")
 
@@ -30,6 +32,16 @@ var _is_destroyed: bool = false
 
 func _ready() -> void:
 	update_obstacle_visuals()
+
+func _physics_process(delta: float) -> void:
+	if _is_destroyed:
+		return
+	if forward_speed > 0.0:
+		global_position.z += forward_speed * delta
+		var player = get_tree().get_first_node_in_group("player")
+		var player_z = player.global_position.z if player else 0.0
+		if global_position.z > (player_z + 8.0):
+			queue_free()
 
 func update_obstacle_visuals() -> void:
 	if obstacle_sprite:
@@ -101,10 +113,11 @@ func _spawn_doubloons() -> void:
 	if not doubloon_scene or doubloons_drop <= 0:
 		return
 		
-	var root = get_tree().current_scene
-	var spawn_parent = root if root else get_parent()
-	if not spawn_parent:
-		return
+	var spawn_parent = get_tree().current_scene
+	if not spawn_parent or spawn_parent == self:
+		spawn_parent = get_parent()
+		if spawn_parent == self or spawn_parent is DestructibleObstacle:
+			return
 		
 	for i in range(doubloons_drop):
 		var doubloon = doubloon_scene.instantiate() as Area3D

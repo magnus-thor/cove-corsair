@@ -47,4 +47,4 @@ func _on_player_doubloons_changed(doubloons: int) -> void:
 
 func _on_player_score_changed(score: int) -> void:
 	if score_label:
-		score_label.text = "Score: %d / 50" % score
+		score_label.text = "Score: %d" % score

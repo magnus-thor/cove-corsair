@@ -241,13 +241,14 @@ func _spawn_death_explosion() -> void:
 		vfx.global_position = global_position + Vector3(0, 0.5, 0)
 
 func _spawn_doubloons() -> void:
-	if not doubloon_scene:
+	if not doubloon_scene or doubloons_drop <= 0:
 		return
 		
-	var root = get_tree().current_scene
-	var spawn_parent = root if root else get_parent()
-	if not spawn_parent:
-		return
+	var spawn_parent = get_tree().current_scene
+	if not spawn_parent or spawn_parent == self:
+		spawn_parent = get_parent()
+		if spawn_parent == self or spawn_parent is EnemyMob:
+			return
 		
 	for i in range(doubloons_drop):
 		var doubloon = doubloon_scene.instantiate() as Area3D

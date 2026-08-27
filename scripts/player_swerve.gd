@@ -78,6 +78,33 @@ func _ready() -> void:
 	
 	detection_area.area_entered.connect(_on_area_entered)
 	
+	# Dynamically construct MagnetArea to attract Layer 4 Collectibles
+	var magnet_area = get_node_or_null("MagnetArea") as Area3D
+	if not magnet_area:
+		magnet_area = Area3D.new()
+		magnet_area.name = "MagnetArea"
+		add_child(magnet_area)
+		
+	magnet_area.collision_layer = 0
+	magnet_area.collision_mask = 8 # Layer 4 (Collectibles)
+	magnet_area.monitoring = true
+	magnet_area.monitorable = false
+
+	var mag_shape = magnet_area.get_node_or_null("CollisionShape3D") as CollisionShape3D
+	if not mag_shape:
+		mag_shape = CollisionShape3D.new()
+		magnet_area.add_child(mag_shape)
+
+	var sphere = SphereShape3D.new()
+	sphere.radius = 7.5 # Magnet attraction radius
+	mag_shape.shape = sphere
+
+	if not magnet_area.area_entered.is_connected(_on_magnet_area_entered):
+		magnet_area.area_entered.connect(_on_magnet_area_entered)
+	
+	if GameState.has_signal("level_completed"):
+		GameState.level_completed.connect(_on_level_completed)
+		
 	if is_calibration_mode:
 		_setup_calibration_mode()
 
@@ -170,10 +197,11 @@ func upgrade_ship(amount: int) -> void:
 	if amount > 0:
 		score += amount
 		score_changed.emit(score)
-		if score >= target_score:
-			game_over(true)
 			
 	_check_tier_updates()
+
+func _on_level_completed() -> void:
+	game_over(true)
 
 func _check_tier_updates(force_mesh_update: bool = false) -> void:
 	var target_tier = ShipTier.RAFT
@@ -198,8 +226,16 @@ func _check_tier_updates(force_mesh_update: bool = false) -> void:
 		ShipTier.GALLEON:
 			shoot_cooldown = 0.18
 
+func _on_magnet_area_entered(area: Area3D) -> void:
+	if area.has_method("attract_to"):
+		area.attract_to(self)
+
 func _on_area_entered(area: Area3D) -> void:
 	if is_game_over:
+		return
+		
+	if area.has_method("collect_coin"):
+		area.collect_coin(self)
 		return
 		
 	if area.is_in_group("destructible") or area.is_in_group("enemies"):
@@ -479,6 +515,10 @@ func _shoot() -> void:
 	if is_calibration_mode:
 		return
 	if not cannonball_scene:
+		return
+		
+	var active_balls = get_tree().get_nodes_in_group("cannonballs")
+	if active_balls.size() >= 8:
 		return
 		
 	var ball = cannonball_scene.instantiate() as Node3D
