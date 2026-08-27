@@ -1,0 +1,54 @@
+[gd_scene format=3 uid="uid://1ik6jk7j01h0"]
+
+[ext_resource type="Script" path="res://src/levels/track_segment.gd" id="1_script"]
+[ext_resource type="Shader" path="res://src/shaders/water_stylized.gdshader" id="2_water_shader"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bank"]
+albedo_color = Color(0.85, 0.72, 0.48, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ocean"]
+material = SubResource("StandardMaterial3D_bank")
+size = Vector2(200, 40)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_noise"]
+noise_type = 2
+frequency = 0.04
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_water"]
+seamless = true
+as_normal_map = true
+noise = SubResource("FastNoiseLite_noise")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_river"]
+render_priority = 0
+shader = ExtResource("2_water_shader")
+shader_parameter/albedo = Color(0.08, 0.58, 0.82, 0.88)
+shader_parameter/roughness = 0.05
+shader_parameter/refraction_strength = 0.04
+shader_parameter/uv1_scale = Vector3(0.15, 0.15, 0.15)
+shader_parameter/flow_speed = Vector2(0, -0.6)
+shader_parameter/texture_normal = SubResource("NoiseTexture2D_water")
+shader_parameter/texture_refraction = SubResource("NoiseTexture2D_water")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_river"]
+material = SubResource("ShaderMaterial_river")
+size = Vector2(18, 40)
+
+[node name="TrackSegment" type="Node3D" unique_id=87088833]
+script = ExtResource("1_script")
+
+[node name="WaterPlane" type="MeshInstance3D" parent="." unique_id=1548549550]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -20)
+mesh = SubResource("PlaneMesh_ocean")
+
+[node name="RiverLane" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, -20)
+mesh = SubResource("PlaneMesh_river")
+
+[node name="VisibleOnScreenNotifier3D" type="VisibleOnScreenNotifier3D" parent="." unique_id=1471931802]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -20)
+aabb = AABB(-9, -1, -20, 18, 2, 40)
+
+[node name="Obstacles" type="Node3D" parent="." unique_id=371182929]
+
+[node name="Scenery" type="Node3D" parent="."]

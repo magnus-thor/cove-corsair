@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://src/gameplay/collectibles/collectible_doubloon.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/coin_icon.svg" id="2_coin_tex"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_doubloon"]
+radius = 0.8
+
+[node name="CollectibleDoubloon" type="Area3D" groups=["collectibles", "doubloons"]]
+collision_layer = 8
+collision_mask = 1
+script = ExtResource("1_script")
+
+[node name="Visuals" type="Node3D" parent="."]
+
+[node name="CoinSprite" type="Sprite3D" parent="Visuals"]
+pixel_size = 0.01
+billboard = 1
+alpha_cut = 1
+texture = ExtResource("2_coin_tex")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_doubloon")

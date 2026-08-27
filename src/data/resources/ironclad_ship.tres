@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShipData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/data/ship_data.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/The Ironclad.png" id="2_tex"]
+
+[resource]
+script = ExtResource("1_script")
+ship_name = "The Ironclad"
+sprite_texture = ExtResource("2_tex")
+pixel_size = 0.0041
+base_cannons = 3
+fire_rate = 0.25
+max_health = 8
+move_speed = 7.0
+y_offset = 1.125
+collision_size = Vector3(2.4, 1.4, 3.8)

@@ -1,0 +1,143 @@
+[gd_scene format=3 uid="uid://b7yak4m2p5q8y"]
+
+[ext_resource type="Script" path="res://src/ui/start_screen.gd" id="1_start_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_start_normal"]
+bg_color = Color(0.18, 0.72, 0.35, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.98, 0.85, 0.25, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.45)
+shadow_size = 8
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_start_hover"]
+bg_color = Color(0.22, 0.82, 0.4, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.92, 0.4, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.5)
+shadow_size = 10
+shadow_offset = Vector2(0, 5)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_start_pressed"]
+bg_color = Color(0.14, 0.6, 0.28, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.85, 0.72, 0.18, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.3)
+shadow_size = 4
+shadow_offset = Vector2(0, 2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_start_disabled"]
+bg_color = Color(0.3, 0.35, 0.32, 0.8)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.5, 0.5, 0.4, 0.8)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[node name="StartScreen" type="CanvasLayer"]
+layer = 15
+script = ExtResource("1_start_script")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HeaderContainer" type="VBoxContainer" parent="Control"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 80.0
+offset_bottom = 180.0
+grow_horizontal = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="GameTitle" type="Label" parent="Control/HeaderContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.84, 0, 1)
+theme_override_colors/font_outline_color = Color(0.24, 0.14, 0.05, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 44
+text = "PIRATE RUNNERS"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GameSubtitle" type="Label" parent="Control/HeaderContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.95, 0.92, 1)
+theme_override_colors/font_outline_color = Color(0.1, 0.1, 0.1, 0.8)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "COVE OF PLUNDER"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BottomContainer" type="VBoxContainer" parent="Control"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -200.0
+offset_bottom = -90.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 15
+alignment = 1
+
+[node name="StartButton" type="Button" parent="Control/BottomContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.1, 0.25, 0.1, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("StyleBoxFlat_start_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_start_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_start_pressed")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_start_disabled")
+text = "SET SAIL"
+
+[node name="TapHint" type="Label" parent="Control/BottomContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.78, 0.82, 0.85, 1)
+theme_override_colors/font_outline_color = Color(0.05, 0.05, 0.05, 0.8)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 14
+text = "Swipe / Drag to Steer & Aim Cannons"
+horizontal_alignment = 1
+vertical_alignment = 1

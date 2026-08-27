@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShipData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/data/ship_data.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/The Dinghy.png" id="2_tex"]
+
+[resource]
+script = ExtResource("1_script")
+ship_name = "The Dinghy"
+sprite_texture = ExtResource("2_tex")
+pixel_size = 0.0021
+base_cannons = 1
+fire_rate = 0.45
+max_health = 3
+move_speed = 12.0
+y_offset = 0.485
+collision_size = Vector3(1.6, 1, 2.8)

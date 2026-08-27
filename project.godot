@@ -11,14 +11,14 @@ config_version=5
 [application]
 
 config/name="Cove Corsair"
-run/main_scene="res://scenes/main.tscn"
+run/main_scene="res://src/core/main_game.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
-AudioManager="*res://scripts/audio_manager.gd"
-GameState="*res://scripts/game_state.gd"
+AudioManager="*res://src/core/audio_manager.gd"
+GameState="*res://src/core/game_state.gd"
 
 [display]
 

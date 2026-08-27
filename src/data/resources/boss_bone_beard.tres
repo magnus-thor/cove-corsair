@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/Captain Bone-Beard's Twin Frigate.png" id="2_tex"]
+
+[resource]
+script = ExtResource("1_script")
+mob_name = "Captain Bone-Beard"
+sprite_texture = ExtResource("2_tex")
+pixel_size = 0.0055
+max_hp = 100
+forward_speed = 0.0
+doubloon_drop_count = 25
+is_boss = true
+y_offset = 2.612
+collision_size = Vector3(4.4, 1.6, 2.8)
