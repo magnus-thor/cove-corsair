@@ -113,6 +113,10 @@ func _physics_process(delta: float) -> void:
 	var player = get_tree().get_first_node_in_group("player")
 	if player and "is_calibration_mode" in player and player.is_calibration_mode:
 		return
+
+	if not GameState.is_game_active:
+		# Keep track forward scrolling paused (scroll_speed = 0.0), but water shader TIME remains active
+		return
 		
 	if is_boss_active:
 		# Stop track forward scrolling while boss fight is active (locking combat arena).

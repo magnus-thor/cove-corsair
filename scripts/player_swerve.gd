@@ -56,6 +56,8 @@ var doubloons: int = 0
 var is_game_over: bool = false
 var float_time: float = 0.0
 
+@export var is_shooting_enabled: bool = false
+
 @export var end_game_ui_scene: PackedScene = preload("res://prefabs/end_game_ui.tscn")
 
 func _ready() -> void:
@@ -177,10 +179,11 @@ func _physics_process(delta: float) -> void:
 		visuals.rotation_degrees.y = lerp(visuals.rotation_degrees.y, target_yaw_deg, yaw_lerp_speed * delta)
 		
 	# Automatic shooting loop
-	shoot_timer += delta
-	if shoot_timer >= shoot_cooldown:
-		shoot_timer = 0.0
-		_shoot()
+	if is_shooting_enabled and GameState.is_game_active:
+		shoot_timer += delta
+		if shoot_timer >= shoot_cooldown:
+			shoot_timer = 0.0
+			_shoot()
 
 func add_doubloons(amount: int) -> void:
 	if is_game_over:

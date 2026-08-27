@@ -164,6 +164,9 @@ func _physics_process(delta: float) -> void:
 	if player and "is_calibration_mode" in player and player.is_calibration_mode:
 		return
 		
+	if not GameState.is_game_active:
+		return
+		
 	_time += delta
 	
 	# Move forward down the track along +Z toward the player
