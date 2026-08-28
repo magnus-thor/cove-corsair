@@ -9,5 +9,5 @@ weapon_name = "Starboard Swivel"
 weapon_type = "swivel_gun"
 pixel_size = 0.005
 fire_rate = 0.2
-spread_angle_deg = 18.0
+spread_angle_deg = 7.0
 default_ammo = ExtResource("2_ammo")

@@ -62,6 +62,9 @@ var current_health: int = 3
 @export var target_score: int = 50
 
 var power_level: int = 0
+var evolution_xp: float = 0.0
+var equipped_weapons: Dictionary = {}
+var active_weapons: Array[Node] = []
 var shoot_timer: float = 0.0
 var score: int = 0
 var doubloons: int = 0
@@ -120,10 +123,11 @@ func _ready() -> void:
 	
 	magnet_area.area_entered.connect(_on_magnet_area_entered)
 	
+	evolution_xp = 0.0
 	if ship_data:
 		apply_ship_data(ship_data)
-	else:
-		_check_tier_updates(true)
+	
+	equip_weapon_to_socket("BowMount", preload("res://src/data/resources/weapon_bow_chaser.tres"))
 	
 	if is_calibration_mode:
 		_setup_calibration_mode()
@@ -180,6 +184,16 @@ func apply_ship_data(data: ShipData) -> void:
 		area_box.size = Vector3(data.collision_size.x, data.collision_size.y + 0.2, data.collision_size.z)
 		area_col.position = Vector3(0, (data.collision_size.y + 0.2) * 0.5, 0)
 		
+	# Dynamically position hardpoint sockets on Y to align with the slanted deck
+	var hardpoints = get_node_or_null("Hardpoints")
+	if hardpoints:
+		for socket in hardpoints.get_children():
+			if socket is Node3D:
+				var z_pos = socket.position.z
+				# y_offset is the height of the boat sprite center
+				# slant slope is tan(30 deg) = 0.57735
+				socket.position.y = data.y_offset - 0.57735 * z_pos
+		
 	health_changed.emit(current_health, max_health)
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -211,6 +225,20 @@ func _physics_process(delta: float) -> void:
 	if track_mgr and "scroll_speed" in track_mgr and GameState.is_game_active:
 		GameState.update_distance(track_mgr.scroll_speed * delta)
 		
+	if not GameState.is_game_active:
+		# Floating / Bobbing on water
+		float_time += delta * bob_frequency
+		var hover_height = lerp(min_hover_height, max_hover_height, (sin(float_time) + 1.0) * 0.5)
+		if visuals:
+			visuals.position.y = hover_height
+			visuals.rotation_degrees.x = sin(float_time * 1.5) * 2.0
+			
+			var hardpoints = get_node_or_null("Hardpoints")
+			if hardpoints:
+				hardpoints.position.y = visuals.position.y
+				hardpoints.rotation_degrees.x = visuals.rotation_degrees.x
+		return
+
 	# 2. Keyboard fallback controls
 	var input_dir: float = 0.0
 	if Input.is_action_pressed("ui_left") or Input.is_key_pressed(KEY_A):
@@ -240,51 +268,19 @@ func _physics_process(delta: float) -> void:
 		visuals.position.y = hover_height
 		visuals.rotation_degrees.x = sin(float_time * 1.5) * 2.0
 		
+		var hardpoints = get_node_or_null("Hardpoints")
+		if hardpoints:
+			hardpoints.position.y = visuals.position.y
+			hardpoints.rotation_degrees.x = visuals.rotation_degrees.x
+		
 	# 6. Automatic periodic cannon shooting
 	if is_shooting_enabled:
-		shoot_timer += delta
-		if shoot_timer >= shoot_cooldown:
-			shoot_timer = 0.0
-			_fire_cannons()
+		for weapon in equipped_weapons.values():
+			if is_instance_valid(weapon) and weapon.has_method("try_fire"):
+				weapon.try_fire(delta)
 			
 	move_and_slide()
 
-func _fire_cannons() -> void:
-	if not cannonball_scene:
-		return
-		
-	var parent = get_tree().current_scene
-	if not parent:
-		parent = get_parent()
-		
-	AudioManager.play_sfx("cannon_shots")
-	
-	var cannon_count = 1
-	if ship_data:
-		cannon_count = ship_data.base_cannons
-	else:
-		match current_tier:
-			ShipTier.RAFT: cannon_count = 1
-			ShipTier.SLOOP: cannon_count = 2
-			ShipTier.GALLEON: cannon_count = 3
-			
-	var offsets: Array[Vector3] = []
-	match cannon_count:
-		1:
-			offsets.append(Vector3(0, 0.4, -1.2))
-		2:
-			offsets.append(Vector3(-0.4, 0.4, -1.2))
-			offsets.append(Vector3(0.4, 0.4, -1.2))
-		3:
-			offsets.append(Vector3(-0.6, 0.4, -1.2))
-			offsets.append(Vector3(0.0, 0.4, -1.4))
-			offsets.append(Vector3(0.6, 0.4, -1.2))
-			
-	for off in offsets:
-		var ball = cannonball_scene.instantiate() as Area3D
-		if ball:
-			parent.add_child(ball)
-			ball.global_position = global_position + off
 
 func _on_magnet_area_entered(area: Area3D) -> void:
 	if area and area.is_in_group("doubloons") and area.has_method("attract_to"):
@@ -300,24 +296,62 @@ func add_doubloons(amount: int) -> void:
 	doubloons += amount
 	doubloons_changed.emit(doubloons)
 
+func add_evolution_xp(amount: float) -> void:
+	evolution_xp += amount
+	print("Player XP: ", evolution_xp, " / Current Tier: ", current_tier)
+	_check_tier_updates()
+
 func _check_tier_updates(force: bool = false) -> void:
 	var old_tier = current_tier
 	
-	if power_level >= 25:
+	if evolution_xp >= 280.0:
 		current_tier = ShipTier.GALLEON
-		if ironclad_ship_data:
-			apply_ship_data(ironclad_ship_data)
-	elif power_level >= 10:
+	elif evolution_xp >= 120.0:
 		current_tier = ShipTier.SLOOP
-		if sloop_ship_data:
-			apply_ship_data(sloop_ship_data)
 	else:
 		current_tier = ShipTier.RAFT
-		if dinghy_ship_data:
-			apply_ship_data(dinghy_ship_data)
+			
+	if current_tier != old_tier or force:
+		_apply_weapon_tier_setup()
+
+func _apply_weapon_tier_setup() -> void:
+	clear_weapons()
+	
+	var heavy_ammo = preload("res://src/data/resources/ammo_heavy_shot.tres")
+	
+	match current_tier:
+		ShipTier.RAFT:
+			var bow_weapon = preload("res://src/data/resources/weapon_bow_chaser.tres")
+			equip_weapon_to_socket("BowMount", bow_weapon)
+			
+		ShipTier.SLOOP:
+			var bow_weapon = preload("res://src/data/resources/weapon_bow_chaser.tres")
+			var port_weapon = preload("res://src/data/resources/weapon_port_swivel.tres")
+			var star_weapon = preload("res://src/data/resources/weapon_starboard_swivel.tres")
+			equip_weapon_to_socket("BowMount", bow_weapon)
+			equip_weapon_to_socket("PortSwivelMount", port_weapon)
+			equip_weapon_to_socket("StarboardSwivelMount", star_weapon)
+			
+		ShipTier.GALLEON:
+			var bow_weapon = preload("res://src/data/resources/weapon_bow_chaser.tres").duplicate()
+			bow_weapon.default_ammo = heavy_ammo
+			
+			var port_weapon = preload("res://src/data/resources/weapon_port_swivel.tres").duplicate()
+			port_weapon.default_ammo = heavy_ammo
+			
+			var star_weapon = preload("res://src/data/resources/weapon_starboard_swivel.tres").duplicate()
+			star_weapon.default_ammo = heavy_ammo
+			
+			var aft_weapon = preload("res://src/data/resources/weapon_deckhand_sniper.tres")
+			
+			equip_weapon_to_socket("BowMount", bow_weapon)
+			equip_weapon_to_socket("PortSwivelMount", port_weapon)
+			equip_weapon_to_socket("StarboardSwivelMount", star_weapon)
+			equip_weapon_to_socket("AftMortarMount", aft_weapon)
+
 
 func _on_area_entered(area: Area3D) -> void:
-	if is_game_over:
+	if is_game_over or not GameState.is_game_active:
 		return
 		
 	# Ignore collectibles and cannonballs
@@ -357,3 +391,44 @@ func _process_calibration_controls(delta: float) -> void:
 func _setup_calibration_mode() -> void:
 	position = Vector3.ZERO
 	target_x = 0.0
+
+func equip_weapon_to_socket(socket_name: String, weapon_data: WeaponData) -> void:
+	var hardpoints = get_node_or_null("Hardpoints")
+	if not hardpoints:
+		return
+	var socket = hardpoints.get_node_or_null(socket_name)
+	if not socket:
+		return
+		
+	if equipped_weapons.has(socket_name):
+		var old_weapon = equipped_weapons[socket_name]
+		if is_instance_valid(old_weapon):
+			old_weapon.queue_free()
+		equipped_weapons.erase(socket_name)
+		
+	var attached_weapon_scene = load("res://src/gameplay/player/attached_weapon.tscn")
+	var weapon_instance = attached_weapon_scene.instantiate() as AttachedWeapon
+	if weapon_instance.has_method("setup_weapon"):
+		weapon_instance.setup_weapon(weapon_data)
+	else:
+		weapon_instance.weapon_data = weapon_data
+	socket.add_child(weapon_instance)
+	equipped_weapons[socket_name] = weapon_instance
+	
+	var sprite = weapon_instance.get_node_or_null("Sprite3D") as Sprite3D
+	if sprite:
+		sprite.scale = Vector3.ZERO
+		var tween = create_tween()
+		tween.tween_property(sprite, "scale", Vector3.ONE, 0.4).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+
+func clear_weapons() -> void:
+	for weapon in equipped_weapons.values():
+		if is_instance_valid(weapon):
+			weapon.queue_free()
+	equipped_weapons.clear()
+	
+	var hardpoints = get_node_or_null("Hardpoints")
+	if hardpoints:
+		for socket in hardpoints.get_children():
+			for child in socket.get_children():
+				child.queue_free()

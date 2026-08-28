@@ -79,7 +79,7 @@ func _trigger_spawn_bounce(horizontal_scatter: Vector2 = Vector2.ZERO) -> void:
 	)
 
 func _physics_process(delta: float) -> void:
-	if _is_collected:
+	if _is_collected or not GameState.is_game_active:
 		return
 		
 	_time += delta
@@ -114,13 +114,13 @@ func _physics_process(delta: float) -> void:
 		queue_free()
 
 func _on_area_entered(area: Area3D) -> void:
-	if _is_collected:
+	if _is_collected or not GameState.is_game_active:
 		return
 	if _is_player_node(area):
 		collect_coin(area)
 
 func _on_body_entered(body: Node3D) -> void:
-	if _is_collected:
+	if _is_collected or not GameState.is_game_active:
 		return
 	if _is_player_node(body):
 		collect_coin(body)
@@ -148,9 +148,12 @@ func collect_coin(player_ref: Node = null) -> void:
 			
 	GameState.add_doubloons(value)
 	
-	var player = player_ref if player_ref and _is_player_node(player_ref) else get_tree().get_first_node_in_group("player")
-	if player and player.has_method("add_doubloons"):
-		player.add_doubloons(value)
+	var player = get_tree().get_first_node_in_group("player")
+	if player:
+		if player.has_method("add_doubloons"):
+			player.add_doubloons(value)
+		if player.has_method("add_evolution_xp"):
+			player.add_evolution_xp(10.0)
 		
 	AudioManager.play_sfx("coin_pickups")
 	_spawn_pickup_vfx()

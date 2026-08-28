@@ -24,18 +24,29 @@ var ammo_data: AmmoData:
 			_apply_ammo_data()
 
 var _is_destroyed: bool = false
+var direction: Vector3 = Vector3.ZERO
+
+func setup(p_direction: Vector3, p_ammo_data: AmmoData) -> void:
+	direction = p_direction.normalized()
+	ammo_data = p_ammo_data
+	if ammo_data:
+		speed = ammo_data.projectile_speed
+		damage = ammo_data.damage
+		if ammo_data.scale_multiplier != 1.0:
+			scale = Vector3.ONE * ammo_data.scale_multiplier
 
 func _ready() -> void:
 	add_to_group("cannonballs")
 	area_entered.connect(_on_hit)
 	body_entered.connect(_on_hit)
+	damage = ammo_data.damage if ammo_data else 1
 	if ammo_data:
 		_apply_ammo_data()
 
 func _apply_ammo_data() -> void:
+	damage = ammo_data.damage if ammo_data else 1
 	if not ammo_data:
 		return
-	damage = ammo_data.damage
 	speed = ammo_data.projectile_speed
 	
 	if ammo_data.splash_radius > 0.0:
@@ -62,8 +73,11 @@ func _apply_ammo_data() -> void:
 func _physics_process(delta: float) -> void:
 	if _is_destroyed:
 		return
-	# Move forward along the local negative Z-axis
-	global_position += -global_transform.basis.z * speed * delta
+	# Move forward along the direction if set, otherwise along the local negative Z-axis
+	if direction != Vector3.ZERO:
+		global_position += direction * speed * delta
+	else:
+		global_position += -global_transform.basis.z * speed * delta
 	
 	lifetime -= delta
 	if lifetime <= 0.0:

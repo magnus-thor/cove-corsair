@@ -2,8 +2,8 @@
 
 [ext_resource type="PackedScene" uid="uid://1ik6jk7j01h0" path="res://src/levels/track_segment.tscn" id="1_track_segment"]
 [ext_resource type="PackedScene" path="res://src/gameplay/player/player_boat.tscn" id="2_player_boat"]
-[ext_resource type="Script" path="res://src/levels/track_manager.gd" id="3_track_manager"]
-[ext_resource type="Script" path="res://src/core/main_game.gd" id="5_main"]
+[ext_resource type="Script" uid="uid://bkmu2vnccqqwt" path="res://src/levels/track_manager.gd" id="3_track_manager"]
+[ext_resource type="Script" uid="uid://dcuh1f3l83nbt" path="res://src/core/main_game.gd" id="5_main"]
 [ext_resource type="PackedScene" uid="uid://b3p5h42mkw601" path="res://src/ui/top_hud.tscn" id="6_top_hud"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
@@ -37,7 +37,6 @@ script = ExtResource("3_track_manager")
 segment_scene = ExtResource("1_track_segment")
 
 [node name="PlayerBoat" parent="." unique_id=1076449957 instance=ExtResource("2_player_boat")]
-is_calibration_mode = false
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=456464510]
 transform = Transform3D(1, 0, 0, 0, 0.90107703, 0.4336591, 0, -0.4336591, 0.90107703, 0, 9.851, 11.32)

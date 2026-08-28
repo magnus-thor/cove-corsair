@@ -108,6 +108,8 @@ func load_level_config(level_num: int) -> void:
 		push_warning("TrackManager: Level config not found at %s" % path)
 
 func _physics_process(delta: float) -> void:
+	if not GameState.is_game_active:
+		return
 	var movement = Vector3(0, 0, scroll_speed * delta)
 	
 	for segment in active_segments:

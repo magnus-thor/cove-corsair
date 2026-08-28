@@ -97,7 +97,7 @@ func _apply_mob_type_fallback() -> void:
 			apply_enemy_data(res)
 
 func _physics_process(delta: float) -> void:
-	if _is_dead:
+	if _is_dead or not GameState.is_game_active:
 		return
 		
 	_time += delta
@@ -116,7 +116,7 @@ func _physics_process(delta: float) -> void:
 		queue_free()
 
 func _on_area_entered(area: Area3D) -> void:
-	if _is_dead:
+	if _is_dead or not GameState.is_game_active:
 		return
 	# Colliding with player directly
 	if area.is_in_group("player") or (area.get_parent() and area.get_parent().is_in_group("player")):
@@ -173,8 +173,11 @@ func die() -> void:
 	_spawn_doubloons()
 	
 	var player = get_tree().get_first_node_in_group("player")
-	if player and player.has_method("upgrade_ship"):
-		player.upgrade_ship(1)
+	if player:
+		if player.has_method("upgrade_ship"):
+			player.upgrade_ship(1)
+		if player.has_method("add_evolution_xp"):
+			player.add_evolution_xp(15.0)
 		
 	queue_free()
 
