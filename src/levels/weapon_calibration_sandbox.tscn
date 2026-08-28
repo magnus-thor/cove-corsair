@@ -1,0 +1,146 @@
+[gd_scene format=3 uid="uid://d3y8calib83a1"]
+
+[ext_resource type="Script" path="res://src/levels/weapon_calibration_sandbox.gd" id="1_script"]
+[ext_resource type="Shader" path="res://src/shaders/water_stylized.gdshader" id="2_water_shader"]
+[ext_resource type="PackedScene" path="res://src/gameplay/player/player_boat.tscn" id="3_player_boat"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
+sky_top_color = Color(0.53, 0.81, 0.98, 1)
+sky_horizon_color = Color(0.7, 0.88, 0.98, 1)
+ground_bottom_color = Color(0.07843, 0.25882, 0.44706, 1)
+ground_horizon_color = Color(0.7, 0.88, 0.98, 1)
+
+[sub_resource type="Sky" id="Sky_sky"]
+sky_material = SubResource("ProceduralSkyMaterial_sky")
+
+[sub_resource type="Environment" id="Environment_main"]
+background_mode = 2
+sky = SubResource("Sky_sky")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_noise"]
+noise_type = 2
+frequency = 0.04
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_water"]
+seamless = true
+as_normal_map = true
+noise = SubResource("FastNoiseLite_noise")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_water"]
+render_priority = 0
+shader = ExtResource("2_water_shader")
+shader_parameter/albedo = Color(0.08, 0.58, 0.82, 0.88)
+shader_parameter/roughness = 0.05
+shader_parameter/refraction_strength = 0.04
+shader_parameter/uv1_scale = Vector3(0.15, 0.15, 0.15)
+shader_parameter/flow_speed = Vector2(0, -0.6)
+shader_parameter/texture_normal = SubResource("NoiseTexture2D_water")
+shader_parameter/texture_refraction = SubResource("NoiseTexture2D_water")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_water"]
+material = SubResource("ShaderMaterial_water")
+size = Vector2(30, 30)
+
+[sub_resource type="LabelSettings" id="LabelSettings_title"]
+font_size = 16
+
+[node name="WeaponCalibrationSandbox" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_main")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.5, 0.866025, 0, -0.866025, 0.5, 0, 14, 8)
+
+[node name="WaterPlane" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_water")
+
+[node name="PlayerBoat" parent="." instance=ExtResource("3_player_boat")]
+
+[node name="DebugUI" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="Control" type="Control" parent="DebugUI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="DebugUI/Control"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 20.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="DebugUI/Control/PanelContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TitleLabel" type="Label" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "WEAPON CALIBRATION SANDBOX"
+label_settings = SubResource("LabelSettings_title")
+
+[node name="Row1" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="btn_bow" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/Row1"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Equip Bow Chaser"
+
+[node name="btn_clear_bow" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/Row1"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Clear Bow"
+
+[node name="Row2" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="btn_port" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/Row2"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Equip Port Swivel"
+
+[node name="btn_starboard" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/Row2"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Equip Starboard Swivel"
+
+[node name="Row3" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="btn_monkey" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/Row3"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Equip Monkey Gunner"
+
+[node name="btn_mortar" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/Row3"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Equip Aft Mortar"
+
+[node name="HSeparator" type="HSeparator" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="btn_fire_toggle" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Auto-Fire: ON / OFF"
+
+[node name="btn_clear_all" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Clear All Weapons"
+
+[node name="info_label" type="Label" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Use Inspector in Remote Tree to fine-tune offsets live!"

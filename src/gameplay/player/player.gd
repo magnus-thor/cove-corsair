@@ -386,11 +386,17 @@ func game_over(victory: bool) -> void:
 			ui.set_result(victory, score)
 
 func _process_calibration_controls(delta: float) -> void:
-	pass
+	if is_shooting_enabled:
+		for weapon in equipped_weapons.values():
+			if is_instance_valid(weapon) and weapon.has_method("try_fire"):
+				weapon.try_fire(delta)
 
 func _setup_calibration_mode() -> void:
 	position = Vector3.ZERO
 	target_x = 0.0
+
+func clear_all_weapons() -> void:
+	clear_weapons()
 
 func equip_weapon_to_socket(socket_name: String, weapon_data: WeaponData) -> void:
 	var hardpoints = get_node_or_null("Hardpoints")

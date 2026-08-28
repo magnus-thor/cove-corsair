@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://d1w8y210efcsy"]
 
 [ext_resource type="PackedScene" uid="uid://1ik6jk7j01h0" path="res://src/levels/track_segment.tscn" id="1_track_segment"]
-[ext_resource type="PackedScene" path="res://src/gameplay/player/player_boat.tscn" id="2_player_boat"]
+[ext_resource type="PackedScene" uid="uid://dcehj56vbh1l2" path="res://src/gameplay/player/player_boat.tscn" id="2_player_boat"]
 [ext_resource type="Script" uid="uid://bkmu2vnccqqwt" path="res://src/levels/track_manager.gd" id="3_track_manager"]
 [ext_resource type="Script" uid="uid://dcuh1f3l83nbt" path="res://src/core/main_game.gd" id="5_main"]
 [ext_resource type="PackedScene" uid="uid://b3p5h42mkw601" path="res://src/ui/top_hud.tscn" id="6_top_hud"]

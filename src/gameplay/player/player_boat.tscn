@@ -4,17 +4,9 @@
 [ext_resource type="Resource" path="res://src/data/resources/dinghy_ship.tres" id="2_ship_data"]
 [ext_resource type="Texture2D" uid="uid://btb22xeh01yqb" path="res://assets/sprites/The Dinghy.png" id="3_dinghy_tex"]
 [ext_resource type="PackedScene" path="res://src/gameplay/vfx/boat_wake.tscn" id="4_wake"]
-[ext_resource type="PackedScene" path="res://src/gameplay/player/attached_weapon.tscn" id="5_4g7bw"]
-[ext_resource type="Script" uid="uid://dkuo2x5fcb3xe" path="res://src/data/weapon_data.gd" id="6_x3vpt"]
-[ext_resource type="Texture2D" uid="uid://cb8v0q7oxp4oj" path="res://assets/sprites/weapon_port_swivel.png" id="7_x3vpt"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_boat"]
 size = Vector3(1.6, 1, 2.8)
-
-[sub_resource type="Resource" id="Resource_iaspp"]
-script = ExtResource("6_x3vpt")
-sprite_texture = ExtResource("7_x3vpt")
-metadata/_custom_type_script = "uid://dkuo2x5fcb3xe"
 
 [node name="PlayerBoat" type="CharacterBody3D" unique_id=144945920]
 script = ExtResource("1_script")
@@ -42,10 +34,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, -0.75)
 
 [node name="PortSwivelMount" type="Node3D" parent="Hardpoints" unique_id=1339749719]
 transform = Transform3D(-0.60746455, 0, 0.497204, 0, 0.785, 0, -0.497204, 0, -0.60746455, -0.42, 0.22, -0.15)
-
-[node name="AttachedWeapon" parent="Hardpoints/PortSwivelMount" unique_id=946879082 instance=ExtResource("5_4g7bw")]
-transform = Transform3D(1.0387595, 1.0863304, 0.716303, 0, 0.91655046, -1.3900217, -1.3012316, 0.8672061, 0.5718171, -1.7245307, 0.012318611, 0.59803236)
-weapon_data = SubResource("Resource_iaspp")
 
 [node name="StarboardSwivelMount" type="Node3D" parent="Hardpoints" unique_id=1720415769]
 transform = Transform3D(0.992546, 0, -0.121869, 0, 1, 0, 0.121869, 0, 0.992546, 0.42, 0.22, -0.15)
