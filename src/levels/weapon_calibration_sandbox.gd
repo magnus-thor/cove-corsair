@@ -9,10 +9,23 @@ var dinghy_ship: ShipData = preload("res://src/data/resources/dinghy_ship.tres")
 var sloop_ship: ShipData = preload("res://src/data/resources/sloop_ship.tres")
 var ironclad_ship: ShipData = preload("res://src/data/resources/ironclad_ship.tres")
 
+# Available Weapon & Crew Resources for live asset previewing
+var available_assets: Array[Dictionary] = [
+	{"name": "[ Default Ship Tier ]", "data": null},
+	{"name": "Monkey Bomber (Crew)", "data": preload("res://src/data/resources/crew_monkey_bomber.tres")},
+	{"name": "Skeleton Deckhand (Crew)", "data": preload("res://src/data/resources/crew_skeleton_tosser.tres")},
+	{"name": "Bow Chaser (Cannon)", "data": preload("res://src/data/resources/weapon_bow_chaser.tres")},
+	{"name": "Port Swivel (Gun)", "data": preload("res://src/data/resources/weapon_port_swivel.tres")},
+	{"name": "Starboard Swivel (Gun)", "data": preload("res://src/data/resources/weapon_starboard_swivel.tres")},
+	{"name": "Deckhand Sniper (Crew)", "data": preload("res://src/data/resources/weapon_deckhand_sniper.tres")},
+	{"name": "Aft Mortar (Cannon)", "data": preload("res://src/data/resources/weapon_aft_mortar.tres")}
+]
+
 # UI References
 @onready var ship_option: OptionButton = %ship_option
 @onready var tier_option: OptionButton = %tier_option
 @onready var socket_option: OptionButton = %socket_option
+@onready var asset_option: OptionButton = %asset_option
 
 @onready var slider_pos_x: HSlider = %slider_pos_x
 @onready var slider_pos_y: HSlider = %slider_pos_y
@@ -75,6 +88,13 @@ func _setup_ui() -> void:
 				ship_option.selected = 0
 		ship_option.item_selected.connect(_on_ship_selected)
 
+	if asset_option:
+		asset_option.clear()
+		for item in available_assets:
+			asset_option.add_item(item["name"])
+		asset_option.selected = 0
+		asset_option.item_selected.connect(_on_asset_selected)
+
 	_refresh_ship_sockets_and_tiers()
 	
 	if slider_pos_x: slider_pos_x.value_changed.connect(_on_slider_changed)
@@ -83,7 +103,6 @@ func _setup_ui() -> void:
 	if slider_rot_y: slider_rot_y.value_changed.connect(_on_slider_changed)
 	if slider_scale: slider_scale.value_changed.connect(_on_slider_changed)
 	
-	# Connect LineEdit inputs for direct text typing
 	if input_pos_x:
 		input_pos_x.text_submitted.connect(func(t): _on_input_submitted(slider_pos_x, t))
 		input_pos_x.focus_exited.connect(func(): _on_input_submitted(slider_pos_x, input_pos_x.text))
@@ -100,7 +119,6 @@ func _setup_ui() -> void:
 		input_scale.text_submitted.connect(func(t): _on_input_submitted(slider_scale, t))
 		input_scale.focus_exited.connect(func(): _on_input_submitted(slider_scale, input_scale.text))
 
-	# Fine 0.01 step buttons for precise positioning and scaling, 1.0 for rotation
 	if btn_pos_x_dec: btn_pos_x_dec.pressed.connect(func(): _step_slider(slider_pos_x, -0.01))
 	if btn_pos_x_inc: btn_pos_x_inc.pressed.connect(func(): _step_slider(slider_pos_x, 0.01))
 	if btn_pos_y_dec: btn_pos_y_dec.pressed.connect(func(): _step_slider(slider_pos_y, -0.01))
@@ -176,7 +194,22 @@ func _on_equip_tier(tier: int) -> void:
 		player_boat.apply_tier(tier)
 		if tier_option and tier - 1 < tier_option.item_count:
 			tier_option.selected = tier - 1
+		if asset_option:
+			asset_option.selected = 0
 		_update_ui_from_current_socket()
+
+func _on_asset_selected(idx: int) -> void:
+	if not player_boat or active_socket.is_empty():
+		return
+	if idx > 0 and idx < available_assets.size():
+		var w_data: WeaponData = available_assets[idx]["data"]
+		if w_data and player_boat.has_method("equip_weapon_to_socket"):
+			player_boat.equip_weapon_to_socket(active_socket, w_data)
+	else:
+		# Reset to default ship tier
+		var selected_tier = tier_option.selected + 1 if tier_option else 1
+		player_boat.apply_tier(selected_tier)
+	_update_ui_from_current_socket()
 
 func _on_ship_selected(idx: int) -> void:
 	match idx:

@@ -1,0 +1,283 @@
+[gd_scene format=3 uid="uid://c8objcalib99x"]
+
+[ext_resource type="Script" path="res://src/levels/object_calibration_sandbox.gd" id="1_script"]
+[ext_resource type="Shader" path="res://src/shaders/water_stylized.gdshader" id="2_water_shader"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
+sky_top_color = Color(0.53, 0.81, 0.98, 1)
+sky_horizon_color = Color(0.7, 0.88, 0.98, 1)
+ground_bottom_color = Color(0.07843, 0.25882, 0.44706, 1)
+ground_horizon_color = Color(0.7, 0.88, 0.98, 1)
+
+[sub_resource type="Sky" id="Sky_sky"]
+sky_material = SubResource("ProceduralSkyMaterial_sky")
+
+[sub_resource type="Environment" id="Environment_main"]
+background_mode = 2
+sky = SubResource("Sky_sky")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_noise"]
+noise_type = 2
+frequency = 0.04
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_water"]
+seamless = true
+as_normal_map = true
+noise = SubResource("FastNoiseLite_noise")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_water"]
+render_priority = 0
+shader = ExtResource("2_water_shader")
+shader_parameter/albedo = Color(0.08, 0.58, 0.82, 0.88)
+shader_parameter/roughness = 0.05
+shader_parameter/refraction_strength = 0.04
+shader_parameter/uv1_scale = Vector3(0.15, 0.15, 0.15)
+shader_parameter/flow_speed = Vector2(0, -0.6)
+shader_parameter/texture_normal = SubResource("NoiseTexture2D_water")
+shader_parameter/texture_refraction = SubResource("NoiseTexture2D_water")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_water"]
+material = SubResource("ShaderMaterial_water")
+size = Vector2(40, 40)
+
+[sub_resource type="LabelSettings" id="LabelSettings_title"]
+font_size = 16
+
+[node name="ObjectCalibrationSandbox" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_main")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.5, 0.866025, 0, -0.866025, 0.5, 0, 8, 5)
+
+[node name="WaterPlane" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_water")
+
+[node name="ObjectContainer" type="Node3D" parent="."]
+
+[node name="DebugUI" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="Control" type="Control" parent="DebugUI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="DebugUI/Control"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -240.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="DebugUI/Control/PanelContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="LeftCol" type="VBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="TitleLabel" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol"]
+layout_mode = 2
+text = "WORLD OBJECT WATER CALIBRATION"
+label_settings = SubResource("LabelSettings_title")
+
+[node name="HSeparator1" type="HSeparator" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol"]
+layout_mode = 2
+
+[node name="CategoryRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/CategoryRow"]
+custom_minimum_size = Vector2(95, 0)
+layout_mode = 2
+text = "Category:"
+
+[node name="category_option" type="OptionButton" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/CategoryRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ObjectRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ObjectRow"]
+custom_minimum_size = Vector2(95, 0)
+layout_mode = 2
+text = "Select Object:"
+
+[node name="object_option" type="OptionButton" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ObjectRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="btn_bobbing_toggle" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Water Floating Bobbing: OFF"
+
+[node name="btn_print_values" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Print Calibration Values to Console"
+
+[node name="VSeparator" type="VSeparator" parent="DebugUI/Control/PanelContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="RightCol" type="VBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="PosYRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosYRow"]
+custom_minimum_size = Vector2(105, 0)
+layout_mode = 2
+text = "Water Height Y:"
+
+[node name="btn_pos_y_dec" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosYRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = " - "
+
+[node name="slider_pos_y" type="HSlider" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosYRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+min_value = -1.0
+max_value = 3.0
+step = 0.01
+
+[node name="btn_pos_y_inc" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosYRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = " + "
+
+[node name="input_pos_y" type="LineEdit" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosYRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(55, 0)
+layout_mode = 2
+text = "0.48"
+
+[node name="PixelSizeRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PixelSizeRow"]
+custom_minimum_size = Vector2(105, 0)
+layout_mode = 2
+text = "Pixel Size:"
+
+[node name="btn_psize_dec" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PixelSizeRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = " - "
+
+[node name="slider_psize" type="HSlider" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PixelSizeRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+min_value = 0.0005
+max_value = 0.01
+step = 0.0001
+value = 0.0021
+
+[node name="btn_psize_inc" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PixelSizeRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = " + "
+
+[node name="input_psize" type="LineEdit" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PixelSizeRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(55, 0)
+layout_mode = 2
+text = "0.0021"
+
+[node name="ScaleRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/ScaleRow"]
+custom_minimum_size = Vector2(105, 0)
+layout_mode = 2
+text = "3D Scale:"
+
+[node name="btn_scale_dec" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/ScaleRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = " - "
+
+[node name="slider_scale" type="HSlider" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/ScaleRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+min_value = 0.1
+max_value = 3.0
+step = 0.01
+value = 1.0
+
+[node name="btn_scale_inc" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/ScaleRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = " + "
+
+[node name="input_scale" type="LineEdit" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/ScaleRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(55, 0)
+layout_mode = 2
+text = "1.00"
+
+[node name="RotYRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/RotYRow"]
+custom_minimum_size = Vector2(105, 0)
+layout_mode = 2
+text = "Rot Y:"
+
+[node name="btn_rot_y_dec" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/RotYRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = " - "
+
+[node name="slider_rot_y" type="HSlider" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/RotYRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+min_value = -180.0
+max_value = 180.0
+step = 1.0
+
+[node name="btn_rot_y_inc" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/RotYRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = " + "
+
+[node name="input_rot_y" type="LineEdit" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/RotYRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(55, 0)
+layout_mode = 2
+text = "0.0"
