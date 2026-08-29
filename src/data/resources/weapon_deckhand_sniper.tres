@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dkuo2x5fcb3xe" path="res://src/data/weapon_data.gd" id="1_script"]
 [ext_resource type="Resource" path="res://src/data/resources/ammo_heavy_shot.tres" id="2_ammo"]
-[ext_resource type="Texture2D" uid="uid://dhvd74ec3njib" path="res://assets/sprites/weapon_deckhand_sniper.png" id="3_55s0a"]
+[ext_resource type="Texture2D" uid="uid://dhvd74ec3njib" path="res://assets/sprites/weapon_deckhand_sniper_back.png" id="3_55s0a"]
 
 [resource]
 script = ExtResource("1_script")

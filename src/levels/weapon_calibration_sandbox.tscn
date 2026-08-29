@@ -3,6 +3,8 @@
 [ext_resource type="Script" path="res://src/levels/weapon_calibration_sandbox.gd" id="1_script"]
 [ext_resource type="Shader" path="res://src/shaders/water_stylized.gdshader" id="2_water_shader"]
 [ext_resource type="PackedScene" path="res://src/gameplay/player/player_boat.tscn" id="3_player_boat"]
+[ext_resource type="Resource" path="res://src/data/resources/dinghy_ship.tres" id="4_target_ship"]
+[ext_resource type="Texture2D" uid="uid://cwm3nw1dpaix5" path="res://assets/sprites/Skeleton Rower.png" id="5_target_tex"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 sky_top_color = Color(0.53, 0.81, 0.98, 1)
@@ -46,8 +48,12 @@ size = Vector2(30, 30)
 [sub_resource type="LabelSettings" id="LabelSettings_title"]
 font_size = 16
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_target"]
+size = Vector3(1.5, 1.5, 1.5)
+
 [node name="WeaponCalibrationSandbox" type="Node3D"]
 script = ExtResource("1_script")
+target_ship = ExtResource("4_target_ship")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
@@ -57,12 +63,23 @@ shadow_enabled = true
 environment = SubResource("Environment_main")
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.5, 0.866025, 0, -0.866025, 0.5, 0, 14, 8)
+transform = Transform3D(1, 0, 0, 0, 0.5, 0.866025, 0, -0.866025, 0.5, 0, 10, 2)
 
 [node name="WaterPlane" type="MeshInstance3D" parent="."]
 mesh = SubResource("PlaneMesh_water")
 
 [node name="PlayerBoat" parent="." instance=ExtResource("3_player_boat")]
+
+[node name="TargetDummy" type="Area3D" parent="." groups=["enemies"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -6)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TargetDummy"]
+shape = SubResource("BoxShape3D_target")
+
+[node name="Sprite3D" type="Sprite3D" parent="TargetDummy"]
+pixel_size = 0.0025
+billboard = 2
+texture = ExtResource("5_target_tex")
 
 [node name="DebugUI" type="CanvasLayer" parent="."]
 layer = 10
@@ -79,68 +96,258 @@ grow_vertical = 2
 layout_mode = 0
 offset_left = 20.0
 offset_top = 20.0
+offset_right = 450.0
+offset_bottom = 680.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="DebugUI/Control/PanelContainer"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 8
 
 [node name="TitleLabel" type="Label" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
 layout_mode = 2
 text = "WEAPON CALIBRATION SANDBOX"
 label_settings = SubResource("LabelSettings_title")
 
-[node name="Row1" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+[node name="HSeparator1" type="HSeparator" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="btn_bow" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/Row1"]
+[node name="ShipRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/VBoxContainer/ShipRow"]
+custom_minimum_size = Vector2(90, 0)
+layout_mode = 2
+text = "Vessel:"
+
+[node name="ship_option" type="OptionButton" parent="DebugUI/Control/PanelContainer/VBoxContainer/ShipRow"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Equip Bow Chaser"
+size_flags_horizontal = 3
 
-[node name="btn_clear_bow" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/Row1"]
+[node name="TierRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/VBoxContainer/TierRow"]
+custom_minimum_size = Vector2(90, 0)
+layout_mode = 2
+text = "Active Tier:"
+
+[node name="tier_option" type="OptionButton" parent="DebugUI/Control/PanelContainer/VBoxContainer/TierRow"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Clear Bow"
+size_flags_horizontal = 3
 
-[node name="Row2" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+[node name="SocketRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="btn_port" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/Row2"]
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/VBoxContainer/SocketRow"]
+custom_minimum_size = Vector2(90, 0)
+layout_mode = 2
+text = "Cal Socket:"
+
+[node name="socket_option" type="OptionButton" parent="DebugUI/Control/PanelContainer/VBoxContainer/SocketRow"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Equip Port Swivel"
+size_flags_horizontal = 3
 
-[node name="btn_starboard" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/Row2"]
+[node name="HSeparator2" type="HSeparator" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="PosXRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosXRow"]
+custom_minimum_size = Vector2(65, 0)
+layout_mode = 2
+text = "Pos X:"
+
+[node name="btn_pos_x_dec" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosXRow"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Equip Starboard Swivel"
+text = " - "
 
-[node name="Row3" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="btn_monkey" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/Row3"]
+[node name="slider_pos_x" type="HSlider" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosXRow"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Equip Monkey Gunner"
+size_flags_horizontal = 3
+size_flags_vertical = 4
+min_value = -3.0
+max_value = 3.0
+step = 0.01
 
-[node name="btn_mortar" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/Row3"]
+[node name="btn_pos_x_inc" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosXRow"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Equip Aft Mortar"
+text = " + "
 
-[node name="HSeparator" type="HSeparator" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+[node name="input_pos_x" type="LineEdit" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosXRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(55, 0)
 layout_mode = 2
+text = "0.00"
+
+[node name="PosYRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosYRow"]
+custom_minimum_size = Vector2(65, 0)
+layout_mode = 2
+text = "Pos Y:"
+
+[node name="btn_pos_y_dec" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosYRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = " - "
+
+[node name="slider_pos_y" type="HSlider" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosYRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+min_value = -3.0
+max_value = 3.0
+step = 0.01
+
+[node name="btn_pos_y_inc" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosYRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = " + "
+
+[node name="input_pos_y" type="LineEdit" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosYRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(55, 0)
+layout_mode = 2
+text = "0.00"
+
+[node name="PosZRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosZRow"]
+custom_minimum_size = Vector2(65, 0)
+layout_mode = 2
+text = "Pos Z:"
+
+[node name="btn_pos_z_dec" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosZRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = " - "
+
+[node name="slider_pos_z" type="HSlider" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosZRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+min_value = -3.0
+max_value = 3.0
+step = 0.01
+
+[node name="btn_pos_z_inc" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosZRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = " + "
+
+[node name="input_pos_z" type="LineEdit" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosZRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(55, 0)
+layout_mode = 2
+text = "0.00"
+
+[node name="RotYRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/VBoxContainer/RotYRow"]
+custom_minimum_size = Vector2(65, 0)
+layout_mode = 2
+text = "Rot Y:"
+
+[node name="btn_rot_y_dec" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/RotYRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = " - "
+
+[node name="slider_rot_y" type="HSlider" parent="DebugUI/Control/PanelContainer/VBoxContainer/RotYRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+min_value = -180.0
+max_value = 180.0
+step = 1.0
+
+[node name="btn_rot_y_inc" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/RotYRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = " + "
+
+[node name="input_rot_y" type="LineEdit" parent="DebugUI/Control/PanelContainer/VBoxContainer/RotYRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(55, 0)
+layout_mode = 2
+text = "0.0°"
+
+[node name="ScaleRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/VBoxContainer/ScaleRow"]
+custom_minimum_size = Vector2(65, 0)
+layout_mode = 2
+text = "Size / Scale:"
+
+[node name="btn_scale_dec" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/ScaleRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = " - "
+
+[node name="slider_scale" type="HSlider" parent="DebugUI/Control/PanelContainer/VBoxContainer/ScaleRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+min_value = 0.05
+max_value = 3.0
+step = 0.01
+value = 1.0
+
+[node name="btn_scale_inc" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/ScaleRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = " + "
+
+[node name="input_scale" type="LineEdit" parent="DebugUI/Control/PanelContainer/VBoxContainer/ScaleRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(55, 0)
+layout_mode = 2
+text = "1.00x"
+
+[node name="HSeparator3" type="HSeparator" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="btn_tier1" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Equip Bow Cannon (Tier 1)"
+
+[node name="btn_tier2" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Add Monkey Bomber (Tier 2)"
+
+[node name="btn_tier3" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Add Skeleton Deckhand (Tier 3)"
 
 [node name="btn_fire_toggle" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Auto-Fire: ON / OFF"
+text = "Auto-Fire: OFF"
 
 [node name="btn_clear_all" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Clear All Weapons"
+text = "Clear All"
 
-[node name="info_label" type="Label" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+[node name="btn_print_dict" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
-text = "Use Inspector in Remote Tree to fine-tune offsets live!"
+text = "Print Dictionary to Console"

@@ -1,16 +1,43 @@
-[gd_resource type="Resource" script_class="ShipData" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="ShipData" format=3 uid="uid://i3y6e47wyxa1"]
 
-[ext_resource type="Script" path="res://src/data/ship_data.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/The Ironclad.png" id="2_tex"]
+[ext_resource type="Script" uid="uid://cs0f78ukvxpo3" path="res://src/data/ship_data.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://cve6hq7jqcpym" path="res://assets/sprites/The Ironclad.png" id="2_tex"]
 
 [resource]
 script = ExtResource("1_script")
+ship_id = "ironclad"
 ship_name = "The Ironclad"
 sprite_texture = ExtResource("2_tex")
 pixel_size = 0.0041
-base_cannons = 3
-fire_rate = 0.25
-max_health = 8
-move_speed = 7.0
 y_offset = 1.125
 collision_size = Vector3(2.4, 1.4, 3.8)
+max_health = 400
+move_speed = 7.0
+fire_rate = 0.25
+base_cannons = 3
+hardpoint_offsets = {
+"AftMortarMount": Vector3(0, 0.45, 0.8),
+"BowMount": Vector3(0, 0.45, -1.2),
+"PortSwivelMount": Vector3(-0.75, 0.45, -0.3),
+"StarboardSwivelMount": Vector3(0.75, 0.45, -0.3)
+}
+hardpoint_rotations = {
+"AftMortarMount": Vector3(0, 180, 0),
+"BowMount": Vector3(0, 0, 0),
+"PortSwivelMount": Vector3(0, -45, 0),
+"StarboardSwivelMount": Vector3(0, 45, 0)
+}
+tier_upgrades = Array[Dictionary]([{
+"AftMortarMount": "res://src/data/resources/weapon_aft_mortar.tres",
+"BowMount": "res://src/data/resources/weapon_bow_chaser.tres"
+}, {
+"AftMortarMount": "res://src/data/resources/weapon_aft_mortar.tres",
+"BowMount": "res://src/data/resources/weapon_bow_chaser.tres",
+"PortSwivelMount": "res://src/data/resources/weapon_port_swivel.tres",
+"StarboardSwivelMount": "res://src/data/resources/weapon_starboard_swivel.tres"
+}, {
+"AftMortarMount": "res://src/data/resources/weapon_aft_mortar.tres",
+"BowMount": "res://src/data/resources/weapon_deckhand_sniper_back.tres",
+"PortSwivelMount": "res://src/data/resources/weapon_port_swivel.tres",
+"StarboardSwivelMount": "res://src/data/resources/weapon_starboard_swivel.tres"
+}])

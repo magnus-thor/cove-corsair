@@ -104,8 +104,8 @@ func _on_hit(target: Node) -> void:
 		if target.has_method("take_damage"):
 			target.take_damage(damage)
 			
-			# Apply splash AoE to nearby destructibles if boosted
-			if splash_radius_multiplier > 1.0:
+			# Apply splash AoE to nearby destructibles if ammo has splash_radius
+			if (ammo_data and ammo_data.splash_radius > 0.0) or splash_radius_multiplier > 1.0:
 				_apply_splash_damage()
 				
 		_spawn_splash()

@@ -126,8 +126,8 @@ func _ready() -> void:
 	evolution_xp = 0.0
 	if ship_data:
 		apply_ship_data(ship_data)
-	
-	equip_weapon_to_socket("BowMount", preload("res://src/data/resources/weapon_bow_chaser.tres"))
+	else:
+		equip_weapon_to_socket("BowMount", preload("res://src/data/resources/weapon_bow_chaser.tres"))
 	
 	if is_calibration_mode:
 		_setup_calibration_mode()
@@ -137,32 +137,30 @@ func apply_ship_data(data: ShipData) -> void:
 		return
 	if ship_data != data:
 		ship_data = data
-		return
 	max_health = data.max_health
 	current_health = data.max_health
-	shoot_cooldown = data.fire_rate
+	if "fire_rate" in data:
+		shoot_cooldown = data.fire_rate
 	keyboard_speed = data.move_speed
 	lerp_speed = data.move_speed * 1.3
 	
-	if not visuals:
-		return
-		
-	var sprite = visuals.get_node_or_null("BoatSprite") as Sprite3D
-	if not sprite:
-		for child in visuals.get_children():
-			if not child.name.begins_with("Cal_"):
-				child.queue_free()
-		sprite = Sprite3D.new()
-		sprite.name = "BoatSprite"
-		visuals.add_child(sprite)
-		
-	sprite.visible = true
-	sprite.texture = data.sprite_texture
-	sprite.pixel_size = data.pixel_size
-	sprite.rotation_degrees = Vector3(player_pitch_deg, 0, 0)
-	sprite.position = Vector3(0, data.y_offset, 0)
-	sprite.billboard = BaseMaterial3D.BILLBOARD_DISABLED
-	sprite.alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
+	if visuals:
+		var sprite = visuals.get_node_or_null("BoatSprite") as Sprite3D
+		if not sprite:
+			for child in visuals.get_children():
+				if not child.name.begins_with("Cal_"):
+					child.queue_free()
+			sprite = Sprite3D.new()
+			sprite.name = "BoatSprite"
+			visuals.add_child(sprite)
+			
+		sprite.visible = true
+		sprite.texture = data.sprite_texture
+		sprite.pixel_size = data.pixel_size
+		sprite.rotation_degrees = Vector3(player_pitch_deg, 0, 0)
+		sprite.position = Vector3(0, data.y_offset if "y_offset" in data else 0.485, 0)
+		sprite.billboard = BaseMaterial3D.BILLBOARD_DISABLED
+		sprite.alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
 	
 	# Update main character collision shape
 	var body_col = get_node_or_null("CollisionShape3D") as CollisionShape3D
@@ -184,17 +182,61 @@ func apply_ship_data(data: ShipData) -> void:
 		area_box.size = Vector3(data.collision_size.x, data.collision_size.y + 0.2, data.collision_size.z)
 		area_col.position = Vector3(0, (data.collision_size.y + 0.2) * 0.5, 0)
 		
-	# Dynamically position hardpoint sockets on Y to align with the slanted deck
+	# Position and rotate all children under $Hardpoints according to data.hardpoint_offsets and data.hardpoint_rotations
 	var hardpoints = get_node_or_null("Hardpoints")
 	if hardpoints:
+		for s_name in data.hardpoint_offsets.keys():
+			var s_node = hardpoints.get_node_or_null(s_name)
+			if not s_node:
+				s_node = Node3D.new()
+				s_node.name = s_name
+				hardpoints.add_child(s_node)
+
 		for socket in hardpoints.get_children():
 			if socket is Node3D:
-				var z_pos = socket.position.z
-				# y_offset is the height of the boat sprite center
-				# slant slope is tan(30 deg) = 0.57735
-				socket.position.y = data.y_offset - 0.57735 * z_pos
+				var s_name = socket.name
+				if data.hardpoint_offsets.has(s_name):
+					socket.position = data.hardpoint_offsets[s_name]
+				elif "y_offset" in data:
+					socket.position.y = data.y_offset - 0.57735 * socket.position.z
+					
+				if data.hardpoint_rotations.has(s_name):
+					var rot = data.hardpoint_rotations[s_name]
+					if rot is Vector3:
+						socket.rotation_degrees = rot
+
+				if data.hardpoint_scales.has(s_name):
+					var sc = data.hardpoint_scales[s_name]
+					if sc is Vector3:
+						socket.scale = sc
+		
+	# Initialize active tier to 1 using data.tier_upgrades
+	apply_tier(1)
 		
 	health_changed.emit(current_health, max_health)
+
+func apply_tier(tier_level: int) -> void:
+	if not ship_data:
+		return
+	if ship_data.tier_upgrades.is_empty():
+		_apply_weapon_tier_setup()
+		return
+	var index = clamp(tier_level - 1, 0, ship_data.tier_upgrades.size() - 1)
+	var tier_dict: Dictionary = ship_data.tier_upgrades[index]
+	clear_weapons()
+	
+	var weapons_map: Dictionary = tier_dict.get("weapons", tier_dict)
+	for socket_name in weapons_map:
+		if socket_name == "tier":
+			continue
+		var val = weapons_map[socket_name]
+		var w_data: WeaponData = null
+		if val is String:
+			w_data = load(val) as WeaponData
+		elif val is WeaponData:
+			w_data = val
+		if w_data:
+			equip_weapon_to_socket(socket_name, w_data)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if is_game_over:
@@ -304,15 +346,18 @@ func add_evolution_xp(amount: float) -> void:
 func _check_tier_updates(force: bool = false) -> void:
 	var old_tier = current_tier
 	
-	if evolution_xp >= 280.0:
+	if evolution_xp >= 250.0:
 		current_tier = ShipTier.GALLEON
-	elif evolution_xp >= 120.0:
+	elif evolution_xp >= 100.0:
 		current_tier = ShipTier.SLOOP
 	else:
 		current_tier = ShipTier.RAFT
 			
 	if current_tier != old_tier or force:
-		_apply_weapon_tier_setup()
+		if ship_data and not ship_data.tier_upgrades.is_empty():
+			apply_tier(int(current_tier) + 1)
+		else:
+			_apply_weapon_tier_setup()
 
 func _apply_weapon_tier_setup() -> void:
 	clear_weapons()
@@ -404,7 +449,19 @@ func equip_weapon_to_socket(socket_name: String, weapon_data: WeaponData) -> voi
 		return
 	var socket = hardpoints.get_node_or_null(socket_name)
 	if not socket:
-		return
+		socket = Node3D.new()
+		socket.name = socket_name
+		hardpoints.add_child(socket)
+		if ship_data and ship_data.hardpoint_offsets.has(socket_name):
+			socket.position = ship_data.hardpoint_offsets[socket_name]
+		if ship_data and ship_data.hardpoint_rotations.has(socket_name):
+			var rot = ship_data.hardpoint_rotations[socket_name]
+			if rot is Vector3:
+				socket.rotation_degrees = rot
+		if ship_data and ship_data.hardpoint_scales.has(socket_name):
+			var sc = ship_data.hardpoint_scales[socket_name]
+			if sc is Vector3:
+				socket.scale = sc
 		
 	if equipped_weapons.has(socket_name):
 		var old_weapon = equipped_weapons[socket_name]
