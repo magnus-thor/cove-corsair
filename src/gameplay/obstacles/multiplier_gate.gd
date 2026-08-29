@@ -34,6 +34,15 @@ func _ready() -> void:
 		value = clamp(value, 1, 5)
 	else:
 		value = clamp(value, 2, 3)
+		
+	# Apply water calibration offset, pixel size, and scale
+	var gate_sprite = get_node_or_null("Visuals/GateSprite") as Sprite3D
+	if gate_sprite:
+		gate_sprite.pixel_size = 0.0028
+	if visuals:
+		visuals.position.y = -0.59
+	scale = Vector3(1.09, 1.09, 1.09)
+		
 	update_visuals()
 
 func update_visuals() -> void:

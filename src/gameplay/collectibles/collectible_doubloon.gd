@@ -10,7 +10,7 @@ extends Area3D
 ## Floating bobbing parameters on water
 @export var bob_speed: float = 3.5
 @export var bob_height: float = 0.02
-@export var base_water_y: float = 0.05
+@export var base_water_y: float = 0.13
 
 ## Default river flow downstream speed when floating free
 @export var river_flow_speed: float = 14.0
@@ -41,6 +41,12 @@ func _ready() -> void:
 	
 	area_entered.connect(_on_area_entered)
 	body_entered.connect(_on_body_entered)
+	
+	# Apply water calibration values
+	var coin_sprite = get_node_or_null("Visuals/CoinSprite") as Sprite3D
+	if coin_sprite:
+		coin_sprite.pixel_size = 0.0042
+	scale = Vector3(3.00, 3.00, 3.00)
 	
 	if not _is_bouncing:
 		global_position.y = base_water_y

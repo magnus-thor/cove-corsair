@@ -7,10 +7,10 @@
 script = ExtResource("1_script")
 mob_name = "Skeleton Rower"
 sprite_texture = ExtResource("2_tex")
-pixel_size = 0.0025
+pixel_size = 0.0021
 max_hp = 3
 forward_speed = 2.0
 doubloon_drop_count = 2
 is_boss = false
-y_offset = 0.968
+y_offset = 0.00
 collision_size = Vector3(1.6, 1.2, 1.8)

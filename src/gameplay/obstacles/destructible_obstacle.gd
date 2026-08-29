@@ -50,33 +50,57 @@ func update_obstacle_visuals() -> void:
 			barrel_model.visible = false
 			
 		var tex: Texture2D = wooden_barrel_tex
-		var p_size: float = 0.0012
+		var p_size: float = 0.0017
+		var y_off: float = 0.78
+		var sc: Vector3 = Vector3(0.94, 0.94, 0.94)
+		var rot_deg: Vector3 = Vector3(0.0, 23.0, 0.0)
+		
 		match obstacle_type:
 			ObstacleType.WOODEN_BARREL:
 				tex = wooden_barrel_tex
-				p_size = 0.0012
+				p_size = 0.0017
+				y_off = 0.78
+				sc = Vector3(0.94, 0.94, 0.94)
+				rot_deg = Vector3(0.0, 23.0, 0.0)
 				doubloons_drop = 1
 			ObstacleType.FUSE_BARREL:
 				tex = fuse_barrel_tex
-				p_size = 0.00125
+				p_size = 0.0017
+				y_off = 0.70
+				sc = Vector3(1.0, 1.0, 1.0)
+				rot_deg = Vector3(0.0, 0.0, 0.0)
 				doubloons_drop = 2
 			ObstacleType.RUNE_BARREL:
 				tex = rune_barrel_tex
-				p_size = 0.00125
+				p_size = 0.0017
+				y_off = 0.68
+				sc = Vector3(1.0, 1.0, 1.0)
+				rot_deg = Vector3(0.0, 0.0, 0.0)
 				doubloons_drop = 3
 			ObstacleType.SEA_MINE:
 				tex = sea_mine_tex
-				p_size = 0.0013
+				p_size = 0.0021
+				y_off = 0.37
+				sc = Vector3(1.0, 1.0, 1.0)
+				rot_deg = Vector3(0.0, 0.0, 0.0)
 				doubloons_drop = 2
 			ObstacleType.CORAL_REEF:
 				tex = coral_reef_tex
-				p_size = 0.0015
+				p_size = 0.0028
+				y_off = 1.99
+				sc = Vector3(0.95, 0.95, 0.95)
+				rot_deg = Vector3(0.0, 40.0, 0.0)
 				doubloons_drop = 4
 				
 		obstacle_sprite.texture = tex
 		obstacle_sprite.pixel_size = p_size
 		obstacle_sprite.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
 		obstacle_sprite.alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
+		
+		# Set visual Y position relative to water plane
+		obstacle_sprite.position = Vector3(0.0, y_off, 0.0)
+		scale = sc
+		rotation_degrees = rot_deg
 
 func take_damage(amount: int) -> void:
 	if _is_destroyed:

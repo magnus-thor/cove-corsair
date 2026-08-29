@@ -225,8 +225,18 @@ func _update_ui_from_current_object() -> void:
 		
 	updating_ui = true
 	var pos_y = current_object_node.position.y
-	if current_sprite and current_sprite.position.y != 0.0:
-		pos_y = current_sprite.position.y
+	
+	var cat_idx = category_option.selected if category_option else 0
+	if cat_idx == 0 or cat_idx == 1: # Enemies & Obstacles: height is visual sprite position
+		if current_sprite:
+			pos_y = current_sprite.position.y
+	elif cat_idx == 2: # Gates & Collectibles
+		var name_str = object_option.get_item_text(object_option.selected) if object_option else ""
+		if "Gate" in name_str:
+			var visuals_node = current_object_node.get_node_or_null("Visuals") as Node3D
+			if visuals_node:
+				pos_y = visuals_node.position.y
+				
 	base_y_position = pos_y
 	
 	var psize = current_sprite.pixel_size if current_sprite else 0.0021
@@ -251,14 +261,32 @@ func _on_slider_changed(_val: float) -> void:
 	var new_rot_y = slider_rot_y.value if slider_rot_y else 0.0
 	
 	base_y_position = new_pos_y
-	current_object_node.position = Vector3(0.0, new_pos_y, 0.0)
+	
+	var cat_idx = category_option.selected if category_option else 0
+	
+	if cat_idx == 3: # Vessels: root Y position is the y_offset
+		current_object_node.position.y = new_pos_y
+		if current_sprite:
+			current_sprite.position.y = 0.0
+	elif cat_idx == 2: # Gates & Collectibles
+		var name_str = object_option.get_item_text(object_option.selected) if object_option else ""
+		if "Gate" in name_str:
+			current_object_node.position.y = 0.0
+			var visuals_node = current_object_node.get_node_or_null("Visuals") as Node3D
+			if visuals_node:
+				visuals_node.position.y = new_pos_y
+		else: # Doubloon
+			current_object_node.position.y = new_pos_y
+	else: # Mobs and Obstacles: root stays at Y=0, sprite moves to Y=new_pos_y
+		current_object_node.position.y = 0.0
+		if current_sprite:
+			current_sprite.position.y = new_pos_y
+			
 	current_object_node.scale = Vector3.ONE * new_scale
 	current_object_node.rotation_degrees.y = new_rot_y
 	
 	if current_sprite:
 		current_sprite.pixel_size = new_psize
-		if current_sprite.get_parent() != current_object_node:
-			current_sprite.position.y = new_pos_y
 			
 	if current_resource:
 		if "y_offset" in current_resource:
@@ -272,12 +300,27 @@ func _process(delta: float) -> void:
 	if not current_object_node:
 		return
 		
+	var cat_idx = category_option.selected if category_option else 0
+	var offset_y = base_y_position
 	if is_bobbing_enabled:
 		bob_time += delta * 2.2
-		var hover_y = base_y_position + sin(bob_time) * 0.04
-		current_object_node.position = Vector3(0.0, hover_y, 0.0)
-	else:
-		current_object_node.position = Vector3(0.0, base_y_position, 0.0)
+		offset_y += sin(bob_time) * 0.04
+		
+	if cat_idx == 3: # Vessels
+		current_object_node.position = Vector3(0.0, offset_y, 0.0)
+	elif cat_idx == 2: # Gates & Collectibles
+		var name_str = object_option.get_item_text(object_option.selected) if object_option else ""
+		if "Gate" in name_str:
+			current_object_node.position = Vector3.ZERO
+			var visuals_node = current_object_node.get_node_or_null("Visuals") as Node3D
+			if visuals_node:
+				visuals_node.position.y = offset_y
+		else: # Doubloon
+			current_object_node.position = Vector3(0.0, offset_y, 0.0)
+	else: # Enemies and Obstacles
+		current_object_node.position = Vector3.ZERO
+		if current_sprite:
+			current_sprite.position.y = offset_y
 
 func _on_input_submitted(slider: HSlider, text: String) -> void:
 	if not slider:

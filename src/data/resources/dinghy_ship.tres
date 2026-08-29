@@ -9,6 +9,7 @@ ship_id = "dinghy"
 ship_name = "The Dinghy"
 sprite_texture = ExtResource("2_tex")
 pixel_size = 0.0021
+y_offset = 0.55
 move_speed = 12.0
 fire_rate = 0.45
 hardpoint_offsets = {
