@@ -1,8 +1,8 @@
 class_name EnemyCannonball
 extends Area3D
 
-@export var speed: float = 18.0
-@export var lifetime: float = 3.5
+@export var speed: float = 11.0
+@export var lifetime: float = 4.5
 var direction: Vector3 = Vector3(0, 0, 1)
 
 func _ready() -> void:

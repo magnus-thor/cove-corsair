@@ -3,8 +3,8 @@ extends Node3D
 
 enum State { APPROACHING, COMBAT, DYING }
 
-@export var max_hp: int = 250 # Left Outrigger: 40, Right Outrigger: 40, Main Core: 170
-@export var current_hp: int = 250
+@export var max_hp: int = 120 # Left Outrigger: 20, Right Outrigger: 20, Main Core: 80
+@export var current_hp: int = 120
 
 @export var approach_speed: float = 12.0
 @export var combat_z_offset: float = -18.0
@@ -14,9 +14,9 @@ enum State { APPROACHING, COMBAT, DYING }
 # Component HP
 var hp_left_cannon: int = 5
 var hp_right_cannon: int = 5
-var hp_left_armor: int = 40  # Left Outrigger
-var hp_right_armor: int = 40 # Right Outrigger
-var hp_boiler: int = 170     # Main Core
+var hp_left_armor: int = 20  # Left Outrigger
+var hp_right_armor: int = 20 # Right Outrigger
+var hp_boiler: int = 80      # Main Core
 var combat_time: float = 0.0
 var enraged_shoot_timer: float = 0.0
 var minion_timer: float = 0.0
@@ -47,7 +47,7 @@ var _attack_timer: float = 0.0
 var _is_left_turn: bool = true
 var _flash_tweens: Dictionary = {}
 var _is_defeated: bool = false
-var _y_base: float = 0.8
+var _y_base: float = 1.38
 
 # Phase 2 Steam Venting variables
 var is_venting_steam: bool = false
@@ -74,11 +74,11 @@ func _ready() -> void:
 	GameState.boss_health_changed.emit(current_hp, max_hp)
 	
 	# Position cannons relative to ship
-	if left_cannon_node: left_cannon_node.position = Vector3(-1.8, 0.4, 0.5)
-	if right_cannon_node: right_cannon_node.position = Vector3(1.8, 0.4, 0.5)
-	if left_armor_node: left_armor_node.position = Vector3(-0.9, 0.3, -0.6)
-	if right_armor_node: right_armor_node.position = Vector3(0.9, 0.3, -0.6)
-	if boiler_node: boiler_node.position = Vector3(0.0, 0.5, -0.2)
+	if left_cannon_node: left_cannon_node.position = Vector3(-2.0, 0.5, 0.5)
+	if right_cannon_node: right_cannon_node.position = Vector3(2.0, 0.5, 0.5)
+	if left_armor_node: left_armor_node.position = Vector3(-1.0, 0.4, -0.6)
+	if right_armor_node: right_armor_node.position = Vector3(1.0, 0.4, -0.6)
+	if boiler_node: boiler_node.position = Vector3(0.0, 0.6, -0.2)
 
 func _physics_process(delta: float) -> void:
 	if _is_defeated or current_state == State.DYING:
@@ -113,23 +113,23 @@ func _process_combat(delta: float) -> void:
 	else:
 		_process_ram_charge(delta)
 		
-	# Continuous Mob & Hazard pressure — 2 Skiffs every 4s
+	# Continuous Mob & Hazard pressure — Skiffs every 6.5s
 	minion_timer += delta
-	if minion_timer >= 4.0:
+	if minion_timer >= 6.5:
 		minion_timer = 0.0
 		_deploy_side_minions()
 		
 	keg_timer += delta
-	if keg_timer >= 4.5:
+	if keg_timer >= 6.0:
 		keg_timer = 0.0
 		_deploy_center_kegs()
 		
 	mortar_timer += delta
-	if mortar_timer >= 6.0:
+	if mortar_timer >= 9.0:
 		mortar_timer = 0.0
 		_fire_targeted_mortar()
 		
-	if combat_time >= 12.0:
+	if combat_time >= 40.0:
 		if boss_sprite:
 			boss_sprite.modulate = Color(2.5, 0.4, 0.4, 1.0) # Tint red for enrage
 		_process_enraged_volley(delta)
@@ -158,8 +158,8 @@ func _spawn_pressure_skiff(x_norm: float, speed_val: float) -> void:
 			parent.add_child(skiff)
 			if skiff.has_method("apply_enemy_data"):
 				skiff.apply_enemy_data(skiff_data)
-			skiff.max_hp = 10
-			skiff.current_hp = 10
+			skiff.max_hp = 4
+			skiff.current_hp = 4
 			skiff.forward_speed = speed_val
 			var river_width = 12.0
 			var player = get_tree().get_first_node_in_group("player")
@@ -249,7 +249,7 @@ func _explode_mortar_at(pos: Vector3) -> void:
 
 func _process_enraged_volley(delta: float) -> void:
 	enraged_shoot_timer += delta
-	if enraged_shoot_timer >= 0.2: # Fire mortar shell every 0.2s
+	if enraged_shoot_timer >= 0.75: # Fire shell every 0.75s during enrage
 		enraged_shoot_timer = 0.0
 		
 		var player = get_tree().get_first_node_in_group("player")
@@ -277,9 +277,9 @@ func _fire_enraged_mortar(target_pos: Vector3) -> void:
 		root.add_child(ball)
 		
 	ball.global_position = global_position + Vector3(randf_range(-1.5, 1.5), 1.0, 2.0)
-	ball.scale = Vector3(2.5, 2.5, 2.5) # Heavy enrage scale
+	ball.scale = Vector3(1.8, 1.8, 1.8)
 	if "speed" in ball:
-		ball.speed = 32.0
+		ball.speed = 13.0
 	
 	var dir = (target_pos - ball.global_position).normalized()
 	dir.y = 0.0
@@ -290,7 +290,7 @@ func _fire_enraged_mortar(target_pos: Vector3) -> void:
 
 func _process_phase_1(delta: float) -> void:
 	_attack_timer += delta
-	if _attack_timer >= 0.9:
+	if _attack_timer >= 2.2:
 		_attack_timer = 0.0
 		_fire_cannon_volley()
 		
@@ -310,7 +310,7 @@ func _process_phase_2(delta: float) -> void:
 			
 	# Cannon fires slower in Phase 2
 	_attack_timer += delta
-	if _attack_timer >= 1.3:
+	if _attack_timer >= 2.8:
 		_attack_timer = 0.0
 		_fire_cannon_volley()
 
@@ -378,22 +378,24 @@ func _start_steam_venting() -> void:
 	AudioManager.play_sfx("water_splashes") # Steam venting hiss
 	
 	# Glow boiler core red
-	var mesh = boiler_node.get_node_or_null("LogMesh") as MeshInstance3D # Reuse log mesh shape or visual representation
-	if mesh:
-		var mat = StandardMaterial3D.new()
-		mat.albedo_color = Color(2.5, 0.5, 0.1) # Bright glowing orange/red
-		mat.emission_enabled = true
-		mat.emission = Color(1.5, 0.3, 0.0)
-		mesh.material_override = mat
+	if is_instance_valid(boiler_node):
+		var mesh = boiler_node.get_node_or_null("LogMesh") as MeshInstance3D
+		if mesh and is_instance_valid(mesh):
+			var mat = StandardMaterial3D.new()
+			mat.albedo_color = Color(2.5, 0.5, 0.1) # Bright glowing orange/red
+			mat.emission_enabled = true
+			mat.emission = Color(1.5, 0.3, 0.0)
+			mesh.material_override = mat
 
 func _stop_steam_venting() -> void:
 	is_venting_steam = false
 	steam_cycle_timer = 0.0
 	
 	# Reset boiler color
-	var mesh = boiler_node.get_node_or_null("LogMesh") as MeshInstance3D
-	if mesh:
-		mesh.material_override = null
+	if is_instance_valid(boiler_node):
+		var mesh = boiler_node.get_node_or_null("LogMesh") as MeshInstance3D
+		if mesh and is_instance_valid(mesh):
+			mesh.material_override = null
 
 # Ram Charge
 func _start_ram_charge() -> void:
@@ -403,7 +405,7 @@ func _start_ram_charge() -> void:
 	AudioManager.play_sfx("cannon_shots") # Warning sound
 	
 	# Flash red indicators
-	if boss_sprite:
+	if is_instance_valid(boss_sprite):
 		var tween = create_tween()
 		tween.tween_property(boss_sprite, "modulate", Color(4.0, 0.2, 0.2, 1.0), 0.15)
 		tween.tween_property(boss_sprite, "modulate", Color.WHITE, 0.15)
@@ -562,11 +564,11 @@ func _destroy_subcomponent(node: Variant) -> void:
 				col.set_deferred("disabled", true)
 
 func _check_phase_transition() -> void:
-	# Phase thresholds scaled for 250 HP pool:
-	# Phase 2 at < 65% = 162 HP, Phase 3 at < 30% = 75 HP
-	if current_phase == 1 and current_hp <= 162: # < 65%
+	# Phase thresholds scaled for 120 HP pool:
+	# Phase 2 at < 65% = 78 HP, Phase 3 at < 30% = 36 HP
+	if current_phase == 1 and current_hp <= 78: # < 65%
 		_transition_to_phase_2()
-	elif current_phase == 2 and current_hp <= 75:  # < 30%
+	elif current_phase == 2 and current_hp <= 36:  # < 30%
 		_transition_to_phase_3()
 
 func _transition_to_phase_2() -> void:

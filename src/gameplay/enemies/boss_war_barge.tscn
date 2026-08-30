@@ -29,7 +29,7 @@ radial_segments = 12
 script = ExtResource("1_boss_script")
 
 [node name="BossSprite" type="Sprite3D" parent="."]
-transform = Transform3D(1.8, 0, 0, 0, 1.37888, 1.15702, 0, -1.15702, 1.37888, 0, 0.8, 0)
+transform = Transform3D(1.1, 0, 0, 0, 0.842648, 0.707078, 0, -0.707078, 0.842648, 0, 1.38, 0)
 pixel_size = 0.0038
 alpha_cut = 1
 texture = ExtResource("2_barge_tex")

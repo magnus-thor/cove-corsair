@@ -297,29 +297,23 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 				reef.global_position = Vector3(x_world, -0.05, z_spawn)
 				reef.scale = Vector3(scale_x, 1.0, scale_z)
 
-		# ── Elite Ironclad mini-boss ───────────────────────────────────────────
-		"elite_ironclad":
-			var x_norm  = float(event.get("x", 0.0))
-			var x_world = normalized_to_world_x(x_norm)
-			var hp      = int(event.get("hp", 65))
-			var elite_scene = preload("res://src/gameplay/enemies/enemy_elite_ironclad.tscn")
-			if elite_scene:
-				var elite = elite_scene.instantiate() as Area3D
-				add_child(elite)
-				elite.global_position = Vector3(x_world, 0.1, z_spawn)
-				# Override HP from event data
-				if "max_hp" in elite:     elite.max_hp     = hp
-				if "current_hp" in elite: elite.current_hp = hp
-			# Flanking fuse barrels
-			var fuse_offsets: Array = event.get("fuse_offsets", [-0.35, 0.35])
-			for x_off in fuse_offsets:
-				if barrel_scene:
-					var barrel = barrel_scene.instantiate() as Area3D
-					add_child(barrel)
-					barrel.global_position = Vector3(x_world + normalized_to_world_x(float(x_off)), 0.05, z_spawn - 1.5)
-					barrel.hp = 1
-					if "obstacle_type" in barrel:
-						barrel.obstacle_type = DestructibleObstacle.ObstacleType.FUSE_BARREL
+		# ── Armored Turtle Rafts ───────────────────────────────────────────────
+		"turtle_rafts":
+			var x_positions: Array = event.get("x_positions", [0.0])
+			var hp         = int(event.get("hp", 8))
+			var raft_speed = float(event.get("speed", 1.8))
+			for x_norm in x_positions:
+				var x_world = normalized_to_world_x(float(x_norm))
+				if enemy_mob_scene:
+					var enemy = enemy_mob_scene.instantiate() as Area3D
+					add_child(enemy)
+					enemy.global_position = Vector3(x_world, 0.1, z_spawn)
+					var turtle_data = preload("res://src/data/resources/turtle_raft.tres")
+					if enemy.has_method("apply_enemy_data"):
+						enemy.apply_enemy_data(turtle_data)
+					enemy.max_hp        = hp
+					enemy.current_hp    = hp
+					enemy.forward_speed = raft_speed
 
 		# ── Reinforced gate (Ironwood) ─────────────────────────────────────────
 		"reinforced_gate":

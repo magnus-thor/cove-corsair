@@ -12,5 +12,5 @@ max_hp = 100
 forward_speed = 0.0
 doubloon_drop_count = 25
 is_boss = true
-y_offset = 2.612
+y_offset = 2.43
 collision_size = Vector3(4.4, 1.6, 2.8)

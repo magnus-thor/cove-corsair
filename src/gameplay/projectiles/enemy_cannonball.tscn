@@ -1,25 +1,38 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/projectiles/enemy_cannonball.gd" id="1_script"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ball"]
-albedo_color = Color(0.15, 0.15, 0.15, 1)
-metallic = 0.8
-roughness = 0.3
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fire_core"]
+shading_mode = 0
+albedo_color = Color(1.0, 0.35, 0.05, 1.0)
 
-[sub_resource type="SphereMesh" id="SphereMesh_ball"]
-material = SubResource("StandardMaterial3D_ball")
-radius = 0.28
-height = 0.56
+[sub_resource type="SphereMesh" id="SphereMesh_core"]
+material = SubResource("StandardMaterial3D_fire_core")
+radius = 0.35
+height = 0.7
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fire_glow"]
+transparency = 1
+blend_mode = 1
+shading_mode = 0
+albedo_color = Color(1.0, 0.2, 0.0, 0.45)
+
+[sub_resource type="SphereMesh" id="SphereMesh_glow"]
+material = SubResource("StandardMaterial3D_fire_glow")
+radius = 0.55
+height = 1.1
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_ball"]
-radius = 0.28
+radius = 0.4
 
 [node name="EnemyCannonball" type="Area3D" groups=["enemy_projectiles"]]
 script = ExtResource("1_script")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = SubResource("SphereMesh_ball")
+[node name="FireCore" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_core")
+
+[node name="FireGlow" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_glow")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("SphereShape3D_ball")

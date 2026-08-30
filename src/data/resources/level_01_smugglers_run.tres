@@ -88,10 +88,10 @@ wave_events = Array[Dictionary]([{
 "x_positions": [0.0]
 }, {
 "distance": 118.0,
-"fuse_offsets": [-0.35, 0.35],
-"hp": 28,
-"type": "elite_ironclad",
-"x": 0.0
+"hp": 20,
+"speed": 1.5,
+"type": "turtle_rafts",
+"x_positions": [0.0]
 }, {
 "distance": 130.0,
 "text": "+1",
@@ -142,10 +142,10 @@ wave_events = Array[Dictionary]([{
 "x_positions": [-0.7, 0.0, 0.7]
 }, {
 "distance": 194.0,
-"fuse_offsets": [-0.45, 0.45],
-"hp": 50,
-"type": "elite_ironclad",
-"x": 0.0
+"hp": 30,
+"speed": 1.5,
+"type": "turtle_rafts",
+"x_positions": [-0.3, 0.3]
 }, {
 "distance": 210.0,
 "text": "+2",

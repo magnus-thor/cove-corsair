@@ -38,7 +38,6 @@ var categories: Array[String] = [
 var enemy_items: Array[Dictionary] = [
 	{"name": "Skeleton Rower", "res": "res://src/data/resources/skeleton_rower.tres"},
 	{"name": "Raider Skiff", "res": "res://src/data/resources/raider_skiff.tres"},
-	{"name": "Elite Ironclad", "res": "res://src/data/resources/enemy_elite_ironclad.tres"},
 	{"name": "Goblin Skiff", "res": "res://src/data/resources/goblin_skiff.tres"},
 	{"name": "Turtle Raft", "res": "res://src/data/resources/turtle_raft.tres"},
 	{"name": "Boss Bone-Beard", "res": "res://src/data/resources/boss_bone_beard.tres"},

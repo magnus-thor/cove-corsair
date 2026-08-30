@@ -66,37 +66,16 @@ func generate_scenery() -> void:
 					palm.rotation.y = randf_range(0.0, TAU)
 					_clean_shadow_nodes(palm)
 					
-	# 4. Soft wispy fog planes along the shoals (frame the river, hide empty edges)
-	for i in range(2):
-		var fog_x = randf_range(-11.0, -9.0) if side == "left" else randf_range(9.0, 11.0)
-		var fog_z = -strip_length / 2.0 + (i * (strip_length / 2.0)) + randf_range(-3.0, 3.0)
-		
-		var fog_mesh_inst = MeshInstance3D.new()
-		var quad = QuadMesh.new()
-		quad.size = Vector2(randf_range(12.0, 18.0), randf_range(4.0, 7.0))
-		fog_mesh_inst.mesh = quad
-		
-		var mat = StandardMaterial3D.new()
-		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		mat.albedo_color = Color(0.18, 0.28, 0.35, 0.18) # Moody smugglers blue mist albedo
-		mat.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
-		mat.double_sided = true
-		
-		fog_mesh_inst.material_override = mat
-		add_child(fog_mesh_inst)
-		fog_mesh_inst.position = Vector3(fog_x, randf_range(0.2, 0.6), fog_z)
-
 func _clean_shadow_nodes(node: Node) -> void:
 	if not node:
 		return
 		
-	if node is MeshInstance3D or node is Sprite3D or node is GeometryInstance3D:
+	if node is GeometryInstance3D:
 		node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		
 	var lower_name = node.name.to_lower()
 	var is_shadow_node = false
-	if "shadow" in lower_name or "decal" in lower_name or "projector" in lower_name or "card" in lower_name or "oblate" in lower_name or "sphere" in lower_name or "quad" in lower_name or "dark" in lower_name:
+	if "shadow" in lower_name or "decal" in lower_name or "projector" in lower_name or "card" in lower_name or "oblate" in lower_name or "sphere" in lower_name or "dark" in lower_name:
 		is_shadow_node = true
 		
 	if is_shadow_node:

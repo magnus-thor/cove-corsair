@@ -44,7 +44,7 @@ func _ready() -> void:
 	if gate_sprite:
 		gate_sprite.pixel_size = 0.0028
 	if visuals:
-		visuals.position.y = -0.59
+		visuals.position.y = -0.13
 	scale = Vector3(1.09, 1.09, 1.09)
 		
 	_clean_shadow_nodes(self)
@@ -95,10 +95,11 @@ func _on_area_entered(area: Area3D) -> void:
 	if not choice_group.is_empty():
 		var gates = get_tree().get_nodes_in_group("multiplier_gate")
 		for gate in gates:
-			if gate is MultiplierGate and gate.choice_group == choice_group:
+			if gate is MultiplierGate and gate.choice_group == choice_group and gate != self:
 				gate.is_active = false
-				var t = gate.create_tween()
-				t.tween_property(gate, "modulate:a", 0.3, 0.2)
+				var t = gate.create_tween().set_parallel(true)
+				t.tween_property(gate, "modulate:a", 0.0, 0.25)
+				t.chain().tween_callback(gate.queue_free)
 				
 	# Find the player node
 	var player_node = null
@@ -112,14 +113,31 @@ func _on_area_entered(area: Area3D) -> void:
 	if player_node and player_node.has_method("add_follower_ships"):
 		player_node.add_follower_ships(final_value)
 		
-	_play_bounce_tween()
+	_play_disappear_animation()
 
-func _play_bounce_tween() -> void:
+func _play_disappear_animation() -> void:
+	# Disable collision immediately
+	set_deferred("monitoring", false)
+	set_deferred("monitorable", false)
+	for child in get_children():
+		if child is CollisionShape3D:
+			child.set_deferred("disabled", true)
+			
 	if not visuals:
+		queue_free()
 		return
-	var tween = create_tween()
-	tween.tween_property(visuals, "scale", Vector3(1.25, 1.25, 1.25), 0.08).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tween.tween_property(visuals, "scale", Vector3(1.0, 1.0, 1.0), 0.12).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+		
+	var tween = create_tween().set_parallel(true)
+	tween.tween_property(visuals, "scale", Vector3(1.35, 1.35, 1.35), 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(visuals, "position:y", visuals.position.y + 0.8, 0.22).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	
+	var gate_sprite = get_node_or_null("Visuals/GateSprite") as Sprite3D
+	if gate_sprite:
+		tween.tween_property(gate_sprite, "modulate:a", 0.0, 0.22)
+	if label_3d:
+		tween.tween_property(label_3d, "modulate:a", 0.0, 0.22)
+		
+	tween.chain().tween_callback(queue_free)
 
 func _clean_shadow_nodes(node: Node) -> void:
 	if not node:

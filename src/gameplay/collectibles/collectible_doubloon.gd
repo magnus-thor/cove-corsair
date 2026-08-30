@@ -10,7 +10,7 @@ extends Area3D
 ## Floating bobbing parameters on water
 @export var bob_speed: float = 3.5
 @export var bob_height: float = 0.02
-@export var base_water_y: float = 0.13
+@export var base_water_y: float = 0.16
 
 ## Default river flow downstream speed when floating free
 @export var river_flow_speed: float = 14.0
