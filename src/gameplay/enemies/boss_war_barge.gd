@@ -3,8 +3,8 @@ extends Node3D
 
 enum State { APPROACHING, COMBAT, DYING }
 
-@export var max_hp: int = 120 # 80 Boiler + 20 Left Armor + 20 Right Armor
-@export var current_hp: int = 120
+@export var max_hp: int = 250 # Left Outrigger: 40, Right Outrigger: 40, Main Core: 170
+@export var current_hp: int = 250
 
 @export var approach_speed: float = 12.0
 @export var combat_z_offset: float = -18.0
@@ -14,9 +14,9 @@ enum State { APPROACHING, COMBAT, DYING }
 # Component HP
 var hp_left_cannon: int = 5
 var hp_right_cannon: int = 5
-var hp_left_armor: int = 20
-var hp_right_armor: int = 20
-var hp_boiler: int = 80
+var hp_left_armor: int = 40  # Left Outrigger
+var hp_right_armor: int = 40 # Right Outrigger
+var hp_boiler: int = 170     # Main Core
 var combat_time: float = 0.0
 var enraged_shoot_timer: float = 0.0
 var minion_timer: float = 0.0
@@ -113,9 +113,9 @@ func _process_combat(delta: float) -> void:
 	else:
 		_process_ram_charge(delta)
 		
-	# Continuous Mob & Hazard pressure
+	# Continuous Mob & Hazard pressure — 2 Skiffs every 4s
 	minion_timer += delta
-	if minion_timer >= 3.0:
+	if minion_timer >= 4.0:
 		minion_timer = 0.0
 		_deploy_side_minions()
 		
@@ -158,8 +158,8 @@ func _spawn_pressure_skiff(x_norm: float, speed_val: float) -> void:
 			parent.add_child(skiff)
 			if skiff.has_method("apply_enemy_data"):
 				skiff.apply_enemy_data(skiff_data)
-			skiff.max_hp = 3
-			skiff.current_hp = 3
+			skiff.max_hp = 10
+			skiff.current_hp = 10
 			skiff.forward_speed = speed_val
 			var river_width = 12.0
 			var player = get_tree().get_first_node_in_group("player")
@@ -435,6 +435,16 @@ func _process_ram_charge(delta: float) -> void:
 			is_charging = false
 			ram_timer = 0.0
 
+func take_damage(amount: int) -> void:
+	if _is_defeated:
+		return
+	if hp_left_armor > 0:
+		damage_component("left_armor", amount, false)
+	elif hp_right_armor > 0:
+		damage_component("right_armor", amount, false)
+	else:
+		damage_component("boiler_core", amount, false)
+
 # Damage routing
 func damage_component(comp_name: String, amount: int, from_bow: bool) -> void:
 	if _is_defeated:
@@ -499,21 +509,24 @@ func damage_component(comp_name: String, amount: int, from_bow: bool) -> void:
 				# Invulnerable! Clanking deflect sound
 				AudioManager.play_sfx("barrel_hits")
 
-func _flash_node(node: Node3D) -> void:
-	if not node: return
-	if _flash_tweens.has(node) and _flash_tweens[node].is_valid():
+func _flash_node(node: Variant) -> void:
+	if not is_instance_valid(node) or not (node is Node3D):
+		return
+	if _flash_tweens.has(node) and is_instance_valid(_flash_tweens[node]) and _flash_tweens[node].is_valid():
 		_flash_tweens[node].kill()
 		
+	var orig_scale = node.scale
 	var tween = create_tween()
 	_flash_tweens[node] = tween
 	
 	# Scale punch
-	tween.tween_property(node, "scale", node.scale * 1.25, 0.05)
-	tween.tween_property(node, "scale", node.scale, 0.08)
+	tween.tween_property(node, "scale", orig_scale * 1.25, 0.05)
+	tween.tween_property(node, "scale", orig_scale, 0.08)
 
 func _flash_boss_main() -> void:
-	if not boss_sprite: return
-	if _flash_tweens.has(boss_sprite) and _flash_tweens[boss_sprite].is_valid():
+	if not is_instance_valid(boss_sprite):
+		return
+	if _flash_tweens.has(boss_sprite) and is_instance_valid(_flash_tweens[boss_sprite]) and _flash_tweens[boss_sprite].is_valid():
 		_flash_tweens[boss_sprite].kill()
 		
 	var tween = create_tween()
@@ -522,21 +535,24 @@ func _flash_boss_main() -> void:
 	tween.tween_property(boss_sprite, "modulate", Color.WHITE, 0.1)
 
 func _show_crit_flash() -> void:
-	if not boss_sprite: return
+	if not is_instance_valid(boss_sprite):
+		return
 	var tween = create_tween()
 	tween.tween_property(boss_sprite, "modulate", Color(1.0, 1.0, 3.0, 1.0), 0.05) # Blue flash for crit
 	tween.tween_property(boss_sprite, "modulate", Color.WHITE, 0.15)
 
-func _destroy_subcomponent(node: Node3D) -> void:
-	if not node: return
+func _destroy_subcomponent(node: Variant) -> void:
+	if not is_instance_valid(node):
+		return
 	AudioManager.play_sfx("barrel_breaks")
-	if explosion_scene:
+	if explosion_scene and (node is Node3D):
 		var vfx = explosion_scene.instantiate() as Node3D
 		var parent = get_parent() if get_parent() else get_tree().current_scene
 		if parent:
 			parent.add_child(vfx)
 			vfx.global_position = node.global_position
-	node.visible = false
+	if "visible" in node:
+		node.visible = false
 	# Disable collisions on the sub-component
 	if node is Area3D:
 		node.set_deferred("monitoring", false)
@@ -546,10 +562,11 @@ func _destroy_subcomponent(node: Node3D) -> void:
 				col.set_deferred("disabled", true)
 
 func _check_phase_transition() -> void:
-	var hp_ratio = float(current_hp) / float(max_hp)
-	if current_phase == 1 and current_hp <= 39: # <65%
+	# Phase thresholds scaled for 250 HP pool:
+	# Phase 2 at < 65% = 162 HP, Phase 3 at < 30% = 75 HP
+	if current_phase == 1 and current_hp <= 162: # < 65%
 		_transition_to_phase_2()
-	elif current_phase == 2 and current_hp <= 18: # <30%
+	elif current_phase == 2 and current_hp <= 75:  # < 30%
 		_transition_to_phase_3()
 
 func _transition_to_phase_2() -> void:

@@ -128,7 +128,7 @@ func _physics_process(delta: float) -> void:
 		
 	if "raider" in mob_name_lower or "skiff" in mob_name_lower or "elite" in mob_name_lower or "ironclad" in mob_name_lower:
 		shoot_cooldown_timer += delta
-		var shoot_interval = 2.0
+		var shoot_interval = 1.8
 		if "elite" in mob_name_lower or "ironclad" in mob_name_lower:
 			shoot_interval = 1.5
 		if shoot_cooldown_timer >= shoot_interval:
@@ -204,18 +204,7 @@ func take_damage(amount: int) -> void:
 			fct.global_position = global_position + Vector3(randf_range(-0.5, 0.5), 1.2, randf_range(-0.5, 0.5))
 			fct.setup("-" + str(amount), Color(1.0, 0.3, 0.3))
 			
-	# Spawn XP orb flying into the boat on hit!
-	var player = get_tree().get_first_node_in_group("player")
-	var xp_script = load("res://src/gameplay/collectibles/collectible_xp_orb.gd")
-	if xp_script:
-		var orb = xp_script.new()
-		var root = get_tree().current_scene
-		if root:
-			root.add_child(orb)
-			orb.global_position = global_position + Vector3(randf_range(-0.4, 0.4), 0.3, randf_range(-0.4, 0.4))
-			if player:
-				orb.attract_to(player)
-	
+	# NOTE: XP is awarded only on kill (in die()), not per hit, to prevent XP runaway.
 	if current_hp <= 0:
 		die()
 
@@ -261,7 +250,7 @@ func die() -> void:
 		if player.has_method("upgrade_ship"):
 			player.upgrade_ship(1)
 		if player.has_method("add_evolution_xp"):
-			player.add_evolution_xp(15.0)
+			player.add_evolution_xp(10.0)
 		
 	queue_free()
 

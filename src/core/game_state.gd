@@ -37,9 +37,6 @@ func update_distance(delta_distance: float) -> void:
 		return
 	distance_traveled = min(level_distance_target, distance_traveled + delta_distance)
 	progress_changed.emit(distance_traveled, level_distance_target)
-	if distance_traveled >= level_distance_target and not boss_spawned:
-		boss_spawned = true
-		distance_target_reached.emit()
 
 func reset_level() -> void:
 	doubloons = 0

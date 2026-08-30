@@ -32,11 +32,11 @@ func _update_label_visuals() -> void:
 		return
 	hp_label.text = str(hp)
 	if hp <= 5:
-		hp_label.modulate = Color(0.2, 1.0, 0.2) # green
-	elif hp <= 15:
-		hp_label.modulate = Color(1.0, 0.8, 0.2) # orange
+		hp_label.modulate = Color(0.2, 1.0, 0.2) # green  – almost dead
+	elif hp <= 25:
+		hp_label.modulate = Color(1.0, 0.8, 0.2) # orange – half health
 	else:
-		hp_label.modulate = Color(1.0, 0.2, 0.2) # red
+		hp_label.modulate = Color(1.0, 0.2, 0.2) # red    – full health
 
 func take_damage(amount: int) -> void:
 	super.take_damage(amount)

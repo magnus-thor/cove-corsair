@@ -300,10 +300,8 @@ func _physics_process(delta: float) -> void:
 	else:
 		speed_multiplier = 1.0
 
-	# 1. Update global GameState level distance
-	var track_mgr = get_tree().get_first_node_in_group("track_manager")
-	if track_mgr and "scroll_speed" in track_mgr and GameState.is_game_active:
-		GameState.update_distance(track_mgr.scroll_speed * delta)
+	# NOTE: distance tracking is owned solely by LevelController._physics_process.
+	# Do NOT call GameState.update_distance() here — it causes double-counting.
 		
 	if not GameState.is_game_active:
 		# Floating / Bobbing on water
@@ -399,7 +397,7 @@ func _check_tier_updates(force: bool = false) -> void:
 	var old_tier = current_tier
 	
 	var t2_threshold = 30.0 if ship_data and ship_data.ship_id == "dinghy" else 100.0
-	var t3_threshold = 80.0 if ship_data and ship_data.ship_id == "dinghy" else 250.0
+	var t3_threshold = 500.0 if ship_data and ship_data.ship_id == "dinghy" else 250.0
 	
 	if evolution_xp >= t3_threshold:
 		current_tier = ShipTier.GALLEON

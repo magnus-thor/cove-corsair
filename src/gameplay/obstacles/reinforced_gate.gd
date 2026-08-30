@@ -2,7 +2,7 @@ class_name ReinforcedGate
 extends Node3D
 
 @export var segment_prefab: PackedScene = preload("res://src/gameplay/obstacles/barricade_segment.tscn")
-@export var lock_hp: int = 5
+@export var lock_hp: int = 50
 @export var wall_hp: int = 99
 
 var lock_segment: BarricadeSegment = null

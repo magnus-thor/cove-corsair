@@ -122,18 +122,7 @@ func take_damage(amount: int) -> void:
 			fct.global_position = global_position + Vector3(randf_range(-0.5, 0.5), 1.2, randf_range(-0.5, 0.5))
 			fct.setup("-" + str(amount), Color(1.0, 0.3, 0.3))
 			
-	# Spawn an XP orb directly flying into the boat on hit!
-	var player = get_tree().get_first_node_in_group("player")
-	var xp_script = load("res://src/gameplay/collectibles/collectible_xp_orb.gd")
-	if xp_script:
-		var orb = xp_script.new()
-		var root = get_tree().current_scene
-		if root:
-			root.add_child(orb)
-			orb.global_position = global_position + Vector3(randf_range(-0.4, 0.4), 0.3, randf_range(-0.4, 0.4))
-			if player:
-				orb.attract_to(player)
-				
+	# NOTE: XP is awarded only on kill (in die()), not per hit, to prevent XP runaway.
 	if hp <= 0:
 		die()
 

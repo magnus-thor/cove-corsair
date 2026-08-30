@@ -158,8 +158,8 @@ func collect_coin(player_ref: Node = null) -> void:
 	if player:
 		if player.has_method("add_doubloons"):
 			player.add_doubloons(value)
-		if player.has_method("add_evolution_xp"):
-			player.add_evolution_xp(10.0)
+		# NOTE: Doubloons are currency only — they do NOT award XP.
+		# XP is awarded solely on enemy/obstacle kills via die().
 		
 	AudioManager.play_sfx("coin_pickups")
 	_spawn_pickup_vfx()

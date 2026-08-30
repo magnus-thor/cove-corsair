@@ -17,11 +17,11 @@ func _ready() -> void:
 	_update_pivots()
 	get_viewport().size_changed.connect(_update_pivots)
 	
-	# Connect to GameState Autoload signals
-	if Engine.has_singleton("GameState") or get_node_or_null("/root/GameState"):
 		GameState.doubloons_changed.connect(_on_doubloons_changed)
 		GameState.multiplier_changed.connect(_on_multiplier_changed)
 		GameState.progress_changed.connect(_on_progress_changed)
+		GameState.boss_spawned_event.connect(_on_boss_spawned)
+		GameState.boss_health_changed.connect(_on_boss_health_changed)
 		
 		# Set initial state
 		_displayed_gold = GameState.doubloons
@@ -31,6 +31,33 @@ func _ready() -> void:
 		level_progress_bar.value = GameState.distance_traveled
 		if "current_level" in GameState:
 			level_title.text = "WORLD %d - COVE RUN" % GameState.current_level
+
+var is_boss_mode: bool = false
+
+func _on_boss_spawned(boss_name: String, max_hp: int) -> void:
+	is_boss_mode = true
+	if level_title:
+		level_title.text = "⚔ " + boss_name.to_upper() + " ⚔"
+		level_title.modulate = Color(1.0, 0.3, 0.3)
+	if level_progress_bar:
+		level_progress_bar.max_value = max_hp
+		level_progress_bar.value = max_hp
+		var red_fill = StyleBoxFlat.new()
+		red_fill.bg_color = Color(0.95, 0.15, 0.15)
+		red_fill.corner_radius_top_left = 7
+		red_fill.corner_radius_top_right = 7
+		red_fill.corner_radius_bottom_left = 7
+		red_fill.corner_radius_bottom_right = 7
+		level_progress_bar.add_theme_stylebox_override("fill", red_fill)
+
+func _on_boss_health_changed(current: int, max_hp: int) -> void:
+	if not level_progress_bar:
+		return
+	level_progress_bar.max_value = max_hp
+	if _progress_tween and _progress_tween.is_valid():
+		_progress_tween.kill()
+	_progress_tween = create_tween()
+	_progress_tween.tween_property(level_progress_bar, "value", clamp(current, 0, max_hp), 0.1).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 func _update_pivots() -> void:
 	if gold_container:
@@ -81,7 +108,7 @@ func _update_multiplier_text(val: float, mode: String) -> void:
 	multiplier_label.text = prefix + val_str
 
 func _on_progress_changed(current: float, total: float) -> void:
-	if not level_progress_bar:
+	if not level_progress_bar or is_boss_mode:
 		return
 	level_progress_bar.max_value = max(1.0, total)
 	

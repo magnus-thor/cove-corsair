@@ -37,9 +37,12 @@ var categories: Array[String] = [
 
 var enemy_items: Array[Dictionary] = [
 	{"name": "Skeleton Rower", "res": "res://src/data/resources/skeleton_rower.tres"},
+	{"name": "Raider Skiff", "res": "res://src/data/resources/raider_skiff.tres"},
+	{"name": "Elite Ironclad", "res": "res://src/data/resources/enemy_elite_ironclad.tres"},
 	{"name": "Goblin Skiff", "res": "res://src/data/resources/goblin_skiff.tres"},
 	{"name": "Turtle Raft", "res": "res://src/data/resources/turtle_raft.tres"},
-	{"name": "Boss Bone-Beard", "res": "res://src/data/resources/boss_bone_beard.tres"}
+	{"name": "Boss Bone-Beard", "res": "res://src/data/resources/boss_bone_beard.tres"},
+	{"name": "Boss War-Barge", "scene": "res://src/gameplay/enemies/boss_war_barge.tscn"}
 ]
 
 var obstacle_items: Array[Dictionary] = [
@@ -155,16 +158,30 @@ func _on_object_selected(obj_idx: int) -> void:
 	match cat_idx:
 		0: # Enemies
 			if obj_idx < enemy_items.size():
-				var res_path = enemy_items[obj_idx]["res"]
-				var e_data = load(res_path) as EnemyData
-				current_resource = e_data
-				var enemy_scene = load("res://src/gameplay/enemies/enemy_mob.tscn")
-				var instance = enemy_scene.instantiate() as Node3D
-				object_container.add_child(instance)
-				current_object_node = instance
-				if instance.has_method("apply_enemy_data"):
-					instance.apply_enemy_data(e_data)
-				current_sprite = instance.get_node_or_null("MobSprite") as Sprite3D
+				var item = enemy_items[obj_idx]
+				if item.has("res"):
+					var res_path = item["res"]
+					var e_data = load(res_path) as EnemyData
+					current_resource = e_data
+					var enemy_scene = load("res://src/gameplay/enemies/enemy_mob.tscn")
+					var instance = enemy_scene.instantiate() as Node3D
+					object_container.add_child(instance)
+					current_object_node = instance
+					if instance.has_method("apply_enemy_data"):
+						instance.apply_enemy_data(e_data)
+					current_sprite = instance.get_node_or_null("EnemySprite") as Sprite3D
+					if not current_sprite:
+						current_sprite = instance.get_node_or_null("MobSprite") as Sprite3D
+				elif item.has("scene"):
+					var scene_path = item["scene"]
+					var s_res = load(scene_path) as PackedScene
+					if s_res:
+						var instance = s_res.instantiate() as Node3D
+						object_container.add_child(instance)
+						current_object_node = instance
+						current_sprite = instance.get_node_or_null("BossSprite") as Sprite3D
+						if not current_sprite:
+							current_sprite = instance.get_node_or_null("EnemySprite") as Sprite3D
 				
 		1: # Barrels & Obstacles
 			if obj_idx < obstacle_items.size():
@@ -209,6 +226,12 @@ func _on_object_selected(obj_idx: int) -> void:
 					current_sprite = visuals.get_node_or_null("BoatSprite") as Sprite3D
 
 	if current_object_node:
+		# Fallback search for any Sprite3D child if not directly found
+		if not current_sprite:
+			for child in current_object_node.find_children("*", "Sprite3D"):
+				current_sprite = child
+				break
+				
 		# Freeze physics and forward movement so object stays completely stationary
 		current_object_node.set_physics_process(false)
 		if "forward_speed" in current_object_node:
@@ -281,6 +304,9 @@ func _on_slider_changed(_val: float) -> void:
 		current_object_node.position.y = 0.0
 		if current_sprite:
 			current_sprite.position.y = new_pos_y
+		var health_bar = current_object_node.get_node_or_null("HealthBarSprite") as Sprite3D
+		if health_bar:
+			health_bar.position.y = new_pos_y + 0.85
 			
 	current_object_node.scale = Vector3.ONE * new_scale
 	current_object_node.rotation_degrees.y = new_rot_y
