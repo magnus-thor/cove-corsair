@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://src/gameplay/collectibles/collectible_chest.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/treasure_chest.png" id="2_chest_tex"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_chest"]
+size = Vector3(0.8, 0.8, 0.8)
+
+[node name="CollectibleChest" type="Area3D"]
+script = ExtResource("1_script")
+
+[node name="Visuals" type="Node3D" parent="."]
+
+[node name="ChestSprite" type="Sprite3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 0.25, 0)
+pixel_size = 0.003
+billboard = 0
+alpha_cut = 1
+texture = ExtResource("2_chest_tex")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+shape = SubResource("BoxShape3D_chest")

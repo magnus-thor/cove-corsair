@@ -4,7 +4,8 @@
 [ext_resource type="PackedScene" uid="uid://dcehj56vbh1l2" path="res://src/gameplay/player/player_boat.tscn" id="2_player_boat"]
 [ext_resource type="Script" uid="uid://bkmu2vnccqqwt" path="res://src/levels/track_manager.gd" id="3_track_manager"]
 [ext_resource type="Script" uid="uid://dcuh1f3l83nbt" path="res://src/core/main_game.gd" id="5_main"]
-[ext_resource type="PackedScene" uid="uid://b3p5h42mkw601" path="res://src/ui/top_hud.tscn" id="6_top_hud"]
+[ext_resource type="PackedScene" uid="uid://c56j382mkw601" path="res://src/ui/hud/top_hud.tscn" id="6_top_hud"]
+[ext_resource type="Script" path="res://src/gameplay/levels/level_controller.gd" id="7_level_controller"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 sky_top_color = Color(0.53, 0.81, 0.98, 1)
@@ -43,3 +44,6 @@ transform = Transform3D(1, 0, 0, 0, 0.90107703, 0.4336591, 0, -0.4336591, 0.9010
 fov = 70.0
 
 [node name="TopHUD" parent="." unique_id=72493796 instance=ExtResource("6_top_hud")]
+
+[node name="LevelController" type="Node3D" parent="."]
+script = ExtResource("7_level_controller")

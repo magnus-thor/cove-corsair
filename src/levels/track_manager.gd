@@ -68,7 +68,7 @@ func _ready() -> void:
 					child.queue_free()
 
 func _on_distance_target_reached() -> void:
-	if is_boss_active:
+	if GameState.current_level == 1 or is_boss_active:
 		return
 	is_boss_active = true
 	

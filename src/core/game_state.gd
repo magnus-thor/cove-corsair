@@ -7,6 +7,8 @@ signal multiplier_changed(new_multiplier: float, mode: String)
 signal progress_changed(current_distance: float, total_distance: float)
 signal distance_target_reached
 signal level_completed(doubloons: int, targets: int)
+signal boss_spawned_event(boss_name: String, max_val: int)
+signal boss_health_changed(current: int, max_val: int)
 
 var doubloons: int = 0
 var targets_destroyed: int = 0

@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://src/gameplay/obstacles/hazard_sea_mine.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/Spiked Sea Mine.png" id="2_sea_mine_tex"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_mine"]
+height = 1.2
+radius = 0.6
+
+[node name="HazardSeaMine" type="Area3D" groups=["destructible"]]
+script = ExtResource("1_script")
+
+[node name="ObstacleSprite" type="Sprite3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+pixel_size = 0.0021
+billboard = 2
+alpha_cut = 1
+texture = ExtResource("2_sea_mine_tex")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("CylinderShape3D_mine")

@@ -122,6 +122,16 @@ func die() -> void:
 	var player = get_tree().get_first_node_in_group("player")
 	if player and player.has_method("upgrade_ship"):
 		player.upgrade_ship(1)
+		
+	if has_meta("spawns_chest"):
+		var chest_scene = load("res://src/gameplay/collectibles/collectible_chest.tscn")
+		if chest_scene:
+			var chest = chest_scene.instantiate() as Area3D
+			var root = get_tree().current_scene
+			if root:
+				root.add_child(chest)
+			chest.global_position = Vector3(global_position.x, 0.15, global_position.z)
+			
 	queue_free()
 
 func _spawn_explosion() -> void:

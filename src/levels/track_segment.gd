@@ -62,6 +62,9 @@ func spawn_obstacles() -> void:
 		obstacles_container.remove_child(child)
 		child.queue_free()
 		
+	if GameState.current_level == 1 or level_config_data.get("is_scripted", false):
+		return
+		
 	var player = get_tree().get_first_node_in_group("player")
 	if player and "is_calibration_mode" in player and player.is_calibration_mode:
 		return
@@ -167,6 +170,9 @@ func spawn_gates() -> void:
 	for child in gates_container.get_children():
 		gates_container.remove_child(child)
 		child.queue_free()
+		
+	if GameState.current_level == 1 or level_config_data.get("is_scripted", false):
+		return
 		
 	var player = get_tree().get_first_node_in_group("player")
 	if player and "is_calibration_mode" in player and player.is_calibration_mode:

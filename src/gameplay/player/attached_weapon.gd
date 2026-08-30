@@ -230,6 +230,10 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 		world_container.add_child(ball)
 		ball.global_position = muzzle_point.global_position
 		
+		# Mark projectile as fired from BowMount for boss weakpoint checks
+		if get_parent() and get_parent().name == "BowMount":
+			ball.set_meta("from_bow", true)
+		
 		var proj_dir: Vector3
 		if is_crew:
 			proj_dir = aim_direction if (aim_direction != Vector3.ZERO and aim_direction.z < 0.0) else Vector3(0, 0, -1)

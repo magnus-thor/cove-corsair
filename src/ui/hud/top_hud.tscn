@@ -1,0 +1,325 @@
+[gd_scene load_steps=14 format=3 uid="uid://c56j382mkw601"]
+
+[ext_resource type="Script" path="res://src/ui/hud/top_hud.gd" id="1_tophud_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/coin_icon.svg" id="2_coin_icon"]
+[ext_resource type="Texture2D" path="res://assets/sprites/hud_boat_icon.svg" id="3_boat_icon"]
+[ext_resource type="Texture2D" path="res://assets/sprites/hud_skull_icon.svg" id="4_skull_icon"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gold"]
+bg_color = Color(0.1, 0.12, 0.18, 0.85)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.9, 0.72, 0.18, 0.9)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.35)
+shadow_size = 4
+shadow_offset = Vector2(0, 2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_progress_bg"]
+bg_color = Color(0.08, 0.11, 0.16, 0.85)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.25, 0.35, 0.45, 0.6)
+corner_radius_top_left = 7
+corner_radius_top_right = 7
+corner_radius_bottom_right = 7
+corner_radius_bottom_left = 7
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_progress_fill"]
+bg_color = Color(0, 0.82, 0.78, 1)
+corner_radius_top_left = 7
+corner_radius_top_right = 7
+corner_radius_bottom_right = 7
+corner_radius_bottom_left = 7
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_boss_panel"]
+bg_color = Color(0.08, 0.05, 0.05, 0.85)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.85, 0.2, 0.2, 0.85)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.4)
+shadow_size = 3
+shadow_offset = Vector2(0, 2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_boss_segment_bg"]
+bg_color = Color(0.18, 0.08, 0.08, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.12, 0.05, 0.05, 0.5)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_boss_segment_fill"]
+bg_color = Color(0.9, 0.15, 0.15, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 0.4, 0.4, 0.3)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_multiplier"]
+bg_color = Color(0.12, 0.14, 0.22, 0.85)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.58, 0.1, 0.95)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(1, 0.5, 0, 0.25)
+shadow_size = 5
+shadow_offset = Vector2(0, 2)
+
+[node name="TopHUD" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_tophud_script")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 24.0
+offset_top = 20.0
+offset_right = -24.0
+offset_bottom = 100.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="GoldPanel" type="PanelContainer" parent="MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_gold")
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer/GoldPanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 6
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/GoldPanel/MarginContainer"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="GoldIcon" type="TextureRect" parent="MarginContainer/HBoxContainer/GoldPanel/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("2_coin_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="GoldLabel" type="Label" parent="MarginContainer/HBoxContainer/GoldPanel/MarginContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.3, 1)
+theme_override_colors/font_outline_color = Color(0.2, 0.1, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 24
+text = "0"
+vertical_alignment = 1
+
+[node name="ProgressContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 8
+alignment = 0
+
+[node name="LevelTitle" type="Label" parent="MarginContainer/HBoxContainer/ProgressContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.95, 1, 0.9)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 14
+text = "WORLD 1 - COVE RUN"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="WarningLabel" type="Label" parent="MarginContainer/HBoxContainer/ProgressContainer"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.25, 0.25, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 16
+text = "CAUTION: RIVER NARROWING AHEAD!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/ProgressContainer"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="PlayerBoatIcon" type="TextureRect" parent="MarginContainer/HBoxContainer/ProgressContainer/HBoxContainer"]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("3_boat_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="LevelProgressBar" type="ProgressBar" parent="MarginContainer/HBoxContainer/ProgressContainer/HBoxContainer"]
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_progress_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_progress_fill")
+show_percentage = false
+
+[node name="SkullFlagIcon" type="TextureRect" parent="MarginContainer/HBoxContainer/ProgressContainer/HBoxContainer"]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("4_skull_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="BossHealthPanel" type="PanelContainer" parent="MarginContainer/HBoxContainer/ProgressContainer"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_boss_panel")
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer/ProgressContainer/BossHealthPanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/ProgressContainer/BossHealthPanel/MarginContainer"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 2
+
+[node name="BossNameLabel" type="Label" parent="MarginContainer/HBoxContainer/ProgressContainer/BossHealthPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.25, 0.25, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 13
+text = "CAPTAIN IRONJAW'S WAR-BARGE"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SegmentsContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/ProgressContainer/BossHealthPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="Segment1" type="ProgressBar" parent="MarginContainer/HBoxContainer/ProgressContainer/BossHealthPanel/MarginContainer/VBoxContainer/SegmentsContainer"]
+custom_minimum_size = Vector2(36, 10)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_boss_segment_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_boss_segment_fill")
+max_value = 10.0
+value = 10.0
+show_percentage = false
+
+[node name="Segment2" type="ProgressBar" parent="MarginContainer/HBoxContainer/ProgressContainer/BossHealthPanel/MarginContainer/VBoxContainer/SegmentsContainer"]
+custom_minimum_size = Vector2(36, 10)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_boss_segment_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_boss_segment_fill")
+max_value = 10.0
+value = 10.0
+show_percentage = false
+
+[node name="Segment3" type="ProgressBar" parent="MarginContainer/HBoxContainer/ProgressContainer/BossHealthPanel/MarginContainer/VBoxContainer/SegmentsContainer"]
+custom_minimum_size = Vector2(36, 10)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_boss_segment_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_boss_segment_fill")
+max_value = 10.0
+value = 10.0
+show_percentage = false
+
+[node name="Segment4" type="ProgressBar" parent="MarginContainer/HBoxContainer/ProgressContainer/BossHealthPanel/MarginContainer/VBoxContainer/SegmentsContainer"]
+custom_minimum_size = Vector2(36, 10)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_boss_segment_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_boss_segment_fill")
+max_value = 10.0
+value = 10.0
+show_percentage = false
+
+[node name="Segment5" type="ProgressBar" parent="MarginContainer/HBoxContainer/ProgressContainer/BossHealthPanel/MarginContainer/VBoxContainer/SegmentsContainer"]
+custom_minimum_size = Vector2(36, 10)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_boss_segment_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_boss_segment_fill")
+max_value = 10.0
+value = 10.0
+show_percentage = false
+
+[node name="Segment6" type="ProgressBar" parent="MarginContainer/HBoxContainer/ProgressContainer/BossHealthPanel/MarginContainer/VBoxContainer/SegmentsContainer"]
+custom_minimum_size = Vector2(36, 10)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_boss_segment_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_boss_segment_fill")
+max_value = 10.0
+value = 10.0
+show_percentage = false
+
+[node name="MultiplierPanel" type="PanelContainer" parent="MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_multiplier")
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer/MultiplierPanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 6
+
+[node name="MultiplierLabel" type="Label" parent="MarginContainer/HBoxContainer/MultiplierPanel/MarginContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.78, 0.18, 1)
+theme_override_colors/font_outline_color = Color(0.2, 0.08, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 22
+text = "1x"
+horizontal_alignment = 1
+vertical_alignment = 1

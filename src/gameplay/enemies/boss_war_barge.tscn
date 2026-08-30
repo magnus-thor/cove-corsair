@@ -1,0 +1,85 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://src/gameplay/enemies/boss_war_barge.gd" id="1_boss_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/boss_war_barge.png" id="2_barge_tex"]
+[ext_resource type="Script" path="res://src/gameplay/enemies/boss_component_delegate.gd" id="3_delegate"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_cannon"]
+size = Vector3(1.0, 0.8, 1.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_armor"]
+size = Vector3(1.3, 1.0, 0.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_boiler"]
+size = Vector3(1.8, 1.4, 1.6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_boiler_mesh"]
+albedo_color = Color(0.28, 0.28, 0.28, 1)
+metallic = 0.9
+roughness = 0.2
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_boiler"]
+material = SubResource("StandardMaterial3D_boiler_mesh")
+top_radius = 0.6
+bottom_radius = 0.6
+height = 1.3
+radial_segments = 12
+
+[node name="BossWarBarge" type="Node3D" groups=["enemies"]]
+script = ExtResource("1_boss_script")
+
+[node name="BossSprite" type="Sprite3D" parent="."]
+transform = Transform3D(1.8, 0, 0, 0, 1.37888, 1.15702, 0, -1.15702, 1.37888, 0, 0.8, 0)
+pixel_size = 0.0038
+alpha_cut = 1
+texture = ExtResource("2_barge_tex")
+
+[node name="LeftCannon" type="Area3D" parent="." node_paths=PackedStringArray("boss_node") groups=["destructible"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 0.4, 0.5)
+script = ExtResource("3_delegate")
+boss_node = NodePath("..")
+component_name = "left_cannon"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="LeftCannon"]
+shape = SubResource("BoxShape3D_cannon")
+
+[node name="RightCannon" type="Area3D" parent="." node_paths=PackedStringArray("boss_node") groups=["destructible"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 0.4, 0.5)
+script = ExtResource("3_delegate")
+boss_node = NodePath("..")
+component_name = "right_cannon"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RightCannon"]
+shape = SubResource("BoxShape3D_cannon")
+
+[node name="LeftArmor" type="Area3D" parent="." node_paths=PackedStringArray("boss_node") groups=["destructible"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9, 0.3, -0.6)
+script = ExtResource("3_delegate")
+boss_node = NodePath("..")
+component_name = "left_armor"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="LeftArmor"]
+shape = SubResource("BoxShape3D_armor")
+
+[node name="RightArmor" type="Area3D" parent="." node_paths=PackedStringArray("boss_node") groups=["destructible"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 0.3, -0.6)
+script = ExtResource("3_delegate")
+boss_node = NodePath("..")
+component_name = "right_armor"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RightArmor"]
+shape = SubResource("BoxShape3D_armor")
+
+[node name="BoilerCore" type="Area3D" parent="." node_paths=PackedStringArray("boss_node") groups=["destructible"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0.5, -0.2)
+script = ExtResource("3_delegate")
+boss_node = NodePath("..")
+component_name = "boiler_core"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="BoilerCore"]
+shape = SubResource("BoxShape3D_boiler")
+
+[node name="LogMesh" type="MeshInstance3D" parent="BoilerCore"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+visible = false
+mesh = SubResource("CylinderMesh_boiler")
