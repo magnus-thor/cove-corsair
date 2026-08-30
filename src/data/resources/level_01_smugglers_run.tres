@@ -5,64 +5,52 @@
 [resource]
 script = ExtResource("1_script")
 level_name = "Level 1: Smuggler's Run"
-total_distance = 600.0
+total_distance = 250.0
 base_scroll_speed = 12.0
 river_width_world = 12.0
 wave_events = Array[Dictionary]([{
-"count": 5,
-"distance": 30.0,
-"type": "coin_arc",
-"x_end": 0.3,
-"x_start": -0.3
-}, {
-"distance": 70.0,
+"distance": 15.0,
 "hp": 1,
 "type": "obstacles",
-"x_positions": [-0.4, 0.4]
+"x_positions": [-0.3, 0.0, 0.3]
+}, {
+"distance": 40.0,
+"type": "fleet_gate",
+"value": 1,
+"text": "+1",
+"x": 0.0
+}, {
+"distance": 65.0,
+"type": "barricade",
+"x_points": [-0.5, 0.0, 0.5],
+"hp_values": [8, 3, 8]
 }, {
 "distance": 110.0,
-"hp": 2,
-"sub_type": "armored_barrel_chest",
-"type": "obstacle",
+"type": "fleet_gate",
+"value": 1,
+"text": "+1",
 "x": 0.0
 }, {
-"distance": 140.0,
-"hp": 2,
-"type": "barricade",
-"x_points": [-0.8, -0.4, 0.0, 0.4, 0.8]
-}, {
-"distance": 180.0,
-"type": "warning"
-}, {
-"distance": 210.0,
-"hp": 3,
+"distance": 135.0,
 "type": "raider_skiffs",
-"x_positions": [-0.25, 0.25]
+"x_positions": [-0.8, -0.5, -0.2, 0.2, 0.5, 0.8],
+"hp": 2,
+"speed": 5.0
 }, {
-"distance": 260.0,
-"type": "sea_mine",
-"x": -0.3
-}, {
-"distance": 280.0,
-"type": "sea_mine",
-"x": 0.3
-}, {
-"distance": 300.0,
-"type": "sea_mine",
+"distance": 150.0,
+"type": "elite_ironclad",
 "x": 0.0
 }, {
-"distance": 350.0,
-"explosive_barrels": [-0.6, 0.6],
-"type": "patrol_boat",
+"distance": 190.0,
+"type": "fleet_gate",
+"value": 2,
+"text": "+2",
 "x": 0.0
 }, {
-"distance": 410.0,
-"type": "kamikaze_rafts",
-"x_positions": [-0.7, 0.0, 0.7]
+"distance": 220.0,
+"type": "reinforced_gate",
+"hp": 25
 }, {
-"distance": 470.0,
-"type": "reinforced_gate"
-}, {
-"distance": 520.0,
+"distance": 250.0,
 "type": "boss"
 }])

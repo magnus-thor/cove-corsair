@@ -150,3 +150,30 @@ func show_warning_alert(text: String) -> void:
 		tween.tween_interval(2.5)
 		tween.tween_property(label, "modulate:a", 0.0, 0.5)
 		tween.tween_callback(func(): label.visible = false)
+
+func trigger_red_flash() -> void:
+	var flash = get_node_or_null("VignetteAlert")
+	if flash:
+		flash.queue_free()
+		
+	var panel = Panel.new()
+	panel.name = "VignetteAlert"
+	panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	
+	var style = StyleBoxFlat.new()
+	style.bg_color = Color(0, 0, 0, 0) # Transparent center
+	style.border_color = Color(0.8, 0.1, 0.1, 0.45) # Red border
+	style.border_width_left = 60
+	style.border_width_top = 60
+	style.border_width_right = 60
+	style.border_width_bottom = 60
+	style.shadow_color = Color(0.8, 0.1, 0.1, 0.5)
+	style.shadow_size = 40
+	
+	panel.add_theme_stylebox_override("panel", style)
+	add_child(panel)
+	
+	var tween = create_tween()
+	tween.tween_property(panel, "modulate:a", 0.0, 0.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_callback(panel.queue_free)

@@ -170,32 +170,6 @@ func spawn_gates() -> void:
 	for child in gates_container.get_children():
 		gates_container.remove_child(child)
 		child.queue_free()
-		
-	if GameState.current_level == 1 or level_config_data.get("is_scripted", false):
-		return
-		
-	var player = get_tree().get_first_node_in_group("player")
-	if player and "is_calibration_mode" in player and player.is_calibration_mode:
-		return
-		
-	var gate_freq = float(level_config_data.get("gate_frequency", 0.4))
-	if multiplier_gate_prefab and randf() < gate_freq:
-		var gate = multiplier_gate_prefab.instantiate() as Area3D
-		if gate:
-			gates_container.add_child(gate)
-			var lane_choices = [-2.8, 2.8]
-			var gate_x = lane_choices.pick_random()
-			var gate_z = -randf_range(12.0, segment_length - 12.0)
-			gate.position = Vector3(gate_x, 0.0, gate_z)
-			
-			var level_idx = int(level_config_data.get("level_index", 1))
-			if "operation" in gate and "value" in gate:
-				if randf() < 0.65:
-					gate.operation = 0 # ADD
-					gate.value = randi_range(2, min(8, 2 + int(level_idx * 0.5)))
-				else:
-					gate.operation = 1 # MULTIPLY
-					gate.value = randi_range(2, 3)
 
 ## Spawns landscape scenery pieces along the segment shores
 func spawn_scenery() -> void:
@@ -226,9 +200,9 @@ func spawn_scenery() -> void:
 			
 		var rand_x = 0.0
 		if shore == 1:
-			rand_x = randf_range(-18.0, -9.0)
+			rand_x = randf_range(-18.0, -9.5)
 		else:
-			rand_x = randf_range(9.0, 18.0)
+			rand_x = randf_range(9.5, 18.0)
 			
 		var rand_z = randf_range(zone.x, zone.y)
 		
@@ -238,6 +212,7 @@ func spawn_scenery() -> void:
 			var base_inst = base_scene.instantiate() as Node3D
 			scenery_container.add_child(base_inst)
 			base_inst.position = Vector3(rand_x, 0.0, rand_z)
+			_clean_shadow_nodes(base_inst)
 			
 			if randf() < 0.6:
 				var palm_path = palm_straight_path if randf() < 0.5 else palm_bend_path
@@ -246,3 +221,23 @@ func spawn_scenery() -> void:
 					var palm_inst = palm_scene.instantiate() as Node3D
 					base_inst.add_child(palm_inst)
 					palm_inst.rotation.y = randf_range(0.0, TAU)
+					_clean_shadow_nodes(palm_inst)
+
+func _clean_shadow_nodes(node: Node) -> void:
+	if not node:
+		return
+		
+	if node is MeshInstance3D or node is Sprite3D or node is GeometryInstance3D:
+		node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		
+	var lower_name = node.name.to_lower()
+	var is_shadow_node = false
+	if "shadow" in lower_name or "decal" in lower_name or "projector" in lower_name or "card" in lower_name or "oblate" in lower_name or "sphere" in lower_name or "quad" in lower_name or "dark" in lower_name:
+		is_shadow_node = true
+		
+	if is_shadow_node:
+		node.queue_free()
+		return
+			
+	for child in node.get_children():
+		_clean_shadow_nodes(child)

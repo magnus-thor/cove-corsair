@@ -29,6 +29,17 @@ func show_victory(doubloons_earned: int, targets_hit: int, stars_earned: int = 3
 	visible = true
 	get_tree().paused = true
 	
+	if GameState.current_level == 1:
+		if title_label:
+			title_label.text = "LEVEL 1 VICTORY"
+		if next_level_button:
+			next_level_button.text = "Continue to Shipyard"
+	else:
+		if title_label:
+			title_label.text = "VICTORY!"
+		if next_level_button:
+			next_level_button.text = "NEXT LEVEL"
+			
 	if subtitle_label:
 		subtitle_label.text = "COVE %d CLEARED" % GameState.current_level
 	if doubloons_label:

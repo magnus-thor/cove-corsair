@@ -27,6 +27,7 @@ var _is_defeated: bool = false
 var _current_base_y: float = 2.612
 
 func _ready() -> void:
+	_clean_shadow_nodes(self)
 	add_to_group("enemies")
 	add_to_group("destructible")
 	current_hp = max_hp
@@ -182,3 +183,26 @@ func _on_area_entered(area: Area3D) -> void:
 				player.health_changed.emit(player.current_health, player.max_health)
 			if player.current_health <= 0 and player.has_method("game_over"):
 				player.game_over(false)
+
+func _clean_shadow_nodes(node: Node) -> void:
+	if not node:
+		return
+	var lower_name = node.name.to_lower()
+	var is_shadow_node = false
+	if "shadow" in lower_name or "decal" in lower_name or "projector" in lower_name or "card" in lower_name or "oblate" in lower_name or "sphere" in lower_name:
+		is_shadow_node = true
+		
+	if is_shadow_node:
+		if node is Sprite3D or node is MeshInstance3D or node is Decal or node.get_class() == "Decal3D":
+			node.queue_free()
+			return
+			
+	if node is MeshInstance3D:
+		if "shadow" in lower_name or "plane" in lower_name or "billboard" in lower_name or "card" in lower_name:
+			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			node.visible = false
+			node.queue_free()
+			return
+			
+	for child in node.get_children():
+		_clean_shadow_nodes(child)

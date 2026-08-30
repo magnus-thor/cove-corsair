@@ -21,6 +21,10 @@ enum OperationType { ADD, MULTIPLY }
 @export var is_active: bool = true
 @export var cannonball_scene: PackedScene = preload("res://src/gameplay/projectiles/cannonball.tscn")
 
+@export var choice_group: String = ""
+@export var custom_text: String = ""
+@export var gate_action: String = ""
+
 @onready var visuals: Node3D = $Visuals
 @onready var label_3d: Label3D = $Visuals/Label3D
 
@@ -43,83 +47,72 @@ func _ready() -> void:
 		visuals.position.y = -0.59
 	scale = Vector3(1.09, 1.09, 1.09)
 		
+	_clean_shadow_nodes(self)
 	update_visuals()
 
 func update_visuals() -> void:
+	var gate_sprite = get_node_or_null("Visuals/GateSprite") as Sprite3D
+	if gate_sprite:
+		gate_sprite.modulate = Color(0.15, 0.75, 1.0, 0.8) # High-contrast cyan/blue holographic frame
+		
 	if label_3d:
-		if operation == OperationType.ADD:
-			label_3d.text = "+%d" % value
-			label_3d.modulate = Color(0.2, 0.85, 1.0)
+		var display_value = value
+		if not custom_text.is_empty():
+			var clean_text = custom_text.replace(" Ships", "").replace(" Ship", "").replace(" ships", "").replace(" ship", "").strip_edges()
+			var num = clean_text.to_int()
+			if num != 0:
+				display_value = abs(num)
+			if num > 0 and not clean_text.begins_with("+"):
+				clean_text = "+" + str(num)
+			label_3d.text = clean_text
 		else:
-			label_3d.text = "x%d" % value
-			label_3d.modulate = Color(1.0, 0.8, 0.2)
-		label_3d.outline_size = 12
+			label_3d.text = "+%d" % display_value
+		label_3d.modulate = Color(1.0, 0.85, 0.1) # Bold golden numbers
+		label_3d.outline_size = 16
 		label_3d.outline_modulate = Color(0.0, 0.0, 0.0, 1.0)
+		label_3d.font_size = 85
 
 func _on_area_entered(area: Area3D) -> void:
 	if not is_active:
 		return
 		
-	# Ensure the entering area is a cannonball
-	if not area.is_in_group("cannonballs") and not (area is Cannonball):
+	var is_player = area.name == "CollisionArea" or area.is_in_group("player") or (area.get_parent() and area.get_parent().is_in_group("player"))
+	if not is_player:
 		return
 		
-	_processed_cannonballs[area] = true
+	is_active = false
 	AudioManager.play_sfx("gate_passes")
 	
-	var mode_str = "+" if operation == OperationType.ADD else "x"
-	GameState.set_multiplier(float(value), mode_str)
-	
-	# Play bounce animation
-	_play_bounce_tween()
-	
-	# Calculate duplication requirements
-	# Additive: output = count + value (extra = value)
-	# Multiplicative: output = count * value (extra = count * (value - 1))
-	var extra_needed: int = 0
-	if operation == OperationType.ADD:
-		extra_needed = value
-	elif operation == OperationType.MULTIPLY:
-		extra_needed = max(0, value - 1)
-		
-	var active_balls = get_tree().get_nodes_in_group("cannonballs")
-	var current_count: int = active_balls.size()
-	var max_simultaneous: int = 8
-	
-	var can_spawn: int = max(0, min(extra_needed, max_simultaneous - current_count))
-	var overflow: int = extra_needed - can_spawn
-	
-	# If output exceeds 30, add splash AoE radius multiplier to active projectiles
-	if overflow > 0:
-		if "splash_radius_multiplier" in area:
-			area.splash_radius_multiplier += overflow * 0.35
-		for ball in active_balls:
-			if is_instance_valid(ball) and "splash_radius_multiplier" in ball:
-				ball.splash_radius_multiplier += overflow * 0.15
-				
-	# Instantiate extra projectiles up to the soft cap
-	if cannonball_scene and can_spawn > 0:
-		var parent = get_tree().current_scene
-		if not parent:
-			parent = get_parent()
+	# Determine value to add (fallback to custom_text parsing)
+	var final_value = value
+	if not custom_text.is_empty():
+		var clean_text = custom_text.replace(" Ships", "").replace(" Ship", "").replace(" ships", "").replace(" ship", "").strip_edges()
+		var num = clean_text.to_int()
+		if num != 0:
+			final_value = abs(num)
 			
-		var origin_pos = area.global_position if (area and is_instance_valid(area) and area.is_inside_tree()) else global_position
-		for i in range(can_spawn):
-			var new_ball = cannonball_scene.instantiate() as Area3D
-			if new_ball:
-				var spread_x = randf_range(-0.7, 0.7)
-				var spread_y = randf_range(-0.2, 0.2)
+	# Handle choice group deactivation
+	if not choice_group.is_empty():
+		var gates = get_tree().get_nodes_in_group("multiplier_gate")
+		for gate in gates:
+			if gate is MultiplierGate and gate.choice_group == choice_group:
+				gate.is_active = false
+				var t = gate.create_tween()
+				t.tween_property(gate, "modulate:a", 0.3, 0.2)
 				
-				if "speed" in area and "speed" in new_ball:
-					new_ball.speed = area.speed
-				if "lifetime" in area and "lifetime" in new_ball:
-					new_ball.lifetime = area.lifetime
-				if "splash_radius_multiplier" in area and "splash_radius_multiplier" in new_ball:
-					new_ball.splash_radius_multiplier = area.splash_radius_multiplier
-					
-				_processed_cannonballs[new_ball] = true
-				parent.add_child(new_ball)
-				new_ball.global_position = origin_pos + Vector3(spread_x, spread_y, -0.2 * (i + 1))
+	# Find the player node
+	var player_node = null
+	if area.is_in_group("player") and not area.name == "CollisionArea":
+		player_node = area
+	elif area.get_parent() and area.get_parent().is_in_group("player"):
+		player_node = area.get_parent()
+	else:
+		player_node = get_tree().get_first_node_in_group("player")
+		
+	if player_node and player_node.has_method("add_follower_ships"):
+		player_node.add_follower_ships(final_value)
+		
+	_play_bounce_tween()
 
 func _play_bounce_tween() -> void:
 	if not visuals:
@@ -127,3 +120,26 @@ func _play_bounce_tween() -> void:
 	var tween = create_tween()
 	tween.tween_property(visuals, "scale", Vector3(1.25, 1.25, 1.25), 0.08).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tween.tween_property(visuals, "scale", Vector3(1.0, 1.0, 1.0), 0.12).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+
+func _clean_shadow_nodes(node: Node) -> void:
+	if not node:
+		return
+	var lower_name = node.name.to_lower()
+	var is_shadow_node = false
+	if "shadow" in lower_name or "decal" in lower_name or "projector" in lower_name or "card" in lower_name or "oblate" in lower_name or "sphere" in lower_name:
+		is_shadow_node = true
+		
+	if is_shadow_node:
+		if node is Sprite3D or node is MeshInstance3D or node is Decal or node.get_class() == "Decal3D":
+			node.queue_free()
+			return
+			
+	if node is MeshInstance3D:
+		if "shadow" in lower_name or "plane" in lower_name or "billboard" in lower_name or "card" in lower_name:
+			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			node.visible = false
+			node.queue_free()
+			return
+			
+	for child in node.get_children():
+		_clean_shadow_nodes(child)

@@ -13,10 +13,21 @@ var sfx_library: Dictionary = {
 	"water_splashes": []
 }
 
+var sound_cooldowns: Dictionary = {
+	"cannon_shots": 0.08,
+	"cannon_fire": 0.08,
+	"barrel_breaks": 0.12,
+	"explosion": 0.12,
+	"coin_pickups": 0.06,
+	"coin_pickup": 0.06
+}
+
+var last_play_times: Dictionary = {}
+
 var base_sfx_path: String = "res://assets/audio/sfx/"
 var music_player: AudioStreamPlayer
 var sfx_players: Array[AudioStreamPlayer] = []
-const POOL_SIZE: int = 12
+const POOL_SIZE: int = 24
 
 var _sfx_pool_index: int = 0
 
@@ -103,17 +114,46 @@ func _scan_and_load_sfx() -> void:
 
 ## Play a sound effect from the specified category with randomized pitch variation
 func play_sfx(category: String, min_pitch: float = 0.93, max_pitch: float = 1.07, volume_db: float = 0.0) -> void:
-	if not sfx_library.has(category):
-		push_warning("AudioManager: Category '%s' does not exist in sfx_library." % category)
+	# Throttling and cooldown check (handle aliases)
+	var check_category = category
+	var actual_category = category
+	if category == "cannon_fire":
+		actual_category = "cannon_shots"
+	elif category == "explosion":
+		actual_category = "barrel_breaks"
+	elif category == "coin_pickup":
+		actual_category = "coin_pickups"
+		
+	var current_time = Time.get_ticks_msec() / 1000.0
+	if sound_cooldowns.has(check_category):
+		var cooldown = sound_cooldowns[check_category]
+		var last_time = last_play_times.get(check_category, 0.0)
+		if current_time - last_time < cooldown:
+			return
+		last_play_times[check_category] = current_time
+	elif sound_cooldowns.has(actual_category):
+		var cooldown = sound_cooldowns[actual_category]
+		var last_time = last_play_times.get(actual_category, 0.0)
+		if current_time - last_time < cooldown:
+			return
+		last_play_times[actual_category] = current_time
+
+	if not sfx_library.has(actual_category):
+		push_warning("AudioManager: Category '%s' does not exist in sfx_library." % actual_category)
 		return
 
-	var streams: Array = sfx_library[category]
+	var streams: Array = sfx_library[actual_category]
 	if streams.is_empty():
 		return
 
 	var stream: AudioStream = streams.pick_random()
 	if not stream:
 		return
+
+	# Lower volume of projectile impact SFX by 4dB
+	var final_volume = volume_db
+	if actual_category == "barrel_hits":
+		final_volume -= 4.0
 
 	var target_player: AudioStreamPlayer = null
 	for player in sfx_players:
@@ -129,7 +169,7 @@ func play_sfx(category: String, min_pitch: float = 0.93, max_pitch: float = 1.07
 	if target_player:
 		target_player.stream = stream
 		target_player.pitch_scale = randf_range(min_pitch, max_pitch)
-		target_player.volume_db = volume_db
+		target_player.volume_db = final_volume
 		target_player.play()
 
 ## Play background music stream

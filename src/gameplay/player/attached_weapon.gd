@@ -245,6 +245,10 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 		
 		if ball.has_method("setup"):
 			ball.setup(proj_dir, weapon_data.default_ammo)
+			
+		var player = get_tree().get_first_node_in_group("player")
+		if player and "base_damage_bonus" in player and "damage" in ball:
+			ball.damage += player.base_damage_bonus
 
 func _trigger_throw_anim() -> void:
 	if not sprite_3d:

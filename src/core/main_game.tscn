@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://dcuh1f3l83nbt" path="res://src/core/main_game.gd" id="5_main"]
 [ext_resource type="PackedScene" uid="uid://c56j382mkw601" path="res://src/ui/hud/top_hud.tscn" id="6_top_hud"]
 [ext_resource type="Script" path="res://src/gameplay/levels/level_controller.gd" id="7_level_controller"]
+[ext_resource type="Script" path="res://src/core/game_camera.gd" id="8_camera"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 sky_top_color = Color(0.53, 0.81, 0.98, 1)
@@ -42,6 +43,7 @@ segment_scene = ExtResource("1_track_segment")
 [node name="Camera3D" type="Camera3D" parent="." unique_id=456464510]
 transform = Transform3D(1, 0, 0, 0, 0.90107703, 0.4336591, 0, -0.4336591, 0.90107703, 0, 9.851, 11.32)
 fov = 70.0
+script = ExtResource("8_camera")
 
 [node name="TopHUD" parent="." unique_id=72493796 instance=ExtResource("6_top_hud")]
 

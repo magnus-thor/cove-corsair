@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://dg3y4untdiyc7"]
+
+[ext_resource type="Script" path="res://src/gameplay/player/follower_boat.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://btb22xeh01yqb" path="res://assets/sprites/The Dinghy.png" id="2_tex"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_follower"]
+size = Vector3(1.2, 0.8, 2.0)
+
+[node name="FollowerBoat" type="Area3D" groups=["follower", "player"]]
+collision_layer = 1
+collision_mask = 6
+script = ExtResource("1_script")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+shape = SubResource("BoxShape3D_follower")
+
+[node name="Sprite3D" type="Sprite3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.5, 0.866025, 0, -0.866025, 0.5, 0, 0.38, 0)
+pixel_size = 0.0016
+billboard = 0
+alpha_cut = 1
+texture = ExtResource("2_tex")
+
+[node name="BowMount" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.154, -0.525)

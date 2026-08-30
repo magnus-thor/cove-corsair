@@ -10,6 +10,6 @@ weapon_name = "Skeleton Deckhand"
 weapon_type = "crew_thrower"
 sprite_texture = ExtResource("3_tex")
 pixel_size = 0.0022
-fire_rate = 0.6
+fire_rate = 0.2
 spread_angle_deg = 0.0
 default_ammo = ExtResource("2_ammo")

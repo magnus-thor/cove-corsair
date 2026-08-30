@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://dm3y4untdiyc7"]
+
+[ext_resource type="Script" path="res://src/gameplay/levels/biome_bank_strip.gd" id="1_script"]
+
+[node name="BiomeBankStrip" type="Node3D"]
+script = ExtResource("1_script")

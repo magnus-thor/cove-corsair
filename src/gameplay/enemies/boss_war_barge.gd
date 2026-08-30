@@ -3,8 +3,8 @@ extends Node3D
 
 enum State { APPROACHING, COMBAT, DYING }
 
-@export var max_hp: int = 60 # 40 Boiler + 10 Left Armor + 10 Right Armor
-@export var current_hp: int = 60
+@export var max_hp: int = 120 # 80 Boiler + 20 Left Armor + 20 Right Armor
+@export var current_hp: int = 120
 
 @export var approach_speed: float = 12.0
 @export var combat_z_offset: float = -18.0
@@ -14,9 +14,14 @@ enum State { APPROACHING, COMBAT, DYING }
 # Component HP
 var hp_left_cannon: int = 5
 var hp_right_cannon: int = 5
-var hp_left_armor: int = 10
-var hp_right_armor: int = 10
-var hp_boiler: int = 40
+var hp_left_armor: int = 20
+var hp_right_armor: int = 20
+var hp_boiler: int = 80
+var combat_time: float = 0.0
+var enraged_shoot_timer: float = 0.0
+var minion_timer: float = 0.0
+var keg_timer: float = 0.0
+var mortar_timer: float = 0.0
 
 # Prefabs
 @export var enemy_cannonball_scene: PackedScene = preload("res://src/gameplay/projectiles/enemy_cannonball.tscn")
@@ -57,6 +62,7 @@ var charge_direction: int = 1 # 1 = forward, -1 = retreating
 var original_combat_z: float = -18.0
 
 func _ready() -> void:
+	_clean_shadow_nodes(self)
 	add_to_group("enemies")
 	add_to_group("boss")
 	
@@ -93,6 +99,8 @@ func _physics_process(delta: float) -> void:
 			_process_combat(delta)
 
 func _process_combat(delta: float) -> void:
+	combat_time += delta
+	
 	# Horizontal Patrol Weaving (unless charging)
 	if not is_charging:
 		global_position.z = lerp(global_position.z, _target_z, 3.0 * delta)
@@ -105,18 +113,184 @@ func _process_combat(delta: float) -> void:
 	else:
 		_process_ram_charge(delta)
 		
-	# Phase-Specific Behaviors
-	match current_phase:
-		1:
-			_process_phase_1(delta)
-		2:
-			_process_phase_2(delta)
-		3:
-			_process_phase_3(delta)
+	# Continuous Mob & Hazard pressure
+	minion_timer += delta
+	if minion_timer >= 3.0:
+		minion_timer = 0.0
+		_deploy_side_minions()
+		
+	keg_timer += delta
+	if keg_timer >= 4.5:
+		keg_timer = 0.0
+		_deploy_center_kegs()
+		
+	mortar_timer += delta
+	if mortar_timer >= 6.0:
+		mortar_timer = 0.0
+		_fire_targeted_mortar()
+		
+	if combat_time >= 12.0:
+		if boss_sprite:
+			boss_sprite.modulate = Color(2.5, 0.4, 0.4, 1.0) # Tint red for enrage
+		_process_enraged_volley(delta)
+	else:
+		# Phase-Specific Behaviors
+		match current_phase:
+			1:
+				_process_phase_1(delta)
+			2:
+				_process_phase_2(delta)
+			3:
+				_process_phase_3(delta)
+
+func _deploy_side_minions() -> void:
+	_spawn_pressure_skiff(-0.7, 5.0)
+	_spawn_pressure_skiff(0.7, 5.0)
+
+func _spawn_pressure_skiff(x_norm: float, speed_val: float) -> void:
+	if enemy_mob_scene:
+		var skiff = enemy_mob_scene.instantiate() as Area3D
+		var skiff_data = preload("res://src/data/resources/raider_skiff.tres")
+		var parent = get_tree().get_first_node_in_group("level_controller")
+		if not parent:
+			parent = get_parent()
+		if parent:
+			parent.add_child(skiff)
+			if skiff.has_method("apply_enemy_data"):
+				skiff.apply_enemy_data(skiff_data)
+			skiff.max_hp = 3
+			skiff.current_hp = 3
+			skiff.forward_speed = speed_val
+			var river_width = 12.0
+			var player = get_tree().get_first_node_in_group("player")
+			if player and "river_width" in player:
+				river_width = player.river_width
+			var x_world = x_norm * (river_width / 2.0)
+			skiff.global_position = Vector3(x_world, 0.1, global_position.z + 2.0)
+
+func _deploy_center_kegs() -> void:
+	_spawn_pressure_keg(-0.15, 6.0)
+	_spawn_pressure_keg(0.15, 6.0)
+
+func _spawn_pressure_keg(x_norm: float, speed_val: float) -> void:
+	if powder_keg_scene:
+		var keg = powder_keg_scene.instantiate() as Node3D
+		var parent = get_tree().get_first_node_in_group("level_controller")
+		if not parent:
+			parent = get_parent()
+		if parent:
+			parent.add_child(keg)
+			keg.global_position = Vector3(x_norm * 6.0, 0.05, global_position.z + 3.0)
+			if "forward_speed" in keg:
+				keg.forward_speed = speed_val
+			if "obstacle_type" in keg:
+				keg.obstacle_type = DestructibleObstacle.ObstacleType.FUSE_BARREL
+
+func _fire_targeted_mortar() -> void:
+	var player = get_tree().get_first_node_in_group("player")
+	if not player or not is_instance_valid(player):
+		return
+	var target_node: Node3D = player
+	if "follower_boats" in player and not player.follower_boats.is_empty():
+		if randf() < 0.5:
+			var active_f = player.follower_boats.filter(func(x): return is_instance_valid(x))
+			if not active_f.is_empty():
+				target_node = active_f.pick_random()
+	var target_pos = target_node.global_position
+	var circle = MeshInstance3D.new()
+	var disc = CylinderMesh.new()
+	disc.top_radius = 2.0
+	disc.bottom_radius = 2.0
+	disc.height = 0.01
+	circle.mesh = disc
+	var mat = StandardMaterial3D.new()
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.albedo_color = Color(1.0, 0.1, 0.1, 0.35)
+	circle.material_override = mat
+	get_tree().current_scene.add_child(circle)
+	circle.global_position = Vector3(target_pos.x, 0.02, target_pos.z)
+	var tween = create_tween()
+	for i in range(3):
+		tween.tween_property(mat, "albedo_color:a", 0.1, 0.25)
+		tween.tween_property(mat, "albedo_color:a", 0.5, 0.25)
+	tween.tween_callback(func():
+		_explode_mortar_at(circle.global_position)
+		circle.queue_free()
+	)
+
+func _explode_mortar_at(pos: Vector3) -> void:
+	if explosion_scene:
+		var vfx = explosion_scene.instantiate() as Node3D
+		get_tree().current_scene.add_child(vfx)
+		vfx.global_position = pos
+		vfx.scale = Vector3(2.0, 2.0, 2.0)
+	AudioManager.play_sfx("barrel_breaks")
+	AudioManager.play_sfx("water_splashes", 0.9, 1.1)
+	var camera = get_tree().get_first_node_in_group("game_camera")
+	if camera and camera.has_method("shake"):
+		camera.shake(0.2, 0.2)
+	var player = get_tree().get_first_node_in_group("player")
+	if player and is_instance_valid(player):
+		var targets: Array[Node3D] = [player]
+		if "follower_boats" in player:
+			for f in player.follower_boats:
+				if is_instance_valid(f):
+					targets.append(f)
+		for target in targets:
+			var dist = target.global_position.distance_to(pos)
+			if dist <= 2.0:
+				if target.has_method("destroy_follower"):
+					target.destroy_follower()
+					if player.has_method("spawn_floating_text_at_position"):
+						player.spawn_floating_text_at_position("-1 FLEET", Color(1.0, 0.1, 0.1))
+				elif player.has_method("damage_fleet"):
+					player.damage_fleet(1)
+
+func _process_enraged_volley(delta: float) -> void:
+	enraged_shoot_timer += delta
+	if enraged_shoot_timer >= 0.2: # Fire mortar shell every 0.2s
+		enraged_shoot_timer = 0.0
+		
+		var player = get_tree().get_first_node_in_group("player")
+		if not player or not is_instance_valid(player):
+			return
+			
+		var target_node = player
+		if "follower_boats" in player and not player.follower_boats.is_empty():
+			if randf() < 0.6:
+				var active_f = player.follower_boats.filter(func(x): return is_instance_valid(x))
+				if not active_f.is_empty():
+					target_node = active_f.pick_random()
+					
+		if target_node and is_instance_valid(target_node):
+			_fire_enraged_mortar(target_node.global_position)
+
+func _fire_enraged_mortar(target_pos: Vector3) -> void:
+	if not enemy_cannonball_scene:
+		return
+		
+	AudioManager.play_sfx("cannon_shots", 0.8, 1.0, 1.0)
+	var ball = enemy_cannonball_scene.instantiate() as Area3D
+	var root = get_tree().current_scene
+	if root:
+		root.add_child(ball)
+		
+	ball.global_position = global_position + Vector3(randf_range(-1.5, 1.5), 1.0, 2.0)
+	ball.scale = Vector3(2.5, 2.5, 2.5) # Heavy enrage scale
+	if "speed" in ball:
+		ball.speed = 32.0
+	
+	var dir = (target_pos - ball.global_position).normalized()
+	dir.y = 0.0
+	dir = dir.normalized()
+	
+	if "direction" in ball:
+		ball.direction = dir
 
 func _process_phase_1(delta: float) -> void:
 	_attack_timer += delta
-	if _attack_timer >= 2.2:
+	if _attack_timer >= 0.9:
 		_attack_timer = 0.0
 		_fire_cannon_volley()
 		
@@ -136,7 +310,7 @@ func _process_phase_2(delta: float) -> void:
 			
 	# Cannon fires slower in Phase 2
 	_attack_timer += delta
-	if _attack_timer >= 3.0:
+	if _attack_timer >= 1.3:
 		_attack_timer = 0.0
 		_fire_cannon_volley()
 
@@ -147,7 +321,7 @@ func _process_phase_3(delta: float) -> void:
 		_start_ram_charge()
 		
 	# Eject Mines while patrolling/moving
-	if not is_charging and randf() < 0.008:
+	if not is_charging and randf() < 0.025:
 		_eject_mine()
 
 # Actions
@@ -432,14 +606,20 @@ func boss_defeat() -> void:
 	
 	# Explode dramatically
 	var tween = create_tween()
-	for i in range(12):
+	for i in range(15):
 		tween.tween_callback(func():
 			_spawn_hull_explosion()
-			AudioManager.play_sfx("barrel_breaks")
+			AudioManager.play_sfx("barrel_breaks", 0.6, 1.3, 2.0)
+			if randf() < 0.3:
+				AudioManager.play_sfx("gate_passes", 0.8, 1.2, 0.0)
 		)
 		tween.tween_interval(0.12)
 		
+	# Play celebratory fanfare and stop combat music
 	tween.tween_callback(func():
+		AudioManager.stop_music()
+		AudioManager.play_sfx("gate_passes", 0.7, 0.9, 3.0)
+		AudioManager.play_sfx("coin_pickups", 0.9, 1.1, 4.0)
 		_spawn_doubloon_fountain()
 	)
 	tween.tween_interval(1.8)
@@ -455,6 +635,7 @@ func _spawn_hull_explosion() -> void:
 		get_tree().current_scene.add_child(vfx)
 		var offset = Vector3(randf_range(-3.0, 3.0), randf_range(0.2, 1.5), randf_range(-2.0, 2.0))
 		vfx.global_position = global_position + offset
+		vfx.scale = Vector3.ONE * randf_range(1.5, 3.0)
 
 func _spawn_doubloon_fountain() -> void:
 	if not doubloon_scene:
@@ -468,3 +649,26 @@ func _spawn_doubloon_fountain() -> void:
 			var scatter = Vector2(randf_range(-3.5, 3.5), randf_range(-3.5, 3.5))
 			if d.has_method("_trigger_spawn_bounce"):
 				d._trigger_spawn_bounce(scatter)
+
+func _clean_shadow_nodes(node: Node) -> void:
+	if not node:
+		return
+	var lower_name = node.name.to_lower()
+	var is_shadow_node = false
+	if "shadow" in lower_name or "decal" in lower_name or "projector" in lower_name or "card" in lower_name or "oblate" in lower_name or "sphere" in lower_name:
+		is_shadow_node = true
+		
+	if is_shadow_node:
+		if node is Sprite3D or node is MeshInstance3D or node is Decal or node.get_class() == "Decal3D":
+			node.queue_free()
+			return
+			
+	if node is MeshInstance3D:
+		if "shadow" in lower_name or "plane" in lower_name or "billboard" in lower_name or "card" in lower_name:
+			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			node.visible = false
+			node.queue_free()
+			return
+			
+	for child in node.get_children():
+		_clean_shadow_nodes(child)

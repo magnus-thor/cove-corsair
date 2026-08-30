@@ -11,17 +11,17 @@ sprite_texture = ExtResource("2_tex")
 pixel_size = 0.0021
 y_offset = 0.55
 move_speed = 12.0
-fire_rate = 0.45
+fire_rate = 0.2
 hardpoint_offsets = {
-"BowMount": Vector3(0, 0.22, -0.75),
-"MidDeckCrew": Vector3(0.06, 1.05, 0.01)
+"BowMount": Vector3(0.00, 0.22, -0.75),
+"MidDeckCrew": Vector3(-0.03, 1.43, -0.10)
 }
 hardpoint_rotations = {
-"BowMount": Vector3(0, 0, 0),
-"MidDeckCrew": Vector3(0, 0, 0)
+"BowMount": Vector3(0.0, 0.0, 0.0),
+"MidDeckCrew": Vector3(0.0, 0.0, 0.0)
 }
 hardpoint_scales = {
-"BowMount": Vector3(1, 1, 1),
+"BowMount": Vector3(1.00, 1.00, 1.00),
 "MidDeckCrew": Vector3(0.35, 0.35, 0.35)
 }
 tier_upgrades = Array[Dictionary]([{

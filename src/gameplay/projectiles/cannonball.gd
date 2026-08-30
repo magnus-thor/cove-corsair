@@ -135,3 +135,21 @@ func _apply_splash_damage() -> void:
 				var dist = (obj as Node3D).global_position.distance_to(global_position)
 				if dist <= radius and obj.has_method("take_damage"):
 					obj.take_damage(damage)
+
+func apply_gate_glow() -> void:
+	var sprite_node = get_node_or_null("Sprite3D") as Sprite3D
+	if sprite_node:
+		sprite_node.modulate = Color(2.5, 2.0, 0.5, 1.0)
+	
+	var model = get_node_or_null("CannonBallModel")
+	if model:
+		var mat = StandardMaterial3D.new()
+		mat.albedo_color = Color(1.0, 0.6, 0.1)
+		mat.emission_enabled = true
+		mat.emission = Color(2.5, 1.5, 0.2)
+		if model is MeshInstance3D:
+			model.material_override = mat
+		else:
+			for child in model.get_children():
+				if child is MeshInstance3D:
+					child.material_override = mat

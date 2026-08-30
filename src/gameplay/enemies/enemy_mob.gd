@@ -27,6 +27,7 @@ extends Area3D
 ## Prefabs
 @export var doubloon_scene: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
 @export var barrel_explosion_scene: PackedScene = preload("res://src/gameplay/vfx/barrel_explosion.tscn")
+@export var enemy_cannonball_scene: PackedScene = preload("res://src/gameplay/projectiles/enemy_cannonball.tscn")
 
 @onready var enemy_sprite: Sprite3D = $EnemySprite
 @onready var collision_shape: CollisionShape3D = $CollisionShape3D
@@ -38,8 +39,10 @@ var _flash_tween: Tween
 var _time: float = 0.0
 var _is_dead: bool = false
 var _current_base_y: float = 1.25
+var shoot_cooldown_timer: float = 0.0
 
 func _ready() -> void:
+	_clean_shadow_nodes(self)
 	add_to_group("enemies")
 	add_to_group("destructible")
 	
@@ -109,11 +112,65 @@ func _physics_process(delta: float) -> void:
 	if enemy_sprite:
 		enemy_sprite.position.y = _current_base_y + sin(_time * 3.0) * 0.04
 		
-	# Clean up if passed far behind the player boat
 	var player = get_tree().get_first_node_in_group("player")
 	var player_z = player.global_position.z if player else 0.0
-	if global_position.z > (player_z + 10.0):
+	
+	# Active Combatant Homing / Steering
+	if has_meta("is_kamikaze") and get_meta("is_kamikaze") and player and is_instance_valid(player):
+		global_position.x = move_toward(global_position.x, player.global_position.x, 2.5 * delta)
+		
+	# Active Combatant Shooting
+	var mob_name_lower = ""
+	if enemy_data:
+		mob_name_lower = enemy_data.mob_name.to_lower()
+	elif mob_type:
+		mob_name_lower = mob_type.to_lower()
+		
+	if "raider" in mob_name_lower or "skiff" in mob_name_lower or "elite" in mob_name_lower or "ironclad" in mob_name_lower:
+		shoot_cooldown_timer += delta
+		var shoot_interval = 2.0
+		if "elite" in mob_name_lower or "ironclad" in mob_name_lower:
+			shoot_interval = 1.5
+		if shoot_cooldown_timer >= shoot_interval:
+			shoot_cooldown_timer = 0.0
+			_fire_forward_cannonball()
+		
+	# Clean up and leak threat if passed behind the player boat
+	if global_position.z > (player_z + 3.0):
+		if player and player.has_method("leak_threat"):
+			player.leak_threat(self)
 		queue_free()
+
+func _fire_forward_cannonball() -> void:
+	if not enemy_cannonball_scene:
+		return
+		
+	var ball = enemy_cannonball_scene.instantiate() as Area3D
+	var root = get_tree().current_scene
+	if root:
+		root.add_child(ball)
+	else:
+		get_parent().add_child(ball)
+		
+	# Spawn slightly ahead in positive Z
+	ball.global_position = global_position + Vector3(0.0, 0.4, 1.2)
+	
+	var ball_speed = 8.0
+	var mob_name_lower = ""
+	if enemy_data:
+		mob_name_lower = enemy_data.mob_name.to_lower()
+	elif mob_type:
+		mob_name_lower = mob_type.to_lower()
+		
+	if "elite" in mob_name_lower or "ironclad" in mob_name_lower:
+		ball_speed = 10.0
+		
+	if "direction" in ball:
+		ball.direction = Vector3(0, 0, 1)
+	if "speed" in ball:
+		ball.speed = ball_speed
+		
+	AudioManager.play_sfx("cannon_shots", 0.9, 1.1, -4.0)
 
 func _on_area_entered(area: Area3D) -> void:
 	if _is_dead or not GameState.is_game_active:
@@ -136,6 +193,28 @@ func take_damage(amount: int) -> void:
 	current_hp = max(0, current_hp - amount)
 	_update_health_bar()
 	_flash_white()
+	
+	# Spawn floating combat text
+	var ft_script = load("res://src/gameplay/vfx/floating_text.gd")
+	if ft_script:
+		var fct = ft_script.new()
+		var root = get_tree().current_scene
+		if root:
+			root.add_child(fct)
+			fct.global_position = global_position + Vector3(randf_range(-0.5, 0.5), 1.2, randf_range(-0.5, 0.5))
+			fct.setup("-" + str(amount), Color(1.0, 0.3, 0.3))
+			
+	# Spawn XP orb flying into the boat on hit!
+	var player = get_tree().get_first_node_in_group("player")
+	var xp_script = load("res://src/gameplay/collectibles/collectible_xp_orb.gd")
+	if xp_script:
+		var orb = xp_script.new()
+		var root = get_tree().current_scene
+		if root:
+			root.add_child(orb)
+			orb.global_position = global_position + Vector3(randf_range(-0.4, 0.4), 0.3, randf_range(-0.4, 0.4))
+			if player:
+				orb.attract_to(player)
 	
 	if current_hp <= 0:
 		die()
@@ -171,6 +250,11 @@ func die() -> void:
 	AudioManager.play_sfx("barrel_breaks")
 	_spawn_explosion()
 	_spawn_doubloons()
+	
+	# Trigger camera shake on death!
+	var camera = get_tree().get_first_node_in_group("game_camera")
+	if camera and camera.has_method("shake"):
+		camera.shake(0.18, 0.16)
 	
 	var player = get_tree().get_first_node_in_group("player")
 	if player:
@@ -209,3 +293,26 @@ func _spawn_doubloons() -> void:
 			var scatter = Vector2(randf_range(-0.8, 0.8), randf_range(-0.8, 0.8))
 			if doubloon.has_method("_trigger_spawn_bounce"):
 				doubloon._trigger_spawn_bounce(scatter)
+
+func _clean_shadow_nodes(node: Node) -> void:
+	if not node:
+		return
+	var lower_name = node.name.to_lower()
+	var is_shadow_node = false
+	if "shadow" in lower_name or "decal" in lower_name or "projector" in lower_name or "card" in lower_name or "oblate" in lower_name or "sphere" in lower_name:
+		is_shadow_node = true
+		
+	if is_shadow_node:
+		if node is Sprite3D or node is MeshInstance3D or node is Decal or node.get_class() == "Decal3D":
+			node.queue_free()
+			return
+			
+	if node is MeshInstance3D:
+		if "shadow" in lower_name or "plane" in lower_name or "billboard" in lower_name or "card" in lower_name:
+			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			node.visible = false
+			node.queue_free()
+			return
+			
+	for child in node.get_children():
+		_clean_shadow_nodes(child)

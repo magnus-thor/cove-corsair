@@ -6,4 +6,5 @@
 [resource]
 script = ExtResource("1_script")
 weapon_name = "Bow Chaser"
+fire_rate = 0.2
 default_ammo = ExtResource("2_ammo")
