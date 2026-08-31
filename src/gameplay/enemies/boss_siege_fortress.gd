@@ -1,0 +1,359 @@
+class_name BossSiegeFortress
+extends Node3D
+
+enum State { APPROACHING, COMBAT, RAMMING, DYING }
+
+@export var max_hp: int = 800 # Port: 150, Starboard: 150, Prow Ram: 150, Furnace Core: 350
+@export var current_hp: int = 800
+
+@export var approach_speed: float = 12.0
+@export var combat_z_offset: float = -19.0
+@export var weave_speed: float = 1.1
+@export var patrol_width: float = 3.5
+
+# Component HP
+var hp_port_turret: int = 150
+var hp_starboard_turret: int = 150
+var hp_prow_ram: int = 150
+var hp_furnace_core: int = 350
+
+var current_state: State = State.APPROACHING
+var current_phase: int = 1
+var combat_time: float = 0.0
+
+var _target_z: float = -19.0
+var _weave_time: float = 0.0
+var _attack_timer: float = 0.0
+var _geyser_timer: float = 0.0
+var _ram_timer: float = 0.0
+var _minion_timer: float = 0.0
+var _is_defeated: bool = false
+var _charge_dir: int = 1
+var _y_base: float = 1.4
+var _flash_tweens: Dictionary = {}
+
+# Prefabs
+@export var enemy_cannonball_scene: PackedScene = preload("res://src/gameplay/projectiles/enemy_cannonball.tscn")
+@export var thermal_geyser_scene: PackedScene = preload("res://src/gameplay/obstacles/hazard_thermal_geyser.tscn")
+@export var iron_gunner_scene: PackedScene = preload("res://src/gameplay/enemies/enemy_iron_gunner.tscn")
+@export var brimstone_raft_scene: PackedScene = preload("res://src/gameplay/enemies/enemy_brimstone_raft.tscn")
+@export var doubloon_scene: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
+@export var explosion_scene: PackedScene = preload("res://src/gameplay/vfx/barrel_explosion.tscn")
+
+@onready var boss_sprite: Sprite3D = $BossSprite
+@onready var port_turret_node: Node3D = $PortTurret
+@onready var starboard_turret_node: Node3D = $StarboardTurret
+@onready var prow_ram_node: Node3D = $ProwRam
+@onready var furnace_core_node: Node3D = $FurnaceCore
+
+func _ready() -> void:
+	add_to_group("enemies")
+	add_to_group("boss")
+	current_hp = max_hp
+	
+	GameState.boss_spawned_event.emit("The Siege Fortress", max_hp)
+	GameState.boss_health_changed.emit(current_hp, max_hp)
+
+func _physics_process(delta: float) -> void:
+	if _is_defeated or current_state == State.DYING:
+		return
+		
+	var player = get_tree().get_first_node_in_group("player")
+	var player_z = player.global_position.z if player else 0.0
+	_target_z = player_z + combat_z_offset
+	
+	match current_state:
+		State.APPROACHING:
+			global_position.z = move_toward(global_position.z, _target_z, approach_speed * delta)
+			if abs(global_position.z - _target_z) < 0.5:
+				current_state = State.COMBAT
+				_attack_timer = 0.5
+				
+		State.COMBAT:
+			_process_combat(delta)
+			
+		State.RAMMING:
+			_process_ram_overdrive(delta)
+
+func _process_combat(delta: float) -> void:
+	combat_time += delta
+	
+	# Horizontal patrol weave
+	global_position.z = lerp(global_position.z, _target_z, 3.0 * delta)
+	_weave_time += delta * weave_speed
+	global_position.x = sin(_weave_time) * patrol_width
+	
+	if boss_sprite:
+		boss_sprite.position.y = _y_base + sin(_weave_time * 2.0) * 0.06
+		
+	# Turret Broadsides
+	_attack_timer += delta
+	var attack_cd = 2.2 if current_phase == 1 else (1.6 if current_phase == 2 else 0.9)
+	if _attack_timer >= attack_cd:
+		_attack_timer = 0.0
+		_fire_fortress_salvo()
+		
+	# Geyser Slams
+	_geyser_timer += delta
+	var geyser_cd = 7.0 if current_phase == 1 else (5.0 if current_phase == 2 else 3.5)
+	if _geyser_timer >= geyser_cd:
+		_geyser_timer = 0.0
+		_trigger_geyser_slam()
+		
+	# Ram Overdrive Trigger (Phase 2 & 3)
+	if current_phase >= 2 and hp_prow_ram > 0:
+		_ram_timer += delta
+		var ram_cd = 10.0 if current_phase == 2 else 7.0
+		if _ram_timer >= ram_cd:
+			_ram_timer = 0.0
+			_start_ram_overdrive()
+			return
+			
+	# Reinforcement Minions
+	_minion_timer += delta
+	var minion_cd = 8.0 if current_phase == 1 else 6.0
+	if _minion_timer >= minion_cd:
+		_minion_timer = 0.0
+		_spawn_bastion_minions()
+
+func _fire_fortress_salvo() -> void:
+	var shoot_points: Array[Node3D] = []
+	if hp_port_turret > 0 and is_instance_valid(port_turret_node):
+		shoot_points.append(port_turret_node)
+	if hp_starboard_turret > 0 and is_instance_valid(starboard_turret_node):
+		shoot_points.append(starboard_turret_node)
+	if shoot_points.is_empty():
+		shoot_points.append(furnace_core_node)
+		
+	AudioManager.play_sfx("cannon_shots", 0.7, 0.9, 2.0)
+	
+	for point in shoot_points:
+		if not is_instance_valid(point):
+			continue
+		var ball = enemy_cannonball_scene.instantiate() as Area3D
+		var root = get_tree().current_scene
+		if root:
+			root.add_child(ball)
+		else:
+			get_parent().add_child(ball)
+		ball.global_position = point.global_position + Vector3(0, 0.4, 1.2)
+		if ball.has_method("set_color"):
+			ball.set_color(Color(1.0, 0.45, 0.1))
+		if "speed" in ball:
+			ball.speed = 11.0
+
+		if "direction" in ball:
+			var player = get_tree().get_first_node_in_group("player")
+			if player:
+				var dir = (player.global_position - ball.global_position).normalized()
+				dir.y = 0.0
+				ball.direction = dir.normalized()
+			else:
+				ball.direction = Vector3(0, 0, 1)
+
+func _trigger_geyser_slam() -> void:
+	AudioManager.play_sfx("barrel_breaks", 0.5, 0.7, 4.0)
+	AudioManager.play_sfx("water_splashes", 0.5, 0.7, 3.0)
+	
+	var camera = get_tree().get_first_node_in_group("game_camera")
+	if camera and camera.has_method("shake"):
+		camera.shake(0.35, 0.3)
+		
+	var player = get_tree().get_first_node_in_group("player")
+	if not player or not is_instance_valid(player):
+		return
+		
+	# Spawn 2 thermal geysers near player's path
+	for offset_x in [-2.5, 2.5]:
+		if thermal_geyser_scene:
+			var geyser = thermal_geyser_scene.instantiate() as Node3D
+			get_tree().current_scene.add_child(geyser)
+			geyser.global_position = Vector3(player.global_position.x + offset_x, 0.0, player.global_position.z + randf_range(-1.0, 2.0))
+
+func _start_ram_overdrive() -> void:
+	current_state = State.RAMMING
+	_charge_dir = 1
+	AudioManager.play_sfx("cannon_shots", 0.5, 0.7, 4.0)
+	
+	if boss_sprite:
+		var tween = create_tween()
+		tween.tween_property(boss_sprite, "modulate", Color(4.0, 0.8, 0.1, 1.0), 0.15)
+		tween.tween_property(boss_sprite, "modulate", Color.WHITE, 0.15)
+		tween.tween_property(boss_sprite, "modulate", Color(4.0, 0.8, 0.1, 1.0), 0.15)
+		tween.tween_property(boss_sprite, "modulate", Color.WHITE, 0.15)
+
+func _process_ram_overdrive(delta: float) -> void:
+	var player = get_tree().get_first_node_in_group("player")
+	var player_z = player.global_position.z if player else 0.0
+	
+	if _charge_dir == 1:
+		# Rapid forward thrust
+		global_position.z = move_toward(global_position.z, player_z - 3.0, 22.0 * delta)
+		
+		# Check hit
+		if abs(global_position.z - (player_z - 3.0)) < 0.8:
+			if player and "current_health" in player:
+				player.current_health -= 1
+				player.health_changed.emit(player.current_health, player.max_health)
+				if player.current_health <= 0 and player.has_method("game_over"):
+					player.game_over(false)
+				AudioManager.play_sfx("barrel_breaks", 0.6, 0.8, 3.0)
+			_charge_dir = -1 # Retreat
+	else:
+		# Retreat back
+		global_position.z = move_toward(global_position.z, _target_z, 9.0 * delta)
+		if abs(global_position.z - _target_z) < 0.5:
+			current_state = State.COMBAT
+
+func _spawn_bastion_minions() -> void:
+	var parent = get_tree().get_first_node_in_group("level_controller")
+	if not parent: parent = get_parent()
+	if not parent: return
+	
+	if randf() < 0.5 and iron_gunner_scene:
+		var gunner = iron_gunner_scene.instantiate() as Area3D
+		parent.add_child(gunner)
+		gunner.global_position = Vector3(randf_range(-3.5, 3.5), 0.1, global_position.z + 4.0)
+	elif brimstone_raft_scene:
+		var raft = brimstone_raft_scene.instantiate() as Area3D
+		parent.add_child(raft)
+		raft.global_position = Vector3(randf_range(-3.0, 3.0), 0.1, global_position.z + 4.0)
+
+# Damage Routing
+func damage_component(comp_name: String, amount: int, _from_bow: bool) -> void:
+	if _is_defeated:
+		return
+		
+	match comp_name:
+		"port_turret":
+			if hp_port_turret > 0:
+				hp_port_turret = max(0, hp_port_turret - amount)
+				current_hp = max(0, current_hp - amount)
+				GameState.boss_health_changed.emit(current_hp, max_hp)
+				_flash_node(port_turret_node)
+				if hp_port_turret <= 0:
+					_destroy_subpart(port_turret_node)
+					
+		"starboard_turret":
+			if hp_starboard_turret > 0:
+				hp_starboard_turret = max(0, hp_starboard_turret - amount)
+				current_hp = max(0, current_hp - amount)
+				GameState.boss_health_changed.emit(current_hp, max_hp)
+				_flash_node(starboard_turret_node)
+				if hp_starboard_turret <= 0:
+					_destroy_subpart(starboard_turret_node)
+					
+		"prow_ram":
+			if hp_prow_ram > 0:
+				hp_prow_ram = max(0, hp_prow_ram - amount)
+				current_hp = max(0, current_hp - amount)
+				GameState.boss_health_changed.emit(current_hp, max_hp)
+				_flash_node(prow_ram_node)
+				if hp_prow_ram <= 0:
+					_destroy_subpart(prow_ram_node)
+					
+		"furnace_core":
+			# Takes full damage always, but takes double if turrets are down
+			var mult = 1.5 if (hp_port_turret <= 0 and hp_starboard_turret <= 0) else 1.0
+			var actual_dmg = int(amount * mult)
+			hp_furnace_core = max(0, hp_furnace_core - actual_dmg)
+			current_hp = max(0, current_hp - actual_dmg)
+			GameState.boss_health_changed.emit(current_hp, max_hp)
+			_flash_node(furnace_core_node)
+			_flash_boss_main()
+			
+	if current_hp <= 0:
+		boss_defeat()
+	else:
+		_check_phase()
+
+func _flash_node(node: Variant) -> void:
+	if not is_instance_valid(node) or not (node is Node3D):
+		return
+	var orig_sc = node.scale
+	var tween = create_tween()
+	tween.tween_property(node, "scale", orig_sc * 1.2, 0.05)
+	tween.tween_property(node, "scale", orig_sc, 0.08)
+
+func _flash_boss_main() -> void:
+	if not boss_sprite:
+		return
+	var tween = create_tween()
+	tween.tween_property(boss_sprite, "modulate", Color(3.0, 1.5, 0.8, 1.0), 0.05)
+	tween.tween_property(boss_sprite, "modulate", Color.WHITE, 0.1)
+
+func _destroy_subpart(node: Variant) -> void:
+	if not is_instance_valid(node):
+		return
+	AudioManager.play_sfx("barrel_breaks", 0.6, 0.8, 3.0)
+	if explosion_scene and (node is Node3D):
+		var vfx = explosion_scene.instantiate() as Node3D
+		get_tree().current_scene.add_child(vfx)
+		vfx.global_position = node.global_position
+		vfx.scale = Vector3(2.5, 2.5, 2.5)
+	if is_instance_valid(node) and "visible" in node:
+		node.visible = false
+	if is_instance_valid(node) and node is Area3D:
+		node.set_deferred("monitoring", false)
+		node.set_deferred("monitorable", false)
+
+
+func _check_phase() -> void:
+	if current_phase == 1 and current_hp <= int(max_hp * 0.65):
+		current_phase = 2
+		weave_speed = 1.4
+		AudioManager.play_sfx("gate_passes", 0.8, 1.0)
+	elif current_phase == 2 and current_hp <= int(max_hp * 0.35):
+		current_phase = 3
+		weave_speed = 1.8
+		if boss_sprite:
+			boss_sprite.modulate = Color(2.5, 0.4, 0.1, 1.0)
+		AudioManager.play_sfx("gate_passes", 0.7, 0.9)
+
+func boss_defeat() -> void:
+	if _is_defeated:
+		return
+	_is_defeated = true
+	current_state = State.DYING
+	GameState.targets_destroyed += 1
+	
+	# Grand fortress meltdown explosion sequence
+	var tween = create_tween()
+	for i in range(24):
+		tween.tween_callback(func():
+			if explosion_scene:
+				var vfx = explosion_scene.instantiate() as Node3D
+				get_tree().current_scene.add_child(vfx)
+				vfx.global_position = global_position + Vector3(randf_range(-4.0, 4.0), randf_range(0.2, 2.5), randf_range(-3.0, 3.0))
+				vfx.scale = Vector3.ONE * randf_range(2.5, 4.5)
+				vfx.modulate = Color(3.0, 1.0, 0.2, 1.0) if randf() < 0.7 else Color(2.5, 2.0, 0.5, 1.0)
+			AudioManager.play_sfx("barrel_breaks", 0.4, 1.0, 3.0)
+		)
+		tween.tween_interval(0.09)
+		
+	tween.tween_callback(func():
+		AudioManager.stop_music()
+		AudioManager.play_sfx("gate_passes", 0.5, 0.7, 4.0)
+		AudioManager.play_sfx("coin_pickups", 0.9, 1.1, 5.0)
+		_spawn_doubloon_fountain()
+	)
+	tween.tween_interval(2.2)
+	tween.tween_callback(func():
+		GameState.is_game_active = false
+		GameState.unlock_next_level()
+		# Emit campaign completion signal!
+		GameState.campaign_completed.emit(GameState.doubloons, GameState.targets_destroyed)
+		GameState.level_completed.emit(GameState.doubloons, GameState.targets_destroyed)
+		queue_free()
+	)
+
+func _spawn_doubloon_fountain() -> void:
+	if not doubloon_scene:
+		return
+	for i in range(250):
+		var d = doubloon_scene.instantiate() as Area3D
+		if d:
+			get_tree().current_scene.add_child(d)
+			d.global_position = Vector3(global_position.x, 0.1, global_position.z)
+			if d.has_method("_trigger_spawn_bounce"):
+				d._trigger_spawn_bounce(Vector2(randf_range(-5.0, 5.0), randf_range(-5.0, 5.0)))

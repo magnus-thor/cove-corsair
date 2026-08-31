@@ -189,7 +189,7 @@ func _clean_shadow_nodes(node: Node) -> void:
 		return
 	var lower_name = node.name.to_lower()
 	var is_shadow_node = false
-	if "shadow" in lower_name or "decal" in lower_name or "projector" in lower_name or "card" in lower_name or "oblate" in lower_name or "sphere" in lower_name:
+	if "shadow" in lower_name or "decal" in lower_name or "projector" in lower_name or "card" in lower_name or "oblate" in lower_name or "shadow_sphere" in lower_name or "sphere_shadow" in lower_name:
 		is_shadow_node = true
 		
 	if is_shadow_node:

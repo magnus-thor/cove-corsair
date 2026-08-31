@@ -10,6 +10,23 @@ func _ready() -> void:
 	area_entered.connect(_on_hit)
 	body_entered.connect(_on_hit)
 
+func set_color(color: Color) -> void:
+	var core = get_node_or_null("FireCore") as MeshInstance3D
+	if core:
+		var mat = StandardMaterial3D.new()
+		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		mat.albedo_color = color
+		core.material_override = mat
+	var glow = get_node_or_null("FireGlow") as MeshInstance3D
+	if glow:
+		var mat = StandardMaterial3D.new()
+		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		mat.albedo_color = Color(color.r, color.g, color.b, 0.45)
+		glow.material_override = mat
+
+
 func _physics_process(delta: float) -> void:
 	global_position += direction * speed * delta
 	lifetime -= delta

@@ -378,26 +378,13 @@ func add_doubloons(amount: int) -> void:
 
 func add_evolution_xp(amount: float) -> void:
 	evolution_xp += amount
-	var current_xp = evolution_xp
-	print("Player XP: ", current_xp, " / Current Tier: ", current_tier)
-	
-	if ship_data and ship_data.ship_id == "dinghy":
-		if current_xp >= 30.0 and current_tier == ShipTier.RAFT:
-			print("Dinghy XP:", current_xp, "-> Triggering Tier 2 Monkey Bomber")
-			current_tier = ShipTier.SLOOP
-			var monkey_data = load("res://src/data/resources/crew_monkey_bomber.tres") as WeaponData
-			if monkey_data:
-				equip_weapon_to_socket("MidDeckCrew", monkey_data)
-				AudioManager.play_sfx("gate_passes")
-			return
-			
 	_check_tier_updates()
 
 func _check_tier_updates(force: bool = false) -> void:
 	var old_tier = current_tier
 	
 	var t2_threshold = 30.0 if ship_data and ship_data.ship_id == "dinghy" else 100.0
-	var t3_threshold = 500.0 if ship_data and ship_data.ship_id == "dinghy" else 250.0
+	var t3_threshold = 50.0 if ship_data and ship_data.ship_id == "dinghy" else 250.0
 	
 	if evolution_xp >= t3_threshold:
 		current_tier = ShipTier.GALLEON
@@ -462,11 +449,11 @@ func _on_area_entered(area: Area3D) -> void:
 	if is_game_over or not GameState.is_game_active:
 		return
 		
-	# Ignore collectibles and cannonballs
-	if area.is_in_group("collectibles") or area.is_in_group("cannonballs") or area.is_in_group("multiplier_gate"):
+	# Ignore collectibles, cannonballs, and gates
+	if area.is_in_group("collectibles") or area.is_in_group("cannonballs") or area.is_in_group("multiplier_gate") or area.is_in_group("player") or area.is_in_group("follower"):
 		return
 		
-	if area.is_in_group("destructible") or area.is_in_group("enemies"):
+	if area.is_in_group("destructible") or area.is_in_group("enemies") or area.is_in_group("boss"):
 		AudioManager.play_sfx("barrel_hits")
 		
 		# Decrement player health
@@ -476,10 +463,16 @@ func _on_area_entered(area: Area3D) -> void:
 		if current_health <= 0:
 			game_over(false)
 			
-		if area.has_method("die"):
+		if area.is_in_group("boss") or (area.get_parent() and area.get_parent().is_in_group("boss")):
+			if area.has_method("take_damage"):
+				area.take_damage(5)
+		elif area.has_method("die"):
 			area.die()
+		elif area.has_method("take_damage"):
+			area.take_damage(5)
 		else:
 			area.queue_free()
+
 
 func game_over(victory: bool) -> void:
 	if is_game_over:
@@ -726,7 +719,7 @@ func _clean_shadow_nodes(node: Node) -> void:
 		return
 	var lower_name = node.name.to_lower()
 	var is_shadow_node = false
-	if "shadow" in lower_name or "decal" in lower_name or "projector" in lower_name or "card" in lower_name or "oblate" in lower_name or "sphere" in lower_name:
+	if "shadow" in lower_name or "decal" in lower_name or "projector" in lower_name or "card" in lower_name or "oblate" in lower_name or "shadow_sphere" in lower_name or "sphere_shadow" in lower_name:
 		is_shadow_node = true
 		
 	if is_shadow_node:

@@ -1,0 +1,204 @@
+[gd_resource type="Resource" script_class="LevelData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/data/level_data.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://src/gameplay/enemies/boss_siege_fortress.tscn" id="2_boss"]
+
+[resource]
+script = ExtResource("1_script")
+level_name = "Level 3: Brimstone Bastion"
+total_distance = 320.0
+base_scroll_speed = 10.0
+river_width_world = 12.0
+biome_type = "brimstone_bastion"
+water_albedo = Color(0.22, 0.06, 0.04, 0.95)
+fog_color = Color(0.25, 0.08, 0.04, 1.0)
+fog_density = 0.024
+boss_scene = ExtResource("2_boss")
+wave_events = Array[Dictionary]([{
+"count": 5,
+"distance": 10.0,
+"type": "coin_arc",
+"x_end": 0.3,
+"x_start": -0.3
+}, {
+"distance": 16.0,
+"type": "thermal_geyser",
+"x": 0.0
+}, {
+"distance": 25.0,
+"hp": 6,
+"obstacle_type": "fuse",
+"type": "obstacles",
+"x_positions": [-0.45, 0.45]
+}, {
+"distance": 36.0,
+"hp": 22,
+"speed": 2.6,
+"type": "iron_gunners",
+"x_positions": [-0.35]
+}, {
+"distance": 44.0,
+"hp": 22,
+"speed": 2.6,
+"type": "iron_gunners",
+"x_positions": [0.35]
+}, {
+"distance": 54.0,
+"type": "thermal_geyser",
+"x": -0.4
+}, {
+"distance": 56.0,
+"type": "thermal_geyser",
+"x": 0.4
+}, {
+"distance": 62.0,
+"hp": 18,
+"speed": 7.5,
+"type": "brimstone_rafts",
+"x_positions": [0.0]
+}, {
+"action": "add_fleet_1",
+"custom_text": "+1",
+"distance": 70.0,
+"text": "+1",
+"type": "fleet_gate",
+"value": 1,
+"x": 0.0
+}, {
+"distance": 82.0,
+"hp": 18,
+"speed": 7.5,
+"type": "brimstone_rafts",
+"x_positions": [-0.45]
+}, {
+"distance": 86.0,
+"hp": 18,
+"speed": 7.5,
+"type": "brimstone_rafts",
+"x_positions": [0.45]
+}, {
+"distance": 98.0,
+"hp": 8,
+"obstacle_type": "rune",
+"type": "obstacles",
+"x_positions": [-0.6, 0.6]
+}, {
+"distance": 108.0,
+"hp": 22,
+"speed": 2.8,
+"type": "iron_gunners",
+"x_positions": [-0.4, 0.4]
+}, {
+"distance": 120.0,
+"type": "thermal_geyser",
+"x": 0.0
+}, {
+"distance": 128.0,
+"hp": 120,
+"speed": 1.3,
+"type": "mini_boss_bombard",
+"x": 0.0
+}, {
+"distance": 140.0,
+"hp": 18,
+"speed": 7.8,
+"type": "brimstone_rafts",
+"x_positions": [-0.35, 0.35]
+}, {
+"action": "add_fleet_1",
+"custom_text": "+1",
+"distance": 150.0,
+"text": "+1",
+"type": "fleet_gate",
+"value": 1,
+"x": 0.0
+}, {
+"distance": 164.0,
+"hp": 22,
+"speed": 3.0,
+"type": "iron_gunners",
+"x_positions": [-0.5, 0.5]
+}, {
+"distance": 175.0,
+"type": "thermal_geyser",
+"x": -0.35
+}, {
+"distance": 178.0,
+"type": "thermal_geyser",
+"x": 0.35
+}, {
+"distance": 188.0,
+"hp": 10,
+"obstacle_type": "fuse",
+"type": "obstacles",
+"x_positions": [-0.65, 0.0, 0.65]
+}, {
+"distance": 200.0,
+"hp": 18,
+"speed": 8.0,
+"type": "brimstone_rafts",
+"x_positions": [-0.5, 0.5]
+}, {
+"distance": 212.0,
+"hp": 22,
+"speed": 3.2,
+"type": "iron_gunners",
+"x_positions": [-0.55, 0.0, 0.55]
+}, {
+"distance": 228.0,
+"type": "thermal_geyser",
+"x": 0.0
+}, {
+"distance": 236.0,
+"hp": 18,
+"speed": 8.2,
+"type": "brimstone_rafts",
+"x_positions": [-0.4, 0.4]
+}, {
+"action": "add_fleet_2",
+"custom_text": "+2",
+"distance": 250.0,
+"text": "+2",
+"type": "fleet_gate",
+"value": 2,
+"x": 0.0
+}, {
+"distance": 265.0,
+"hp": 22,
+"speed": 3.4,
+"type": "iron_gunners",
+"x_positions": [-0.45, 0.45]
+}, {
+"distance": 276.0,
+"hp": 18,
+"speed": 8.5,
+"type": "brimstone_rafts",
+"x_positions": [-0.6]
+}, {
+"distance": 280.0,
+"hp": 18,
+"speed": 8.5,
+"type": "brimstone_rafts",
+"x_positions": [0.6]
+}, {
+"distance": 292.0,
+"type": "thermal_geyser",
+"x": -0.3
+}, {
+"distance": 295.0,
+"type": "thermal_geyser",
+"x": 0.3
+}, {
+"distance": 305.0,
+"hp": 22,
+"speed": 3.5,
+"type": "iron_gunners",
+"x_positions": [-0.5, 0.0, 0.5]
+}, {
+"distance": 312.0,
+"message": "WARNING: SIEGE FORTRESS BATTLESTATIONS!",
+"type": "warning"
+}, {
+"distance": 320.0,
+"type": "boss"
+}])

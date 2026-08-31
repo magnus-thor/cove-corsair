@@ -66,7 +66,10 @@ func _on_area_entered(area: Area3D) -> void:
 		
 	if area.is_in_group("destructible") or area.is_in_group("enemies") or area.is_in_group("boss"):
 		AudioManager.play_sfx("barrel_breaks")
-		if area.has_method("take_damage"):
+		if area.is_in_group("boss") or (area.get_parent() and area.get_parent().is_in_group("boss")):
+			if area.has_method("take_damage"):
+				area.take_damage(10)
+		elif area.has_method("take_damage"):
 			area.take_damage(10)
 		elif area.has_method("die"):
 			area.die()
@@ -74,6 +77,7 @@ func _on_area_entered(area: Area3D) -> void:
 			area.queue_free()
 		
 		destroy_follower()
+
 
 func destroy_follower() -> void:
 	var player = get_tree().get_first_node_in_group("player")
@@ -86,7 +90,7 @@ func _clean_shadow_nodes(node: Node) -> void:
 		return
 	var lower_name = node.name.to_lower()
 	var is_shadow_node = false
-	if "shadow" in lower_name or "decal" in lower_name or "projector" in lower_name or "card" in lower_name or "oblate" in lower_name or "sphere" in lower_name:
+	if "shadow" in lower_name or "decal" in lower_name or "projector" in lower_name or "card" in lower_name or "oblate" in lower_name or "shadow_sphere" in lower_name or "sphere_shadow" in lower_name:
 		is_shadow_node = true
 		
 	if is_shadow_node:

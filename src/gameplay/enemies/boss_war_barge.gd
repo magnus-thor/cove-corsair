@@ -3,25 +3,26 @@ extends Node3D
 
 enum State { APPROACHING, COMBAT, DYING }
 
-@export var max_hp: int = 120 # Left Outrigger: 20, Right Outrigger: 20, Main Core: 80
-@export var current_hp: int = 120
+@export var max_hp: int = 220 # Left Outrigger: 40, Right Outrigger: 40, Main Core: 140
+@export var current_hp: int = 220
 
 @export var approach_speed: float = 12.0
 @export var combat_z_offset: float = -18.0
-@export var weave_speed: float = 1.2
-@export var patrol_width: float = 3.2
+@export var weave_speed: float = 1.3
+@export var patrol_width: float = 3.4
 
 # Component HP
-var hp_left_cannon: int = 5
-var hp_right_cannon: int = 5
-var hp_left_armor: int = 20  # Left Outrigger
-var hp_right_armor: int = 20 # Right Outrigger
-var hp_boiler: int = 80      # Main Core
+var hp_left_cannon: int = 15
+var hp_right_cannon: int = 15
+var hp_left_armor: int = 40  # Left Outrigger
+var hp_right_armor: int = 40 # Right Outrigger
+var hp_boiler: int = 140     # Main Core
 var combat_time: float = 0.0
 var enraged_shoot_timer: float = 0.0
 var minion_timer: float = 0.0
 var keg_timer: float = 0.0
 var mortar_timer: float = 0.0
+
 
 # Prefabs
 @export var enemy_cannonball_scene: PackedScene = preload("res://src/gameplay/projectiles/enemy_cannonball.tscn")
@@ -490,26 +491,26 @@ func damage_component(comp_name: String, amount: int, from_bow: bool) -> void:
 				_flash_boss_main()
 					
 		"boiler_core":
-			# Only takes damage if both armors are destroyed
-			if hp_left_armor <= 0 and hp_right_armor <= 0:
-				var actual_damage = amount
-				if is_venting_steam and from_bow:
-					actual_damage *= 2 # Crit!
-					_show_crit_flash()
-					
-				hp_boiler = max(0, hp_boiler - actual_damage)
-				current_hp = max(0, current_hp - actual_damage)
-				GameState.boss_health_changed.emit(current_hp, max_hp)
-				_flash_node(boiler_node)
-				_flash_boss_main()
-				
-				if hp_boiler <= 0 or current_hp <= 0:
-					boss_defeat()
-				else:
-					_check_phase_transition()
-			else:
-				# Invulnerable! Clanking deflect sound
+			var actual_damage = amount
+			# Full damage if outriggers are down, or 60% chip damage if outriggers are still alive
+			if hp_left_armor > 0 or hp_right_armor > 0:
+				actual_damage = max(1, int(amount * 0.6))
 				AudioManager.play_sfx("barrel_hits")
+				
+			if is_venting_steam and from_bow:
+				actual_damage *= 2 # Crit!
+				_show_crit_flash()
+				
+			hp_boiler = max(0, hp_boiler - actual_damage)
+			current_hp = max(0, current_hp - actual_damage)
+			GameState.boss_health_changed.emit(current_hp, max_hp)
+			_flash_node(boiler_node)
+			_flash_boss_main()
+			
+			if hp_boiler <= 0 or current_hp <= 0:
+				boss_defeat()
+			else:
+				_check_phase_transition()
 
 func _flash_node(node: Variant) -> void:
 	if not is_instance_valid(node) or not (node is Node3D):
@@ -553,23 +554,22 @@ func _destroy_subcomponent(node: Variant) -> void:
 		if parent:
 			parent.add_child(vfx)
 			vfx.global_position = node.global_position
-	if "visible" in node:
+	if is_instance_valid(node) and "visible" in node:
 		node.visible = false
 	# Disable collisions on the sub-component
-	if node is Area3D:
+	if is_instance_valid(node) and node is Area3D:
 		node.set_deferred("monitoring", false)
 		node.set_deferred("monitorable", false)
 		for col in node.get_children():
-			if col is CollisionShape3D:
+			if is_instance_valid(col) and col is CollisionShape3D:
 				col.set_deferred("disabled", true)
 
 func _check_phase_transition() -> void:
-	# Phase thresholds scaled for 120 HP pool:
-	# Phase 2 at < 65% = 78 HP, Phase 3 at < 30% = 36 HP
-	if current_phase == 1 and current_hp <= 78: # < 65%
+	if current_phase == 1 and current_hp <= int(max_hp * 0.65):
 		_transition_to_phase_2()
-	elif current_phase == 2 and current_hp <= 36:  # < 30%
+	elif current_phase == 2 and current_hp <= int(max_hp * 0.35):
 		_transition_to_phase_3()
+
 
 func _transition_to_phase_2() -> void:
 	current_phase = 2
@@ -590,7 +590,6 @@ func _spawn_minion_skiff(x_norm: float) -> void:
 		var skiff = enemy_mob_scene.instantiate() as Area3D
 		var skiff_data = preload("res://src/data/resources/raider_skiff.tres")
 		
-		# Add to level controller container if it exists so it scrolls down
 		var parent = get_tree().get_first_node_in_group("level_controller")
 		if not parent:
 			parent = get_parent()
@@ -616,12 +615,12 @@ func boss_defeat() -> void:
 	
 	GameState.targets_destroyed += 1
 	
-	# Deactivate remaining components
-	left_cannon_node.visible = false
-	right_cannon_node.visible = false
-	left_armor_node.visible = false
-	right_armor_node.visible = false
-	boiler_node.visible = false
+	# Deactivate remaining components safely
+	if is_instance_valid(left_cannon_node): left_cannon_node.visible = false
+	if is_instance_valid(right_cannon_node): right_cannon_node.visible = false
+	if is_instance_valid(left_armor_node): left_armor_node.visible = false
+	if is_instance_valid(right_armor_node): right_armor_node.visible = false
+	if is_instance_valid(boiler_node): boiler_node.visible = false
 	
 	# Explode dramatically
 	var tween = create_tween()
@@ -647,6 +646,7 @@ func boss_defeat() -> void:
 		GameState.level_completed.emit(GameState.doubloons, GameState.targets_destroyed)
 		queue_free()
 	)
+
 
 func _spawn_hull_explosion() -> void:
 	if explosion_scene:
@@ -674,7 +674,7 @@ func _clean_shadow_nodes(node: Node) -> void:
 		return
 	var lower_name = node.name.to_lower()
 	var is_shadow_node = false
-	if "shadow" in lower_name or "decal" in lower_name or "projector" in lower_name or "card" in lower_name or "oblate" in lower_name or "sphere" in lower_name:
+	if "shadow" in lower_name or "decal" in lower_name or "projector" in lower_name or "card" in lower_name or "oblate" in lower_name or "shadow_sphere" in lower_name or "sphere_shadow" in lower_name:
 		is_shadow_node = true
 		
 	if is_shadow_node:

@@ -1,0 +1,79 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://src/gameplay/enemies/enemy_mini_boss_harvester.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/Armored Turtle-Raft.png" id="2_harvester_tex"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_harvester"]
+size = Vector3(3.2, 1.8, 3.8)
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_hp"]
+viewport_path = NodePath("HealthBarViewport")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_bg"]
+bg_color = Color(0.1, 0.12, 0.15, 0.8)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_fill"]
+bg_color = Color(0.15, 0.9, 0.45, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="EnemyMiniBossHarvester" type="Area3D" groups=["destructible", "enemies"]]
+collision_layer = 4
+collision_mask = 3
+script = ExtResource("1_script")
+max_hp = 110
+current_hp = 110
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("BoxShape3D_harvester")
+
+[node name="Sprite3D" type="Sprite3D" parent="."]
+transform = Transform3D(1.4, 0, 0, 0, 0.766044, 0.642788, 0, -0.642788, 0.766044, 0, 1.2, 0)
+pixel_size = 0.003
+alpha_cut = 1
+texture = ExtResource("2_harvester_tex")
+modulate = Color(0.65, 1.1, 0.75, 1)
+
+[node name="HealthBarSprite" type="Sprite3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)
+billboard = 1
+double_sided = false
+texture = SubResource("ViewportTexture_hp")
+
+[node name="HealthBarViewport" type="SubViewport" parent="."]
+transparent_bg = true
+size = Vector2i(140, 18)
+render_target_update_mode = 4
+
+[node name="HealthBarControl" type="Control" parent="HealthBarViewport"]
+custom_minimum_size = Vector2(140, 18)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 140.0
+offset_bottom = 18.0
+
+[node name="ProgressBar" type="ProgressBar" parent="HealthBarViewport/HealthBarControl"]
+custom_minimum_size = Vector2(136, 14)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -68.0
+offset_top = -7.0
+offset_right = 68.0
+offset_bottom = 7.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_hp_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
+value = 100.0
+show_percentage = false

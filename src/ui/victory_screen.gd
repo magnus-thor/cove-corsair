@@ -32,16 +32,31 @@ func show_victory(doubloons_earned: int, targets_hit: int, stars_earned: int = 3
 	if GameState.current_level == 1:
 		if title_label:
 			title_label.text = "LEVEL 1 VICTORY"
+		if subtitle_label:
+			subtitle_label.text = "COVE 1 CLEARED: SMUGGLER'S RUN"
+		if boss_label:
+			boss_label.text = "Captain Ironjaw"
 		if next_level_button:
-			next_level_button.text = "Continue to Shipyard"
+			next_level_button.text = "NEXT: Black Tide Bayou"
+	elif GameState.current_level == 2:
+		if title_label:
+			title_label.text = "LEVEL 2 VICTORY"
+		if subtitle_label:
+			subtitle_label.text = "COVE 2 CLEARED: BLACK TIDE BAYOU"
+		if boss_label:
+			boss_label.text = "The Phantom Dredge"
+		if next_level_button:
+			next_level_button.text = "NEXT: Brimstone Bastion"
 	else:
 		if title_label:
-			title_label.text = "VICTORY!"
+			title_label.text = "CAMPAIGN VICTORY!"
+		if subtitle_label:
+			subtitle_label.text = "ALL COVES CONQUERED - PIRATE KING!"
+		if boss_label:
+			boss_label.text = "The Siege Fortress"
 		if next_level_button:
-			next_level_button.text = "NEXT LEVEL"
+			next_level_button.text = "PLAY AGAIN"
 			
-	if subtitle_label:
-		subtitle_label.text = "COVE %d CLEARED" % GameState.current_level
 	if doubloons_label:
 		doubloons_label.text = "0"
 	if targets_label:
@@ -115,6 +130,10 @@ func _on_retry_pressed() -> void:
 
 func _on_next_level_pressed() -> void:
 	get_tree().paused = false
-	GameState.current_level += 1
+	if GameState.current_level >= 3:
+		GameState.current_level = 1
+	else:
+		GameState.current_level += 1
 	GameState.reset_level()
 	get_tree().reload_current_scene()
+

@@ -40,14 +40,30 @@ func _ready() -> void:
 	area_entered.connect(_on_hit)
 	body_entered.connect(_on_hit)
 	damage = ammo_data.damage if ammo_data else 1
+	_apply_visual_styling()
 	if ammo_data:
 		_apply_ammo_data()
+
+func _apply_visual_styling() -> void:
+	var model = get_node_or_null("CannonBallModel")
+	if model:
+		var mat = StandardMaterial3D.new()
+		mat.albedo_color = Color(0.22, 0.22, 0.25) # Dark cast iron cannonball
+		mat.metallic = 0.85
+		mat.roughness = 0.35
+		mat.emission_enabled = false
+		if model is MeshInstance3D:
+			model.material_override = mat
+		else:
+			for child in model.get_children():
+				if child is MeshInstance3D:
+					child.material_override = mat
 
 func _apply_ammo_data() -> void:
 	damage = ammo_data.damage if ammo_data else 1
 	if not ammo_data:
 		return
-	speed = ammo_data.projectile_speed
+	speed = max(24.0, ammo_data.projectile_speed)
 	
 	if ammo_data.splash_radius > 0.0:
 		splash_radius_multiplier = ammo_data.splash_radius / 2.5
@@ -55,8 +71,22 @@ func _apply_ammo_data() -> void:
 	if ammo_data.scale_multiplier != 1.0:
 		scale = Vector3.ONE * ammo_data.scale_multiplier
 		
+	var model = get_node_or_null("CannonBallModel")
+	if ammo_data.ammo_name == "Coconut Bomb" and model:
+		var mat = StandardMaterial3D.new()
+		mat.albedo_color = Color(0.38, 0.24, 0.14) # Textured coconut husk brown
+		mat.roughness = 0.85
+		mat.metallic = 0.05
+		mat.emission_enabled = true
+		mat.emission = Color(0.3, 0.15, 0.05)
+		if model is MeshInstance3D:
+			model.material_override = mat
+		else:
+			for child in model.get_children():
+				if child is MeshInstance3D:
+					child.material_override = mat
+		
 	if ammo_data.sprite_texture:
-		var model = get_node_or_null("CannonBallModel")
 		if model:
 			model.visible = false
 			
@@ -69,6 +99,7 @@ func _apply_ammo_data() -> void:
 			add_child(sprite_node)
 		sprite_node.texture = ammo_data.sprite_texture
 		sprite_node.pixel_size = 0.005
+
 
 func _physics_process(delta: float) -> void:
 	if _is_destroyed:

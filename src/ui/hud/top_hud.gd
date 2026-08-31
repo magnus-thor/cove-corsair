@@ -124,11 +124,17 @@ func _on_boss_spawned(boss_name: String, max_hp: int) -> void:
 		tween.tween_property(boss_health_panel, "modulate:a", 1.0, 0.5).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 
 func _on_boss_health_changed(current: int, max_hp: int) -> void:
-	# Segmented health bar updates: 6 segments representing 10 HP each
-	for i in range(_boss_segments.size()):
+	if _boss_segments.is_empty():
+		return
+	var seg_count = _boss_segments.size()
+	var segment_max = float(max_hp) / float(seg_count) if max_hp > 0 else 10.0
+	
+	for i in range(seg_count):
 		var segment = _boss_segments[i]
-		var min_hp = i * 10
-		var segment_val = clamp(current - min_hp, 0, 10)
+		if not is_instance_valid(segment):
+			continue
+		var min_hp = float(i) * segment_max
+		var segment_val = clamp(float(current) - min_hp, 0.0, segment_max) / segment_max * 10.0
 		
 		# Tween individual segment value smoothly
 		var tween = create_tween()
@@ -136,7 +142,7 @@ func _on_boss_health_changed(current: int, max_hp: int) -> void:
 
 func show_warning_alert(text: String) -> void:
 	var label = get_node_or_null("MarginContainer/HBoxContainer/ProgressContainer/WarningLabel") as Label
-	if label:
+	if label and is_instance_valid(label):
 		label.text = text
 		label.visible = true
 		label.modulate = Color.WHITE
@@ -149,7 +155,11 @@ func show_warning_alert(text: String) -> void:
 		tween.tween_property(label, "modulate", Color.WHITE, 0.1)
 		tween.tween_interval(2.5)
 		tween.tween_property(label, "modulate:a", 0.0, 0.5)
-		tween.tween_callback(func(): label.visible = false)
+		tween.tween_callback(func():
+			if is_instance_valid(label):
+				label.visible = false
+		)
+
 
 func trigger_red_flash() -> void:
 	var flash = get_node_or_null("VignetteAlert")

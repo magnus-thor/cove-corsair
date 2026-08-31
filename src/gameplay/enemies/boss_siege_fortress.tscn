@@ -1,0 +1,68 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://src/gameplay/enemies/boss_siege_fortress.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/boss_war_barge.png" id="2_barge_tex"]
+[ext_resource type="Script" path="res://src/gameplay/enemies/boss_component_delegate.gd" id="3_delegate"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_turret"]
+size = Vector3(1.4, 1.0, 1.4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ram"]
+size = Vector3(2.4, 1.2, 1.6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_core"]
+size = Vector3(2.8, 1.8, 2.8)
+
+[node name="BossSiegeFortress" type="Node3D" groups=["boss", "enemies"]]
+script = ExtResource("1_script")
+
+[node name="BossSprite" type="Sprite3D" parent="."]
+transform = Transform3D(1.5, 0, 0, 0, 0.842648, 0.707078, 0, -0.707078, 0.842648, 0, 1.5, 0)
+pixel_size = 0.004
+alpha_cut = 1
+texture = ExtResource("2_barge_tex")
+modulate = Color(1.4, 0.6, 0.3, 1)
+
+[node name="PortTurret" type="Area3D" parent="." node_paths=PackedStringArray("boss_node") groups=["destructible"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 0.6, 0.4)
+collision_layer = 4
+collision_mask = 3
+script = ExtResource("3_delegate")
+boss_node = NodePath("..")
+component_name = "port_turret"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PortTurret"]
+shape = SubResource("BoxShape3D_turret")
+
+[node name="StarboardTurret" type="Area3D" parent="." node_paths=PackedStringArray("boss_node") groups=["destructible"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 0.6, 0.4)
+collision_layer = 4
+collision_mask = 3
+script = ExtResource("3_delegate")
+boss_node = NodePath("..")
+component_name = "starboard_turret"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StarboardTurret"]
+shape = SubResource("BoxShape3D_turret")
+
+[node name="ProwRam" type="Area3D" parent="." node_paths=PackedStringArray("boss_node") groups=["destructible"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 1.8)
+collision_layer = 4
+collision_mask = 3
+script = ExtResource("3_delegate")
+boss_node = NodePath("..")
+component_name = "prow_ram"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ProwRam"]
+shape = SubResource("BoxShape3D_ram")
+
+[node name="FurnaceCore" type="Area3D" parent="." node_paths=PackedStringArray("boss_node") groups=["destructible"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, -0.4)
+collision_layer = 4
+collision_mask = 3
+script = ExtResource("3_delegate")
+boss_node = NodePath("..")
+component_name = "furnace_core"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="FurnaceCore"]
+shape = SubResource("BoxShape3D_core")

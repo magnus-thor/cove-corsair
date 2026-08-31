@@ -1,0 +1,173 @@
+class_name EnemyMiniBossBombard
+extends Area3D
+
+@export var max_hp: int = 120
+@export var current_hp: int = 120
+@export var forward_speed: float = 1.3
+@export var doubloons_drop: int = 22
+@export var bombard_interval: float = 2.6
+
+@export var doubloon_scene: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
+@export var explosion_scene: PackedScene = preload("res://src/gameplay/vfx/barrel_explosion.tscn")
+
+@onready var sprite_node: Sprite3D = get_node_or_null("Sprite3D")
+@onready var collision_shape: CollisionShape3D = get_node_or_null("CollisionShape3D")
+@onready var progress_bar: ProgressBar = get_node_or_null("HealthBarViewport/HealthBarControl/ProgressBar")
+
+var _bombard_timer: float = 0.0
+var _is_dead: bool = false
+var _flash_tween: Tween
+var _time: float = 0.0
+
+func _ready() -> void:
+	add_to_group("enemies")
+	add_to_group("destructible")
+	current_hp = max_hp
+	_update_health_bar()
+	_bombard_timer = 0.8
+
+func _physics_process(delta: float) -> void:
+	if _is_dead or not GameState.is_game_active:
+		return
+		
+	_time += delta
+	global_position.z += forward_speed * delta
+	
+	if sprite_node:
+		sprite_node.position.y = 1.2 + sin(_time * 2.5) * 0.05
+		
+	_bombard_timer += delta
+	if _bombard_timer >= bombard_interval:
+		_bombard_timer = 0.0
+		_launch_heavy_bombard()
+		
+	var player = get_tree().get_first_node_in_group("player")
+	var player_z = player.global_position.z if player else 0.0
+	if global_position.z > (player_z + 4.5):
+		if player and player.has_method("leak_threat"):
+			player.leak_threat(self)
+		queue_free()
+
+func _launch_heavy_bombard() -> void:
+	var player = get_tree().get_first_node_in_group("player")
+	if not player or not is_instance_valid(player):
+		return
+		
+	var target_pos = player.global_position + Vector3(randf_range(-1.0, 1.0), 0, randf_range(-0.5, 0.5))
+	
+	var reticle = MeshInstance3D.new()
+	var disc = CylinderMesh.new()
+	disc.top_radius = 2.6
+	disc.bottom_radius = 2.6
+	disc.height = 0.02
+	reticle.mesh = disc
+	
+	var mat = StandardMaterial3D.new()
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.albedo_color = Color(1.0, 0.25, 0.05, 0.4)
+	reticle.material_override = mat
+	get_tree().current_scene.add_child(reticle)
+	reticle.global_position = Vector3(target_pos.x, 0.03, target_pos.z)
+	
+	AudioManager.play_sfx("cannon_shots", 0.6, 0.8, 2.0)
+	
+	var tween = reticle.create_tween()
+	tween.tween_property(mat, "albedo_color:a", 0.9, 1.1).set_trans(Tween.TRANS_SINE)
+	tween.tween_callback(func():
+		_detonate_bombard(reticle.global_position)
+		reticle.queue_free()
+	)
+
+func _detonate_bombard(pos: Vector3) -> void:
+	AudioManager.play_sfx("barrel_breaks", 0.6, 0.8, 3.0)
+	AudioManager.play_sfx("cannon_shots", 0.5, 0.7, 3.0)
+	
+	if explosion_scene:
+		var vfx = explosion_scene.instantiate() as Node3D
+		get_tree().current_scene.add_child(vfx)
+		vfx.global_position = pos
+		vfx.scale = Vector3(3.0, 3.0, 3.0)
+		vfx.modulate = Color(2.5, 0.8, 0.2, 1.0)
+		
+	var camera = get_tree().get_first_node_in_group("game_camera")
+	if camera and camera.has_method("shake"):
+		camera.shake(0.3, 0.28)
+		
+	var player = get_tree().get_first_node_in_group("player")
+	if player and is_instance_valid(player):
+		var dist = player.global_position.distance_to(pos)
+		if dist <= 2.6 and player.has_method("damage_fleet"):
+			player.damage_fleet(1)
+
+func take_damage(amount: int) -> void:
+	if _is_dead:
+		return
+	current_hp = max(0, current_hp - amount)
+	_update_health_bar()
+	_flash()
+	
+	var ft_script = load("res://src/gameplay/vfx/floating_text.gd")
+	if ft_script:
+		var fct = ft_script.new()
+		var root = get_tree().current_scene
+		if root:
+			root.add_child(fct)
+			fct.global_position = global_position + Vector3(randf_range(-0.6, 0.6), 1.5, randf_range(-0.6, 0.6))
+			fct.setup("-" + str(amount), Color(1.0, 0.5, 0.1))
+			
+	if current_hp <= 0:
+		die()
+
+func _flash() -> void:
+	if not sprite_node:
+		return
+	if _flash_tween and _flash_tween.is_valid():
+		_flash_tween.kill()
+	_flash_tween = create_tween()
+	_flash_tween.tween_property(sprite_node, "modulate", Color(3.0, 1.8, 1.0, 1.0), 0.06)
+	_flash_tween.tween_property(sprite_node, "modulate", Color(1.2, 0.8, 0.6, 1.0), 0.1)
+
+func _update_health_bar() -> void:
+	if progress_bar:
+		progress_bar.max_value = max_hp
+		progress_bar.value = current_hp
+		var ratio = float(current_hp) / float(max_hp) if max_hp > 0 else 0.0
+		progress_bar.modulate = Color(1.0, 0.7, 0.1).lerp(Color(1.0, 0.1, 0.1), 1.0 - ratio)
+
+func die() -> void:
+	if _is_dead:
+		return
+	_is_dead = true
+	GameState.targets_destroyed += 1
+	AudioManager.play_sfx("barrel_breaks", 0.6, 0.8, 3.0)
+	
+	var camera = get_tree().get_first_node_in_group("game_camera")
+	if camera and camera.has_method("shake"):
+		camera.shake(0.38, 0.32)
+		
+	for i in range(5):
+		get_tree().create_timer(i * 0.1).timeout.connect(func():
+			if explosion_scene:
+				var vfx = explosion_scene.instantiate() as Node3D
+				get_tree().current_scene.add_child(vfx)
+				vfx.global_position = global_position + Vector3(randf_range(-1.8, 1.8), 0.5, randf_range(-1.8, 1.8))
+				vfx.scale = Vector3(2.0, 2.0, 2.0)
+				vfx.modulate = Color(2.5, 0.9, 0.2, 1.0)
+		)
+		
+	if doubloon_scene:
+		for i in range(doubloons_drop):
+			var d = doubloon_scene.instantiate() as Area3D
+			var root = get_tree().current_scene
+			if root:
+				root.add_child(d)
+				d.global_position = global_position
+				if d.has_method("_trigger_spawn_bounce"):
+					d._trigger_spawn_bounce(Vector2(randf_range(-1.6, 1.6), randf_range(-1.6, 1.6)))
+					
+	var player = get_tree().get_first_node_in_group("player")
+	if player and player.has_method("upgrade_ship"):
+		player.upgrade_ship(2)
+		
+	queue_free()
