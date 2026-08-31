@@ -159,7 +159,7 @@ func _process_targeting(delta: float) -> void:
 	var boat_z = player.global_position.z if (player and is_instance_valid(player)) else global_position.z
 	
 	var candidates: Array[Node] = []
-	for grp in ["enemies", "destructible_obstacles", "destructible", "boss"]:
+	for grp in ["enemies", "destructible_obstacles", "destructible", "boss", "obstacles"]:
 		candidates.append_array(get_tree().get_nodes_in_group(grp))
 		
 	var best_target: Node3D = null
@@ -172,12 +172,12 @@ func _process_targeting(delta: float) -> void:
 		processed[target] = true
 		
 		var node3d = target as Node3D
-		# Approaching enemies are upstream (smaller Z coordinate than boat)
-		if node3d.global_position.z >= (boat_z + 0.5):
+		# Allow targeting approaching targets ahead as well as targets alongside as we sail past (up to 2.5m behind boat)
+		if node3d.global_position.z > (boat_z + 2.5):
 			continue
 			
 		var dist = global_position.distance_to(node3d.global_position)
-		if dist <= 18.0 and dist < min_dist:
+		if dist <= 22.0 and dist < min_dist:
 			min_dist = dist
 			best_target = node3d
 			
@@ -185,7 +185,9 @@ func _process_targeting(delta: float) -> void:
 	
 	if current_target and is_instance_valid(current_target):
 		var m_pos = muzzle_point.global_position if muzzle_point else global_position
-		aim_direction = (current_target.global_position - m_pos).normalized()
+		var dir_to_target = (current_target.global_position - m_pos)
+		dir_to_target.y = 0.0 # Maintain flat water level trajectory
+		aim_direction = dir_to_target.normalized() if dir_to_target.length_squared() > 0.001 else Vector3(0, 0, -1)
 		
 		# Flip sprite left/right based on target relative to boat
 		if sprite_3d:
@@ -231,17 +233,28 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 		ball.global_position = muzzle_point.global_position
 		
 		# Mark projectile as fired from BowMount for boss weakpoint checks
-		if get_parent() and get_parent().name == "BowMount":
+		var socket_name = get_parent().name.to_lower() if get_parent() else ""
+		if "bow" in socket_name:
 			ball.set_meta("from_bow", true)
 		
 		var proj_dir: Vector3
 		if is_crew:
-			proj_dir = aim_direction if (aim_direction != Vector3.ZERO and aim_direction.z < 0.0) else Vector3(0, 0, -1)
+			proj_dir = aim_direction if aim_direction != Vector3.ZERO else Vector3(0, 0, -1)
 		else:
-			proj_dir = -global_transform.basis.z.rotated(Vector3.UP, deg_to_rad(weapon_data.spread_angle_deg)).normalized()
-			if proj_dir.z > 0.0 and weapon_data.spread_angle_deg == 0.0:
-				proj_dir.z = -abs(proj_dir.z)
-				proj_dir = proj_dir.normalized()
+			# Each weapon controls its own firing vector relative to the ship (unaffected by socket sprite rotation)
+			var spread = deg_to_rad(weapon_data.spread_angle_deg)
+			if "port" in socket_name or "port" in w_name:
+				# Port swivel guns fire angled to the port side (-35 deg from forward)
+				proj_dir = Vector3(0, 0, -1).rotated(Vector3.UP, deg_to_rad(-35.0) + spread).normalized()
+			elif "starboard" in socket_name or "starboard" in w_name:
+				# Starboard swivel guns fire angled to the starboard side (+35 deg from forward)
+				proj_dir = Vector3(0, 0, -1).rotated(Vector3.UP, deg_to_rad(35.0) + spread).normalized()
+			elif "aft" in socket_name or "aft" in w_name or "mortar" in w_name:
+				# Aft / Stern mortar fires backward (+Z)
+				proj_dir = Vector3(0, 0, 1).rotated(Vector3.UP, spread).normalized()
+			else:
+				# Forward bow chaser / main cannon fires forward (-Z)
+				proj_dir = Vector3(0, 0, -1).rotated(Vector3.UP, spread).normalized()
 		
 		if ball.has_method("setup"):
 			ball.setup(proj_dir, weapon_data.default_ammo)

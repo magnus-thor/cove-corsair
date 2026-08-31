@@ -4,6 +4,9 @@ extends Node3D
 ## Maximum lifetime in seconds before auto-destroying this VFX instance
 @export var max_lifetime: float = 1.0
 @export var auto_destroy: bool = true
+@export var modulate: Color = Color.WHITE:
+	set(val):
+		modulate = val
 
 func _ready() -> void:
 	var particle_nodes: Array[Node] = []

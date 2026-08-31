@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dow3hvn782irr"
-path="res://.godot/imported/skeleton_crew.jpg-9b2698a6fe256084f944736b5be91407.ctex"
+uid="uid://6usdqs30asxv"
+path="res://.godot/imported/skeleton_crew.png-dc292730be0e2d07b76c2e2c032deac5.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/skeleton_crew.jpg"
-dest_files=["res://.godot/imported/skeleton_crew.jpg-9b2698a6fe256084f944736b5be91407.ctex"]
+source_file="res://assets/sprites/skeleton_crew.png"
+dest_files=["res://.godot/imported/skeleton_crew.png-dc292730be0e2d07b76c2e2c032deac5.ctex"]
 
 [params]
 

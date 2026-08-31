@@ -136,6 +136,10 @@ func _ready() -> void:
 	magnet_area.area_entered.connect(_on_magnet_area_entered)
 	
 	evolution_xp = 0.0
+	var level_ship = GameState.get_current_ship_resource() if GameState.has_method("get_current_ship_resource") else null
+	if level_ship:
+		ship_data = level_ship
+		
 	if ship_data:
 		apply_ship_data(ship_data)
 	else:
@@ -383,12 +387,14 @@ func add_evolution_xp(amount: float) -> void:
 func _check_tier_updates(force: bool = false) -> void:
 	var old_tier = current_tier
 	
-	var t2_threshold = 30.0 if ship_data and ship_data.ship_id == "dinghy" else 100.0
-	var t3_threshold = 50.0 if ship_data and ship_data.ship_id == "dinghy" else 250.0
+	var num_tiers = ship_data.tier_upgrades.size() if (ship_data and not ship_data.tier_upgrades.is_empty()) else 3
 	
-	if evolution_xp >= t3_threshold:
+	var t2_threshold = 30.0
+	var t3_threshold = 70.0
+	
+	if num_tiers >= 3 and evolution_xp >= t3_threshold:
 		current_tier = ShipTier.GALLEON
-	elif evolution_xp >= t2_threshold:
+	elif num_tiers >= 2 and evolution_xp >= t2_threshold:
 		current_tier = ShipTier.SLOOP
 	else:
 		current_tier = ShipTier.RAFT

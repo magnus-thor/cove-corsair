@@ -28,10 +28,22 @@ const LEVEL_RESOURCES: Dictionary = {
 	3: "res://src/data/resources/level_03_brimstone_bastion.tres"
 }
 
+const LEVEL_SHIPS: Dictionary = {
+	1: "res://src/data/resources/dinghy_ship.tres",
+	2: "res://src/data/resources/sloop_ship.tres",
+	3: "res://src/data/resources/ironclad_ship.tres"
+}
+
 func get_current_level_resource() -> LevelData:
 	var path = LEVEL_RESOURCES.get(current_level, LEVEL_RESOURCES[1])
 	if ResourceLoader.exists(path):
 		return load(path) as LevelData
+	return null
+
+func get_current_ship_resource() -> ShipData:
+	var path = LEVEL_SHIPS.get(current_level, LEVEL_SHIPS[1])
+	if ResourceLoader.exists(path):
+		return load(path) as ShipData
 	return null
 
 func add_doubloons(amount: int) -> void:

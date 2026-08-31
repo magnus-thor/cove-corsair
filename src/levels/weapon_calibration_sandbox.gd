@@ -53,6 +53,8 @@ var available_assets: Array[Dictionary] = [
 @onready var btn_tier1: Button = %btn_tier1
 @onready var btn_tier2: Button = %btn_tier2
 @onready var btn_tier3: Button = %btn_tier3
+@onready var btn_reset_socket: Button = %btn_reset_socket
+@onready var btn_reset_all: Button = %btn_reset_all
 @onready var btn_print_dict: Button = %btn_print_dict
 @onready var btn_fire_toggle: Button = %btn_fire_toggle
 @onready var btn_clear_all: Button = %btn_clear_all
@@ -60,6 +62,9 @@ var available_assets: Array[Dictionary] = [
 var sockets: Array[String] = []
 var active_socket: String = ""
 var updating_ui: bool = false
+var default_offsets: Dictionary = {}
+var default_rotations: Dictionary = {}
+var default_scales: Dictionary = {}
 
 func _ready() -> void:
 	GameState.is_game_active = true
@@ -137,6 +142,11 @@ func _setup_ui() -> void:
 	if btn_tier3:
 		btn_tier3.pressed.connect(func(): _on_equip_tier(3))
 		
+	if btn_reset_socket:
+		btn_reset_socket.pressed.connect(_on_btn_reset_socket_pressed)
+	if btn_reset_all:
+		btn_reset_all.pressed.connect(_on_btn_reset_all_pressed)
+		
 	if btn_print_dict:
 		btn_print_dict.pressed.connect(_on_btn_print_dict_pressed)
 	if btn_fire_toggle:
@@ -153,9 +163,18 @@ func _on_input_submitted(slider: HSlider, text: String) -> void:
 
 func _refresh_ship_sockets_and_tiers() -> void:
 	sockets.clear()
+	default_offsets.clear()
+	default_rotations.clear()
+	default_scales.clear()
+	
 	if target_ship and "hardpoint_offsets" in target_ship:
 		for k in target_ship.hardpoint_offsets.keys():
 			sockets.append(String(k))
+			default_offsets[String(k)] = target_ship.hardpoint_offsets[k]
+		for k in target_ship.hardpoint_rotations.keys():
+			default_rotations[String(k)] = target_ship.hardpoint_rotations[k]
+		for k in target_ship.hardpoint_scales.keys():
+			default_scales[String(k)] = target_ship.hardpoint_scales[k]
 	else:
 		sockets = ["BowMount", "MidDeckCrew"]
 
@@ -340,6 +359,56 @@ func _on_btn_fire_toggle_pressed() -> void:
 func _on_btn_clear_all_pressed() -> void:
 	if player_boat:
 		player_boat.clear_all_weapons()
+
+func _on_btn_reset_socket_pressed() -> void:
+	if not player_boat or active_socket.is_empty():
+		return
+	var hardpoints = player_boat.get_node_or_null("Hardpoints")
+	if not hardpoints:
+		return
+	var socket_node = hardpoints.get_node_or_null(active_socket)
+	if not socket_node:
+		return
+		
+	var orig_pos = default_offsets.get(active_socket, Vector3.ZERO)
+	var orig_rot = default_rotations.get(active_socket, Vector3.ZERO)
+	var orig_scale = default_scales.get(active_socket, Vector3.ONE)
+	
+	socket_node.position = orig_pos
+	socket_node.rotation_degrees = orig_rot
+	socket_node.scale = orig_scale
+	
+	if target_ship:
+		target_ship.hardpoint_offsets[active_socket] = orig_pos
+		target_ship.hardpoint_rotations[active_socket] = orig_rot
+		target_ship.hardpoint_scales[active_socket] = orig_scale
+		
+	_update_ui_from_current_socket()
+
+func _on_btn_reset_all_pressed() -> void:
+	if not player_boat:
+		return
+	var hardpoints = player_boat.get_node_or_null("Hardpoints")
+	if not hardpoints:
+		return
+		
+	for s_name in sockets:
+		var s_node = hardpoints.get_node_or_null(s_name)
+		if s_node:
+			var orig_pos = default_offsets.get(s_name, Vector3.ZERO)
+			var orig_rot = default_rotations.get(s_name, Vector3.ZERO)
+			var orig_scale = default_scales.get(s_name, Vector3.ONE)
+			
+			s_node.position = orig_pos
+			s_node.rotation_degrees = orig_rot
+			s_node.scale = orig_scale
+			
+			if target_ship:
+				target_ship.hardpoint_offsets[s_name] = orig_pos
+				target_ship.hardpoint_rotations[s_name] = orig_rot
+				target_ship.hardpoint_scales[s_name] = orig_scale
+				
+	_update_ui_from_current_socket()
 
 func _update_fire_toggle_button() -> void:
 	if btn_fire_toggle and player_boat:

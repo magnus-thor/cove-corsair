@@ -11,28 +11,27 @@ var _gold_tween: Tween
 var _multiplier_tween: Tween
 var _progress_tween: Tween
 var _displayed_gold: int = 0
+var is_boss_mode: bool = false
 
 func _ready() -> void:
 	# Ensure pivot centers for punch scale animations
 	_update_pivots()
 	get_viewport().size_changed.connect(_update_pivots)
 	
-		GameState.doubloons_changed.connect(_on_doubloons_changed)
-		GameState.multiplier_changed.connect(_on_multiplier_changed)
-		GameState.progress_changed.connect(_on_progress_changed)
-		GameState.boss_spawned_event.connect(_on_boss_spawned)
-		GameState.boss_health_changed.connect(_on_boss_health_changed)
-		
-		# Set initial state
-		_displayed_gold = GameState.doubloons
-		gold_label.text = str(GameState.doubloons)
-		_update_multiplier_text(GameState.active_multiplier, GameState.multiplier_mode)
-		level_progress_bar.max_value = GameState.level_distance_target
-		level_progress_bar.value = GameState.distance_traveled
-		if "current_level" in GameState:
-			level_title.text = "WORLD %d - COVE RUN" % GameState.current_level
-
-var is_boss_mode: bool = false
+	GameState.doubloons_changed.connect(_on_doubloons_changed)
+	GameState.multiplier_changed.connect(_on_multiplier_changed)
+	GameState.progress_changed.connect(_on_progress_changed)
+	GameState.boss_spawned_event.connect(_on_boss_spawned)
+	GameState.boss_health_changed.connect(_on_boss_health_changed)
+	
+	# Set initial state
+	_displayed_gold = GameState.doubloons
+	gold_label.text = str(GameState.doubloons)
+	_update_multiplier_text(GameState.active_multiplier, GameState.multiplier_mode)
+	level_progress_bar.max_value = GameState.level_distance_target
+	level_progress_bar.value = GameState.distance_traveled
+	if "current_level" in GameState:
+		level_title.text = "WORLD %d - COVE RUN" % GameState.current_level
 
 func _on_boss_spawned(boss_name: String, max_hp: int) -> void:
 	is_boss_mode = true
