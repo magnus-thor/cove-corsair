@@ -1,0 +1,59 @@
+[gd_resource type="Resource" script_class="ShipData" format=3 uid="uid://i3y6e47wyxa1"]
+
+[ext_resource type="Script" uid="uid://cs0f78ukvxpo3" path="res://src/data/ship_data.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://cve6hq7jqcpym" path="res://assets/sprites/The Ironclad.png" id="2_tex"]
+
+[resource]
+script = ExtResource("1_script")
+ship_id = "ironclad"
+ship_name = "The Ironclad"
+sprite_texture = ExtResource("2_tex")
+pixel_size = 0.0041
+y_offset = 1.47
+collision_size = Vector3(2.4, 1.4, 3.8)
+max_health = 8
+move_speed = 7.5
+fire_rate = 0.15
+base_cannons = 3
+hardpoint_offsets = {
+"BowMount": Vector3(0, 0.45, -1.2),
+"MonkeyCrew": Vector3(-0.35, 1.45, -0.1),
+"PortSwivelMount1": Vector3(-0.75, 0.45, -0.4),
+"PortSwivelMount2": Vector3(-0.75, 0.45, 0.1),
+"SkeletonCrew": Vector3(0.35, 1.45, 0.2),
+"StarboardSwivelMount1": Vector3(0.75, 0.45, -0.4),
+"StarboardSwivelMount2": Vector3(0.75, 0.45, 0.1)
+}
+hardpoint_rotations = {
+"BowMount": Vector3(0, 0, 0),
+"MonkeyCrew": Vector3(0, 0, 0),
+"PortSwivelMount1": Vector3(0, -45, 0),
+"PortSwivelMount2": Vector3(0, -45, 0),
+"SkeletonCrew": Vector3(0, 0, 0),
+"StarboardSwivelMount1": Vector3(0, 45, 0),
+"StarboardSwivelMount2": Vector3(0, 45, 0)
+}
+hardpoint_scales = {
+"BowMount": Vector3(1, 1, 1),
+"MonkeyCrew": Vector3(0.35, 0.35, 0.35),
+"PortSwivelMount1": Vector3(0.5, 0.5, 0.5),
+"PortSwivelMount2": Vector3(0.5, 0.5, 0.5),
+"SkeletonCrew": Vector3(0.35, 0.35, 0.35),
+"StarboardSwivelMount1": Vector3(0.5, 0.5, 0.5),
+"StarboardSwivelMount2": Vector3(0.5, 0.5, 0.5)
+}
+tier_upgrades = Array[Dictionary]([{
+"BowMount": "res://src/data/resources/user_crew/weapon_bow_chaser.tres"
+}, {
+"BowMount": "res://src/data/resources/user_crew/weapon_bow_chaser.tres",
+"MonkeyCrew": "res://src/data/resources/user_crew/crew_monkey_bomber.tres",
+"SkeletonCrew": "res://src/data/resources/user_crew/crew_skeleton_tosser.tres"
+}, {
+"BowMount": "res://src/data/resources/user_crew/weapon_bow_chaser.tres",
+"MonkeyCrew": "res://src/data/resources/user_crew/crew_monkey_bomber.tres",
+"PortSwivelMount1": "res://src/data/resources/user_crew/weapon_port_swivel.tres",
+"PortSwivelMount2": "res://src/data/resources/user_crew/weapon_port_swivel.tres",
+"SkeletonCrew": "res://src/data/resources/user_crew/crew_skeleton_tosser.tres",
+"StarboardSwivelMount1": "res://src/data/resources/user_crew/weapon_port_swivel.tres",
+"StarboardSwivelMount2": "res://src/data/resources/user_crew/weapon_port_swivel.tres"
+}])

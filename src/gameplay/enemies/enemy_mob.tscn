@@ -1,7 +1,7 @@
 [gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/enemies/enemy_mob.gd" id="1_script"]
-[ext_resource type="Resource" path="res://src/data/resources/skeleton_rower.tres" id="2_enemy_data"]
+[ext_resource type="Resource" path="res://src/data/resources/enemy_vessels/skeleton_rower.tres" id="2_enemy_data"]
 [ext_resource type="Texture2D" path="res://assets/sprites/Skeleton Rower.png" id="3_skeleton_tex"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_mob"]

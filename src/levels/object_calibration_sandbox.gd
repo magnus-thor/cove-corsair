@@ -36,11 +36,11 @@ var categories: Array[String] = [
 ]
 
 var enemy_items: Array[Dictionary] = [
-	{"name": "Skeleton Rower", "res": "res://src/data/resources/skeleton_rower.tres"},
-	{"name": "Raider Skiff", "res": "res://src/data/resources/raider_skiff.tres"},
-	{"name": "Goblin Skiff", "res": "res://src/data/resources/goblin_skiff.tres"},
-	{"name": "Turtle Raft", "res": "res://src/data/resources/turtle_raft.tres"},
-	{"name": "Boss Bone-Beard", "res": "res://src/data/resources/boss_bone_beard.tres"},
+	{"name": "Skeleton Rower", "res": "res://src/data/resources/enemy_vessels/skeleton_rower.tres"},
+	{"name": "Raider Skiff", "res": "res://src/data/resources/enemy_vessels/raider_skiff.tres"},
+	{"name": "Goblin Skiff", "res": "res://src/data/resources/enemy_vessels/goblin_skiff.tres"},
+	{"name": "Turtle Raft", "res": "res://src/data/resources/enemy_vessels/turtle_raft.tres"},
+	{"name": "Boss Bone-Beard", "res": "res://src/data/resources/enemy_bosses/boss_bone_beard.tres"},
 	{"name": "Boss War-Barge", "scene": "res://src/gameplay/enemies/boss_war_barge.tscn"}
 ]
 
@@ -58,9 +58,9 @@ var gate_items: Array[Dictionary] = [
 ]
 
 var ship_items: Array[Dictionary] = [
-	{"name": "The Dinghy", "res": "res://src/data/resources/dinghy_ship.tres"},
-	{"name": "The Sloop", "res": "res://src/data/resources/sloop_ship.tres"},
-	{"name": "The Ironclad", "res": "res://src/data/resources/ironclad_ship.tres"}
+	{"name": "The Dinghy", "res": "res://src/data/resources/user_vessels/dinghy_ship.tres"},
+	{"name": "The Sloop", "res": "res://src/data/resources/user_vessels/sloop_ship.tres"},
+	{"name": "The Ironclad", "res": "res://src/data/resources/user_vessels/ironclad_ship.tres"}
 ]
 
 var current_object_node: Node3D = null

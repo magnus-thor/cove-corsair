@@ -158,28 +158,55 @@ func _process_targeting(delta: float) -> void:
 	var player = get_tree().get_first_node_in_group("player")
 	var boat_z = player.global_position.z if (player and is_instance_valid(player)) else global_position.z
 	
-	var candidates: Array[Node] = []
-	for grp in ["enemies", "destructible_obstacles", "destructible", "boss", "obstacles"]:
-		candidates.append_array(get_tree().get_nodes_in_group(grp))
-		
+	# Priority 1: Active enemy mobs, spawns, minion skiffs, and destructible obstacles
+	var spawn_candidates: Array[Node] = []
+	for grp in ["enemies", "destructible_obstacles", "destructible", "obstacles"]:
+		for node in get_tree().get_nodes_in_group(grp):
+			if is_instance_valid(node) and not node.is_in_group("boss") and not (node is BossWarBarge) and not (node is BossComponentDelegate):
+				spawn_candidates.append(node)
+				
+	# Priority 2: Boss components
+	var boss_candidates: Array[Node] = []
+	for node in get_tree().get_nodes_in_group("boss"):
+		if is_instance_valid(node):
+			boss_candidates.append(node)
+			
 	var best_target: Node3D = null
 	var min_dist = INF
 	
+	# Try priority spawns first
 	var processed: Dictionary = {}
-	for target in candidates:
+	for target in spawn_candidates:
 		if not is_instance_valid(target) or not target is Node3D or processed.has(target):
 			continue
 		processed[target] = true
 		
 		var node3d = target as Node3D
-		# Allow targeting approaching targets ahead as well as targets alongside as we sail past (up to 2.5m behind boat)
 		if node3d.global_position.z > (boat_z + 2.5):
 			continue
 			
 		var dist = global_position.distance_to(node3d.global_position)
-		if dist <= 22.0 and dist < min_dist:
+		if dist <= 24.0 and dist < min_dist:
 			min_dist = dist
 			best_target = node3d
+			
+	# If no spawns or threats are alive, fallback to targeting the boss
+	if not best_target:
+		processed.clear()
+		min_dist = INF
+		for target in boss_candidates:
+			if not is_instance_valid(target) or not target is Node3D or processed.has(target):
+				continue
+			processed[target] = true
+			
+			var node3d = target as Node3D
+			if node3d.global_position.z > (boat_z + 2.5):
+				continue
+				
+			var dist = global_position.distance_to(node3d.global_position)
+			if dist <= 26.0 and dist < min_dist:
+				min_dist = dist
+				best_target = node3d
 			
 	current_target = best_target
 	
@@ -230,7 +257,9 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 	var ball = proj_scene.instantiate() as Area3D
 	if ball:
 		world_container.add_child(ball)
-		ball.global_position = muzzle_point.global_position
+		var spawn_pos = muzzle_point.global_position
+		spawn_pos.y = max(0.38, spawn_pos.y)
+		ball.global_position = spawn_pos
 		
 		# Mark projectile as fired from BowMount for boss weakpoint checks
 		var socket_name = get_parent().name.to_lower() if get_parent() else ""

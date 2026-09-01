@@ -7,7 +7,7 @@ extends Node3D
 # Zero procedural generation. Zero random timers. No fallback loops.
 # ──────────────────────────────────────────────────────────────────────────────
 
-@export var level_data: LevelData = preload("res://src/data/resources/level_01_smugglers_run.tres")
+@export var level_data: LevelData = preload("res://src/data/resources/levels/level_01_smugglers_run.tres")
 @export var spawn_z_ahead: float = -70.0
 
 # Prefabs
@@ -34,7 +34,9 @@ var current_distance: float = 0.0
 var active_queue: Array[Dictionary] = []
 var river_width_world: float = 12.0
 var base_scroll_speed: float = 10.0
-var bank_strips: Array[Node3D] = []
+var bank_strips: Array[Node3D] = []          # legacy – kept for potential future use
+var riverbank_chunks: Array[Node3D] = []     # Layer 2 framing strips (new system)
+var _horizon_backdrop: Node3D = null         # Layer 1 horizon quad
 var is_boss_spawned: bool = false
 
 func _ready() -> void:
@@ -70,19 +72,39 @@ func _ready() -> void:
 		if hud and "level_title" in hud:
 			hud.level_title.text = level_data.level_name
 
-		# Spawn Surrounding Biome & Riverbank (pre-warmed)
-		var strip_scene = preload("res://src/gameplay/levels/biome_bank_strip.tscn")
-		var biome_name = level_data.biome_type if "biome_type" in level_data else "smugglers_run"
-		if strip_scene:
-			for side in ["left", "right"]:
+		var biome_name: String = level_data.biome_type if "biome_type" in level_data else "smugglers_run"
+
+		# ── Layer 1: Horizon Backdrop ────────────────────────────────────────
+		# biome_bank_strip is intentionally NOT spawned here; RiverbankProps
+		# (Layer 2) replaces it with strictly-bounded, shadow-free framing strips.
+		var backdrop_scene := preload("res://src/gameplay/levels/horizon_backdrop.tscn")
+		if backdrop_scene:
+			_horizon_backdrop = backdrop_scene.instantiate()
+			add_child(_horizon_backdrop)
+			_horizon_backdrop.add_to_group("horizon_backdrop")  # exempt from child-scroll loop
+			# Null-checked texture bind – works fine with no texture assigned yet
+			if _horizon_backdrop.has_method("bind_texture"):
+				var htex: Texture2D = level_data.horizon_texture if ("horizon_texture" in level_data and level_data.horizon_texture) else null
+				if not htex:
+					var tex_path := "res://assets/textures/horizon_smugglers_run.png"
+					if ResourceLoader.exists(tex_path):
+						htex = load(tex_path) as Texture2D
+				_horizon_backdrop.bind_texture(htex)
+
+		# ── Layer 2: Riverbank Framing Strips ────────────────────────────────
+		# 4 chunks per side, pre-warmed at Z = +20, -20, -60, -100 to fill the
+		# full view distance.  Recycled at Z > 40 (same threshold as segments).
+		var props_scene := preload("res://src/gameplay/levels/riverbank_props.tscn")
+		if props_scene:
+			for prop_side in ["left", "right"]:
 				for i in range(4):
-					var strip = strip_scene.instantiate()
-					add_child(strip)
-					strip.global_position = Vector3(0.0, 0.0, 20.0 - i * 40.0)
-					if strip.has_method("setup"):
-						strip.setup(side, 40.0, biome_name)
-					bank_strips.append(strip)
-					
+					var chunk := props_scene.instantiate()
+					add_child(chunk)
+					chunk.global_position = Vector3(0.0, 0.0, 20.0 - i * 40.0)
+					if chunk.has_method("setup"):
+						chunk.setup(prop_side, 40.0, biome_name)
+					riverbank_chunks.append(chunk)
+
 		# Configure Environment Visuals
 		_apply_biome_visuals()
 
@@ -92,10 +114,10 @@ func _apply_biome_visuals() -> void:
 		
 	var env = get_node_or_null("../WorldEnvironment") as WorldEnvironment
 	if env and env.environment:
-		env.environment.fog_enabled = true
+		env.environment.fog_enabled = false
 		env.environment.fog_light_color = level_data.fog_color
-		env.environment.fog_density = level_data.fog_density
-		env.environment.fog_sky_affect = 0.45
+		env.environment.fog_density = 0.0
+		env.environment.fog_sky_affect = 0.0
 		
 	# Apply water shader color across track segments
 	var track_mgr = get_tree().get_first_node_in_group("track_manager")
@@ -152,13 +174,19 @@ func _physics_process(delta: float) -> void:
 		if child is Node3D \
 				and not child.is_in_group("boss") \
 				and not child.is_in_group("collectibles") \
-				and not child.is_in_group("doubloons"):
+				and not child.is_in_group("doubloons") \
+				and not child.is_in_group("horizon_backdrop"):
 			child.global_position.z += scroll_movement
 
-	# Wrap bank strips (infinite tiling river banks)
+	# Wrap bank strips (legacy – array is empty; kept as no-op for safety)
 	for strip in bank_strips:
 		if is_instance_valid(strip) and strip.global_position.z > 40.0:
 			strip.global_position.z -= 160.0  # 4 tiles × 40m
+
+	# Recycle Layer-2 riverbank framing chunks (4 tiles × 40m = 160m pool)
+	for chunk in riverbank_chunks:
+		if is_instance_valid(chunk) and chunk.global_position.z > 40.0:
+			chunk.global_position.z -= 160.0
 
 func normalized_to_world_x(norm_x: float) -> float:
 	return norm_x * (river_width_world / 2.0)
@@ -354,7 +382,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 					var mob = enemy_mob_scene.instantiate() as Area3D
 					add_child(mob)
 					mob.global_position = Vector3(x_world, 0.1, z_spawn)
-					var rower_data = preload("res://src/data/resources/skeleton_rower.tres")
+					var rower_data = preload("res://src/data/resources/enemy_vessels/skeleton_rower.tres")
 					if mob.has_method("apply_enemy_data"):
 						mob.apply_enemy_data(rower_data)
 					mob.max_hp = hp
@@ -372,7 +400,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 					var enemy = enemy_mob_scene.instantiate() as Area3D
 					add_child(enemy)
 					enemy.global_position = Vector3(x_world, 0.1, z_spawn)
-					var skiff_data = preload("res://src/data/resources/raider_skiff.tres")
+					var skiff_data = preload("res://src/data/resources/enemy_vessels/raider_skiff.tres")
 					if enemy.has_method("apply_enemy_data"):
 						enemy.apply_enemy_data(skiff_data)
 					enemy.max_hp = hp
@@ -390,7 +418,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 					var raft = enemy_mob_scene.instantiate() as Area3D
 					add_child(raft)
 					raft.global_position = Vector3(x_world, 0.1, z_spawn)
-					var rower_data = preload("res://src/data/resources/skeleton_rower.tres")
+					var rower_data = preload("res://src/data/resources/enemy_vessels/skeleton_rower.tres")
 					if raft.has_method("apply_enemy_data"):
 						raft.apply_enemy_data(rower_data)
 					raft.forward_speed = raft_speed
@@ -431,7 +459,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 					var enemy = enemy_mob_scene.instantiate() as Area3D
 					add_child(enemy)
 					enemy.global_position = Vector3(x_world, 0.1, z_spawn)
-					var turtle_data = preload("res://src/data/resources/turtle_raft.tres")
+					var turtle_data = preload("res://src/data/resources/enemy_vessels/turtle_raft.tres")
 					if enemy.has_method("apply_enemy_data"):
 						enemy.apply_enemy_data(turtle_data)
 					enemy.max_hp        = hp
@@ -490,9 +518,9 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 					mob.global_position = Vector3(x_world, 0.1, z_spawn + 2.0)
 					var mob_data: EnemyData = null
 					if mob_type == "raider_skiff":
-						mob_data = preload("res://src/data/resources/raider_skiff.tres")
+						mob_data = preload("res://src/data/resources/enemy_vessels/raider_skiff.tres")
 					else:
-						mob_data = preload("res://src/data/resources/skeleton_rower.tres")
+						mob_data = preload("res://src/data/resources/enemy_vessels/skeleton_rower.tres")
 					if mob.has_method("apply_enemy_data") and mob_data:
 						mob.apply_enemy_data(mob_data)
 					mob.max_hp        = mob_hp

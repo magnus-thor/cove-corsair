@@ -3,8 +3,8 @@ extends Node3D
 
 enum State { APPROACHING, COMBAT, DYING }
 
-@export var max_hp: int = 220 # Left Outrigger: 40, Right Outrigger: 40, Main Core: 140
-@export var current_hp: int = 220
+@export var max_hp: int = 340 # Left Outrigger: 55, Right Outrigger: 55, Main Core: 230
+@export var current_hp: int = 340
 
 @export var approach_speed: float = 12.0
 @export var combat_z_offset: float = -18.0
@@ -12,11 +12,11 @@ enum State { APPROACHING, COMBAT, DYING }
 @export var patrol_width: float = 3.4
 
 # Component HP
-var hp_left_cannon: int = 15
-var hp_right_cannon: int = 15
-var hp_left_armor: int = 40  # Left Outrigger
-var hp_right_armor: int = 40 # Right Outrigger
-var hp_boiler: int = 140     # Main Core
+var hp_left_cannon: int = 20
+var hp_right_cannon: int = 20
+var hp_left_armor: int = 55  # Left Outrigger
+var hp_right_armor: int = 55 # Right Outrigger
+var hp_boiler: int = 230     # Main Core
 var combat_time: float = 0.0
 var enraged_shoot_timer: float = 0.0
 var minion_timer: float = 0.0
@@ -151,7 +151,7 @@ func _deploy_side_minions() -> void:
 func _spawn_pressure_skiff(x_norm: float, speed_val: float) -> void:
 	if enemy_mob_scene:
 		var skiff = enemy_mob_scene.instantiate() as Area3D
-		var skiff_data = preload("res://src/data/resources/raider_skiff.tres")
+		var skiff_data = preload("res://src/data/resources/enemy_vessels/raider_skiff.tres")
 		var parent = get_tree().get_first_node_in_group("level_controller")
 		if not parent:
 			parent = get_parent()
@@ -565,9 +565,9 @@ func _destroy_subcomponent(node: Variant) -> void:
 				col.set_deferred("disabled", true)
 
 func _check_phase_transition() -> void:
-	if current_phase == 1 and current_hp <= int(max_hp * 0.65):
+	if current_phase == 1 and current_hp <= int(max_hp * 0.68):
 		_transition_to_phase_2()
-	elif current_phase == 2 and current_hp <= int(max_hp * 0.35):
+	elif current_phase == 2 and current_hp <= int(max_hp * 0.32):
 		_transition_to_phase_3()
 
 
@@ -576,9 +576,9 @@ func _transition_to_phase_2() -> void:
 	steam_cycle_timer = 0.0
 	_start_steam_venting()
 	
-	# Spawn 2 minion skiffs
-	_spawn_minion_skiff(-0.25)
-	_spawn_minion_skiff(0.25)
+	# Spawn 2 minion skiffs directly shielding front of boss
+	_spawn_minion_skiff(-0.20)
+	_spawn_minion_skiff(0.20)
 
 func _transition_to_phase_3() -> void:
 	current_phase = 3
@@ -588,7 +588,7 @@ func _transition_to_phase_3() -> void:
 func _spawn_minion_skiff(x_norm: float) -> void:
 	if enemy_mob_scene:
 		var skiff = enemy_mob_scene.instantiate() as Area3D
-		var skiff_data = preload("res://src/data/resources/raider_skiff.tres")
+		var skiff_data = preload("res://src/data/resources/enemy_vessels/raider_skiff.tres")
 		
 		var parent = get_tree().get_first_node_in_group("level_controller")
 		if not parent:
@@ -605,7 +605,7 @@ func _spawn_minion_skiff(x_norm: float) -> void:
 				river_width = player.river_width
 				
 			var x_world = x_norm * (river_width / 2.0)
-			skiff.global_position = Vector3(global_position.x + x_world, 0.1, global_position.z + 4.0)
+			skiff.global_position = Vector3(global_position.x + x_world, 0.1, global_position.z + 4.5)
 
 func boss_defeat() -> void:
 	if _is_defeated:

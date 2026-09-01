@@ -23,15 +23,15 @@ var is_game_active: bool = false
 var boss_spawned: bool = false
 
 const LEVEL_RESOURCES: Dictionary = {
-	1: "res://src/data/resources/level_01_smugglers_run.tres",
-	2: "res://src/data/resources/level_02_black_tide_bayou.tres",
-	3: "res://src/data/resources/level_03_brimstone_bastion.tres"
+	1: "res://src/data/resources/levels/level_01_smugglers_run.tres",
+	2: "res://src/data/resources/levels/level_02_black_tide_bayou.tres",
+	3: "res://src/data/resources/levels/level_03_brimstone_bastion.tres"
 }
 
 const LEVEL_SHIPS: Dictionary = {
-	1: "res://src/data/resources/dinghy_ship.tres",
-	2: "res://src/data/resources/sloop_ship.tres",
-	3: "res://src/data/resources/ironclad_ship.tres"
+	1: "res://src/data/resources/user_vessels/dinghy_ship.tres",
+	2: "res://src/data/resources/user_vessels/sloop_ship.tres",
+	3: "res://src/data/resources/user_vessels/ironclad_ship.tres"
 }
 
 func get_current_level_resource() -> LevelData:

@@ -23,7 +23,7 @@ func _ready() -> void:
 	# Instantiate BowMount weapon
 	var attached_weapon_scene = load("res://src/gameplay/player/attached_weapon.tscn")
 	if attached_weapon_scene:
-		var weapon_data = load("res://src/data/resources/weapon_bow_chaser.tres")
+		var weapon_data = load("res://src/data/resources/user_crew/weapon_bow_chaser.tres")
 		if weapon_data:
 			weapon_instance = attached_weapon_scene.instantiate()
 			if weapon_instance.has_method("setup_weapon"):

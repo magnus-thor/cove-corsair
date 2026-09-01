@@ -48,9 +48,9 @@ func _apply_visual_styling() -> void:
 	var model = get_node_or_null("CannonBallModel")
 	if model:
 		var mat = StandardMaterial3D.new()
-		mat.albedo_color = Color(0.22, 0.22, 0.25) # Dark cast iron cannonball
-		mat.metallic = 0.85
-		mat.roughness = 0.35
+		mat.albedo_color = Color(0.24, 0.24, 0.27) # Sleek polished dark cast iron
+		mat.metallic = 0.95
+		mat.roughness = 0.18
 		mat.emission_enabled = false
 		if model is MeshInstance3D:
 			model.material_override = mat
@@ -72,19 +72,68 @@ func _apply_ammo_data() -> void:
 		scale = Vector3.ONE * ammo_data.scale_multiplier
 		
 	var model = get_node_or_null("CannonBallModel")
-	if ammo_data.ammo_name == "Coconut Bomb" and model:
-		var mat = StandardMaterial3D.new()
-		mat.albedo_color = Color(0.38, 0.24, 0.14) # Textured coconut husk brown
-		mat.roughness = 0.85
-		mat.metallic = 0.05
-		mat.emission_enabled = true
-		mat.emission = Color(0.3, 0.15, 0.05)
-		if model is MeshInstance3D:
-			model.material_override = mat
-		else:
-			for child in model.get_children():
-				if child is MeshInstance3D:
-					child.material_override = mat
+	var flare = get_node_or_null("TracerFlare") as Sprite3D
+	
+	match ammo_data.ammo_name:
+		"Coconut Bomb":
+			if model:
+				var mat = StandardMaterial3D.new()
+				mat.albedo_color = Color(0.38, 0.22, 0.12) # Textured coconut husk brown
+				mat.roughness = 0.85
+				mat.metallic = 0.05
+				mat.emission_enabled = true
+				mat.emission = Color(0.15, 0.25, 0.05) # Organic jungle green tint
+				if model is MeshInstance3D:
+					model.material_override = mat
+				else:
+					for child in model.get_children():
+						if child is MeshInstance3D:
+							child.material_override = mat
+			if flare:
+				flare.visible = false
+				
+		"Fire Bomb":
+			if model:
+				var mat = StandardMaterial3D.new()
+				mat.albedo_color = Color(1.0, 0.25, 0.05) # Blazing fire sphere
+				mat.roughness = 0.3
+				mat.metallic = 0.1
+				mat.emission_enabled = true
+				mat.emission = Color(3.0, 1.1, 0.2) # High intensity fire glow
+				mat.emission_energy_multiplier = 1.6
+				if model is MeshInstance3D:
+					model.material_override = mat
+				else:
+					for child in model.get_children():
+						if child is MeshInstance3D:
+							child.material_override = mat
+			if not flare:
+				flare = Sprite3D.new()
+				flare.name = "TracerFlare"
+				flare.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+				flare.pixel_size = 0.005
+				flare.modulate = Color(3.0, 1.2, 0.2, 0.9)
+				add_child(flare)
+			else:
+				flare.visible = true
+				flare.modulate = Color(3.0, 1.2, 0.2, 0.9)
+				
+		_:
+			# Standard vessel cannonball (sleek dark iron)
+			if model:
+				var mat = StandardMaterial3D.new()
+				mat.albedo_color = Color(0.22, 0.22, 0.26) # Authentic cast-iron
+				mat.metallic = 0.95
+				mat.roughness = 0.2
+				mat.emission_enabled = false
+				if model is MeshInstance3D:
+					model.material_override = mat
+				else:
+					for child in model.get_children():
+						if child is MeshInstance3D:
+							child.material_override = mat
+			if flare:
+				flare.visible = false
 		
 	if ammo_data.sprite_texture:
 		if model:

@@ -10,5 +10,6 @@ extends Resource
 @export var fog_color: Color = Color(0.12, 0.22, 0.28)
 @export var fog_density: float = 0.018
 @export var boss_scene: PackedScene
+@export var horizon_texture: Texture2D           # Panoramic backdrop for the horizon quad (null = dark fallback)
 @export var wave_events: Array[Dictionary] = [] # Distance-triggered spawns
 

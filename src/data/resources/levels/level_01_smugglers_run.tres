@@ -1,0 +1,195 @@
+[gd_resource type="Resource" script_class="LevelData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/data/level_data.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://src/gameplay/enemies/boss_war_barge.tscn" id="2_boss"]
+
+[resource]
+script = ExtResource("1_script")
+level_name = "Level 1: Smuggler's Run"
+total_distance = 250.0
+base_scroll_speed = 10.0
+river_width_world = 12.0
+biome_type = "smugglers_run"
+water_albedo = Color(0.08, 0.58, 0.82, 0.88)
+fog_color = Color(0.48, 0.76, 0.94, 1.0)
+fog_density = 0.0
+boss_scene = ExtResource("2_boss")
+wave_events = Array[Dictionary]([{
+
+"distance": 12.0,
+"hp": 2,
+"obstacle_type": "wooden",
+"type": "obstacles",
+"x_positions": [-0.35, 0.35]
+}, {
+"distance": 20.0,
+"hp": 2,
+"obstacle_type": "wooden",
+"type": "obstacle",
+"x": 0.0
+}, {
+"distance": 30.0,
+"hp": 3,
+"speed": 1.5,
+"type": "skeleton_rowers",
+"x_positions": [-0.4]
+}, {
+"distance": 36.0,
+"hp": 3,
+"speed": 1.5,
+"type": "skeleton_rowers",
+"x_positions": [0.4]
+}, {
+"distance": 46.0,
+"hp": 2,
+"obstacle_type": "wooden",
+"type": "obstacles",
+"x_positions": [-0.55, 0.55]
+}, {
+"distance": 52.0,
+"hp": 3,
+"speed": 1.5,
+"type": "skeleton_rowers",
+"x_positions": [0.0]
+}, {
+"distance": 60.0,
+"text": "+1",
+"type": "fleet_gate",
+"value": 1,
+"x": 0.0
+}, {
+"distance": 74.0,
+"hp": 5,
+"obstacle_type": "rune",
+"type": "obstacles",
+"x_positions": [-0.5, 0.5]
+}, {
+"distance": 80.0,
+"hp": 5,
+"obstacle_type": "rune",
+"type": "obstacle",
+"x": 0.0
+}, {
+"distance": 90.0,
+"hp": 8,
+"speed": 2.5,
+"type": "raider_skiffs",
+"x_positions": [-0.4]
+}, {
+"distance": 96.0,
+"hp": 8,
+"speed": 2.5,
+"type": "raider_skiffs",
+"x_positions": [0.4]
+}, {
+"distance": 106.0,
+"hp": 6,
+"obstacle_type": "rune",
+"type": "obstacles",
+"x_positions": [-0.6, 0.6]
+}, {
+"distance": 112.0,
+"hp": 8,
+"speed": 2.5,
+"type": "raider_skiffs",
+"x_positions": [0.0]
+}, {
+"distance": 118.0,
+"hp": 20,
+"speed": 1.5,
+"type": "turtle_rafts",
+"x_positions": [0.0]
+}, {
+"distance": 130.0,
+"text": "+1",
+"type": "fleet_gate",
+"value": 1,
+"x": 0.0
+}, {
+"distance": 144.0,
+"scale_x": 2.0,
+"scale_z": 5.0,
+"type": "reef_hazard",
+"x": 0.0
+}, {
+"distance": 148.0,
+"hp": 10,
+"obstacle_type": "rune",
+"type": "obstacles",
+"x_positions": [-0.7]
+}, {
+"distance": 153.0,
+"hp": 10,
+"obstacle_type": "rune",
+"type": "obstacles",
+"x_positions": [0.7]
+}, {
+"distance": 162.0,
+"hp": 10,
+"speed": 6.0,
+"type": "kamikaze_rafts",
+"x_positions": [-0.55]
+}, {
+"distance": 167.0,
+"hp": 10,
+"speed": 6.0,
+"type": "kamikaze_rafts",
+"x_positions": [0.55]
+}, {
+"distance": 178.0,
+"hp": 10,
+"speed": 3.0,
+"type": "raider_skiffs",
+"x_positions": [-0.5, 0.5]
+}, {
+"distance": 185.0,
+"hp": 10,
+"obstacle_type": "rune",
+"type": "obstacles",
+"x_positions": [-0.7, 0.0, 0.7]
+}, {
+"distance": 194.0,
+"hp": 30,
+"speed": 1.5,
+"type": "turtle_rafts",
+"x_positions": [-0.3, 0.3]
+}, {
+"distance": 210.0,
+"text": "+2",
+"type": "fleet_gate",
+"value": 2,
+"x": 0.0
+}, {
+"distance": 222.0,
+"hp": 10,
+"speed": 3.5,
+"type": "raider_skiffs",
+"x_positions": [-0.6, -0.2]
+}, {
+"distance": 228.0,
+"hp": 10,
+"speed": 3.5,
+"type": "raider_skiffs",
+"x_positions": [0.2, 0.6]
+}, {
+"distance": 236.0,
+"hp": 12,
+"speed": 6.5,
+"type": "kamikaze_rafts",
+"x_positions": [-0.45]
+}, {
+"distance": 241.0,
+"hp": 12,
+"speed": 6.5,
+"type": "kamikaze_rafts",
+"x_positions": [0.45]
+}, {
+"distance": 247.0,
+"hp": 4,
+"obstacle_type": "fuse",
+"type": "obstacles",
+"x_positions": [-0.65, 0.0, 0.65]
+}, {
+"distance": 250.0,
+"type": "boss"
+}])

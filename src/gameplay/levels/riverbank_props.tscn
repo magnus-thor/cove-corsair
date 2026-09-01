@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://riverbank_props_01"]
+
+[ext_resource type="Script" path="res://src/gameplay/levels/riverbank_props.gd" id="1_script"]
+
+[node name="RiverbankProps" type="Node3D"]
+script = ExtResource("1_script")

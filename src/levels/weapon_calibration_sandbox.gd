@@ -1,24 +1,24 @@
 extends Node3D
 
-@export var target_ship: ShipData = preload("res://src/data/resources/dinghy_ship.tres")
+@export var target_ship: ShipData = preload("res://src/data/resources/user_vessels/dinghy_ship.tres")
 
 @onready var player_boat: CharacterBody3D = $PlayerBoat
 
 # Preloaded Ship Resources for multi-vessel calibration
-var dinghy_ship: ShipData = preload("res://src/data/resources/dinghy_ship.tres")
-var sloop_ship: ShipData = preload("res://src/data/resources/sloop_ship.tres")
-var ironclad_ship: ShipData = preload("res://src/data/resources/ironclad_ship.tres")
+var dinghy_ship: ShipData = preload("res://src/data/resources/user_vessels/dinghy_ship.tres")
+var sloop_ship: ShipData = preload("res://src/data/resources/user_vessels/sloop_ship.tres")
+var ironclad_ship: ShipData = preload("res://src/data/resources/user_vessels/ironclad_ship.tres")
 
 # Available Weapon & Crew Resources for live asset previewing
 var available_assets: Array[Dictionary] = [
 	{"name": "[ Default Ship Tier ]", "data": null},
-	{"name": "Monkey Bomber (Crew)", "data": preload("res://src/data/resources/crew_monkey_bomber.tres")},
-	{"name": "Skeleton Deckhand (Crew)", "data": preload("res://src/data/resources/crew_skeleton_tosser.tres")},
-	{"name": "Bow Chaser (Cannon)", "data": preload("res://src/data/resources/weapon_bow_chaser.tres")},
-	{"name": "Port Swivel (Gun)", "data": preload("res://src/data/resources/weapon_port_swivel.tres")},
-	{"name": "Starboard Swivel (Gun)", "data": preload("res://src/data/resources/weapon_starboard_swivel.tres")},
-	{"name": "Deckhand Sniper (Crew)", "data": preload("res://src/data/resources/weapon_deckhand_sniper.tres")},
-	{"name": "Aft Mortar (Cannon)", "data": preload("res://src/data/resources/weapon_aft_mortar.tres")}
+	{"name": "Monkey Bomber (Crew)", "data": preload("res://src/data/resources/user_crew/crew_monkey_bomber.tres")},
+	{"name": "Skeleton Deckhand (Crew)", "data": preload("res://src/data/resources/user_crew/crew_skeleton_tosser.tres")},
+	{"name": "Bow Chaser (Cannon)", "data": preload("res://src/data/resources/user_crew/weapon_bow_chaser.tres")},
+	{"name": "Port Swivel (Gun)", "data": preload("res://src/data/resources/user_crew/weapon_port_swivel.tres")},
+	{"name": "Starboard Swivel (Gun)", "data": preload("res://src/data/resources/user_crew/weapon_starboard_swivel.tres")},
+	{"name": "Deckhand Sniper (Crew)", "data": preload("res://src/data/resources/user_crew/weapon_deckhand_sniper.tres")},
+	{"name": "Aft Mortar (Cannon)", "data": preload("res://src/data/resources/user_crew/weapon_aft_mortar.tres")}
 ]
 
 # UI References

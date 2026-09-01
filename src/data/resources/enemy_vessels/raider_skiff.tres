@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/data/enemy_data.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/Goblin Skiff 2.png" id="2_tex"]
+
+[resource]
+script = ExtResource("1_script")
+mob_name = "Raider Skiff"
+sprite_texture = ExtResource("2_tex")
+pixel_size = 0.003
+max_hp = 16
+forward_speed = 2.0
+doubloon_drop_count = 3
+is_boss = false
+y_offset = 0.95
+collision_size = Vector3(2.2, 1.4, 2.4)

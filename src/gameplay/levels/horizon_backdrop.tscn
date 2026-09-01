@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://horizon_backdrop_01"]
+
+[ext_resource type="Script" path="res://src/gameplay/levels/horizon_backdrop.gd" id="1_script"]
+
+[node name="HorizonBackdrop" type="Node3D"]
+script = ExtResource("1_script")

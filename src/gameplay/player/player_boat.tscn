@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://dcehj56vbh1l2"]
 
 [ext_resource type="Script" uid="uid://djtrfosp60cjx" path="res://src/gameplay/player/player.gd" id="1_script"]
-[ext_resource type="Resource" uid="uid://d08y4untdiyc7" path="res://src/data/resources/dinghy_ship.tres" id="2_ship_data"]
+[ext_resource type="Resource" uid="uid://d08y4untdiyc7" path="res://src/data/resources/user_vessels/dinghy_ship.tres" id="2_ship_data"]
 [ext_resource type="Texture2D" uid="uid://btb22xeh01yqb" path="res://assets/sprites/The Dinghy.png" id="3_dinghy_tex"]
 [ext_resource type="PackedScene" path="res://src/gameplay/vfx/boat_wake.tscn" id="4_wake"]
 [ext_resource type="PackedScene" path="res://src/gameplay/player/attached_weapon.tscn" id="5_4g7bw"]
-[ext_resource type="Resource" path="res://src/data/resources/weapon_starboard_swivel.tres" id="6_x3vpt"]
+[ext_resource type="Resource" path="res://src/data/resources/user_crew/weapon_starboard_swivel.tres" id="6_x3vpt"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_boat"]
 size = Vector3(1.6, 1, 2.8)

@@ -16,9 +16,9 @@ enum ShipTier {RAFT, SLOOP, GALLEON}
 			apply_ship_data(ship_data)
 
 @export_group("Ship Data Tier Presets")
-@export var dinghy_ship_data: ShipData = preload("res://src/data/resources/dinghy_ship.tres")
-@export var sloop_ship_data: ShipData = preload("res://src/data/resources/sloop_ship.tres")
-@export var ironclad_ship_data: ShipData = preload("res://src/data/resources/ironclad_ship.tres")
+@export var dinghy_ship_data: ShipData = preload("res://src/data/resources/user_vessels/dinghy_ship.tres")
+@export var sloop_ship_data: ShipData = preload("res://src/data/resources/user_vessels/sloop_ship.tres")
+@export var ironclad_ship_data: ShipData = preload("res://src/data/resources/user_vessels/ironclad_ship.tres")
 
 ## Width of the river channel boundaries. The boat can move within [-river_width/2, river_width/2]
 @export var river_width: float = 11.0
@@ -143,7 +143,7 @@ func _ready() -> void:
 	if ship_data:
 		apply_ship_data(ship_data)
 	else:
-		equip_weapon_to_socket("BowMount", preload("res://src/data/resources/weapon_bow_chaser.tres"))
+		equip_weapon_to_socket("BowMount", preload("res://src/data/resources/user_crew/weapon_bow_chaser.tres"))
 	
 	if is_calibration_mode:
 		_setup_calibration_mode()
@@ -418,32 +418,32 @@ func spawn_floating_text_at_position(text_val: String, color_val: Color) -> void
 func _apply_weapon_tier_setup() -> void:
 	clear_weapons()
 	
-	var heavy_ammo = preload("res://src/data/resources/ammo_heavy_shot.tres")
+	var heavy_ammo = preload("res://src/data/resources/user_ammo/ammo_heavy_shot.tres")
 	
 	match current_tier:
 		ShipTier.RAFT:
-			var bow_weapon = preload("res://src/data/resources/weapon_bow_chaser.tres")
+			var bow_weapon = preload("res://src/data/resources/user_crew/weapon_bow_chaser.tres")
 			equip_weapon_to_socket("BowMount", bow_weapon)
 			
 		ShipTier.SLOOP:
-			var bow_weapon = preload("res://src/data/resources/weapon_bow_chaser.tres")
-			var port_weapon = preload("res://src/data/resources/weapon_port_swivel.tres")
-			var star_weapon = preload("res://src/data/resources/weapon_starboard_swivel.tres")
+			var bow_weapon = preload("res://src/data/resources/user_crew/weapon_bow_chaser.tres")
+			var port_weapon = preload("res://src/data/resources/user_crew/weapon_port_swivel.tres")
+			var star_weapon = preload("res://src/data/resources/user_crew/weapon_starboard_swivel.tres")
 			equip_weapon_to_socket("BowMount", bow_weapon)
 			equip_weapon_to_socket("PortSwivelMount", port_weapon)
 			equip_weapon_to_socket("StarboardSwivelMount", star_weapon)
 			
 		ShipTier.GALLEON:
-			var bow_weapon = preload("res://src/data/resources/weapon_bow_chaser.tres").duplicate()
+			var bow_weapon = preload("res://src/data/resources/user_crew/weapon_bow_chaser.tres").duplicate()
 			bow_weapon.default_ammo = heavy_ammo
 			
-			var port_weapon = preload("res://src/data/resources/weapon_port_swivel.tres").duplicate()
+			var port_weapon = preload("res://src/data/resources/user_crew/weapon_port_swivel.tres").duplicate()
 			port_weapon.default_ammo = heavy_ammo
 			
-			var star_weapon = preload("res://src/data/resources/weapon_starboard_swivel.tres").duplicate()
+			var star_weapon = preload("res://src/data/resources/user_crew/weapon_starboard_swivel.tres").duplicate()
 			star_weapon.default_ammo = heavy_ammo
 			
-			var aft_weapon = preload("res://src/data/resources/weapon_deckhand_sniper.tres")
+			var aft_weapon = preload("res://src/data/resources/user_crew/weapon_deckhand_sniper.tres")
 			
 			equip_weapon_to_socket("BowMount", bow_weapon)
 			equip_weapon_to_socket("PortSwivelMount", port_weapon)
@@ -563,11 +563,11 @@ func clear_weapons() -> void:
 
 func upgrade_crew() -> void:
 	if ship_data and ship_data.hardpoint_offsets.has("MidDeckCrew") and (not equipped_weapons.has("MidDeckCrew") or not is_instance_valid(equipped_weapons["MidDeckCrew"])):
-		var monkey_res = load("res://src/data/resources/crew_monkey_bomber.tres")
+		var monkey_res = load("res://src/data/resources/user_crew/crew_monkey_bomber.tres")
 		equip_weapon_to_socket("MidDeckCrew", monkey_res)
 		spawn_floating_text_at_position("MONKEY BOMBER JOINED!", Color(0.2, 1.0, 0.4))
 	elif ship_data and ship_data.hardpoint_offsets.has("AftDeckCrew") and (not equipped_weapons.has("AftDeckCrew") or not is_instance_valid(equipped_weapons["AftDeckCrew"])):
-		var skeleton_res = load("res://src/data/resources/crew_skeleton_tosser.tres")
+		var skeleton_res = load("res://src/data/resources/user_crew/crew_skeleton_tosser.tres")
 		equip_weapon_to_socket("AftDeckCrew", skeleton_res)
 		spawn_floating_text_at_position("SKELETON JOINED!", Color(0.2, 1.0, 0.4))
 	else:
