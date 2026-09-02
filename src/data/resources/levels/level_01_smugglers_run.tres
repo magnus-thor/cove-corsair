@@ -15,18 +15,29 @@ fog_color = Color(0.48, 0.76, 0.94, 1.0)
 fog_density = 0.0
 boss_scene = ExtResource("2_boss")
 wave_events = Array[Dictionary]([{
-
+"distance": 6.0,
+"hp": 2,
+"obstacle_type": "wooden",
+"type": "obstacles",
+"x_positions": [-0.3, 0.3]
+}, {
 "distance": 12.0,
 "hp": 2,
 "obstacle_type": "wooden",
 "type": "obstacles",
-"x_positions": [-0.35, 0.35]
+"x_positions": [-0.5, 0.5]
 }, {
 "distance": 20.0,
 "hp": 2,
 "obstacle_type": "wooden",
 "type": "obstacle",
 "x": 0.0
+}, {
+"distance": 24.0,
+"hp": 2,
+"obstacle_type": "wooden",
+"type": "obstacles",
+"x_positions": [-0.6, 0.6]
 }, {
 "distance": 30.0,
 "hp": 3,
@@ -39,6 +50,12 @@ wave_events = Array[Dictionary]([{
 "speed": 1.5,
 "type": "skeleton_rowers",
 "x_positions": [0.4]
+}, {
+"distance": 40.0,
+"hp": 3,
+"obstacle_type": "fuse",
+"type": "obstacles",
+"x_positions": [-0.4, 0.0, 0.4]
 }, {
 "distance": 46.0,
 "hp": 2,
@@ -57,6 +74,12 @@ wave_events = Array[Dictionary]([{
 "type": "fleet_gate",
 "value": 1,
 "x": 0.0
+}, {
+"distance": 68.0,
+"hp": 4,
+"obstacle_type": "rune",
+"type": "obstacles",
+"x_positions": [-0.65, 0.65]
 }, {
 "distance": 74.0,
 "hp": 5,
@@ -82,6 +105,12 @@ wave_events = Array[Dictionary]([{
 "type": "raider_skiffs",
 "x_positions": [0.4]
 }, {
+"distance": 100.0,
+"hp": 4,
+"obstacle_type": "fuse",
+"type": "obstacles",
+"x_positions": [-0.5, 0.5]
+}, {
 "distance": 106.0,
 "hp": 6,
 "obstacle_type": "rune",
@@ -100,11 +129,24 @@ wave_events = Array[Dictionary]([{
 "type": "turtle_rafts",
 "x_positions": [0.0]
 }, {
+"distance": 124.0,
+"hp": 6,
+"obstacle_type": "rune",
+"sub_type": "armored_barrel_chest",
+"type": "obstacle",
+"x": 0.0
+}, {
 "distance": 130.0,
 "text": "+1",
 "type": "fleet_gate",
 "value": 1,
 "x": 0.0
+}, {
+"distance": 136.0,
+"hp": 4,
+"obstacle_type": "wooden",
+"type": "obstacles",
+"x_positions": [-0.6, -0.2, 0.2, 0.6]
 }, {
 "distance": 144.0,
 "scale_x": 2.0,
@@ -124,6 +166,12 @@ wave_events = Array[Dictionary]([{
 "type": "obstacles",
 "x_positions": [0.7]
 }, {
+"distance": 160.0,
+"hp": 4,
+"obstacle_type": "fuse",
+"type": "obstacles",
+"x_positions": [-0.4, 0.4]
+}, {
 "distance": 162.0,
 "hp": 10,
 "speed": 6.0,
@@ -135,6 +183,12 @@ wave_events = Array[Dictionary]([{
 "speed": 6.0,
 "type": "kamikaze_rafts",
 "x_positions": [0.55]
+}, {
+"distance": 172.0,
+"hp": 8,
+"obstacle_type": "rune",
+"type": "obstacles",
+"x_positions": [-0.7, 0.7]
 }, {
 "distance": 178.0,
 "hp": 10,
@@ -154,11 +208,23 @@ wave_events = Array[Dictionary]([{
 "type": "turtle_rafts",
 "x_positions": [-0.3, 0.3]
 }, {
+"distance": 202.0,
+"hp": 4,
+"obstacle_type": "fuse",
+"type": "obstacles",
+"x_positions": [-0.5, 0.0, 0.5]
+}, {
 "distance": 210.0,
 "text": "+2",
 "type": "fleet_gate",
 "value": 2,
 "x": 0.0
+}, {
+"distance": 216.0,
+"hp": 4,
+"obstacle_type": "fuse",
+"type": "obstacles",
+"x_positions": [-0.6, 0.6]
 }, {
 "distance": 222.0,
 "hp": 10,

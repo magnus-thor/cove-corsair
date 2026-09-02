@@ -30,6 +30,8 @@ var mortar_timer: float = 0.0
 @onready var boiler_node: Node3D = $BoilerCore
 @onready var boss_sprite: Sprite3D = $BossSprite
 @onready var hit_box: Area3D = $HitBox
+@onready var bow_foam: GPUParticles3D = get_node_or_null("BowFoamParticles")
+@onready var bow_crest: MeshInstance3D = get_node_or_null("BowFoamCrest")
 
 # State variables
 var current_state: State = State.APPROACHING
@@ -100,16 +102,31 @@ func _process_combat(delta: float) -> void:
 		# Bobbing
 		if boss_sprite:
 			boss_sprite.position.y = _y_base + sin(_weave_time * 2.0) * 0.05
+		if bow_crest:
+			bow_crest.position.y = 0.04 + sin(_weave_time * 2.5) * 0.015
 	else:
 		_process_ram_charge(delta)
 		
 	# Targeted mortar pressure
 	mortar_timer += delta
-	if mortar_timer >= 12.0:
+	if mortar_timer >= 10.0:
 		mortar_timer = 0.0
 		_fire_targeted_mortar()
 		
-	if combat_time >= 40.0:
+	# Continuous Minion Add Spawns
+	minion_timer += delta
+	var spawn_interval = 6.5 if current_phase == 1 else (4.5 if current_phase == 2 else 3.5)
+	if minion_timer >= spawn_interval:
+		minion_timer = 0.0
+		_deploy_side_minions()
+		
+	# Rolling Powder Keg Spawns
+	keg_timer += delta
+	if keg_timer >= 7.5:
+		keg_timer = 0.0
+		_deploy_center_kegs()
+		
+	if combat_time >= 45.0:
 		if boss_sprite:
 			boss_sprite.modulate = Color(2.5, 0.4, 0.4, 1.0) # Tint red for enrage
 		_process_enraged_volley(delta)
@@ -124,8 +141,16 @@ func _process_combat(delta: float) -> void:
 				_process_phase_3(delta)
 
 func _deploy_side_minions() -> void:
-	_spawn_pressure_skiff(-0.7, 5.0)
-	_spawn_pressure_skiff(0.7, 5.0)
+	if current_phase == 1:
+		_spawn_pressure_skiff(-0.6, 3.5)
+		_spawn_pressure_skiff(0.6, 3.5)
+	elif current_phase == 2:
+		_spawn_pressure_skiff(-0.7, 4.0)
+		_spawn_pressure_skiff(0.0, 3.2)
+		_spawn_pressure_skiff(0.7, 4.0)
+	else:
+		_spawn_pressure_skiff(-0.55, 5.0)
+		_spawn_pressure_skiff(0.55, 5.0)
 
 func _spawn_pressure_skiff(x_norm: float, speed_val: float) -> void:
 	if enemy_mob_scene:
@@ -138,19 +163,19 @@ func _spawn_pressure_skiff(x_norm: float, speed_val: float) -> void:
 			parent.add_child(skiff)
 			if skiff.has_method("apply_enemy_data"):
 				skiff.apply_enemy_data(skiff_data)
-			skiff.max_hp = 4
-			skiff.current_hp = 4
+			skiff.max_hp = 5
+			skiff.current_hp = 5
 			skiff.forward_speed = speed_val
 			var river_width = 12.0
 			var player = get_tree().get_first_node_in_group("player")
 			if player and "river_width" in player:
 				river_width = player.river_width
 			var x_world = x_norm * (river_width / 2.0)
-			skiff.global_position = Vector3(x_world, 0.1, global_position.z + 2.0)
+			skiff.global_position = Vector3(global_position.x + x_world, 0.1, global_position.z + 2.5)
 
 func _deploy_center_kegs() -> void:
-	_spawn_pressure_keg(-0.15, 6.0)
-	_spawn_pressure_keg(0.15, 6.0)
+	_spawn_pressure_keg(-0.18, 5.5)
+	_spawn_pressure_keg(0.18, 5.5)
 
 func _spawn_pressure_keg(x_norm: float, speed_val: float) -> void:
 	if powder_keg_scene:
@@ -160,7 +185,7 @@ func _spawn_pressure_keg(x_norm: float, speed_val: float) -> void:
 			parent = get_parent()
 		if parent:
 			parent.add_child(keg)
-			keg.global_position = Vector3(x_norm * 6.0, 0.05, global_position.z + 3.0)
+			keg.global_position = Vector3(global_position.x + x_norm * 6.0, 0.05, global_position.z + 3.0)
 			if "forward_speed" in keg:
 				keg.forward_speed = speed_val
 			if "obstacle_type" in keg:
@@ -273,10 +298,6 @@ func _process_phase_1(delta: float) -> void:
 	if _attack_timer >= 2.2:
 		_attack_timer = 0.0
 		_fire_cannon_volley()
-		
-	# Occasionally drop a keg
-	if randf() < 0.003:
-		_drop_keg()
 
 func _process_phase_2(delta: float) -> void:
 	# Handle steam venting cycle
@@ -449,40 +470,13 @@ func _transition_to_phase_2() -> void:
 	current_phase = 2
 	steam_cycle_timer = 0.0
 	_start_steam_venting()
-	
-	# Spawn 2 minion skiffs directly shielding front of boss
-	_spawn_minion_skiff(-0.20)
-	_spawn_minion_skiff(0.20)
+	_deploy_side_minions()
 
 func _transition_to_phase_3() -> void:
 	current_phase = 3
 	_stop_steam_venting()
 	ram_timer = 0.0
-
-func _spawn_minion_skiff(x_norm: float) -> void:
-	if enemy_mob_scene:
-		var skiff = enemy_mob_scene.instantiate() as Area3D
-		var skiff_data = preload("res://src/data/resources/enemy_vessels/raider_skiff.tres")
-		
-		var parent = get_tree().get_first_node_in_group("level_controller")
-		if not parent:
-			parent = get_parent()
-			
-		if parent:
-			parent.add_child(skiff)
-			if skiff.has_method("apply_enemy_data"):
-				skiff.apply_enemy_data(skiff_data)
-			skiff.max_hp = 6
-			skiff.current_hp = 6
-			skiff.forward_speed = 3.5 # Move downstream towards player
-			
-			var river_width = 12.0
-			var player = get_tree().get_first_node_in_group("player")
-			if player and "river_width" in player:
-				river_width = player.river_width
-				
-			var x_world = x_norm * (river_width / 2.0)
-			skiff.global_position = Vector3(global_position.x + x_world, 0.1, global_position.z + 4.5)
+	_deploy_side_minions()
 
 func boss_defeat() -> void:
 	if _is_defeated:
@@ -495,6 +489,11 @@ func boss_defeat() -> void:
 	if is_instance_valid(hit_box):
 		hit_box.set_deferred("monitoring", false)
 		hit_box.set_deferred("monitorable", false)
+	
+	if is_instance_valid(bow_foam):
+		bow_foam.emitting = false
+	if is_instance_valid(bow_crest):
+		bow_crest.visible = false
 	
 	# Explode dramatically
 	var tween = create_tween()
