@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://src/data/crew_data.gd" id="1_script"]
 [ext_resource type="Resource" path="res://src/data/resources/user_ammo/ammo_coconut_bomb.tres" id="2_ammo"]
 [ext_resource type="Resource" path="res://src/data/resources/user_ammo/ammo_fire_bomb.tres" id="3_ammo_fire"]
-[ext_resource type="Texture2D" path="res://assets/sprites/weapon_deckhand_sniper_back.png" id="4_tex"]
+[ext_resource type="Texture2D" path="res://assets/sprites/user_crew/weapon_deckhand_sniper_back.png" id="4_tex"]
 
 [resource]
 script = ExtResource("1_script")

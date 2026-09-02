@@ -8,11 +8,13 @@ extends Node3D
 @onready var slider_pos_y: HSlider = %slider_pos_y
 @onready var slider_psize: HSlider = %slider_psize
 @onready var slider_scale: HSlider = %slider_scale
+@onready var slider_rot_x: HSlider = %slider_rot_x
 @onready var slider_rot_y: HSlider = %slider_rot_y
 
 @onready var input_pos_y: LineEdit = %input_pos_y
 @onready var input_psize: LineEdit = %input_psize
 @onready var input_scale: LineEdit = %input_scale
+@onready var input_rot_x: LineEdit = %input_rot_x
 @onready var input_rot_y: LineEdit = %input_rot_y
 
 @onready var btn_pos_y_dec: Button = %btn_pos_y_dec
@@ -21,11 +23,26 @@ extends Node3D
 @onready var btn_psize_inc: Button = %btn_psize_inc
 @onready var btn_scale_dec: Button = %btn_scale_dec
 @onready var btn_scale_inc: Button = %btn_scale_inc
+@onready var btn_rot_x_dec: Button = %btn_rot_x_dec
+@onready var btn_rot_x_inc: Button = %btn_rot_x_inc
 @onready var btn_rot_y_dec: Button = %btn_rot_y_dec
 @onready var btn_rot_y_inc: Button = %btn_rot_y_inc
 
 @onready var btn_bobbing_toggle: Button = %btn_bobbing_toggle
 @onready var btn_print_values: Button = %btn_print_values
+
+@onready var camera_3d: Camera3D = $Camera3D
+@onready var btn_cam_lane: Button = %btn_cam_lane
+@onready var btn_cam_boss: Button = %btn_cam_boss
+@onready var btn_cam_waterline: Button = %btn_cam_waterline
+@onready var slider_zoom: HSlider = %slider_zoom
+@onready var btn_zoom_in: Button = %btn_zoom_in
+@onready var btn_zoom_out: Button = %btn_zoom_out
+@onready var btn_zoom_reset: Button = %btn_zoom_reset
+
+enum CamView { LANE, BOSS, WATERLINE }
+var current_cam_view: CamView = CamView.LANE
+var zoom_factor: float = 1.0
 
 # Object Definitions
 var categories: Array[String] = [
@@ -38,10 +55,10 @@ var categories: Array[String] = [
 var enemy_items: Array[Dictionary] = [
 	{"name": "Skeleton Rower", "res": "res://src/data/resources/enemy_vessels/skeleton_rower.tres"},
 	{"name": "Raider Skiff", "res": "res://src/data/resources/enemy_vessels/raider_skiff.tres"},
-	{"name": "Goblin Skiff", "res": "res://src/data/resources/enemy_vessels/goblin_skiff.tres"},
 	{"name": "Turtle Raft", "res": "res://src/data/resources/enemy_vessels/turtle_raft.tres"},
 	{"name": "Boss Bone-Beard", "res": "res://src/data/resources/enemy_bosses/boss_bone_beard.tres"},
-	{"name": "Boss War-Barge", "scene": "res://src/gameplay/enemies/boss_war_barge.tscn"}
+	{"name": "Boss War-Barge", "scene": "res://src/gameplay/enemies/boss_war_barge.tscn"},
+	{"name": "Boss Phantom Dredge", "scene": "res://src/gameplay/enemies/boss_phantom_dredge.tscn"}
 ]
 
 var obstacle_items: Array[Dictionary] = [
@@ -90,6 +107,7 @@ func _setup_ui() -> void:
 	if slider_pos_y: slider_pos_y.value_changed.connect(_on_slider_changed)
 	if slider_psize: slider_psize.value_changed.connect(_on_slider_changed)
 	if slider_scale: slider_scale.value_changed.connect(_on_slider_changed)
+	if slider_rot_x: slider_rot_x.value_changed.connect(_on_slider_changed)
 	if slider_rot_y: slider_rot_y.value_changed.connect(_on_slider_changed)
 	
 	if input_pos_y:
@@ -101,6 +119,9 @@ func _setup_ui() -> void:
 	if input_scale:
 		input_scale.text_submitted.connect(func(t): _on_input_submitted(slider_scale, t))
 		input_scale.focus_exited.connect(func(): _on_input_submitted(slider_scale, input_scale.text))
+	if input_rot_x:
+		input_rot_x.text_submitted.connect(func(t): _on_input_submitted(slider_rot_x, t))
+		input_rot_x.focus_exited.connect(func(): _on_input_submitted(slider_rot_x, input_rot_x.text))
 	if input_rot_y:
 		input_rot_y.text_submitted.connect(func(t): _on_input_submitted(slider_rot_y, t))
 		input_rot_y.focus_exited.connect(func(): _on_input_submitted(slider_rot_y, input_rot_y.text))
@@ -111,6 +132,8 @@ func _setup_ui() -> void:
 	if btn_psize_inc: btn_psize_inc.pressed.connect(func(): _step_slider(slider_psize, 0.0001))
 	if btn_scale_dec: btn_scale_dec.pressed.connect(func(): _step_slider(slider_scale, -0.01))
 	if btn_scale_inc: btn_scale_inc.pressed.connect(func(): _step_slider(slider_scale, 0.01))
+	if btn_rot_x_dec: btn_rot_x_dec.pressed.connect(func(): _step_slider(slider_rot_x, -1.0))
+	if btn_rot_x_inc: btn_rot_x_inc.pressed.connect(func(): _step_slider(slider_rot_x, 1.0))
 	if btn_rot_y_dec: btn_rot_y_dec.pressed.connect(func(): _step_slider(slider_rot_y, -1.0))
 	if btn_rot_y_inc: btn_rot_y_inc.pressed.connect(func(): _step_slider(slider_rot_y, 1.0))
 
@@ -118,8 +141,72 @@ func _setup_ui() -> void:
 		btn_bobbing_toggle.pressed.connect(_on_btn_bobbing_toggle_pressed)
 		_update_bobbing_button()
 		
+	if btn_cam_lane: btn_cam_lane.pressed.connect(func(): _set_camera_view(CamView.LANE))
+	if btn_cam_boss: btn_cam_boss.pressed.connect(func(): _set_camera_view(CamView.BOSS))
+	if btn_cam_waterline: btn_cam_waterline.pressed.connect(func(): _set_camera_view(CamView.WATERLINE))
+	
+	if slider_zoom: slider_zoom.value_changed.connect(func(v): _on_zoom_changed(v))
+	if btn_zoom_in: btn_zoom_in.pressed.connect(func(): _adjust_zoom(-0.1))
+	if btn_zoom_out: btn_zoom_out.pressed.connect(func(): _adjust_zoom(0.1))
+	if btn_zoom_reset: btn_zoom_reset.pressed.connect(func(): _reset_zoom())
+
 	if btn_print_values:
 		btn_print_values.pressed.connect(_on_btn_print_values_pressed)
+
+func _set_camera_view(view: CamView) -> void:
+	current_cam_view = view
+	_apply_camera_view()
+
+func _on_zoom_changed(v: float) -> void:
+	zoom_factor = v
+	_apply_camera_view()
+
+func _adjust_zoom(delta: float) -> void:
+	zoom_factor = clampf(zoom_factor + delta, 0.25, 2.5)
+	if slider_zoom:
+		slider_zoom.value = zoom_factor
+	_apply_camera_view()
+
+func _reset_zoom() -> void:
+	zoom_factor = 1.0
+	if slider_zoom:
+		slider_zoom.value = 1.0
+	_apply_camera_view()
+
+func _apply_camera_view() -> void:
+	if not camera_3d:
+		return
+		
+	var target_obj_z = current_object_node.position.z if current_object_node else 0.0
+	var base_cam_pos = Vector3.ZERO
+	var look_target = Vector3.ZERO
+	var fov_val = 70.0
+	
+	match current_cam_view:
+		CamView.LANE:
+			base_cam_pos = Vector3(0.0, 9.851, target_obj_z + 11.32)
+			look_target = Vector3(0.0, 0.0, target_obj_z)
+			fov_val = 70.0
+		CamView.BOSS:
+			base_cam_pos = Vector3(0.0, 11.0, target_obj_z + 24.0)
+			look_target = Vector3(0.0, 0.3, target_obj_z + 9.0)
+			fov_val = 70.0
+		CamView.WATERLINE:
+			base_cam_pos = Vector3(0.0, 1.4, target_obj_z + 5.0)
+			look_target = Vector3(0.0, 0.3, target_obj_z)
+			fov_val = 55.0
+
+	var cam_offset = (base_cam_pos - look_target) * zoom_factor
+	camera_3d.global_position = look_target + cam_offset
+	camera_3d.look_at(look_target, Vector3.UP)
+	camera_3d.fov = fov_val
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
+			_adjust_zoom(-0.08)
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
+			_adjust_zoom(0.08)
 
 func _on_category_selected(cat_idx: int) -> void:
 	if not object_option:
@@ -238,6 +325,12 @@ func _on_object_selected(obj_idx: int) -> void:
 		if "speed" in current_object_node:
 			current_object_node.speed = 0.0
 		current_object_node.position = Vector3.ZERO
+		
+		var item_name = object_option.get_item_text(obj_idx) if object_option else ""
+		if "Boss" in item_name:
+			current_cam_view = CamView.BOSS
+		else:
+			current_cam_view = CamView.LANE
 
 	_update_ui_from_current_object()
 
@@ -263,15 +356,22 @@ func _update_ui_from_current_object() -> void:
 	
 	var psize = current_sprite.pixel_size if current_sprite else 0.0021
 	var sc = current_object_node.scale.x
+	var rot_x = 0.0
+	if current_sprite and current_sprite.rotation_degrees.x != 0.0:
+		rot_x = current_sprite.rotation_degrees.x
+	elif current_object_node:
+		rot_x = current_object_node.rotation_degrees.x
 	var rot_y = current_object_node.rotation_degrees.y
 	
 	if slider_pos_y: slider_pos_y.value = pos_y
 	if slider_psize: slider_psize.value = psize
 	if slider_scale: slider_scale.value = sc
+	if slider_rot_x: slider_rot_x.value = rot_x
 	if slider_rot_y: slider_rot_y.value = rot_y
 	
-	_update_inputs(pos_y, psize, sc, rot_y)
+	_update_inputs(pos_y, psize, sc, rot_x, rot_y)
 	updating_ui = false
+	_apply_camera_view()
 
 func _on_slider_changed(_val: float) -> void:
 	if updating_ui or not current_object_node:
@@ -280,6 +380,7 @@ func _on_slider_changed(_val: float) -> void:
 	var new_pos_y = slider_pos_y.value if slider_pos_y else 0.48
 	var new_psize = slider_psize.value if slider_psize else 0.0021
 	var new_scale = slider_scale.value if slider_scale else 1.0
+	var new_rot_x = slider_rot_x.value if slider_rot_x else 0.0
 	var new_rot_y = slider_rot_y.value if slider_rot_y else 0.0
 	
 	base_y_position = new_pos_y
@@ -311,6 +412,11 @@ func _on_slider_changed(_val: float) -> void:
 	current_object_node.rotation_degrees.y = new_rot_y
 	
 	if current_sprite:
+		current_sprite.rotation_degrees.x = new_rot_x
+	else:
+		current_object_node.rotation_degrees.x = new_rot_x
+	
+	if current_sprite:
 		current_sprite.pixel_size = new_psize
 			
 	if current_resource:
@@ -319,7 +425,7 @@ func _on_slider_changed(_val: float) -> void:
 		if "pixel_size" in current_resource:
 			current_resource.pixel_size = new_psize
 			
-	_update_inputs(new_pos_y, new_psize, new_scale, new_rot_y)
+	_update_inputs(new_pos_y, new_psize, new_scale, new_rot_x, new_rot_y)
 
 func _process(delta: float) -> void:
 	if not current_object_node:
@@ -357,10 +463,11 @@ func _step_slider(slider: HSlider, delta: float) -> void:
 	if slider:
 		slider.value = clamp(slider.value + delta, slider.min_value, slider.max_value)
 
-func _update_inputs(pos_y: float, psize: float, sc: float, rot_y: float) -> void:
+func _update_inputs(pos_y: float, psize: float, sc: float, rot_x: float, rot_y: float) -> void:
 	if input_pos_y and not input_pos_y.has_focus(): input_pos_y.text = "%.2f" % pos_y
 	if input_psize and not input_psize.has_focus(): input_psize.text = "%.4f" % psize
 	if input_scale and not input_scale.has_focus(): input_scale.text = "%.2f" % sc
+	if input_rot_x and not input_rot_x.has_focus(): input_rot_x.text = "%.1f" % rot_x
 	if input_rot_y and not input_rot_y.has_focus(): input_rot_y.text = "%.1f" % rot_y
 
 func _on_btn_bobbing_toggle_pressed() -> void:
@@ -383,6 +490,7 @@ func _on_btn_print_values_pressed() -> void:
 	var pos_y = slider_pos_y.value if slider_pos_y else current_object_node.position.y
 	var psize = slider_psize.value if slider_psize else 0.0021
 	var sc = slider_scale.value if slider_scale else 1.0
+	var rot_x = slider_rot_x.value if slider_rot_x else 0.0
 	var rot_y = slider_rot_y.value if slider_rot_y else 0.0
 	
 	print("\n==========================================")
@@ -391,5 +499,5 @@ func _on_btn_print_values_pressed() -> void:
 	print("y_offset = %.2f" % pos_y)
 	print("pixel_size = %.4f" % psize)
 	print("scale = Vector3(%.2f, %.2f, %.2f)" % [sc, sc, sc])
-	print("rotation_degrees = Vector3(0.0, %.1f, 0.0)" % rot_y)
+	print("rotation_degrees = Vector3(%.1f, %.1f, 0.0)" % [rot_x, rot_y])
 	print("==========================================\n")

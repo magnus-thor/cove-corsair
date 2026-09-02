@@ -1,9 +1,9 @@
 [gd_scene load_steps=14 format=3 uid="uid://c56j382mkw601"]
 
 [ext_resource type="Script" path="res://src/ui/hud/top_hud.gd" id="1_tophud_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/coin_icon.svg" id="2_coin_icon"]
-[ext_resource type="Texture2D" path="res://assets/sprites/hud_boat_icon.svg" id="3_boat_icon"]
-[ext_resource type="Texture2D" path="res://assets/sprites/hud_skull_icon.svg" id="4_skull_icon"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/coin_icon.svg" id="2_coin_icon"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/hud_boat_icon.svg" id="3_boat_icon"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/hud_skull_icon.svg" id="4_skull_icon"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gold"]
 bg_color = Color(0.1, 0.12, 0.18, 0.85)

@@ -1,7 +1,7 @@
 [gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/enemies/boss_war_barge.gd" id="1_boss_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/boss_war_barge.png" id="2_barge_tex"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemy_bosses/boss_war_barge.png" id="2_barge_tex"]
 [ext_resource type="Script" path="res://src/gameplay/enemies/boss_component_delegate.gd" id="3_delegate"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_hitbox"]

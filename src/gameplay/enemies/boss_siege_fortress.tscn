@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/enemies/boss_siege_fortress.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/boss_war_barge.png" id="2_barge_tex"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemy_bosses/boss_war_barge.png" id="2_barge_tex"]
 [ext_resource type="Script" path="res://src/gameplay/enemies/boss_component_delegate.gd" id="3_delegate"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_turret"]

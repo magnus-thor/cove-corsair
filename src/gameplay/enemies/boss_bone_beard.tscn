@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/enemies/boss_bone_beard.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/Captain Bone-Beard's Twin Frigate.png" id="2_sprite"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemy_bosses/Captain Bone-Beard's Twin Frigate.png" id="2_sprite"]
 [ext_resource type="PackedScene" path="res://src/gameplay/collectibles/collectible_doubloon.tscn" id="3_doubloon"]
 [ext_resource type="PackedScene" path="res://src/gameplay/vfx/barrel_explosion.tscn" id="4_explosion"]
 [ext_resource type="PackedScene" path="res://src/gameplay/obstacles/destructible_barrel.tscn" id="5_keg"]

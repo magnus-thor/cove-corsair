@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="ShipData" format=3 uid="uid://i3y6e47wyxa1"]
 
-[ext_resource type="Script" uid="uid://cs0f78ukvxpo3" path="res://src/data/ship_data.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://cve6hq7jqcpym" path="res://assets/sprites/The Ironclad.png" id="2_tex"]
+[ext_resource type="Script" path="res://src/data/ship_data.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/user_vessels/The Ironclad.png" id="2_tex"]
 
 [resource]
 script = ExtResource("1_script")

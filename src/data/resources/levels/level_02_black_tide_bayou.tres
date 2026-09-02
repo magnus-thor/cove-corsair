@@ -139,8 +139,8 @@ script = ExtResource("2_spawn_event")
 trigger_distance = 54.0
 entity_type = 3
 lane_x = -2.5
-rarity_tier = 0
-base_hp_override = 1
+rarity_tier = 2
+base_hp_override = 6
 gate_type = 2
 gate_value = 1
 
@@ -539,8 +539,8 @@ script = ExtResource("2_spawn_event")
 trigger_distance = 170.0
 entity_type = 3
 lane_x = 2.8
-rarity_tier = 0
-base_hp_override = 1
+rarity_tier = 2
+base_hp_override = 6
 gate_type = 2
 gate_value = 1
 
@@ -769,8 +769,8 @@ script = ExtResource("2_spawn_event")
 trigger_distance = 236.0
 entity_type = 3
 lane_x = -2.5
-rarity_tier = 0
-base_hp_override = 1
+rarity_tier = 2
+base_hp_override = 6
 gate_type = 2
 gate_value = 1
 

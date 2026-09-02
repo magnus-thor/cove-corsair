@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://c8objcalicbax"]
 
-[ext_resource type="Script" uid="uid://4cjcjfwhgugi" path="res://src/levels/object_calibration_sandbox.gd" id="1_script"]
-[ext_resource type="Shader" uid="uid://d3pqmhtscn7vf" path="res://src/shaders/water_stylized.gdshader" id="2_water_shader"]
+[ext_resource type="Script" path="res://src/levels/object_calibration_sandbox.gd" id="1_script"]
+[ext_resource type="Shader" path="res://src/shaders/water_stylized.gdshader" id="2_water_shader"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 sky_top_color = Color(0.53, 0.81, 0.98, 1)
@@ -38,11 +38,20 @@ shader_parameter/refraction_strength = 0.04
 shader_parameter/uv1_scale = Vector3(0.15, 0.15, 0.15)
 shader_parameter/flow_speed = Vector2(0, -0.6)
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_water"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bank"]
+albedo_color = Color(0.85, 0.72, 0.48, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_bank"]
+material = SubResource("StandardMaterial3D_bank")
+size = Vector2(200, 120)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_river"]
 material = SubResource("ShaderMaterial_water")
-size = Vector2(40, 40)
+size = Vector2(18, 120)
 
 [sub_resource type="LabelSettings" id="LabelSettings_title"]
+font_size = 14
+font_color = Color(1, 0.9, 0.5, 1)
 
 [node name="ObjectCalibrationSandbox" type="Node3D" unique_id=1272224012]
 script = ExtResource("1_script")
@@ -55,10 +64,16 @@ shadow_enabled = true
 environment = SubResource("Environment_main")
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=2099136997]
-transform = Transform3D(1, 0, 0, 0, 0.5, 0.866025, 0, -0.866025, 0.5, 0, 8, 5)
+transform = Transform3D(1, 0, 0, 0, 0.90107703, 0.4336591, 0, -0.4336591, 0.90107703, 0, 9.851, 11.32)
+fov = 70.0
 
-[node name="WaterPlane" type="MeshInstance3D" parent="." unique_id=1958683009]
-mesh = SubResource("PlaneMesh_water")
+[node name="BankPlane" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.01, -10)
+mesh = SubResource("PlaneMesh_bank")
+
+[node name="RiverLane" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, -10)
+mesh = SubResource("PlaneMesh_river")
 
 [node name="ObjectContainer" type="Node3D" parent="." unique_id=79970298]
 
@@ -133,6 +148,65 @@ size_flags_horizontal = 3
 unique_name_in_owner = true
 layout_mode = 2
 text = "Water Floating Bobbing: OFF"
+
+[node name="CameraViewRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/CameraViewRow"]
+custom_minimum_size = Vector2(95, 0)
+layout_mode = 2
+text = "Camera View:"
+
+[node name="btn_cam_lane" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/CameraViewRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "1:1 Lane"
+
+[node name="btn_cam_boss" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/CameraViewRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "1:1 Boss"
+
+[node name="btn_cam_waterline" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/CameraViewRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Waterline"
+
+[node name="ZoomRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ZoomRow"]
+custom_minimum_size = Vector2(95, 0)
+layout_mode = 2
+text = "Zoom:"
+
+[node name="btn_zoom_out" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ZoomRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = " - "
+
+[node name="slider_zoom" type="HSlider" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ZoomRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+min_value = 0.25
+max_value = 2.5
+step = 0.05
+value = 1.0
+
+[node name="btn_zoom_in" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ZoomRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = " + "
+
+[node name="btn_zoom_reset" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ZoomRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Reset 1:1"
 
 [node name="btn_print_values" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol" unique_id=622338956]
 unique_name_in_owner = true
@@ -247,6 +321,40 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(55, 0)
 layout_mode = 2
 text = "1.00"
+
+[node name="RotXRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol" unique_id=609887703]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/RotXRow"]
+custom_minimum_size = Vector2(105, 0)
+layout_mode = 2
+text = "Pitch / Lean X:"
+
+[node name="btn_rot_x_dec" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/RotXRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = " - "
+
+[node name="slider_rot_x" type="HSlider" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/RotXRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+min_value = -85.0
+max_value = 85.0
+step = 0.5
+value = 0.0
+
+[node name="btn_rot_x_inc" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/RotXRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = " + "
+
+[node name="input_rot_x" type="LineEdit" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/RotXRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(55, 0)
+layout_mode = 2
+text = "0.0"
 
 [node name="RotYRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol" unique_id=609887702]
 layout_mode = 2

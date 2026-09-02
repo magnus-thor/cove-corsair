@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/enemies/enemy_tide_cutter.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/The Dinghy.png" id="2_cutter_tex"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemy_vessels/Skeleton Rower.png" id="2_cutter_tex"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_cutter"]
 size = Vector3(1.6, 1.0, 2.0)

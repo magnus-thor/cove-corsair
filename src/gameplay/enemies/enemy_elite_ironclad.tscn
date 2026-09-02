@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://src/gameplay/enemies/enemy_mob.gd" id="1_script"]
 [ext_resource type="Resource" path="res://src/data/resources/enemy_vessels/enemy_elite_ironclad.tres" id="2_enemy_data"]
-[ext_resource type="Texture2D" path="res://assets/sprites/The Ironclad.png" id="3_ironclad_tex"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemy_vessels/Armored Turtle-Raft.png" id="3_ironclad_tex"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_mob"]
 size = Vector3(2.5, 1.5, 3.0)

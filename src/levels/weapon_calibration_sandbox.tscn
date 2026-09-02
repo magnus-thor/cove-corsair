@@ -4,7 +4,7 @@
 [ext_resource type="Shader" path="res://src/shaders/water_stylized.gdshader" id="2_water_shader"]
 [ext_resource type="PackedScene" path="res://src/gameplay/player/player_boat.tscn" id="3_player_boat"]
 [ext_resource type="Resource" path="res://src/data/resources/user_vessels/dinghy_ship.tres" id="4_target_ship"]
-[ext_resource type="Texture2D" uid="uid://cwm3nw1dpaix5" path="res://assets/sprites/Skeleton Rower.png" id="5_target_tex"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemy_vessels/Skeleton Rower.png" id="5_target_tex"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 sky_top_color = Color(0.53, 0.81, 0.98, 1)

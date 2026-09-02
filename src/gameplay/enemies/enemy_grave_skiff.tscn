@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/enemies/enemy_grave_skiff.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/Goblin Skiff 2.png" id="2_skiff_tex"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemy_vessels/Goblin Skiff 2.png" id="2_skiff_tex"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_skiff"]
 size = Vector3(1.8, 1.2, 2.2)
@@ -35,14 +35,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
 shape = SubResource("BoxShape3D_skiff")
 
 [node name="Sprite3D" type="Sprite3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.766044, 0.642788, 0, -0.642788, 0.766044, 0, 1, 0)
-pixel_size = 0.0024
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.47, 0)
+pixel_size = 0.003
 alpha_cut = 1
 texture = ExtResource("2_skiff_tex")
 modulate = Color(0.7, 0.95, 0.75, 1)
 
 [node name="HealthBarSprite" type="Sprite3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)
 billboard = 1
 double_sided = false
 texture = SubResource("ViewportTexture_hp")

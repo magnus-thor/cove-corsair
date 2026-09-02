@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/collectibles/collectible_chest.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/treasure_chest.png" id="2_chest_tex"]
+[ext_resource type="Texture2D" path="res://assets/sprites/lane_objects/treasure_chest.png" id="2_chest_tex"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_chest"]
 size = Vector3(0.8, 0.8, 0.8)

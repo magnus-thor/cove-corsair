@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/obstacles/hazard_sea_mine.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/Spiked Sea Mine.png" id="2_sea_mine_tex"]
+[ext_resource type="Texture2D" path="res://assets/sprites/lane_objects/Spiked Sea Mine.png" id="2_sea_mine_tex"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_mine"]
 height = 1.2

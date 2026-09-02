@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://src/data/enemy_data.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/Armored Turtle-Raft.png" id="2_tex"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemy_vessels/Armored Turtle-Raft.png" id="2_tex"]
 
 [resource]
 script = ExtResource("1_script")

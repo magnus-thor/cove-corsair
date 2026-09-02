@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/enemies/enemy_iron_gunner.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/The Ironclad.png" id="2_iron_tex"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemy_vessels/Armored Turtle-Raft.png" id="2_iron_tex"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_gunner"]
 size = Vector3(2.2, 1.4, 2.6)

@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://src/data/weapon_data.gd" id="1_script"]
 [ext_resource type="Resource" path="res://src/data/resources/user_ammo/ammo_grape_shot.tres" id="2_ammo"]
 [ext_resource type="Resource" path="res://src/data/resources/user_ammo/ammo_standard_ball.tres" id="3_ammo_ball"]
-[ext_resource type="Texture2D" uid="uid://cb8v0q7oxp4oj" path="res://assets/sprites/weapon_port_swivel.png" id="4_tex"]
+[ext_resource type="Texture2D" path="res://assets/sprites/user_crew/weapon_port_swivel.png" id="4_tex"]
 
 [resource]
 script = ExtResource("1_script")

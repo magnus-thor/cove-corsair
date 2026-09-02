@@ -90,7 +90,8 @@ func apply_enemy_data(data: EnemyData) -> void:
 func _apply_mob_type_fallback() -> void:
 	var path_map = {
 		"skeleton_rower": "res://src/data/resources/enemy_vessels/skeleton_rower.tres",
-		"goblin_skiff": "res://src/data/resources/enemy_vessels/goblin_skiff.tres",
+		"raider_skiff": "res://src/data/resources/enemy_vessels/raider_skiff.tres",
+		"goblin_skiff": "res://src/data/resources/enemy_vessels/raider_skiff.tres",
 		"turtle_raft": "res://src/data/resources/enemy_vessels/turtle_raft.tres",
 		"bone_beard": "res://src/data/resources/enemy_bosses/boss_bone_beard.tres"
 	}

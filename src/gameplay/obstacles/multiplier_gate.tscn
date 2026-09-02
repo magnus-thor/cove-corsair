@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/obstacles/multiplier_gate.gd" id="1_gate_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/Floating Multiplier Gate Arch.png" id="2_arch_tex"]
+[ext_resource type="Texture2D" path="res://assets/sprites/lane_objects/Floating Multiplier Gate Arch.png" id="2_arch_tex"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_gate"]
 size = Vector3(3.8, 3.2, 0.8)

@@ -41,7 +41,7 @@ func _ready() -> void:
 	sprite.name = "XpSprite"
 	sprite.billboard = BaseMaterial3D.BILLBOARD_PARTICLES
 	sprite.alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
-	sprite.texture = preload("res://assets/sprites/coin_icon.svg")
+	sprite.texture = preload("res://assets/sprites/ui/coin_icon.svg")
 	sprite.modulate = Color(0.2, 1.0, 0.2) # bright green
 	sprite.pixel_size = 0.006
 	visuals_node.add_child(sprite)

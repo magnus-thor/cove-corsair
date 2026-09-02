@@ -14,11 +14,11 @@ enum ObstacleType { WOODEN_BARREL, FUSE_BARREL, RUNE_BARREL, SEA_MINE, CORAL_REE
 @export var doubloons_drop: int = 1
 @export var doubloon_scene: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
 
-@export var wooden_barrel_tex: Texture2D = preload("res://assets/sprites/wooden barrell.png")
-@export var fuse_barrel_tex: Texture2D = preload("res://assets/sprites/Barrell with fuse.png")
-@export var rune_barrel_tex: Texture2D = preload("res://assets/sprites/Barrell with runes.png")
-@export var sea_mine_tex: Texture2D = preload("res://assets/sprites/Spiked Sea Mine.png")
-@export var coral_reef_tex: Texture2D = preload("res://assets/sprites/Indestructible Coral Reef.png")
+@export var wooden_barrel_tex: Texture2D = preload("res://assets/sprites/lane_objects/wooden barrell.png")
+@export var fuse_barrel_tex: Texture2D = preload("res://assets/sprites/lane_objects/Barrell with fuse.png")
+@export var rune_barrel_tex: Texture2D = preload("res://assets/sprites/lane_objects/Barrell with runes.png")
+@export var sea_mine_tex: Texture2D = preload("res://assets/sprites/lane_objects/Spiked Sea Mine.png")
+@export var coral_reef_tex: Texture2D = preload("res://assets/sprites/lane_objects/Indestructible Coral Reef.png")
 
 ## Barrel destruction explosion VFX to spawn when destroyed
 @export var barrel_explosion_scene: PackedScene = preload("res://src/gameplay/vfx/barrel_explosion.tscn")

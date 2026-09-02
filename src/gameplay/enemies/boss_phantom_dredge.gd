@@ -23,7 +23,7 @@ var _minion_timer: float = 0.0
 var _mortar_timer: float = 0.0
 var _is_defeated: bool = false
 var current_state: State = State.APPROACHING
-var _base_y: float = 1.2
+var _base_y: float = 1.33
 var _flash_tween: Tween
 
 # Prefabs
@@ -41,6 +41,8 @@ func _ready() -> void:
 	add_to_group("enemies")
 	add_to_group("boss")
 	current_hp = max_hp
+	if boss_sprite:
+		boss_sprite.position.y = _base_y
 	
 	GameState.boss_spawned_event.emit("The Phantom Dredge", max_hp)
 	GameState.boss_health_changed.emit(current_hp, max_hp)
@@ -96,7 +98,7 @@ func _process_combat(delta: float) -> void:
 			
 	# Minion Skiff Spawns
 	_minion_timer += delta
-	var minion_cd = 7.5 if current_phase == 1 else 6.0
+	var minion_cd = 3.8 if current_phase == 1 else (2.8 if current_phase == 2 else 2.0)
 	if _minion_timer >= minion_cd:
 		_minion_timer = 0.0
 		_spawn_bayou_adds()
@@ -164,7 +166,7 @@ func _detonate_poison_mortar(pos: Vector3) -> void:
 
 func _start_submerge() -> void:
 	current_state = State.SUBMERGED
-	_submerge_duration = 3.0
+	_submerge_duration = 3.8
 	AudioManager.play_sfx("water_splashes", 0.5, 0.7, 2.0)
 	
 	# Submerge animation
@@ -180,10 +182,26 @@ func _start_submerge() -> void:
 		
 	# Emit 3 expanding shockwaves
 	for i in range(3):
-		get_tree().create_timer(i * 0.8).timeout.connect(func():
+		get_tree().create_timer(i * 0.9).timeout.connect(func():
 			if _is_defeated or not is_instance_valid(self):
 				return
 			_emit_water_shockwave()
+		)
+		
+	# Rain a wave of minions on the user while submerged
+	_rain_submerged_mobs()
+
+func _rain_submerged_mobs() -> void:
+	var lanes = [-3.0, 3.0, -1.5, 1.5, 0.0, -2.5, 2.5]
+	var count = 6 if current_phase >= 2 else 5
+	print("[BOSS SUBMERGED] Raining %d mobs on the player!" % count)
+	for i in range(count):
+		var delay = 0.35 + (i * 0.45)
+		var lane_x = lanes[i % lanes.size()]
+		get_tree().create_timer(delay).timeout.connect(func():
+			if _is_defeated or not is_instance_valid(self):
+				return
+			_spawn_bayou_adds(lane_x, i % 2)
 		)
 
 func _process_submerged(delta: float) -> void:
@@ -238,19 +256,30 @@ func _resurface() -> void:
 	# Immediate poison mortar burst on resurfacing
 	_fire_poison_mortars()
 
-func _spawn_bayou_adds() -> void:
+func _spawn_bayou_adds(lane_x_override: float = NAN, type_choice: int = -1) -> void:
 	var parent = get_tree().get_first_node_in_group("level_controller")
 	if not parent: parent = get_parent()
 	if not parent: return
 	
-	if randf() < 0.5 and grave_skiff_scene:
+	var lx = randf_range(-3.5, 3.5) if is_nan(lane_x_override) else lane_x_override
+	var use_skiff = (randf() < 0.55) if type_choice < 0 else (type_choice == 0)
+	
+	if use_skiff and grave_skiff_scene:
 		var skiff = grave_skiff_scene.instantiate() as Area3D
 		parent.add_child(skiff)
-		skiff.global_position = Vector3(global_position.x + randf_range(-3.5, 3.5), 0.1, global_position.z + 3.0)
+		skiff.global_position = Vector3(lx, 0.1, global_position.z + 4.0)
+		skiff.max_hp = 12 if current_phase >= 2 else 10
+		skiff.current_hp = skiff.max_hp
+		skiff.forward_speed = 3.0
+		print("[BOSS MINION] Spawning Grave Skiff at x=%.2f | HP=%d" % [lx, skiff.max_hp])
 	elif tide_cutter_scene:
 		var cutter = tide_cutter_scene.instantiate() as Area3D
 		parent.add_child(cutter)
-		cutter.global_position = Vector3(randf_range(-3.0, 3.0), 0.1, global_position.z + 4.0)
+		cutter.global_position = Vector3(lx, 0.1, global_position.z + 4.0)
+		cutter.max_hp = 16 if current_phase >= 2 else 14
+		cutter.current_hp = cutter.max_hp
+		cutter.forward_speed = 5.0
+		print("[BOSS MINION] Spawning Tide Cutter at x=%.2f | HP=%d" % [lx, cutter.max_hp])
 
 func take_damage(amount: int) -> void:
 	if _is_defeated or current_state == State.SUBMERGED:

@@ -312,7 +312,15 @@ func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> vo
 				print("[SPAWN GATE] Multiplier Gate (%s) at dist=%.1fm | lane_x=%.2f" % [text_val, current_distance, x_pos])
 
 		SpawnEvent.EntityType.HAZARD:
-			if biogas_pod_scene:
+			if event.rarity_tier == SpawnEvent.RarityTier.RARE or event.base_hp_override >= 5:
+				var reef_prefab = preload("res://src/gameplay/obstacles/hazard_reef.tscn")
+				if reef_prefab:
+					var reef = reef_prefab.instantiate() as Area3D
+					reef.name = "CoralReef_%.1fm_x%.1f" % [current_distance, x_pos]
+					add_child(reef)
+					reef.global_position = Vector3(x_pos, 0.0, z_spawn)
+					print("[SPAWN HAZARD] Indestructible Coral Reef at dist=%.1fm | lane_x=%.2f" % [current_distance, x_pos])
+			elif biogas_pod_scene:
 				var pod = biogas_pod_scene.instantiate() as Area3D
 				pod.name = "BiogasPod_%.1fm_x%.1f" % [current_distance, x_pos]
 				add_child(pod)
