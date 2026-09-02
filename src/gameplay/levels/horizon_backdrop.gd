@@ -24,7 +24,7 @@ var _uv_y_offset   : float = 0.0
 func _ready() -> void:
 	_build_quad()
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if not is_instance_valid(_material):
 		return
 	# Horizon remains stable in vertical perspective, with soft horizontal parallax if desired

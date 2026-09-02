@@ -36,8 +36,8 @@ func _ready() -> void:
 	# Layer 4 (8), Mask 1 (1)
 	collision_layer = 8
 	collision_mask = 1
-	monitoring = true
-	monitorable = true
+	set_deferred("monitoring", true)
+	set_deferred("monitorable", true)
 	
 	area_entered.connect(_on_area_entered)
 	body_entered.connect(_on_body_entered)

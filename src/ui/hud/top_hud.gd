@@ -114,7 +114,7 @@ func _on_progress_changed(current: float, total: float) -> void:
 	_progress_tween.tween_property(level_progress_bar, "value", clamp(current, 0.0, total), 0.1).set_trans(Tween.TRANS_LINEAR)
 
 # Boss logic
-func _on_boss_spawned(boss_name: String, max_hp: int) -> void:
+func _on_boss_spawned(boss_name: String, _max_hp: int) -> void:
 	if boss_name_label:
 		boss_name_label.text = boss_name
 		

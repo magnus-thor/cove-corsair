@@ -245,9 +245,17 @@ func apply_tier(tier_level: int) -> void:
 		return
 	var index = clamp(tier_level - 1, 0, ship_data.tier_upgrades.size() - 1)
 	var tier_dict: Dictionary = ship_data.tier_upgrades[index]
-	clear_weapons()
 	
 	var weapons_map: Dictionary = tier_dict.get("weapons", tier_dict)
+	var sockets_to_remove: Array[String] = []
+	for s in equipped_weapons.keys():
+		if not weapons_map.has(s):
+			sockets_to_remove.append(s)
+	for s in sockets_to_remove:
+		if is_instance_valid(equipped_weapons[s]):
+			equipped_weapons[s].queue_free()
+		equipped_weapons.erase(s)
+		
 	for socket_name in weapons_map:
 		if socket_name == "tier":
 			continue
@@ -531,6 +539,8 @@ func equip_weapon_to_socket(socket_name: String, weapon_data: WeaponData) -> voi
 	if equipped_weapons.has(socket_name):
 		var old_weapon = equipped_weapons[socket_name]
 		if is_instance_valid(old_weapon):
+			if old_weapon.weapon_data == weapon_data:
+				return # Weapon already active and firing seamlessly
 			old_weapon.queue_free()
 		equipped_weapons.erase(socket_name)
 		

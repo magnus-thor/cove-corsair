@@ -89,6 +89,10 @@ func _ready() -> void:
 					var tex_path := "res://assets/textures/horizon_smugglers_run.png"
 					if ResourceLoader.exists(tex_path):
 						htex = load(tex_path) as Texture2D
+					if not htex and FileAccess.file_exists(tex_path):
+						var img := Image.load_from_file(ProjectSettings.globalize_path(tex_path))
+						if img:
+							htex = ImageTexture.create_from_image(img)
 				_horizon_backdrop.bind_texture(htex)
 
 		# ── Layer 2: Riverbank Framing Strips ────────────────────────────────
@@ -555,6 +559,12 @@ func _spawn_boss() -> void:
 	var track_mgr = get_tree().get_first_node_in_group("track_manager")
 	if track_mgr:
 		track_mgr.scroll_speed = 0.0
+
+	# Clean up track obstacles in the arena so the boss channel is completely clear
+	for grp in ["obstacles", "destructible_obstacles", "multiplier_gate"]:
+		for obs in get_tree().get_nodes_in_group(grp):
+			if is_instance_valid(obs) and not obs.is_in_group("boss") and not (obs is BossWarBarge) and not (obs is BossComponentDelegate):
+				obs.queue_free()
 
 	var spawn_prefab = boss_scene
 	if level_data and "boss_scene" in level_data and level_data.boss_scene:

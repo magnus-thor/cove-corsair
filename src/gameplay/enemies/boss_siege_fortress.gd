@@ -233,6 +233,8 @@ func damage_component(comp_name: String, amount: int, _from_bow: bool) -> void:
 				_flash_node(port_turret_node)
 				if hp_port_turret <= 0:
 					_destroy_subpart(port_turret_node)
+			else:
+				damage_component("furnace_core", amount, _from_bow)
 					
 		"starboard_turret":
 			if hp_starboard_turret > 0:
@@ -242,6 +244,8 @@ func damage_component(comp_name: String, amount: int, _from_bow: bool) -> void:
 				_flash_node(starboard_turret_node)
 				if hp_starboard_turret <= 0:
 					_destroy_subpart(starboard_turret_node)
+			else:
+				damage_component("furnace_core", amount, _from_bow)
 					
 		"prow_ram":
 			if hp_prow_ram > 0:
@@ -251,6 +255,8 @@ func damage_component(comp_name: String, amount: int, _from_bow: bool) -> void:
 				_flash_node(prow_ram_node)
 				if hp_prow_ram <= 0:
 					_destroy_subpart(prow_ram_node)
+			else:
+				damage_component("furnace_core", amount, _from_bow)
 					
 		"furnace_core":
 			# Takes full damage always, but takes double if turrets are down
@@ -279,24 +285,25 @@ func _flash_boss_main() -> void:
 	if not boss_sprite:
 		return
 	var tween = create_tween()
-	tween.tween_property(boss_sprite, "modulate", Color(3.0, 1.5, 0.8, 1.0), 0.05)
-	tween.tween_property(boss_sprite, "modulate", Color.WHITE, 0.1)
+	tween.tween_property(boss_sprite, "modulate", Color(2.5, 0.8, 0.4, 1.0), 0.05)
+	tween.tween_property(boss_sprite, "modulate", Color(1.4, 0.6, 0.3, 1.0), 0.1)
 
 func _destroy_subpart(node: Variant) -> void:
 	if not is_instance_valid(node):
 		return
-	AudioManager.play_sfx("barrel_breaks", 0.6, 0.8, 3.0)
+	AudioManager.play_sfx("barrel_breaks")
 	if explosion_scene and (node is Node3D):
 		var vfx = explosion_scene.instantiate() as Node3D
-		get_tree().current_scene.add_child(vfx)
-		vfx.global_position = node.global_position
-		vfx.scale = Vector3(2.5, 2.5, 2.5)
+		var root = get_tree().current_scene
+		if root:
+			root.add_child(vfx)
+			vfx.global_position = node.global_position
 	if is_instance_valid(node) and "visible" in node:
 		node.visible = false
-	if is_instance_valid(node) and node is Area3D:
-		node.set_deferred("monitoring", false)
-		node.set_deferred("monitorable", false)
-
+	if is_instance_valid(node) and node is Node:
+		node.remove_from_group("boss")
+		node.remove_from_group("destructible")
+		node.remove_from_group("enemies")
 
 func _check_phase() -> void:
 	if current_phase == 1 and current_hp <= int(max_hp * 0.65):

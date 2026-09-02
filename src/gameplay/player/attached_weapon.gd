@@ -128,6 +128,8 @@ func _physics_process(delta: float) -> void:
 	if is_crew:
 		_process_deck_idle(delta)
 		_process_targeting(delta)
+	else:
+		aim_direction = Vector3(0, 0, -1)
 
 func _process_deck_idle(delta: float) -> void:
 	if not sprite_3d:
@@ -168,7 +170,13 @@ func _process_targeting(delta: float) -> void:
 	# Priority 2: Boss components
 	var boss_candidates: Array[Node] = []
 	for node in get_tree().get_nodes_in_group("boss"):
-		if is_instance_valid(node):
+		if is_instance_valid(node) and node is Node3D:
+			if "visible" in node and not node.visible:
+				continue
+			if node is BossComponentDelegate and node.boss_node:
+				var comp_name = node.component_name
+				if "hp_" + comp_name in node.boss_node and node.boss_node.get("hp_" + comp_name) <= 0:
+					continue
 			boss_candidates.append(node)
 			
 	var best_target: Node3D = null
@@ -256,10 +264,8 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 	
 	var ball = proj_scene.instantiate() as Area3D
 	if ball:
-		world_container.add_child(ball)
 		var spawn_pos = muzzle_point.global_position
-		spawn_pos.y = max(0.38, spawn_pos.y)
-		ball.global_position = spawn_pos
+		spawn_pos.y = max(0.48, spawn_pos.y)
 		
 		# Mark projectile as fired from BowMount for boss weakpoint checks
 		var socket_name = get_parent().name.to_lower() if get_parent() else ""
@@ -282,8 +288,12 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 				# Aft / Stern mortar fires backward (+Z)
 				proj_dir = Vector3(0, 0, 1).rotated(Vector3.UP, spread).normalized()
 			else:
-				# Forward bow chaser / main cannon fires forward (-Z)
+				# Forward bow chasers / fleet cannons always fire straight forward in the same direction
 				proj_dir = Vector3(0, 0, -1).rotated(Vector3.UP, spread).normalized()
+		
+		world_container.add_child(ball)
+		ball.top_level = true
+		ball.global_position = spawn_pos
 		
 		if ball.has_method("setup"):
 			ball.setup(proj_dir, weapon_data.default_ammo)
@@ -291,6 +301,15 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 		var player = get_tree().get_first_node_in_group("player")
 		if player and "base_damage_bonus" in player and "damage" in ball:
 			ball.damage += player.base_damage_bonus
+			
+		if GameState.boss_spawned:
+			print("[WEAPON FIRE] %s (Socket: %s) fired at %s | Dir: %s | Target: %s" % [
+				weapon_data.weapon_name,
+				socket_name,
+				ball.global_position,
+				proj_dir,
+				current_target.name if (current_target and is_instance_valid(current_target)) else "none"
+			])
 
 func _trigger_throw_anim() -> void:
 	if not sprite_3d:

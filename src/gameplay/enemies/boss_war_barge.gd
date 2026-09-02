@@ -3,26 +3,19 @@ extends Node3D
 
 enum State { APPROACHING, COMBAT, DYING }
 
-@export var max_hp: int = 340 # Left Outrigger: 55, Right Outrigger: 55, Main Core: 230
-@export var current_hp: int = 340
+@export var max_hp: int = 220
+@export var current_hp: int = 220
 
 @export var approach_speed: float = 12.0
 @export var combat_z_offset: float = -18.0
 @export var weave_speed: float = 1.3
 @export var patrol_width: float = 3.4
 
-# Component HP
-var hp_left_cannon: int = 20
-var hp_right_cannon: int = 20
-var hp_left_armor: int = 55  # Left Outrigger
-var hp_right_armor: int = 55 # Right Outrigger
-var hp_boiler: int = 230     # Main Core
 var combat_time: float = 0.0
 var enraged_shoot_timer: float = 0.0
 var minion_timer: float = 0.0
 var keg_timer: float = 0.0
 var mortar_timer: float = 0.0
-
 
 # Prefabs
 @export var enemy_cannonball_scene: PackedScene = preload("res://src/gameplay/projectiles/enemy_cannonball.tscn")
@@ -34,10 +27,9 @@ var mortar_timer: float = 0.0
 
 @onready var left_cannon_node: Node3D = $LeftCannon
 @onready var right_cannon_node: Node3D = $RightCannon
-@onready var left_armor_node: Node3D = $LeftArmor
-@onready var right_armor_node: Node3D = $RightArmor
 @onready var boiler_node: Node3D = $BoilerCore
 @onready var boss_sprite: Sprite3D = $BossSprite
+@onready var hit_box: Area3D = $HitBox
 
 # State variables
 var current_state: State = State.APPROACHING
@@ -74,12 +66,9 @@ func _ready() -> void:
 	GameState.boss_spawned_event.emit("Captain Ironjaw's War-Barge", max_hp)
 	GameState.boss_health_changed.emit(current_hp, max_hp)
 	
-	# Position cannons relative to ship
 	if left_cannon_node: left_cannon_node.position = Vector3(-2.0, 0.5, 0.5)
 	if right_cannon_node: right_cannon_node.position = Vector3(2.0, 0.5, 0.5)
-	if left_armor_node: left_armor_node.position = Vector3(-1.0, 0.4, -0.6)
-	if right_armor_node: right_armor_node.position = Vector3(1.0, 0.4, -0.6)
-	if boiler_node: boiler_node.position = Vector3(0.0, 0.6, -0.2)
+	if boiler_node: boiler_node.position = Vector3(0.0, 0.6, 0.0)
 
 func _physics_process(delta: float) -> void:
 	if _is_defeated or current_state == State.DYING:
@@ -114,19 +103,9 @@ func _process_combat(delta: float) -> void:
 	else:
 		_process_ram_charge(delta)
 		
-	# Continuous Mob & Hazard pressure — Skiffs every 6.5s
-	minion_timer += delta
-	if minion_timer >= 6.5:
-		minion_timer = 0.0
-		_deploy_side_minions()
-		
-	keg_timer += delta
-	if keg_timer >= 6.0:
-		keg_timer = 0.0
-		_deploy_center_kegs()
-		
+	# Targeted mortar pressure
 	mortar_timer += delta
-	if mortar_timer >= 9.0:
+	if mortar_timer >= 12.0:
 		mortar_timer = 0.0
 		_fire_targeted_mortar()
 		
@@ -327,21 +306,8 @@ func _process_phase_3(delta: float) -> void:
 
 # Actions
 func _fire_cannon_volley() -> void:
-	var shoot_node: Node3D = null
-	if _is_left_turn and hp_left_cannon > 0:
-		shoot_node = left_cannon_node
-		_is_left_turn = false
-	elif not _is_left_turn and hp_right_cannon > 0:
-		shoot_node = right_cannon_node
-		_is_left_turn = true
-	else:
-		# Fallback to whatever is alive
-		if hp_left_cannon > 0:
-			shoot_node = left_cannon_node
-		elif hp_right_cannon > 0:
-			shoot_node = right_cannon_node
-			
-	_is_left_turn = !(_is_left_turn) # Alternate anyway
+	var shoot_node: Node3D = left_cannon_node if _is_left_turn else right_cannon_node
+	_is_left_turn = !(_is_left_turn) # Alternate sides
 	
 	if shoot_node and is_instance_valid(shoot_node) and enemy_cannonball_scene:
 		AudioManager.play_sfx("cannon_shots")
@@ -360,7 +326,8 @@ func _drop_keg() -> void:
 			parent.add_child(keg)
 			keg.global_position = Vector3(global_position.x, 0.4, global_position.z + 3.0)
 			if "forward_speed" in keg:
-				keg.forward_speed = 8.0
+				keg.forward_speed = 5.0
+			print("[BOSS SPAWN] Powder Keg launched at %s | Speed: 5.0" % keg.global_position)
 
 func _eject_mine() -> void:
 	if sea_mine_scene:
@@ -368,9 +335,11 @@ func _eject_mine() -> void:
 		var parent = get_parent()
 		if parent:
 			parent.add_child(mine)
-			# Drop on left, center or right randomly
 			var offset_x = randf_range(-2.5, 2.5)
 			mine.global_position = Vector3(global_position.x + offset_x, 0.3, global_position.z + 3.0)
+			if "forward_speed" in mine:
+				mine.forward_speed = 4.0
+			print("[BOSS SPAWN] Spiked Sea Mine ejected at %s | Speed: 4.0" % mine.global_position)
 
 # Steam Venting
 func _start_steam_venting() -> void:
@@ -408,9 +377,7 @@ func _start_ram_charge() -> void:
 	# Flash red indicators
 	if is_instance_valid(boss_sprite):
 		var tween = create_tween()
-		tween.tween_property(boss_sprite, "modulate", Color(4.0, 0.2, 0.2, 1.0), 0.15)
-		tween.tween_property(boss_sprite, "modulate", Color.WHITE, 0.15)
-		tween.tween_property(boss_sprite, "modulate", Color(4.0, 0.2, 0.2, 1.0), 0.15)
+		tween.tween_property(boss_sprite, "modulate", Color(3.0, 0.3, 0.3, 1.0), 0.1)
 		tween.tween_property(boss_sprite, "modulate", Color.WHITE, 0.15)
 
 func _process_ram_charge(delta: float) -> void:
@@ -418,22 +385,17 @@ func _process_ram_charge(delta: float) -> void:
 	var player_z = player.global_position.z if player else 0.0
 	
 	if charge_direction == 1:
-		# Move forward rapidly
-		global_position.z = move_toward(global_position.z, player_z - 3.5, 20.0 * delta)
-		
-		# Check player hit
-		if abs(global_position.z - (player_z - 3.5)) < 0.6:
-			# Hit! Damage player
-			if player and "current_health" in player:
-				player.current_health -= 1
-				player.health_changed.emit(player.current_health, player.max_health)
-				if player.current_health <= 0 and player.has_method("game_over"):
-					player.game_over(false)
-				AudioManager.play_sfx("barrel_breaks")
+		# Surge forward to 9.5m in front of player
+		global_position.z = move_toward(global_position.z, player_z - 9.5, 16.0 * delta)
+		if global_position.z >= player_z - 9.8:
 			charge_direction = -1 # Retreat
+			AudioManager.play_sfx("barrel_breaks")
+			if player and abs(player.global_position.x - global_position.x) < 2.5:
+				if player.has_method("take_hit"):
+					player.take_hit(1)
 	else:
-		# Retreating back
-		global_position.z = move_toward(global_position.z, _target_z, 8.0 * delta)
+		# Retreat back to combat offset
+		global_position.z = move_toward(global_position.z, _target_z, 10.0 * delta)
 		if abs(global_position.z - _target_z) < 0.5:
 			is_charging = false
 			ram_timer = 0.0
@@ -441,90 +403,23 @@ func _process_ram_charge(delta: float) -> void:
 func take_damage(amount: int) -> void:
 	if _is_defeated:
 		return
-	if hp_left_armor > 0:
-		damage_component("left_armor", amount, false)
-	elif hp_right_armor > 0:
-		damage_component("right_armor", amount, false)
-	else:
-		damage_component("boiler_core", amount, false)
-
-# Damage routing
-func damage_component(comp_name: String, amount: int, from_bow: bool) -> void:
-	if _is_defeated:
-		return
 		
-	match comp_name:
-		"left_cannon":
-			if hp_left_cannon > 0:
-				hp_left_cannon = max(0, hp_left_cannon - amount)
-				_flash_node(left_cannon_node)
-				if hp_left_cannon <= 0:
-					_destroy_subcomponent(left_cannon_node)
-					
-		"right_cannon":
-			if hp_right_cannon > 0:
-				hp_right_cannon = max(0, hp_right_cannon - amount)
-				_flash_node(right_cannon_node)
-				if hp_right_cannon <= 0:
-					_destroy_subcomponent(right_cannon_node)
-					
-		"left_armor":
-			if hp_left_armor > 0:
-				hp_left_armor = max(0, hp_left_armor - amount)
-				_flash_node(left_armor_node)
-				current_hp = max(0, current_hp - amount)
-				GameState.boss_health_changed.emit(current_hp, max_hp)
-				if hp_left_armor <= 0:
-					_destroy_subcomponent(left_armor_node)
-					_check_phase_transition()
-				_flash_boss_main()
-					
-		"right_armor":
-			if hp_right_armor > 0:
-				hp_right_armor = max(0, hp_right_armor - amount)
-				_flash_node(right_armor_node)
-				current_hp = max(0, current_hp - amount)
-				GameState.boss_health_changed.emit(current_hp, max_hp)
-				if hp_right_armor <= 0:
-					_destroy_subcomponent(right_armor_node)
-					_check_phase_transition()
-				_flash_boss_main()
-					
-		"boiler_core":
-			var actual_damage = amount
-			# Full damage if outriggers are down, or 60% chip damage if outriggers are still alive
-			if hp_left_armor > 0 or hp_right_armor > 0:
-				actual_damage = max(1, int(amount * 0.6))
-				AudioManager.play_sfx("barrel_hits")
-				
-			if is_venting_steam and from_bow:
-				actual_damage *= 2 # Crit!
-				_show_crit_flash()
-				
-			hp_boiler = max(0, hp_boiler - actual_damage)
-			current_hp = max(0, current_hp - actual_damage)
-			GameState.boss_health_changed.emit(current_hp, max_hp)
-			_flash_node(boiler_node)
-			_flash_boss_main()
-			
-			if hp_boiler <= 0 or current_hp <= 0:
-				boss_defeat()
-			else:
-				_check_phase_transition()
-
-func _flash_node(node: Variant) -> void:
-	if not is_instance_valid(node) or not (node is Node3D):
-		return
-	if _flash_tweens.has(node) and is_instance_valid(_flash_tweens[node]) and _flash_tweens[node].is_valid():
-		_flash_tweens[node].kill()
+	var actual_damage = amount
+	if is_venting_steam:
+		actual_damage *= 2 # Critical hit during steam venting!
+		_show_crit_flash()
 		
-	var orig_scale = node.scale
-	var tween = create_tween()
-	_flash_tweens[node] = tween
+	current_hp = max(0, current_hp - actual_damage)
+	GameState.boss_health_changed.emit(current_hp, max_hp)
+	_flash_boss_main()
 	
-	# Scale punch
-	tween.tween_property(node, "scale", orig_scale * 1.25, 0.05)
-	tween.tween_property(node, "scale", orig_scale, 0.08)
+	if current_hp <= 0:
+		boss_defeat()
+	else:
+		_check_phase_transition()
+
+func damage_component(_comp_name: String, amount: int, _from_bow: bool) -> void:
+	take_damage(amount)
 
 func _flash_boss_main() -> void:
 	if not is_instance_valid(boss_sprite):
@@ -544,32 +439,11 @@ func _show_crit_flash() -> void:
 	tween.tween_property(boss_sprite, "modulate", Color(1.0, 1.0, 3.0, 1.0), 0.05) # Blue flash for crit
 	tween.tween_property(boss_sprite, "modulate", Color.WHITE, 0.15)
 
-func _destroy_subcomponent(node: Variant) -> void:
-	if not is_instance_valid(node):
-		return
-	AudioManager.play_sfx("barrel_breaks")
-	if explosion_scene and (node is Node3D):
-		var vfx = explosion_scene.instantiate() as Node3D
-		var parent = get_parent() if get_parent() else get_tree().current_scene
-		if parent:
-			parent.add_child(vfx)
-			vfx.global_position = node.global_position
-	if is_instance_valid(node) and "visible" in node:
-		node.visible = false
-	# Disable collisions on the sub-component
-	if is_instance_valid(node) and node is Area3D:
-		node.set_deferred("monitoring", false)
-		node.set_deferred("monitorable", false)
-		for col in node.get_children():
-			if is_instance_valid(col) and col is CollisionShape3D:
-				col.set_deferred("disabled", true)
-
 func _check_phase_transition() -> void:
 	if current_phase == 1 and current_hp <= int(max_hp * 0.68):
 		_transition_to_phase_2()
 	elif current_phase == 2 and current_hp <= int(max_hp * 0.32):
 		_transition_to_phase_3()
-
 
 func _transition_to_phase_2() -> void:
 	current_phase = 2
@@ -598,6 +472,9 @@ func _spawn_minion_skiff(x_norm: float) -> void:
 			parent.add_child(skiff)
 			if skiff.has_method("apply_enemy_data"):
 				skiff.apply_enemy_data(skiff_data)
+			skiff.max_hp = 6
+			skiff.current_hp = 6
+			skiff.forward_speed = 3.5 # Move downstream towards player
 			
 			var river_width = 12.0
 			var player = get_tree().get_first_node_in_group("player")
@@ -615,12 +492,9 @@ func boss_defeat() -> void:
 	
 	GameState.targets_destroyed += 1
 	
-	# Deactivate remaining components safely
-	if is_instance_valid(left_cannon_node): left_cannon_node.visible = false
-	if is_instance_valid(right_cannon_node): right_cannon_node.visible = false
-	if is_instance_valid(left_armor_node): left_armor_node.visible = false
-	if is_instance_valid(right_armor_node): right_armor_node.visible = false
-	if is_instance_valid(boiler_node): boiler_node.visible = false
+	if is_instance_valid(hit_box):
+		hit_box.set_deferred("monitoring", false)
+		hit_box.set_deferred("monitorable", false)
 	
 	# Explode dramatically
 	var tween = create_tween()
@@ -646,7 +520,6 @@ func boss_defeat() -> void:
 		GameState.level_completed.emit(GameState.doubloons, GameState.targets_destroyed)
 		queue_free()
 	)
-
 
 func _spawn_hull_explosion() -> void:
 	if explosion_scene:

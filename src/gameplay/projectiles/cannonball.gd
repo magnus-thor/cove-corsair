@@ -5,7 +5,7 @@ extends Area3D
 @export var speed: float = 50.0
 
 ## Total time the cannonball remains active before self-destruction
-@export var lifetime: float = 3.0
+@export var lifetime: float = 5.0
 
 ## Base damage dealt to obstacles
 @export var damage: int = 1
@@ -36,21 +36,47 @@ func setup(p_direction: Vector3, p_ammo_data: AmmoData) -> void:
 			scale = Vector3.ONE * ammo_data.scale_multiplier
 
 func _ready() -> void:
+	top_level = true
 	add_to_group("cannonballs")
-	area_entered.connect(_on_hit)
-	body_entered.connect(_on_hit)
+	monitoring = false
+	monitorable = false
 	damage = ammo_data.damage if ammo_data else 1
 	_apply_visual_styling()
 	if ammo_data:
 		_apply_ammo_data()
+	call_deferred("_enable_collisions")
+
+func _enable_collisions() -> void:
+	if not _is_destroyed and is_inside_tree():
+		monitoring = true
+		monitorable = true
+		area_entered.connect(_on_hit)
+		body_entered.connect(_on_hit)
+
+static var _flare_texture_cache: GradientTexture2D = null
+
+static func _get_flare_texture() -> GradientTexture2D:
+	if not _flare_texture_cache:
+		var grad = Gradient.new()
+		grad.colors = PackedColorArray([Color(1.0, 1.0, 0.85, 1.0), Color(1.0, 0.65, 0.15, 0.8), Color(1.0, 0.3, 0.0, 0.0)])
+		grad.offsets = PackedFloat32Array([0.0, 0.35, 1.0])
+		var tex = GradientTexture2D.new()
+		tex.gradient = grad
+		tex.fill = GradientTexture2D.FILL_RADIAL
+		tex.fill_from = Vector2(0.5, 0.5)
+		tex.fill_to = Vector2(0.5, 0.0)
+		tex.width = 64
+		tex.height = 64
+		_flare_texture_cache = tex
+	return _flare_texture_cache
 
 func _apply_visual_styling() -> void:
 	var model = get_node_or_null("CannonBallModel")
 	if model:
 		var mat = StandardMaterial3D.new()
-		mat.albedo_color = Color(0.24, 0.24, 0.27) # Sleek polished dark cast iron
+		mat.albedo_color = Color(0.18, 0.18, 0.20) # Authentic dark cast iron
 		mat.metallic = 0.95
-		mat.roughness = 0.18
+		mat.roughness = 0.25
 		mat.emission_enabled = false
 		if model is MeshInstance3D:
 			model.material_override = mat
@@ -68,8 +94,8 @@ func _apply_ammo_data() -> void:
 	if ammo_data.splash_radius > 0.0:
 		splash_radius_multiplier = ammo_data.splash_radius / 2.5
 	
-	if ammo_data.scale_multiplier != 1.0:
-		scale = Vector3.ONE * ammo_data.scale_multiplier
+	var base_sc = ammo_data.scale_multiplier if ammo_data.scale_multiplier > 0.0 else 1.0
+	scale = Vector3.ONE * (base_sc * 1.25)
 		
 	var model = get_node_or_null("CannonBallModel")
 	var flare = get_node_or_null("TracerFlare") as Sprite3D
@@ -78,11 +104,12 @@ func _apply_ammo_data() -> void:
 		"Coconut Bomb":
 			if model:
 				var mat = StandardMaterial3D.new()
-				mat.albedo_color = Color(0.38, 0.22, 0.12) # Textured coconut husk brown
+				mat.albedo_color = Color(0.42, 0.25, 0.12) # Textured coconut husk brown
 				mat.roughness = 0.85
 				mat.metallic = 0.05
 				mat.emission_enabled = true
-				mat.emission = Color(0.15, 0.25, 0.05) # Organic jungle green tint
+				mat.emission = Color(0.2, 0.35, 0.08) # Jungle green accent
+				mat.emission_energy_multiplier = 0.9
 				if model is MeshInstance3D:
 					model.material_override = mat
 				else:
@@ -95,12 +122,12 @@ func _apply_ammo_data() -> void:
 		"Fire Bomb":
 			if model:
 				var mat = StandardMaterial3D.new()
-				mat.albedo_color = Color(1.0, 0.25, 0.05) # Blazing fire sphere
-				mat.roughness = 0.3
+				mat.albedo_color = Color(1.0, 0.28, 0.05) # Blazing fire sphere
+				mat.roughness = 0.25
 				mat.metallic = 0.1
 				mat.emission_enabled = true
-				mat.emission = Color(3.0, 1.1, 0.2) # High intensity fire glow
-				mat.emission_energy_multiplier = 1.6
+				mat.emission = Color(3.5, 1.2, 0.2) # High intensity fire glow
+				mat.emission_energy_multiplier = 1.8
 				if model is MeshInstance3D:
 					model.material_override = mat
 				else:
@@ -111,20 +138,22 @@ func _apply_ammo_data() -> void:
 				flare = Sprite3D.new()
 				flare.name = "TracerFlare"
 				flare.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-				flare.pixel_size = 0.005
-				flare.modulate = Color(3.0, 1.2, 0.2, 0.9)
+				flare.texture = _get_flare_texture()
+				flare.pixel_size = 0.012
+				flare.modulate = Color(4.0, 1.4, 0.2, 0.95)
 				add_child(flare)
 			else:
 				flare.visible = true
-				flare.modulate = Color(3.0, 1.2, 0.2, 0.9)
+				flare.texture = _get_flare_texture()
+				flare.modulate = Color(4.0, 1.4, 0.2, 0.95)
 				
 		_:
-			# Standard vessel cannonball (sleek dark iron)
+			# Standard vessel cannonball (pure authentic dark cast iron, no yellow)
 			if model:
 				var mat = StandardMaterial3D.new()
-				mat.albedo_color = Color(0.22, 0.22, 0.26) # Authentic cast-iron
+				mat.albedo_color = Color(0.18, 0.18, 0.20) # Pure dark cast iron
 				mat.metallic = 0.95
-				mat.roughness = 0.2
+				mat.roughness = 0.25
 				mat.emission_enabled = false
 				if model is MeshInstance3D:
 					model.material_override = mat
@@ -164,15 +193,21 @@ func _physics_process(delta: float) -> void:
 		_is_destroyed = true
 		set_deferred("monitoring", false)
 		set_deferred("monitorable", false)
+		if GameState.boss_spawned:
+			print("[CANNON EXPIRED] %s lifetime ended at %s" % [name, global_position])
 		AudioManager.play_sfx("water_splashes")
 		_spawn_splash()
 		queue_free()
 
 func _on_hit(target: Node) -> void:
-	if _is_destroyed:
+	if _is_destroyed or not target or not is_instance_valid(target):
 		return
 		
-	if target.is_in_group("destructible") or target.is_in_group("enemies") or target.has_method("take_damage"):
+	# Ignore player, followers, other cannonballs, and non-combat items
+	if target.is_in_group("player") or target.is_in_group("follower") or target.is_in_group("cannonballs") or target.is_in_group("collectibles") or target.is_in_group("multiplier_gate"):
+		return
+		
+	if target.is_in_group("destructible") or target.is_in_group("enemies") or target.is_in_group("boss") or target.has_method("take_damage"):
 		_is_destroyed = true
 		set_deferred("monitoring", false)
 		set_deferred("monitorable", false)
@@ -180,6 +215,17 @@ func _on_hit(target: Node) -> void:
 			if child is CollisionShape3D:
 				child.set_deferred("disabled", true)
 				
+		var target_pos = (target as Node3D).global_position if target is Node3D else Vector3.ZERO
+		if GameState.boss_spawned:
+			print("[CANNON HIT] %s HIT %s (groups: %s, pos: %s) at ball pos: %s | Dmg: %d" % [
+				name,
+				target.name,
+				target.get_groups(),
+				target_pos,
+				global_position,
+				damage
+			])
+		
 		AudioManager.play_sfx("barrel_hits")
 		if target.has_method("take_damage"):
 			target.take_damage(damage)
