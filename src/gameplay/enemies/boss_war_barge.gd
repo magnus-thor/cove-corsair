@@ -431,6 +431,7 @@ func take_damage(amount: int) -> void:
 		_show_crit_flash()
 		
 	current_hp = max(0, current_hp - actual_damage)
+	print("[BOSS HIT] Captain Ironjaw's War-Barge took %d damage | HP: %d/%d" % [actual_damage, current_hp, max_hp])
 	GameState.boss_health_changed.emit(current_hp, max_hp)
 	_flash_boss_main()
 	

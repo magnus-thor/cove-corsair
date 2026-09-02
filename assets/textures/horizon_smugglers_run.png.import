@@ -2,12 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://lp174giw1lr0"
-valid=false
+uid="uid://c0tbeunp2nalb"
+path="res://.godot/imported/horizon_smugglers_run.png-8dab0929274627d9bf04c3715d9ee7b1.ctex"
+metadata={
+"vram_texture": false
+}
 
 [deps]
 
 source_file="res://assets/textures/horizon_smugglers_run.png"
+dest_files=["res://.godot/imported/horizon_smugglers_run.png-8dab0929274627d9bf04c3715d9ee7b1.ctex"]
 
 [params]
 

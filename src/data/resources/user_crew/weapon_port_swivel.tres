@@ -1,14 +1,17 @@
-[gd_resource type="Resource" script_class="WeaponData" format=3 uid="uid://jbho3tdbg8i5"]
+[gd_resource type="Resource" script_class="WeaponData" load_steps=5 format=3 uid="uid://jbho3tdbg8i5"]
 
 [ext_resource type="Script" uid="uid://dkuo2x5fcb3xe" path="res://src/data/weapon_data.gd" id="1_script"]
 [ext_resource type="Resource" path="res://src/data/resources/user_ammo/ammo_grape_shot.tres" id="2_ammo"]
-[ext_resource type="Texture2D" uid="uid://cb8v0q7oxp4oj" path="res://assets/sprites/weapon_port_swivel.png" id="3_qpe3g"]
+[ext_resource type="Resource" path="res://src/data/resources/user_ammo/ammo_standard_ball.tres" id="3_ammo_ball"]
+[ext_resource type="Texture2D" uid="uid://cb8v0q7oxp4oj" path="res://assets/sprites/weapon_port_swivel.png" id="4_tex"]
 
 [resource]
 script = ExtResource("1_script")
 weapon_name = "Port Swivel"
 weapon_type = "swivel_gun"
-sprite_texture = ExtResource("3_qpe3g")
+sprite_texture = ExtResource("4_tex")
+pixel_size = 0.005
 fire_rate = 0.2
-spread_angle_deg = -7.0
+spread_angle_deg = -6.0
 default_ammo = ExtResource("2_ammo")
+compatible_ammo = Array[Resource]([ExtResource("2_ammo"), ExtResource("3_ammo_ball")])

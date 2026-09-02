@@ -58,11 +58,14 @@ func _select_level(lvl: int) -> void:
 	if level_ctrl and is_instance_valid(level_ctrl):
 		var res = GameState.get_current_level_resource()
 		if res:
-			level_ctrl.level_data = res
-			level_ctrl.current_distance = 0.0
-			level_ctrl.active_queue = res.wave_events.duplicate()
-			level_ctrl.active_queue.sort_custom(func(a, b): return a.distance < b.distance)
-			level_ctrl._apply_biome_visuals()
+			if level_ctrl.has_method("load_level_resource"):
+				level_ctrl.load_level_resource(res)
+			else:
+				level_ctrl.level_data = res
+				level_ctrl.current_distance = 0.0
+				if level_ctrl.has_method("setup_active_queue"):
+					level_ctrl.setup_active_queue()
+				level_ctrl._apply_biome_visuals()
 			
 	var hud = get_tree().get_first_node_in_group("top_hud")
 	if hud and "level_title" in hud and hud.level_title:

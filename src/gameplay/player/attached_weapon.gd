@@ -31,6 +31,15 @@ func setup_weapon(data: WeaponData) -> void:
 	if is_node_ready():
 		_apply_weapon_data()
 
+func _is_crew() -> bool:
+	if not weapon_data:
+		return false
+	if weapon_data is CrewData or (weapon_data.has_method("is_crew_member") and weapon_data.is_crew_member()):
+		return true
+	var w_type = weapon_data.weapon_type.to_lower()
+	var w_name = weapon_data.weapon_name.to_lower()
+	return (w_type == "crew_thrower" or w_type == "crew_musket" or "crew" in w_name or "monkey" in w_name or "skeleton" in w_name)
+
 func _apply_weapon_data() -> void:
 	if not weapon_data:
 		return
@@ -40,8 +49,7 @@ func _apply_weapon_data() -> void:
 		
 		var w_name = weapon_data.weapon_name.to_lower()
 		var w_type = weapon_data.weapon_type.to_lower()
-		
-		var is_crew = (w_type == "crew_thrower" or w_type == "crew_musket" or "crew" in w_name or "monkey" in w_name or "skeleton" in w_name)
+		var is_crew = _is_crew()
 		
 		if is_crew:
 			sprite_3d.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
@@ -121,9 +129,7 @@ func _physics_process(delta: float) -> void:
 	if not weapon_data:
 		return
 		
-	var w_type = weapon_data.weapon_type.to_lower()
-	var w_name = weapon_data.weapon_name.to_lower()
-	var is_crew = (w_type == "crew_thrower" or w_type == "crew_musket" or "crew" in w_name or "monkey" in w_name or "skeleton" in w_name)
+	var is_crew = _is_crew()
 	
 	if is_crew:
 		_process_deck_idle(delta)
@@ -160,29 +166,26 @@ func _process_targeting(delta: float) -> void:
 	var player = get_tree().get_first_node_in_group("player")
 	var boat_z = player.global_position.z if (player and is_instance_valid(player)) else global_position.z
 	
-	# Priority 1: Active enemy mobs, spawns, minion skiffs, and destructible obstacles
+	# Priority 1: Active enemy mobs, hazards, and destructibles
 	var spawn_candidates: Array[Node] = []
-	for grp in ["enemies", "destructible_obstacles", "destructible", "obstacles"]:
+	for grp in ["enemies", "hazards", "destructible", "destructible_obstacles", "obstacles"]:
 		for node in get_tree().get_nodes_in_group(grp):
 			if is_instance_valid(node) and not node.is_in_group("boss") and not (node is BossWarBarge) and not (node is BossComponentDelegate):
 				spawn_candidates.append(node)
 				
-	# Priority 2: Boss components
-	var boss_candidates: Array[Node] = []
-	for node in get_tree().get_nodes_in_group("boss"):
-		if is_instance_valid(node) and node is Node3D:
-			if "visible" in node and not node.visible:
-				continue
-			if node is BossComponentDelegate and node.boss_node:
-				var comp_name = node.component_name
-				if "hp_" + comp_name in node.boss_node and node.boss_node.get("hp_" + comp_name) <= 0:
-					continue
-			boss_candidates.append(node)
-			
+	# Check other crew targets to avoid redundant targeting
+	var claimed_targets: Dictionary = {}
+	if player and "equipped_weapons" in player:
+		for w in player.equipped_weapons.values():
+			if is_instance_valid(w) and w != self and "current_target" in w and is_instance_valid(w.current_target):
+				claimed_targets[w.current_target] = true
+
 	var best_target: Node3D = null
+	var best_unclaimed: Node3D = null
 	var min_dist = INF
-	
-	# Try priority spawns first
+	var min_unclaimed_dist = INF
+	var max_range = weapon_data.detection_range if ("detection_range" in weapon_data and weapon_data.detection_range > 0.0) else 32.0
+
 	var processed: Dictionary = {}
 	for target in spawn_candidates:
 		if not is_instance_valid(target) or not target is Node3D or processed.has(target):
@@ -194,12 +197,29 @@ func _process_targeting(delta: float) -> void:
 			continue
 			
 		var dist = global_position.distance_to(node3d.global_position)
-		if dist <= 24.0 and dist < min_dist:
-			min_dist = dist
-			best_target = node3d
+		if dist <= max_range:
+			if dist < min_dist:
+				min_dist = dist
+				best_target = node3d
+			if not claimed_targets.has(node3d) and dist < min_unclaimed_dist:
+				min_unclaimed_dist = dist
+				best_unclaimed = node3d
+				
+	best_target = best_unclaimed if best_unclaimed else best_target
 			
 	# If no spawns or threats are alive, fallback to targeting the boss
 	if not best_target:
+		var boss_candidates: Array[Node] = []
+		for node in get_tree().get_nodes_in_group("boss"):
+			if is_instance_valid(node) and node is Node3D:
+				if "visible" in node and not node.visible:
+					continue
+				if node is BossComponentDelegate and node.boss_node:
+					var comp_name = node.component_name
+					if "hp_" + comp_name in node.boss_node and node.boss_node.get("hp_" + comp_name) <= 0:
+						continue
+				boss_candidates.append(node)
+
 		processed.clear()
 		min_dist = INF
 		for target in boss_candidates:
@@ -212,7 +232,7 @@ func _process_targeting(delta: float) -> void:
 				continue
 				
 			var dist = global_position.distance_to(node3d.global_position)
-			if dist <= 26.0 and dist < min_dist:
+			if dist <= 28.0 and dist < min_dist:
 				min_dist = dist
 				best_target = node3d
 			
@@ -253,9 +273,7 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 	if not weapon_data or not proj_scene or not world_container or not muzzle_point:
 		return
 		
-	var w_type = weapon_data.weapon_type.to_lower()
-	var w_name = weapon_data.weapon_name.to_lower()
-	var is_crew = (w_type == "crew_thrower" or w_type == "crew_musket" or "crew" in w_name or "monkey" in w_name or "skeleton" in w_name)
+	var is_crew = _is_crew()
 	
 	if is_crew:
 		_trigger_throw_anim()
@@ -276,19 +294,11 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 		if is_crew:
 			proj_dir = aim_direction if aim_direction != Vector3.ZERO else Vector3(0, 0, -1)
 		else:
-			# Each weapon controls its own firing vector relative to the ship (unaffected by socket sprite rotation)
-			var spread = deg_to_rad(weapon_data.spread_angle_deg)
-			if "port" in socket_name or "port" in w_name:
-				# Port swivel guns fire angled to the port side (-35 deg from forward)
-				proj_dir = Vector3(0, 0, -1).rotated(Vector3.UP, deg_to_rad(-35.0) + spread).normalized()
-			elif "starboard" in socket_name or "starboard" in w_name:
-				# Starboard swivel guns fire angled to the starboard side (+35 deg from forward)
-				proj_dir = Vector3(0, 0, -1).rotated(Vector3.UP, deg_to_rad(35.0) + spread).normalized()
-			elif "aft" in socket_name or "aft" in w_name or "mortar" in w_name:
-				# Aft / Stern mortar fires backward (+Z)
-				proj_dir = Vector3(0, 0, 1).rotated(Vector3.UP, spread).normalized()
+			# Naval weapons fire forward along the vessel's heading with their calibrated spread angle
+			if weapon_data.has_method("get_firing_direction"):
+				proj_dir = weapon_data.get_firing_direction(Vector3(0, 0, -1))
 			else:
-				# Forward bow chasers / fleet cannons always fire straight forward in the same direction
+				var spread = deg_to_rad(weapon_data.spread_angle_deg)
 				proj_dir = Vector3(0, 0, -1).rotated(Vector3.UP, spread).normalized()
 		
 		world_container.add_child(ball)

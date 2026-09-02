@@ -3,8 +3,8 @@ extends Node3D
 
 enum State { APPROACHING, COMBAT, SUBMERGED, DYING }
 
-@export var max_hp: int = 450
-@export var current_hp: int = 450
+@export var max_hp: int = 750
+@export var current_hp: int = 750
 
 @export var approach_speed: float = 12.0
 @export var combat_z_offset: float = -18.0
@@ -119,8 +119,8 @@ func _fire_poison_mortars() -> void:
 func _telegraph_and_strike_mortar(pos: Vector3) -> void:
 	var marker = MeshInstance3D.new()
 	var disc = CylinderMesh.new()
-	disc.top_radius = 2.0
-	disc.bottom_radius = 2.0
+	disc.top_radius = 1.6
+	disc.bottom_radius = 1.6
 	disc.height = 0.02
 	marker.mesh = disc
 	
@@ -135,7 +135,7 @@ func _telegraph_and_strike_mortar(pos: Vector3) -> void:
 	AudioManager.play_sfx("cannon_shots", 0.8, 1.0)
 	
 	var tween = marker.create_tween()
-	tween.tween_property(mat, "albedo_color:a", 0.8, 0.9)
+	tween.tween_property(mat, "albedo_color:a", 0.8, 1.1)
 	tween.tween_callback(func():
 		_detonate_poison_mortar(marker.global_position)
 		marker.queue_free()
@@ -149,17 +149,17 @@ func _detonate_poison_mortar(pos: Vector3) -> void:
 		var vfx = explosion_scene.instantiate() as Node3D
 		get_tree().current_scene.add_child(vfx)
 		vfx.global_position = pos
-		vfx.scale = Vector3(2.5, 2.5, 2.5)
+		vfx.scale = Vector3(2.0, 2.0, 2.0)
 		vfx.modulate = Color(0.2, 2.0, 0.6, 1.0)
 		
 	var camera = get_tree().get_first_node_in_group("game_camera")
 	if camera and camera.has_method("shake"):
-		camera.shake(0.22, 0.22)
+		camera.shake(0.20, 0.20)
 		
 	var player = get_tree().get_first_node_in_group("player")
 	if player and is_instance_valid(player):
 		var dist = player.global_position.distance_to(pos)
-		if dist <= 2.2 and player.has_method("damage_fleet"):
+		if dist <= 1.7 and player.has_method("damage_fleet"):
 			player.damage_fleet(1)
 
 func _start_submerge() -> void:
@@ -257,6 +257,7 @@ func take_damage(amount: int) -> void:
 		return
 		
 	current_hp = max(0, current_hp - amount)
+	print("[BOSS HIT] The Phantom Dredge took %d damage | HP: %d/%d" % [amount, current_hp, max_hp])
 	GameState.boss_health_changed.emit(current_hp, max_hp)
 	_flash_boss()
 	

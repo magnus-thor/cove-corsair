@@ -20,6 +20,9 @@ var side         : String = "left"
 var chunk_length : float  = 40.0
 var biome        : String = "smugglers_run"
 
+func _ready() -> void:
+	add_to_group("riverbank_chunk")
+
 # ── Public API ────────────────────────────────────────────────────────────────
 
 func setup(p_side: String, p_length: float = 40.0, p_biome: String = "smugglers_run") -> void:

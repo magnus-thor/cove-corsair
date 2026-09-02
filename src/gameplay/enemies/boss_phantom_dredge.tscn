@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://src/gameplay/enemies/boss_phantom_dredge.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://assets/sprites/Ghost Sloop Big.png" id="2_dredge_tex"]
+[ext_resource type="Script" path="res://src/gameplay/enemies/boss_hitbox.gd" id="3_hitbox_script"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_boss"]
 size = Vector3(4.2, 2.5, 5.0)
@@ -16,9 +17,10 @@ alpha_cut = 1
 texture = ExtResource("2_dredge_tex")
 modulate = Color(0.4, 1.2, 0.8, 1)
 
-[node name="HitBox" type="Area3D" parent="." groups=["destructible", "enemies"]]
-collision_layer = 4
-collision_mask = 3
+[node name="HitBox" type="Area3D" parent="." groups=["boss", "destructible", "enemies"]]
+collision_layer = 5
+collision_mask = 7
+script = ExtResource("3_hitbox_script")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="HitBox"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0)

@@ -68,22 +68,8 @@ func _ready() -> void:
 					child.queue_free()
 
 func _on_distance_target_reached() -> void:
-	if GameState.current_level == 1 or is_boss_active:
-		return
-	is_boss_active = true
-	
-	# Spawn Captain Bone-Beard at the top of the track (Z = player_z - 35.0)
-	var player = get_tree().get_first_node_in_group("player")
-	var player_z = player.global_position.z if player else 0.0
-	
-	if boss_scene:
-		var boss = boss_scene.instantiate() as Node3D
-		var parent = get_tree().current_scene
-		if parent:
-			parent.add_child(boss)
-		else:
-			add_child(boss)
-		boss.global_position = Vector3(0.0, 0.0, player_z - 35.0)
+	# LevelController is the authoritative boss spawner across all levels
+	return
 
 func load_level_config(level_num: int) -> void:
 	var path = "res://src/data/level_config.json"

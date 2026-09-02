@@ -11,12 +11,15 @@ extends Node3D
 @export var level_data: LevelData = preload("res://src/data/resources/levels/level_01_smugglers_run.tres")
 @export var spawn_z_ahead: float = -70.0
 
+const SpawnEvent = preload("res://src/data/spawn_event.gd")
+
 # Prefabs
 @export var coin_scene: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
 @export var barrel_scene: PackedScene = preload("res://src/gameplay/obstacles/destructible_barrel.tscn")
 @export var barricade_scene: PackedScene = preload("res://src/gameplay/obstacles/barricade_wall.tscn")
 @export var sea_mine_scene: PackedScene = preload("res://src/gameplay/obstacles/hazard_sea_mine.tscn")
 @export var reinforced_gate_scene: PackedScene = preload("res://src/gameplay/obstacles/reinforced_gate.tscn")
+@export var multiplier_gate_scene: PackedScene = preload("res://src/gameplay/obstacles/multiplier_gate.tscn")
 @export var boss_scene: PackedScene = preload("res://src/gameplay/enemies/boss_war_barge.tscn")
 @export var enemy_mob_scene: PackedScene = preload("res://src/gameplay/enemies/enemy_mob.tscn")
 
@@ -32,7 +35,7 @@ extends Node3D
 @export var bombard_scene: PackedScene = preload("res://src/gameplay/enemies/enemy_mini_boss_bombard.tscn")
 
 var current_distance: float = 0.0
-var active_queue: Array[Dictionary] = []
+var active_queue: Array = []
 var river_width_world: float = 12.0
 var base_scroll_speed: float = 10.0
 var bank_strips: Array[Node3D] = []          # legacy – kept for potential future use
@@ -49,69 +52,99 @@ func _ready() -> void:
 	# Load level according to GameState
 	var active_res = GameState.get_current_level_resource()
 	if active_res:
-		level_data = active_res
+		load_level_resource(active_res)
+
+func setup_active_queue() -> void:
+	active_queue = [] # Guarantee fresh untyped Array
+	if not level_data:
+		return
+	if not level_data.timeline_events.is_empty():
+		for te in level_data.timeline_events:
+			if te != null:
+				active_queue.append(te)
+		active_queue.sort_custom(func(a, b):
+			var da = a.trigger_distance if "trigger_distance" in a else a.get("distance", 0.0)
+			var db = b.trigger_distance if "trigger_distance" in b else b.get("distance", 0.0)
+			return da < db
+		)
+		print("[LEVEL QUEUE] Loaded %d timeline events for %s" % [active_queue.size(), level_data.level_name])
+	elif not level_data.wave_events.is_empty():
+		for we in level_data.wave_events:
+			if we != null:
+				active_queue.append(we)
+		active_queue.sort_custom(func(a, b): return a.distance < b.distance)
+		print("[LEVEL QUEUE] Loaded %d wave events for %s" % [active_queue.size(), level_data.level_name])
+	else:
+		print("[LEVEL QUEUE WARNING] No events found in %s!" % level_data.level_name)
+
+func load_level_resource(res: LevelData) -> void:
+	if not res:
+		return
+	level_data = res
+	current_distance = 0.0
+	is_boss_spawned = false
+	river_width_world = level_data.river_width_world
+	base_scroll_speed = level_data.base_scroll_speed
+	GameState.level_distance_target = level_data.target_distance if level_data.target_distance > 0.0 else level_data.total_distance
+	GameState.distance_traveled = 0.0
+	
+	# Clear only dynamically spawned obstacles/mobs/hazards from previous level previews
+	for child in get_children():
+		if child is Node3D and (child.is_in_group("destructible") or child.is_in_group("hazards") or child.is_in_group("enemies") or child.is_in_group("collectibles") or child.is_in_group("multiplier_gate")):
+			child.queue_free()
+			
+	setup_active_queue()
+	
+	var track_mgr = get_tree().get_first_node_in_group("track_manager")
+	if track_mgr:
+		track_mgr.scroll_speed = base_scroll_speed
+		if "current_level_data" in track_mgr:
+			track_mgr.current_level_data["is_scripted"] = true
+			
+	var hud = get_tree().get_first_node_in_group("top_hud")
+	if hud and "level_title" in hud:
+		hud.level_title.text = level_data.level_name
 		
 	if level_data:
-		river_width_world = level_data.river_width_world
-		base_scroll_speed = level_data.base_scroll_speed
-		
-		# Set up GameState
-		GameState.level_distance_target = level_data.total_distance
-		GameState.distance_traveled = 0.0
-		GameState.is_game_active = true
-		
-		# Copy and sort wave events by distance – deterministic order
-		active_queue = level_data.wave_events.duplicate()
-		active_queue.sort_custom(func(a, b): return a.distance < b.distance)
-		
-		# Configure TrackManager
-		var track_mgr = get_tree().get_first_node_in_group("track_manager")
-		if track_mgr:
-			track_mgr.scroll_speed = base_scroll_speed
-			if "current_level_data" in track_mgr:
-				track_mgr.current_level_data["is_scripted"] = true
-				
-		# Update level title on HUD
-		var hud = get_tree().get_first_node_in_group("top_hud")
-		if hud and "level_title" in hud:
-			hud.level_title.text = level_data.level_name
-
 		var biome_name: String = level_data.biome_type if "biome_type" in level_data else "smugglers_run"
 
 		# ── Layer 1: Horizon Backdrop ────────────────────────────────────────
-		# biome_bank_strip is intentionally NOT spawned here; RiverbankProps
-		# (Layer 2) replaces it with strictly-bounded, shadow-free framing strips.
-		var backdrop_scene := preload("res://src/gameplay/levels/horizon_backdrop.tscn")
-		if backdrop_scene:
-			_horizon_backdrop = backdrop_scene.instantiate()
-			add_child(_horizon_backdrop)
-			_horizon_backdrop.add_to_group("horizon_backdrop")  # exempt from child-scroll loop
-			# Null-checked texture bind – works fine with no texture assigned yet
-			if _horizon_backdrop.has_method("bind_texture"):
-				var htex: Texture2D = level_data.horizon_texture if ("horizon_texture" in level_data and level_data.horizon_texture) else null
-				if not htex:
-					var tex_path := "res://assets/textures/horizon_smugglers_run.png"
-					if ResourceLoader.exists(tex_path):
-						htex = load(tex_path) as Texture2D
-					if not htex and FileAccess.file_exists(tex_path):
-						var img := Image.load_from_file(ProjectSettings.globalize_path(tex_path))
-						if img:
-							htex = ImageTexture.create_from_image(img)
+		if not _horizon_backdrop:
+			var backdrop_scene := preload("res://src/gameplay/levels/horizon_backdrop.tscn")
+			if backdrop_scene:
+				_horizon_backdrop = backdrop_scene.instantiate()
+				add_child(_horizon_backdrop)
+				_horizon_backdrop.add_to_group("horizon_backdrop")  # exempt from child-scroll loop
+		
+		if _horizon_backdrop and _horizon_backdrop.has_method("bind_texture"):
+			var htex: Texture2D = level_data.horizon_texture if ("horizon_texture" in level_data and level_data.horizon_texture) else null
+			if not htex:
+				var tex_path := "res://assets/textures/horizon_smugglers_run.png"
+				if FileAccess.file_exists(tex_path):
+					var img := Image.load_from_file(ProjectSettings.globalize_path(tex_path))
+					if img and not img.is_empty():
+						htex = ImageTexture.create_from_image(img)
+			if htex:
 				_horizon_backdrop.bind_texture(htex)
 
 		# ── Layer 2: Riverbank Framing Strips ────────────────────────────────
-		# 4 chunks per side, pre-warmed at Z = +20, -20, -60, -100 to fill the
-		# full view distance.  Recycled at Z > 40 (same threshold as segments).
-		var props_scene := preload("res://src/gameplay/levels/riverbank_props.tscn")
-		if props_scene:
-			for prop_side in ["left", "right"]:
-				for i in range(4):
-					var chunk := props_scene.instantiate()
-					add_child(chunk)
-					chunk.global_position = Vector3(0.0, 0.0, 20.0 - i * 40.0)
-					if chunk.has_method("setup"):
-						chunk.setup(prop_side, 40.0, biome_name)
-					riverbank_chunks.append(chunk)
+		var valid_chunks = riverbank_chunks.filter(func(c): return is_instance_valid(c))
+		if valid_chunks.is_empty():
+			riverbank_chunks.clear()
+			var props_scene := preload("res://src/gameplay/levels/riverbank_props.tscn")
+			if props_scene:
+				for prop_side in ["left", "right"]:
+					for i in range(4):
+						var chunk := props_scene.instantiate()
+						add_child(chunk)
+						chunk.global_position = Vector3(0.0, 0.0, 20.0 - i * 40.0)
+						if chunk.has_method("setup"):
+							chunk.setup(prop_side, 40.0, biome_name)
+						riverbank_chunks.append(chunk)
+		else:
+			for chunk in valid_chunks:
+				if chunk.has_method("setup"):
+					chunk.setup(chunk.side, chunk.chunk_length, biome_name)
 
 		# Configure Environment Visuals
 		_apply_biome_visuals()
@@ -171,9 +204,17 @@ func _physics_process(delta: float) -> void:
 		GameState.update_distance(speed * delta)
 
 	# ── Deterministic wave event dispatch ─────────────────────────────────────
-	while not active_queue.is_empty() and current_distance >= active_queue[0].distance:
-		var event = active_queue.pop_front()
-		_spawn_wave_event(event)
+	while not active_queue.is_empty():
+		var first = active_queue[0]
+		var dist = first.trigger_distance if "trigger_distance" in first else first.get("distance", 0.0)
+		if current_distance >= dist:
+			var event = active_queue.pop_front()
+			if event is SpawnEvent or "entity_type" in event:
+				_spawn_timeline_event(event)
+			else:
+				_spawn_wave_event(event)
+		else:
+			break
 	# ──────────────────────────────────────────────────────────────────────────
 
 	# Scroll LevelController-owned obstacles/enemies forward
@@ -198,6 +239,90 @@ func _physics_process(delta: float) -> void:
 
 func normalized_to_world_x(norm_x: float) -> float:
 	return norm_x * (river_width_world / 2.0)
+
+func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> void:
+	var z_spawn = spawn_z_ahead if z_pos_override == 0.0 else z_pos_override
+	var x_pos = clampf(event.lane_x, -7.5, 7.5)
+	
+	match event.entity_type:
+		SpawnEvent.EntityType.BARREL:
+			if barrel_scene:
+				var barrel = barrel_scene.instantiate() as Area3D
+				barrel.name = "Barrel_%.1fm_x%.1f" % [current_distance, x_pos]
+				add_child(barrel)
+				barrel.global_position = Vector3(x_pos, 0.05, z_spawn)
+				var hp = event.base_hp_override if event.base_hp_override > 0 else (2 if event.rarity_tier == SpawnEvent.RarityTier.COMMON else (4 if event.rarity_tier == SpawnEvent.RarityTier.NORMAL else 6))
+				barrel.hp = hp
+				var type_name = "WOODEN"
+				if "obstacle_type" in barrel:
+					if event.rarity_tier == SpawnEvent.RarityTier.RARE:
+						barrel.obstacle_type = DestructibleObstacle.ObstacleType.RUNE_BARREL
+						type_name = "RUNE"
+					elif event.rarity_tier == SpawnEvent.RarityTier.NORMAL:
+						barrel.obstacle_type = DestructibleObstacle.ObstacleType.FUSE_BARREL
+						type_name = "FUSE"
+					else:
+						barrel.obstacle_type = DestructibleObstacle.ObstacleType.WOODEN_BARREL
+				print("[SPAWN] Barrel (%s) at dist=%.1fm | lane_x=%.2f | HP=%d" % [type_name, current_distance, x_pos, hp])
+
+		SpawnEvent.EntityType.MOB:
+			if event.rarity_tier == SpawnEvent.RarityTier.ELITE or event.base_hp_override >= 40:
+				if harvester_scene:
+					var harv = harvester_scene.instantiate() as Area3D
+					harv.name = "MiniBossHarvester_%.1fm" % current_distance
+					add_child(harv)
+					harv.global_position = Vector3(x_pos, 0.1, z_spawn)
+					harv.max_hp = event.base_hp_override if event.base_hp_override > 0 else 45
+					harv.current_hp = harv.max_hp
+					print("[SPAWN MOB] Mini-Boss Harvester at dist=%.1fm | lane_x=%.2f | HP=%d" % [current_distance, x_pos, harv.max_hp])
+			elif (event.rarity_tier == SpawnEvent.RarityTier.RARE and event.base_hp_override >= 8) or event.base_hp_override == 8:
+				if tide_cutter_scene:
+					var cutter = tide_cutter_scene.instantiate() as Area3D
+					cutter.name = "TideCutter_%.1fm_x%.1f" % [current_distance, x_pos]
+					add_child(cutter)
+					cutter.global_position = Vector3(x_pos, 0.1, z_spawn)
+					cutter.max_hp = event.base_hp_override if event.base_hp_override > 0 else 8
+					cutter.current_hp = cutter.max_hp
+					cutter.forward_speed = 4.5
+					print("[SPAWN MOB] Tide Cutter at dist=%.1fm | lane_x=%.2f | HP=%d | Speed=4.5" % [current_distance, x_pos, cutter.max_hp])
+			else:
+				if grave_skiff_scene:
+					var skiff = grave_skiff_scene.instantiate() as Area3D
+					skiff.name = "GraveSkiff_%.1fm_x%.1f" % [current_distance, x_pos]
+					add_child(skiff)
+					skiff.global_position = Vector3(x_pos, 0.1, z_spawn)
+					skiff.max_hp = event.base_hp_override if event.base_hp_override > 0 else (6 if event.rarity_tier == SpawnEvent.RarityTier.RARE else 4)
+					skiff.current_hp = skiff.max_hp
+					skiff.forward_speed = 2.4
+					print("[SPAWN MOB] Grave Skiff at dist=%.1fm | lane_x=%.2f | HP=%d | Speed=2.4" % [current_distance, x_pos, skiff.max_hp])
+
+		SpawnEvent.EntityType.MULTIPLIER_GATE:
+			if multiplier_gate_scene:
+				var gate = multiplier_gate_scene.instantiate() as Area3D
+				gate.name = "MultiplierGate_%.1fm" % current_distance
+				add_child(gate)
+				gate.global_position = Vector3(x_pos, 0.0, z_spawn)
+				var text_val = "+%d" % event.gate_value if event.gate_type == SpawnEvent.GateType.FLEET_SUMMON else ("x%d" % event.gate_value)
+				if "value" in gate:
+					gate.value = event.gate_value
+				if "custom_text" in gate:
+					gate.custom_text = text_val
+				if gate.has_method("update_visuals"):
+					gate.update_visuals()
+				print("[SPAWN GATE] Multiplier Gate (%s) at dist=%.1fm | lane_x=%.2f" % [text_val, current_distance, x_pos])
+
+		SpawnEvent.EntityType.HAZARD:
+			if biogas_pod_scene:
+				var pod = biogas_pod_scene.instantiate() as Area3D
+				pod.name = "BiogasPod_%.1fm_x%.1f" % [current_distance, x_pos]
+				add_child(pod)
+				pod.global_position = Vector3(x_pos, 0.05, z_spawn)
+				pod.hp = event.base_hp_override if event.base_hp_override > 0 else 1
+				print("[SPAWN HAZARD] Biogas Pod at dist=%.1fm | lane_x=%.2f | HP=%d" % [current_distance, x_pos, pod.hp])
+
+		SpawnEvent.EntityType.BOSS:
+			print("[SPAWN BOSS TRIGGER] Triggering Boss at dist=%.1fm" % current_distance)
+			_spawn_boss()
 
 # ──────────────────────────────────────────────────────────────────────────────
 # EVENT SPAWNER – purely data-driven, no randomness

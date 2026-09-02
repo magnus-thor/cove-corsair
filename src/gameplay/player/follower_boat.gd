@@ -12,10 +12,28 @@ func _ready() -> void:
 	
 	area_entered.connect(_on_area_entered)
 	
-	# Initialize scale factor based on current fleet size
+	# Match visual sprite and collision shape to player's active vessel
 	var player = get_tree().get_first_node_in_group("player")
+	var sf: float = 1.0
 	if player and player.has_method("get_fleet_scale_factor"):
-		var sf = player.get_fleet_scale_factor(player.follower_boats.size() + 1)
+		sf = player.get_fleet_scale_factor(player.follower_boats.size() + 1)
+		
+	if player and "ship_data" in player and player.ship_data:
+		var sprite = get_node_or_null("Sprite3D") as Sprite3D
+		if sprite and player.ship_data.sprite_texture:
+			sprite.texture = player.ship_data.sprite_texture
+			sprite.pixel_size = player.ship_data.pixel_size
+			var pitch = player.player_pitch_deg if "player_pitch_deg" in player else 60.0
+			sprite.rotation_degrees = Vector3(pitch, 0, 0)
+			sprite.position = Vector3(0, player.ship_data.y_offset if "y_offset" in player.ship_data else 0.485, 0)
+			sprite.scale = Vector3.ONE * sf
+			
+		var col = get_node_or_null("CollisionShape3D") as CollisionShape3D
+		if col and col.shape is BoxShape3D:
+			col.shape.size = player.ship_data.collision_size
+			col.position = Vector3(0, player.ship_data.collision_size.y * 0.5, 0)
+			col.scale = Vector3.ONE * sf
+	else:
 		var sprite = get_node_or_null("Sprite3D") as Sprite3D
 		if sprite:
 			sprite.scale = Vector3.ONE * sf
@@ -31,6 +49,7 @@ func _ready() -> void:
 			else:
 				weapon_instance.weapon_data = weapon_data
 			$BowMount.add_child(weapon_instance)
+			$BowMount.scale = Vector3.ONE * sf
 
 func set_target_offset(offset: Vector3) -> void:
 	target_offset = offset
@@ -38,8 +57,16 @@ func set_target_offset(offset: Vector3) -> void:
 func tween_scale(target_sf: float, duration: float) -> void:
 	var sprite = get_node_or_null("Sprite3D") as Sprite3D
 	if sprite:
-		var t = create_tween()
+		var t = create_tween().set_parallel(true)
 		t.tween_property(sprite, "scale", Vector3.ONE * target_sf, duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	var col = get_node_or_null("CollisionShape3D") as CollisionShape3D
+	if col:
+		var t_col = create_tween()
+		t_col.tween_property(col, "scale", Vector3.ONE * target_sf, duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	var bow = get_node_or_null("BowMount")
+	if bow:
+		var t_bow = create_tween()
+		t_bow.tween_property(bow, "scale", Vector3.ONE * target_sf, duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 func _physics_process(delta: float) -> void:
 	var player = get_tree().get_first_node_in_group("player")

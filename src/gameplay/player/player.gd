@@ -231,7 +231,13 @@ func apply_ship_data(data: ShipData) -> void:
 					var sc = data.hardpoint_scales[s_name]
 					if sc is Vector3:
 						socket.scale = sc
+						
+				# Wipe any existing weapons inside sockets
+				for child in socket.get_children():
+					child.queue_free()
 		
+		equipped_weapons.clear()
+
 	# Initialize active tier to 1 using data.tier_upgrades
 	apply_tier(1)
 		
@@ -459,6 +465,13 @@ func _apply_weapon_tier_setup() -> void:
 			equip_weapon_to_socket("AftMortarMount", aft_weapon)
 
 
+func take_hit(amount: int = 1, source_info: String = "") -> void:
+	current_health = max(0, current_health - amount)
+	print("[PLAYER HIT] User vessel took %d dmg from %s | HP: %d/%d | Fleet: %d" % [amount, source_info, current_health, max_health, follower_boats.size() + 1])
+	health_changed.emit(current_health, max_health)
+	if current_health <= 0:
+		game_over(false)
+
 func _on_area_entered(area: Area3D) -> void:
 	if is_game_over or not GameState.is_game_active:
 		return
@@ -469,13 +482,7 @@ func _on_area_entered(area: Area3D) -> void:
 		
 	if area.is_in_group("destructible") or area.is_in_group("enemies") or area.is_in_group("boss"):
 		AudioManager.play_sfx("barrel_hits")
-		
-		# Decrement player health
-		current_health -= 1
-		health_changed.emit(current_health, max_health)
-		
-		if current_health <= 0:
-			game_over(false)
+		take_hit(1, "Collision with %s (%s)" % [area.name, str(area.get_groups())])
 			
 		if area.is_in_group("boss") or (area.get_parent() and area.get_parent().is_in_group("boss")):
 			if area.has_method("take_damage"):
@@ -694,11 +701,11 @@ func get_fleet_offsets(size: int) -> Array[Vector3]:
 func get_fleet_scale_factor(size: int) -> float:
 	match size:
 		1: return 1.0
-		2: return 0.925
-		3: return 0.85
-		4: return 0.785
-		5: return 0.72
-		_: return 0.72
+		2: return 0.80
+		3: return 0.68
+		4: return 0.58
+		5: return 0.50
+		_: return 0.50
 
 func _update_follower_positions() -> void:
 	var size = follower_boats.size() + 1
@@ -720,6 +727,14 @@ func _update_follower_positions() -> void:
 		tween.tween_property(hardpoints, "position:x", offsets[0].x, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		tween.tween_property(hardpoints, "position:z", offsets[0].z, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		tween.tween_property(hardpoints, "scale", Vector3.ONE * target_sf, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		
+	var body_col = get_node_or_null("CollisionShape3D") as CollisionShape3D
+	if body_col:
+		tween.tween_property(body_col, "scale", Vector3.ONE * target_sf, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		
+	var area_col = get_node_or_null("CollisionArea/CollisionShape3D") as CollisionShape3D
+	if area_col:
+		tween.tween_property(area_col, "scale", Vector3.ONE * target_sf, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 			
 	for i in range(follower_boats.size()):
 		var follower = follower_boats[i]

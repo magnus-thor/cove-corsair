@@ -8,19 +8,19 @@ script = ExtResource("1_script")
 ship_id = "sloop"
 ship_name = "The Sloop"
 sprite_texture = ExtResource("2_tex")
-pixel_size = 0.0038
-y_offset = 1.2
-collision_size = Vector3(2, 1.2, 3.4)
+pixel_size = 0.0028
+y_offset = 0.9
+collision_size = Vector3(1.4, 1.0, 2.5)
 max_health = 5
 move_speed = 11.0
 fire_rate = 0.16
 base_cannons = 2
 hardpoint_offsets = {
-"AftDeckCrew": Vector3(0.35, 1.4, 0.98),
-"BowMount": Vector3(0, 0.35, -1),
-"MidDeckCrew": Vector3(-0.35, 1.12, 0.76),
-"PortSwivelMount": Vector3(-0.6, 1.39, 0.24),
-"StarboardSwivelMount": Vector3(0.6, 1.56, 0.19)
+"AftDeckCrew": Vector3(0.26, 1.05, 0.73),
+"BowMount": Vector3(0, 0.26, -0.75),
+"MidDeckCrew": Vector3(-0.26, 0.84, 0.57),
+"PortSwivelMount": Vector3(-0.45, 1.04, 0.18),
+"StarboardSwivelMount": Vector3(0.45, 1.17, 0.14)
 }
 hardpoint_rotations = {
 "AftDeckCrew": Vector3(0, -52, 0),
@@ -30,27 +30,22 @@ hardpoint_rotations = {
 "StarboardSwivelMount": Vector3(0, 80, 0)
 }
 hardpoint_scales = {
-"AftDeckCrew": Vector3(0.35, 0.35, 0.35),
-"BowMount": Vector3(1, 1, 1),
-"MidDeckCrew": Vector3(0.35, 0.35, 0.35),
-"PortSwivelMount": Vector3(0.17, 0.17, 0.17),
-"StarboardSwivelMount": Vector3(0.2, 0.2, 0.2)
+"AftDeckCrew": Vector3(0.26, 0.26, 0.26),
+"BowMount": Vector3(0.75, 0.75, 0.75),
+"MidDeckCrew": Vector3(0.26, 0.26, 0.26),
+"PortSwivelMount": Vector3(0.13, 0.13, 0.13),
+"StarboardSwivelMount": Vector3(0.15, 0.15, 0.15)
 }
 tier_upgrades = Array[Dictionary]([{
-"BowMount": "res://src/data/resources/user_crew/weapon_bow_chaser.tres",
-"MidDeckCrew": "res://src/data/resources/user_crew/crew_monkey_bomber.tres",
-"PortSwivelMount": "res://src/data/resources/user_crew/weapon_port_swivel.tres",
-"StarboardSwivelMount": "res://src/data/resources/user_crew/weapon_starboard_swivel.tres"
+"BowMount": "res://src/data/resources/user_crew/weapon_bow_chaser.tres"
 }, {
-"AftDeckCrew": "res://src/data/resources/user_crew/crew_skeleton_tosser.tres",
 "BowMount": "res://src/data/resources/user_crew/weapon_bow_chaser.tres",
 "MidDeckCrew": "res://src/data/resources/user_crew/crew_monkey_bomber.tres",
-"PortSwivelMount": "res://src/data/resources/user_crew/weapon_port_swivel.tres",
-"StarboardSwivelMount": "res://src/data/resources/user_crew/weapon_starboard_swivel.tres"
+"AftDeckCrew": "res://src/data/resources/user_crew/crew_skeleton_tosser.tres",
 }, {
-"AftDeckCrew": "res://src/data/resources/user_crew/crew_skeleton_tosser.tres",
 "BowMount": "res://src/data/resources/user_crew/weapon_bow_chaser.tres",
 "MidDeckCrew": "res://src/data/resources/user_crew/crew_monkey_bomber.tres",
+"AftDeckCrew": "res://src/data/resources/user_crew/crew_skeleton_tosser.tres",
 "PortSwivelMount": "res://src/data/resources/user_crew/weapon_port_swivel.tres",
-"StarboardSwivelMount": "res://src/data/resources/user_crew/weapon_starboard_swivel.tres"
+"StarboardSwivelMount": "res://src/data/resources/user_crew/weapon_port_swivel.tres"
 }])

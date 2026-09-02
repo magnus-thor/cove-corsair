@@ -1,10 +1,14 @@
-[gd_resource type="Resource" script_class="WeaponData" format=3 uid="uid://b4mibo4kok0la"]
+[gd_resource type="Resource" script_class="WeaponData" load_steps=5 format=3 uid="uid://b4mibo4kok0la"]
 
 [ext_resource type="Script" uid="uid://dkuo2x5fcb3xe" path="res://src/data/weapon_data.gd" id="1_script"]
 [ext_resource type="Resource" path="res://src/data/resources/user_ammo/ammo_standard_ball.tres" id="2_ammo"]
+[ext_resource type="Resource" path="res://src/data/resources/user_ammo/ammo_heavy_shot.tres" id="3_ammo_heavy"]
 
 [resource]
 script = ExtResource("1_script")
 weapon_name = "Bow Chaser"
+weapon_type = "cannon"
 fire_rate = 0.2
+spread_angle_deg = 0.0
 default_ammo = ExtResource("2_ammo")
+compatible_ammo = Array[Resource]([ExtResource("2_ammo"), ExtResource("3_ammo_heavy")])

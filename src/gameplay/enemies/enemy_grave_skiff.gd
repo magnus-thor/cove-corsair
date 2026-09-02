@@ -67,7 +67,10 @@ func _fire_dart_burst() -> void:
 			else:
 				get_parent().add_child(dart)
 			dart.global_position = global_position + Vector3(randf_range(-0.3, 0.3), 0.4, 1.0)
-			dart.scale = Vector3(0.7, 0.7, 1.4) # Sleek dart shape
+			dart.scale = Vector3(0.85, 0.85, 0.85)
+			var fire_mesh = dart.get_node_or_null("FireCore")
+			if fire_mesh:
+				fire_mesh.scale = Vector3(0.8, 0.8, 1.6)
 			if "speed" in dart:
 				dart.speed = 12.0
 			if dart.has_method("set_color"):
@@ -80,6 +83,7 @@ func take_damage(amount: int) -> void:
 	if _is_dead:
 		return
 	current_hp = max(0, current_hp - amount)
+	print("[MOB HIT] Grave Skiff took %d damage | HP: %d/%d" % [amount, current_hp, max_hp])
 	_update_health_bar()
 	_flash()
 	

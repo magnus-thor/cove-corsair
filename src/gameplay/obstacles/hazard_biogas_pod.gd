@@ -30,6 +30,7 @@ func take_damage(amount: int) -> void:
 	if _is_popped:
 		return
 	hp -= amount
+	print("[HAZARD HIT] Biogas Pod took %d damage | HP: %d" % [amount, hp])
 	if hp <= 0:
 		explode_corrosive_cloud()
 

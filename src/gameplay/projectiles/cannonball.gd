@@ -48,6 +48,8 @@ func _ready() -> void:
 
 func _enable_collisions() -> void:
 	if not _is_destroyed and is_inside_tree():
+		collision_layer = 2
+		collision_mask = 0xFFFFFFFF
 		monitoring = true
 		monitorable = true
 		area_entered.connect(_on_hit)
@@ -229,10 +231,12 @@ func _on_hit(target: Node) -> void:
 		AudioManager.play_sfx("barrel_hits")
 		if target.has_method("take_damage"):
 			target.take_damage(damage)
+		elif target.get_parent() and target.get_parent().has_method("take_damage"):
+			target.get_parent().take_damage(damage)
 			
-			# Apply splash AoE to nearby destructibles if ammo has splash_radius
-			if (ammo_data and ammo_data.splash_radius > 0.0) or splash_radius_multiplier > 1.0:
-				_apply_splash_damage()
+		# Apply splash AoE to nearby destructibles if ammo has splash_radius
+		if (ammo_data and ammo_data.splash_radius > 0.0) or splash_radius_multiplier > 1.0:
+			_apply_splash_damage()
 				
 		_spawn_splash()
 		queue_free()
