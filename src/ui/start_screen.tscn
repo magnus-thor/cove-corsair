@@ -59,6 +59,30 @@ corner_radius_top_right = 14
 corner_radius_bottom_right = 14
 corner_radius_bottom_left = 14
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lvl_normal"]
+bg_color = Color(0.12, 0.18, 0.25, 0.85)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.4, 0.6, 0.8, 0.7)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lvl_selected"]
+bg_color = Color(0.2, 0.5, 0.8, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.85, 0.2, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
 [node name="StartScreen" type="CanvasLayer"]
 layer = 15
 script = ExtResource("1_start_script")
@@ -75,10 +99,10 @@ grow_vertical = 2
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_top = 80.0
+offset_top = 70.0
 offset_bottom = 180.0
 grow_horizontal = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 12
 alignment = 1
 
 [node name="GameTitle" type="Label" parent="Control/HeaderContainer"]
@@ -109,16 +133,45 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -200.0
-offset_bottom = -90.0
+offset_top = -240.0
+offset_bottom = -40.0
 grow_horizontal = 2
 grow_vertical = 0
-theme_override_constants/separation = 15
+theme_override_constants/separation = 12
 alignment = 1
+
+[node name="LevelSelectContainer" type="HBoxContainer" parent="Control/BottomContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="BtnLvl1" type="Button" parent="Control/BottomContainer/LevelSelectContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(95, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_lvl_normal")
+text = "Level 1"
+
+[node name="BtnLvl2" type="Button" parent="Control/BottomContainer/LevelSelectContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(95, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_lvl_normal")
+text = "Level 2"
+
+[node name="BtnLvl3" type="Button" parent="Control/BottomContainer/LevelSelectContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(95, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_lvl_normal")
+text = "Level 3"
 
 [node name="StartButton" type="Button" parent="Control/BottomContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(200, 56)
+custom_minimum_size = Vector2(220, 56)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_colors/font_color = Color(1, 1, 1, 1)

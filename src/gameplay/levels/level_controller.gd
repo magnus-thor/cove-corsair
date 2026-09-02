@@ -7,6 +7,7 @@ extends Node3D
 # Zero procedural generation. Zero random timers. No fallback loops.
 # ──────────────────────────────────────────────────────────────────────────────
 
+@export var debug_level_override: int = 0
 @export var level_data: LevelData = preload("res://src/data/resources/levels/level_01_smugglers_run.tres")
 @export var spawn_z_ahead: float = -70.0
 
@@ -41,6 +42,9 @@ var is_boss_spawned: bool = false
 
 func _ready() -> void:
 	add_to_group("level_controller")
+	
+	if debug_level_override > 0:
+		GameState.current_level = debug_level_override
 	
 	# Load level according to GameState
 	var active_res = GameState.get_current_level_resource()
