@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="AmmoData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="AmmoData" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://src/data/ammo_data.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ammo/ammo_fire_bomb.png" id="2_tex"]
 
 [resource]
 script = ExtResource("1_script")
@@ -8,4 +9,5 @@ ammo_name = "Fire Bomb"
 damage = 4
 projectile_speed = 20.0
 splash_radius = 2.0
+sprite_texture = ExtResource("2_tex")
 scale_multiplier = 1.15
