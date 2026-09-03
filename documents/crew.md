@@ -12,8 +12,8 @@ Deck Crew members are autonomous units mounted on player flagship hardpoints. De
 
 | Crew Member | Resource Path | Role (`crew_role`) | Fire Rate (Cooldown) | Detection Range | Targeting Priority | Primary Ammo | Compatible Ammo |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Monkey Bomber** | [`crew_monkey_bomber.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_crew/crew_monkey_bomber.tres) | `bomber` | $0.20\text{s}$ | $24.0\text{m}$ | `nearest` | Coconut Bomb | Coconut Bomb, Fire Bomb |
-| **Skeleton Tosser** | [`crew_skeleton_tosser.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_crew/crew_skeleton_tosser.tres) | `tosser` | $0.20\text{s}$ | $26.0\text{m}$ | `nearest` | Throwing Axe | Throwing Axe, Coconut Bomb |
+| **Monkey Bomber** | [`crew_monkey_bomber.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_crew/crew_monkey_bomber.tres) | `bomber` | $0.20\text{s}$ | $20.0\text{m}$ | `nearest` | Coconut Bomb | Coconut Bomb, Fire Bomb |
+| **Skeleton Tosser** | [`crew_skeleton_tosser.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_crew/crew_skeleton_tosser.tres) | `tosser` | $0.20\text{s}$ | $20.0\text{m}$ | `nearest` | Throwing Axe | Throwing Axe, Coconut Bomb |
 | **Deckhand Sniper** | [`weapon_deckhand_sniper.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_crew/weapon_deckhand_sniper.tres) | `sniper` | $0.35\text{s}$ | $32.0\text{m}$ | `highest_threat` | Heavy Shot | Standard Ball, Heavy Shot |
 
 ---

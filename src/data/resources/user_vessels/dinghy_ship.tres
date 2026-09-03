@@ -13,14 +13,17 @@ y_offset = 0.55
 move_speed = 12.0
 fire_rate = 0.2
 hardpoint_offsets = {
+"AftDeckCrew": Vector3(0.08, 1.75, 0.45),
 "BowMount": Vector3(0.00, 0.22, -0.75),
 "MidDeckCrew": Vector3(-0.03, 1.43, -0.10)
 }
 hardpoint_rotations = {
+"AftDeckCrew": Vector3(0.0, 0.0, 0.0),
 "BowMount": Vector3(0.0, 0.0, 0.0),
 "MidDeckCrew": Vector3(0.0, 0.0, 0.0)
 }
 hardpoint_scales = {
+"AftDeckCrew": Vector3(0.35, 0.35, 0.35),
 "BowMount": Vector3(1.00, 1.00, 1.00),
 "MidDeckCrew": Vector3(0.35, 0.35, 0.35)
 }
@@ -29,4 +32,8 @@ tier_upgrades = Array[Dictionary]([{
 }, {
 "BowMount": "res://src/data/resources/user_crew/weapon_bow_chaser.tres",
 "MidDeckCrew": "res://src/data/resources/user_crew/crew_monkey_bomber.tres"
+}, {
+"BowMount": "res://src/data/resources/user_crew/weapon_bow_chaser.tres",
+"MidDeckCrew": "res://src/data/resources/user_crew/crew_monkey_bomber.tres",
+"AftDeckCrew": "res://src/data/resources/user_crew/crew_skeleton_tosser.tres"
 }])

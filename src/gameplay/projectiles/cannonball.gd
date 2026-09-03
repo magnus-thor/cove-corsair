@@ -7,6 +7,9 @@ extends Area3D
 ## Total time the cannonball remains active before self-destruction
 @export var lifetime: float = 5.0
 
+## Maximum travel distance from spawn position before self-destructing
+@export var max_range: float = 35.0
+
 ## Base damage dealt to obstacles
 @export var damage: int = 1
 
@@ -25,6 +28,12 @@ var ammo_data: AmmoData:
 
 var _is_destroyed: bool = false
 var direction: Vector3 = Vector3.ZERO
+var _spawn_pos: Vector3 = Vector3.ZERO
+var _spawn_pos_initialized: bool = false
+
+func set_spawn_pos(pos: Vector3) -> void:
+	_spawn_pos = pos
+	_spawn_pos_initialized = true
 
 func setup(p_direction: Vector3, p_ammo_data: AmmoData) -> void:
 	direction = p_direction.normalized()
@@ -184,12 +193,26 @@ func _apply_ammo_data() -> void:
 func _physics_process(delta: float) -> void:
 	if _is_destroyed:
 		return
+	if not _spawn_pos_initialized:
+		_spawn_pos = global_position
+		_spawn_pos_initialized = true
+
 	# Move forward along the direction if set, otherwise along the local negative Z-axis
 	if direction != Vector3.ZERO:
 		global_position += direction * speed * delta
 	else:
 		global_position += -global_transform.basis.z * speed * delta
 	
+	# Travel distance clamp (primary check: 3D Euclidean distance from spawn position)
+	if global_position.distance_to(_spawn_pos) >= max_range:
+		_is_destroyed = true
+		set_deferred("monitoring", false)
+		set_deferred("monitorable", false)
+		AudioManager.play_sfx("water_splashes")
+		_spawn_splash(true)
+		queue_free()
+		return
+
 	lifetime -= delta
 	if lifetime <= 0.0:
 		_is_destroyed = true
@@ -198,7 +221,7 @@ func _physics_process(delta: float) -> void:
 		if GameState.boss_spawned:
 			print("[CANNON EXPIRED] %s lifetime ended at %s" % [name, global_position])
 		AudioManager.play_sfx("water_splashes")
-		_spawn_splash()
+		_spawn_splash(true)
 		queue_free()
 
 func _on_hit(target: Node) -> void:
@@ -244,10 +267,10 @@ func _on_hit(target: Node) -> void:
 		if (ammo_data and ammo_data.splash_radius > 0.0) or splash_radius_multiplier > 1.0:
 			_apply_splash_damage()
 				
-		_spawn_splash()
+		_spawn_splash(false)
 		queue_free()
 
-func _spawn_splash() -> void:
+func _spawn_splash(at_water_level: bool = false) -> void:
 	if hit_splash_scene:
 		var splash = hit_splash_scene.instantiate() as Node3D
 		var root = get_tree().current_scene
@@ -255,7 +278,10 @@ func _spawn_splash() -> void:
 			root.add_child(splash)
 		elif get_parent():
 			get_parent().add_child(splash)
-		splash.global_position = global_position
+		var splash_pos = global_position
+		if at_water_level:
+			splash_pos.y = 0.02
+		splash.global_position = splash_pos
 
 func _apply_splash_damage() -> void:
 	var radius = 2.5 * splash_radius_multiplier

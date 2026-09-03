@@ -28,9 +28,11 @@ Player vessels define handling speed, hull durability, collision boundaries, and
 * **Hardpoint Sockets:**
   * `BowMount`: Front chaser mount (scale: $1.0$)
   * `MidDeckCrew`: Center deck socket (scale: $0.35$)
+  * `AftDeckCrew`: Aft deck socket (scale: $0.35$)
 * **Tier Progression:**
   * **Tier 1:** Instantiates [`weapon_bow_chaser.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_crew/weapon_bow_chaser.tres) at `BowMount`.
   * **Tier 2:** Adds [`crew_monkey_bomber.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_crew/crew_monkey_bomber.tres) at `MidDeckCrew`.
+  * **Tier 3:** Adds [`crew_skeleton_tosser.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_crew/crew_skeleton_tosser.tres) at `AftDeckCrew`.
 
 #### ⛵ 1.2 The Sloop ([`sloop_ship.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_vessels/sloop_ship.tres))
 * **Hardpoint Sockets:** `BowMount`, `MidDeckCrew`, `AftDeckCrew`, `PortSwivelMount`, `StarboardSwivelMount`

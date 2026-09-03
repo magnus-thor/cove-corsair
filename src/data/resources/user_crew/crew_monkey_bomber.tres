@@ -17,5 +17,6 @@ default_ammo = ExtResource("2_ammo")
 compatible_ammo = Array[Resource]([ExtResource("2_ammo"), ExtResource("3_ammo_fire")])
 crew_role = "bomber"
 targeting_priority = "nearest"
-detection_range = 24.0
+detection_range = 20.0
+max_throw_range = 20.0
 throw_arc_height = 0.5

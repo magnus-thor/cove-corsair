@@ -186,7 +186,11 @@ func _process_targeting(delta: float) -> void:
 	var best_unclaimed: Node3D = null
 	var min_dist = INF
 	var min_unclaimed_dist = INF
-	var max_range = weapon_data.detection_range if ("detection_range" in weapon_data and weapon_data.detection_range > 0.0) else 32.0
+	var max_range = 32.0
+	if "detection_range" in weapon_data and weapon_data.detection_range > 0.0:
+		max_range = weapon_data.detection_range
+	if is_crew:
+		max_range = min(max_range, 20.0)
 	var m_pos_ref = muzzle_point.global_position if muzzle_point else global_position
 
 	var processed: Dictionary = {}
@@ -233,6 +237,7 @@ func _process_targeting(delta: float) -> void:
 
 		processed.clear()
 		min_dist = INF
+		var max_boss_range = 20.0 if is_crew else 28.0
 		for target in boss_candidates:
 			if not is_instance_valid(target) or not target is Node3D or processed.has(target):
 				continue
@@ -249,7 +254,7 @@ func _process_targeting(delta: float) -> void:
 				continue
 				
 			var dist = global_position.distance_to(node3d.global_position)
-			if dist <= 28.0 and dist < min_dist:
+			if dist <= max_boss_range and dist < min_dist:
 				min_dist = dist
 				best_target = node3d
 			
@@ -323,6 +328,20 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 		world_container.add_child(ball)
 		ball.top_level = true
 		ball.global_position = spawn_pos
+		
+		if "max_range" in ball:
+			if is_crew:
+				var crew_max: float = 20.0
+				if "max_throw_range" in weapon_data and weapon_data.max_throw_range > 0.0:
+					crew_max = weapon_data.max_throw_range
+				elif "detection_range" in weapon_data and weapon_data.detection_range > 0.0:
+					crew_max = min(20.0, weapon_data.detection_range)
+				ball.max_range = min(ball.max_range, crew_max)
+			else:
+				ball.max_range = 35.0
+				
+		if ball.has_method("set_spawn_pos"):
+			ball.set_spawn_pos(spawn_pos)
 		
 		if ball.has_method("setup"):
 			ball.setup(proj_dir, weapon_data.default_ammo)
