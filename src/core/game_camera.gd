@@ -26,11 +26,11 @@ func _process(delta: float) -> void:
 		var arena_mid_z = (player_z + target_pos.z) * 0.5
 		
 		# Elevated and pulled back camera position to cleanly frame both player fleet and boss
-		var desired_pos = Vector3(0.0, 11.0, player_z + 6.0)
+		var desired_pos = Vector3(0.0, 16.0, player_z + 12.0)
 		global_position = global_position.lerp(desired_pos, 2.5 * delta)
 		
-		# Look at the midpoint of the combat arena so both player and boss are framed
-		var look_target = Vector3(0.0, 0.3, arena_mid_z)
+		# Look at the combat arena so both player and boss are framed with player at lower screen
+		var look_target = Vector3(0.0, 0.4, arena_mid_z - 1.0)
 		var current_look = global_transform.looking_at(look_target, Vector3.UP)
 		global_transform = global_transform.interpolate_with(current_look, 2.5 * delta)
 	else:

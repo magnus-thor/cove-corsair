@@ -1,9 +1,9 @@
 class_name HazardThermalGeyser
 extends Node3D
 
-@export var telegraph_duration: float = 1.6
+@export var telegraph_duration: float = 1.8
 @export var eruption_duration: float = 1.4
-@export var eruption_radius: float = 2.4
+@export var eruption_radius: float = 1.6
 @export var damage: int = 1
 
 @onready var telegraph_mesh: MeshInstance3D = $TelegraphMesh

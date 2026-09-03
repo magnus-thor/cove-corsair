@@ -47,21 +47,18 @@ func _generate() -> void:
 			_spawn_tropical()
 
 # ── X helpers ─────────────────────────────────────────────────────────────────
-# OUTER band:  cliff / rock masses.  Centre range –12.5 .. –10.5 (left).
-#              At max X scale 1.8 and assuming ~1 local unit half-width,
-#              the innermost edge = –10.5 + 1.8 = –8.7  →  clear of –7.5 lane.
-# INNER band:  shoals / foliage.  Centre range –11.5 .. –9.5 (left).
-#              At max X scale 1.2 the innermost edge = –9.5 + 1.2 = –8.3  → safe.
+# OUTER band:  cliff / rock masses.  Centre range –11.5 .. –9.5 (left).
+# INNER band:  shoals / foliage.      Centre range –8.8 .. –7.4 (left).
 
 func _rand_x_outer() -> float:
 	if side == "left":
-		return randf_range(-12.5, -10.5)
-	return randf_range(10.5, 12.5)
+		return randf_range(-11.5, -9.5)
+	return randf_range(9.5, 11.5)
 
 func _rand_x_inner() -> float:
 	if side == "left":
-		return randf_range(-11.5, -9.5)
-	return randf_range(9.5, 11.5)
+		return randf_range(-8.8, -7.4)
+	return randf_range(7.4, 8.8)
 
 # ── Biome: Tropical / Smuggler's Run ──────────────────────────────────────────
 

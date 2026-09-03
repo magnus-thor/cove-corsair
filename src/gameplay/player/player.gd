@@ -470,7 +470,8 @@ func _apply_weapon_tier_setup() -> void:
 
 func take_hit(amount: int = 1, source_info: String = "") -> void:
 	current_health = max(0, current_health - amount)
-	print("[PLAYER HIT] User vessel took %d dmg from %s | HP: %d/%d | Fleet: %d" % [amount, source_info, current_health, max_health, follower_boats.size() + 1])
+	if GameState.boss_spawned:
+		print("[PLAYER HIT] User vessel took %d dmg from %s | HP: %d/%d | Fleet: %d" % [amount, source_info, current_health, max_health, follower_boats.size() + 1])
 	health_changed.emit(current_health, max_health)
 	if current_health <= 0:
 		game_over(false)

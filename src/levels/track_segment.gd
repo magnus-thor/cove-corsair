@@ -201,9 +201,9 @@ func spawn_scenery() -> void:
 			
 		var rand_x = 0.0
 		if shore == 1:
-			rand_x = randf_range(-18.0, -9.5)
+			rand_x = randf_range(-14.0, -7.5)
 		else:
-			rand_x = randf_range(9.5, 18.0)
+			rand_x = randf_range(7.5, 14.0)
 			
 		var rand_z = randf_range(zone.x, zone.y)
 		

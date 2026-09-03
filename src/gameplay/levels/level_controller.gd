@@ -67,15 +67,11 @@ func setup_active_queue() -> void:
 			var db = b.trigger_distance if "trigger_distance" in b else b.get("distance", 0.0)
 			return da < db
 		)
-		print("[LEVEL QUEUE] Loaded %d timeline events for %s" % [active_queue.size(), level_data.level_name])
 	elif not level_data.wave_events.is_empty():
 		for we in level_data.wave_events:
 			if we != null:
 				active_queue.append(we)
 		active_queue.sort_custom(func(a, b): return a.distance < b.distance)
-		print("[LEVEL QUEUE] Loaded %d wave events for %s" % [active_queue.size(), level_data.level_name])
-	else:
-		print("[LEVEL QUEUE WARNING] No events found in %s!" % level_data.level_name)
 
 func load_level_resource(res: LevelData) -> void:
 	if not res:
@@ -264,7 +260,6 @@ func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> vo
 						type_name = "FUSE"
 					else:
 						barrel.obstacle_type = DestructibleObstacle.ObstacleType.WOODEN_BARREL
-				print("[SPAWN] Barrel (%s) at dist=%.1fm | lane_x=%.2f | HP=%d" % [type_name, current_distance, x_pos, hp])
 
 		SpawnEvent.EntityType.MOB:
 			if is_brimstone:
@@ -277,7 +272,6 @@ func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> vo
 						bombard.max_hp = event.base_hp_override if event.base_hp_override > 0 else 120
 						bombard.current_hp = bombard.max_hp
 						bombard.forward_speed = 1.3
-						print("[SPAWN MOB] Mini-Boss Bombard at dist=%.1fm | lane_x=%.2f | HP=%d" % [current_distance, x_pos, bombard.max_hp])
 				elif event.rarity_tier == SpawnEvent.RarityTier.RARE or event.base_hp_override == 18:
 					if brimstone_raft_scene:
 						var raft = brimstone_raft_scene.instantiate() as Area3D
@@ -287,7 +281,6 @@ func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> vo
 						raft.max_hp = event.base_hp_override if event.base_hp_override > 0 else 18
 						raft.current_hp = raft.max_hp
 						raft.forward_speed = 7.8
-						print("[SPAWN MOB] Brimstone Raft at dist=%.1fm | lane_x=%.2f | HP=%d | Speed=7.8" % [current_distance, x_pos, raft.max_hp])
 				else:
 					if iron_gunner_scene:
 						var gunner = iron_gunner_scene.instantiate() as Area3D
@@ -298,7 +291,6 @@ func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> vo
 						gunner.max_hp = event.base_hp_override if event.base_hp_override > 0 else 22
 						gunner.current_hp = gunner.max_hp
 						gunner.forward_speed = 2.6
-						print("[SPAWN MOB] %s at dist=%.1fm | lane_x=%.2f | HP=%d | Speed=2.6" % [label, current_distance, x_pos, gunner.max_hp])
 			else:
 				if event.rarity_tier == SpawnEvent.RarityTier.ELITE or event.base_hp_override >= 40:
 					if harvester_scene:
@@ -308,7 +300,6 @@ func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> vo
 						harv.global_position = Vector3(x_pos, 0.1, z_spawn)
 						harv.max_hp = event.base_hp_override if event.base_hp_override > 0 else 45
 						harv.current_hp = harv.max_hp
-						print("[SPAWN MOB] Mini-Boss Harvester at dist=%.1fm | lane_x=%.2f | HP=%d" % [current_distance, x_pos, harv.max_hp])
 				elif (event.rarity_tier == SpawnEvent.RarityTier.RARE and event.base_hp_override >= 8) or event.base_hp_override == 8:
 					if tide_cutter_scene:
 						var cutter = tide_cutter_scene.instantiate() as Area3D
@@ -318,7 +309,6 @@ func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> vo
 						cutter.max_hp = event.base_hp_override if event.base_hp_override > 0 else 8
 						cutter.current_hp = cutter.max_hp
 						cutter.forward_speed = 4.5
-						print("[SPAWN MOB] Tide Cutter at dist=%.1fm | lane_x=%.2f | HP=%d | Speed=4.5" % [current_distance, x_pos, cutter.max_hp])
 				else:
 					if grave_skiff_scene:
 						var skiff = grave_skiff_scene.instantiate() as Area3D
@@ -328,7 +318,6 @@ func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> vo
 						skiff.max_hp = event.base_hp_override if event.base_hp_override > 0 else (6 if event.rarity_tier == SpawnEvent.RarityTier.RARE else 4)
 						skiff.current_hp = skiff.max_hp
 						skiff.forward_speed = 2.4
-						print("[SPAWN MOB] Grave Skiff at dist=%.1fm | lane_x=%.2f | HP=%d | Speed=2.4" % [current_distance, x_pos, skiff.max_hp])
 
 		SpawnEvent.EntityType.MULTIPLIER_GATE:
 			if multiplier_gate_scene:
@@ -343,7 +332,6 @@ func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> vo
 					gate.custom_text = text_val
 				if gate.has_method("update_visuals"):
 					gate.update_visuals()
-				print("[SPAWN GATE] Multiplier Gate (%s) at dist=%.1fm | lane_x=%.2f" % [text_val, current_distance, x_pos])
 
 		SpawnEvent.EntityType.HAZARD:
 			if is_brimstone:
@@ -352,7 +340,6 @@ func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> vo
 					geyser.name = "ThermalGeyser_%.1fm_x%.1f" % [current_distance, x_pos]
 					add_child(geyser)
 					geyser.global_position = Vector3(x_pos, 0.0, z_spawn)
-					print("[SPAWN HAZARD] Thermal Geyser at dist=%.1fm | lane_x=%.2f" % [current_distance, x_pos])
 			else:
 				if event.rarity_tier == SpawnEvent.RarityTier.RARE or event.base_hp_override >= 5:
 					var reef_prefab = preload("res://src/gameplay/obstacles/hazard_reef.tscn")
@@ -361,14 +348,12 @@ func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> vo
 						reef.name = "CoralReef_%.1fm_x%.1f" % [current_distance, x_pos]
 						add_child(reef)
 						reef.global_position = Vector3(x_pos, 0.0, z_spawn)
-						print("[SPAWN HAZARD] Indestructible Coral Reef at dist=%.1fm | lane_x=%.2f" % [current_distance, x_pos])
 				elif biogas_pod_scene:
 					var pod = biogas_pod_scene.instantiate() as Area3D
 					pod.name = "BiogasPod_%.1fm_x%.1f" % [current_distance, x_pos]
 					add_child(pod)
 					pod.global_position = Vector3(x_pos, 0.05, z_spawn)
 					pod.hp = event.base_hp_override if event.base_hp_override > 0 else 1
-					print("[SPAWN HAZARD] Biogas Pod at dist=%.1fm | lane_x=%.2f | HP=%d" % [current_distance, x_pos, pod.hp])
 
 		SpawnEvent.EntityType.BOSS:
 			print("[SPAWN BOSS TRIGGER] Triggering Boss at dist=%.1fm" % current_distance)

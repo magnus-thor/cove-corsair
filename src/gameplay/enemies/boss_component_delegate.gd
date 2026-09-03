@@ -18,6 +18,9 @@ func _on_area_entered(area: Area3D) -> void:
 
 func take_damage(amount: int) -> void:
 	if is_instance_valid(boss_node) and boss_node.has_method("damage_component"):
+		var comp_var = "hp_" + component_name
+		if comp_var in boss_node and boss_node.get(comp_var) <= 0:
+			return
 		boss_node.damage_component(component_name, amount, last_hit_from_bow)
 
 func die() -> void:

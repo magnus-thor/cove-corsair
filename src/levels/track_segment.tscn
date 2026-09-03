@@ -32,7 +32,7 @@ shader_parameter/texture_refraction = SubResource("NoiseTexture2D_water")
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_river"]
 material = SubResource("ShaderMaterial_river")
-size = Vector2(18, 40)
+size = Vector2(14, 40)
 
 [node name="TrackSegment" type="Node3D" unique_id=87088833]
 script = ExtResource("1_script")
@@ -47,7 +47,7 @@ mesh = SubResource("PlaneMesh_river")
 
 [node name="VisibleOnScreenNotifier3D" type="VisibleOnScreenNotifier3D" parent="." unique_id=1471931802]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -20)
-aabb = AABB(-9, -1, -20, 18, 2, 40)
+aabb = AABB(-7, -1, -20, 14, 2, 40)
 
 [node name="Obstacles" type="Node3D" parent="." unique_id=371182929]
 

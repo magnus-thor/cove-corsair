@@ -1,10 +1,40 @@
-[gd_resource type="Resource" script_class="LevelData" load_steps=128 format=3]
+[gd_resource type="Resource" script_class="LevelData" load_steps=227 format=3]
 
 [ext_resource type="Script" path="res://src/data/level_data.gd" id="1_level_script"]
 [ext_resource type="Script" path="res://src/data/spawn_event.gd" id="2_spawn_event"]
 [ext_resource type="PackedScene" path="res://src/gameplay/enemies/boss_siege_fortress.tscn" id="3_boss"]
 
 [sub_resource type="Resource" id="Resource_se_001"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 5.0
+entity_type = 0
+lane_x = -2.0
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_002"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 5.0
+entity_type = 0
+lane_x = 0.0
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_003"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 5.0
+entity_type = 0
+lane_x = 2.0
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_004"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 10.0
 entity_type = 0
@@ -14,7 +44,17 @@ base_hp_override = 2
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_002"]
+[sub_resource type="Resource" id="Resource_se_005"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 10.0
+entity_type = 0
+lane_x = 0.0
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_006"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 10.0
 entity_type = 0
@@ -24,7 +64,17 @@ base_hp_override = 2
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_003"]
+[sub_resource type="Resource" id="Resource_se_007"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 16.0
+entity_type = 0
+lane_x = -2.2
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_008"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 16.0
 entity_type = 0
@@ -34,7 +84,17 @@ base_hp_override = 2
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_004"]
+[sub_resource type="Resource" id="Resource_se_009"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 16.0
+entity_type = 0
+lane_x = 2.2
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_010"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 20.0
 entity_type = 0
@@ -44,7 +104,7 @@ base_hp_override = 4
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_005"]
+[sub_resource type="Resource" id="Resource_se_011"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 20.0
 entity_type = 0
@@ -54,69 +114,9 @@ base_hp_override = 2
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_006"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 20.0
-entity_type = 0
-lane_x = 2.0
-rarity_tier = 0
-base_hp_override = 2
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_007"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 28.0
-entity_type = 0
-lane_x = -2.5
-rarity_tier = 0
-base_hp_override = 2
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_008"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 28.0
-entity_type = 0
-lane_x = 2.5
-rarity_tier = 0
-base_hp_override = 2
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_009"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 35.0
-entity_type = 3
-lane_x = -3.5
-rarity_tier = 0
-base_hp_override = 1
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_010"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 35.0
-entity_type = 0
-lane_x = 1.0
-rarity_tier = 1
-base_hp_override = 4
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_011"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 35.0
-entity_type = 0
-lane_x = 0.0
-rarity_tier = 0
-base_hp_override = 2
-gate_type = 2
-gate_value = 1
-
 [sub_resource type="Resource" id="Resource_se_012"]
 script = ExtResource("2_spawn_event")
-trigger_distance = 35.0
+trigger_distance = 20.0
 entity_type = 0
 lane_x = 2.0
 rarity_tier = 0
@@ -126,6 +126,136 @@ gate_value = 1
 
 [sub_resource type="Resource" id="Resource_se_013"]
 script = ExtResource("2_spawn_event")
+trigger_distance = 24.0
+entity_type = 0
+lane_x = -1.5
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_014"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 24.0
+entity_type = 0
+lane_x = 1.5
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_015"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 28.0
+entity_type = 0
+lane_x = -2.5
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_016"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 28.0
+entity_type = 0
+lane_x = 2.5
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_017"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 31.0
+entity_type = 0
+lane_x = -1.8
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_018"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 31.0
+entity_type = 0
+lane_x = 1.8
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_019"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 35.0
+entity_type = 3
+lane_x = -3.5
+rarity_tier = 0
+base_hp_override = 1
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_020"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 35.0
+entity_type = 0
+lane_x = 1.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_021"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 35.0
+entity_type = 0
+lane_x = 0.0
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_022"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 35.0
+entity_type = 0
+lane_x = 2.0
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_023"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 38.0
+entity_type = 0
+lane_x = -2.0
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_024"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 38.0
+entity_type = 0
+lane_x = 0.0
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_025"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 38.0
+entity_type = 0
+lane_x = 2.0
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_026"]
+script = ExtResource("2_spawn_event")
 trigger_distance = 42.0
 entity_type = 0
 lane_x = -1.5
@@ -134,7 +264,7 @@ base_hp_override = 4
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_014"]
+[sub_resource type="Resource" id="Resource_se_027"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 42.0
 entity_type = 0
@@ -144,7 +274,37 @@ base_hp_override = 4
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_015"]
+[sub_resource type="Resource" id="Resource_se_028"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 46.0
+entity_type = 1
+lane_x = 2.5
+rarity_tier = 1
+base_hp_override = 8
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_029"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 46.0
+entity_type = 0
+lane_x = -2.0
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_030"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 46.0
+entity_type = 0
+lane_x = 0.0
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_031"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 50.0
 entity_type = 1
@@ -154,7 +314,7 @@ base_hp_override = 8
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_016"]
+[sub_resource type="Resource" id="Resource_se_032"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 50.0
 entity_type = 0
@@ -164,7 +324,7 @@ base_hp_override = 4
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_017"]
+[sub_resource type="Resource" id="Resource_se_033"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 50.0
 entity_type = 0
@@ -174,7 +334,27 @@ base_hp_override = 4
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_018"]
+[sub_resource type="Resource" id="Resource_se_034"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 53.0
+entity_type = 0
+lane_x = -1.5
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_035"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 53.0
+entity_type = 0
+lane_x = 1.5
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_036"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 56.0
 entity_type = 0
@@ -184,7 +364,7 @@ base_hp_override = 6
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_019"]
+[sub_resource type="Resource" id="Resource_se_037"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 56.0
 entity_type = 0
@@ -194,7 +374,7 @@ base_hp_override = 2
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_020"]
+[sub_resource type="Resource" id="Resource_se_038"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 56.0
 entity_type = 0
@@ -204,7 +384,37 @@ base_hp_override = 2
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_021"]
+[sub_resource type="Resource" id="Resource_se_039"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 59.0
+entity_type = 0
+lane_x = -2.0
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_040"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 59.0
+entity_type = 0
+lane_x = 0.0
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_041"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 59.0
+entity_type = 0
+lane_x = 2.0
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_042"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 62.0
 entity_type = 3
@@ -214,7 +424,27 @@ base_hp_override = 1
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_022"]
+[sub_resource type="Resource" id="Resource_se_043"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 64.0
+entity_type = 0
+lane_x = -1.2
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_044"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 64.0
+entity_type = 0
+lane_x = 1.2
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_045"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 66.0
 entity_type = 0
@@ -224,7 +454,7 @@ base_hp_override = 2
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_023"]
+[sub_resource type="Resource" id="Resource_se_046"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 66.0
 entity_type = 0
@@ -234,7 +464,7 @@ base_hp_override = 2
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_024"]
+[sub_resource type="Resource" id="Resource_se_047"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 70.0
 entity_type = 2
@@ -244,7 +474,37 @@ base_hp_override = 0
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_025"]
+[sub_resource type="Resource" id="Resource_se_048"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 74.0
+entity_type = 0
+lane_x = -2.5
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_049"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 74.0
+entity_type = 0
+lane_x = 0.0
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_050"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 74.0
+entity_type = 0
+lane_x = 2.5
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_051"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 78.0
 entity_type = 0
@@ -254,7 +514,7 @@ base_hp_override = 4
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_026"]
+[sub_resource type="Resource" id="Resource_se_052"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 78.0
 entity_type = 0
@@ -264,7 +524,7 @@ base_hp_override = 2
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_027"]
+[sub_resource type="Resource" id="Resource_se_053"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 78.0
 entity_type = 0
@@ -274,7 +534,27 @@ base_hp_override = 4
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_028"]
+[sub_resource type="Resource" id="Resource_se_054"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 81.0
+entity_type = 0
+lane_x = -1.2
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_055"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 81.0
+entity_type = 0
+lane_x = 1.2
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_056"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 85.0
 entity_type = 1
@@ -284,7 +564,7 @@ base_hp_override = 22
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_029"]
+[sub_resource type="Resource" id="Resource_se_057"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 85.0
 entity_type = 0
@@ -294,7 +574,7 @@ base_hp_override = 4
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_030"]
+[sub_resource type="Resource" id="Resource_se_058"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 85.0
 entity_type = 0
@@ -304,7 +584,37 @@ base_hp_override = 4
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_031"]
+[sub_resource type="Resource" id="Resource_se_059"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 89.0
+entity_type = 1
+lane_x = 2.0
+rarity_tier = 1
+base_hp_override = 22
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_060"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 89.0
+entity_type = 0
+lane_x = -2.0
+rarity_tier = 2
+base_hp_override = 6
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_061"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 89.0
+entity_type = 0
+lane_x = 0.0
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_062"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 94.0
 entity_type = 3
@@ -314,7 +624,7 @@ base_hp_override = 1
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_032"]
+[sub_resource type="Resource" id="Resource_se_063"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 94.0
 entity_type = 0
@@ -324,7 +634,7 @@ base_hp_override = 6
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_033"]
+[sub_resource type="Resource" id="Resource_se_064"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 94.0
 entity_type = 0
@@ -334,7 +644,37 @@ base_hp_override = 2
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_034"]
+[sub_resource type="Resource" id="Resource_se_065"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 99.0
+entity_type = 0
+lane_x = -3.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_066"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 99.0
+entity_type = 0
+lane_x = 0.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_067"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 99.0
+entity_type = 0
+lane_x = 3.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_068"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 105.0
 entity_type = 1
@@ -344,7 +684,27 @@ base_hp_override = 18
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_035"]
+[sub_resource type="Resource" id="Resource_se_069"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 108.0
+entity_type = 0
+lane_x = -2.0
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_070"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 108.0
+entity_type = 0
+lane_x = 2.0
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_071"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 112.0
 entity_type = 0
@@ -354,7 +714,7 @@ base_hp_override = 4
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_036"]
+[sub_resource type="Resource" id="Resource_se_072"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 112.0
 entity_type = 0
@@ -364,7 +724,7 @@ base_hp_override = 4
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_037"]
+[sub_resource type="Resource" id="Resource_se_073"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 112.0
 entity_type = 0
@@ -374,7 +734,7 @@ base_hp_override = 2
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_038"]
+[sub_resource type="Resource" id="Resource_se_074"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 112.0
 entity_type = 0
@@ -384,7 +744,37 @@ base_hp_override = 2
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_039"]
+[sub_resource type="Resource" id="Resource_se_075"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 116.0
+entity_type = 1
+lane_x = 0.0
+rarity_tier = 1
+base_hp_override = 22
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_076"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 116.0
+entity_type = 0
+lane_x = -2.2
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_077"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 116.0
+entity_type = 0
+lane_x = 2.2
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_078"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 120.0
 entity_type = 3
@@ -394,7 +784,7 @@ base_hp_override = 1
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_040"]
+[sub_resource type="Resource" id="Resource_se_079"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 120.0
 entity_type = 3
@@ -404,7 +794,7 @@ base_hp_override = 1
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_041"]
+[sub_resource type="Resource" id="Resource_se_080"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 122.0
 entity_type = 0
@@ -414,7 +804,27 @@ base_hp_override = 6
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_042"]
+[sub_resource type="Resource" id="Resource_se_081"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 125.0
+entity_type = 0
+lane_x = -2.5
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_082"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 125.0
+entity_type = 0
+lane_x = 2.5
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_083"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 128.0
 entity_type = 1
@@ -424,7 +834,7 @@ base_hp_override = 120
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_043"]
+[sub_resource type="Resource" id="Resource_se_084"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 128.0
 entity_type = 0
@@ -434,7 +844,7 @@ base_hp_override = 4
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_044"]
+[sub_resource type="Resource" id="Resource_se_085"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 128.0
 entity_type = 0
@@ -444,7 +854,37 @@ base_hp_override = 4
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_045"]
+[sub_resource type="Resource" id="Resource_se_086"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 133.0
+entity_type = 1
+lane_x = -2.8
+rarity_tier = 2
+base_hp_override = 18
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_087"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 133.0
+entity_type = 0
+lane_x = 0.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_088"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 133.0
+entity_type = 0
+lane_x = 2.8
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_089"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 138.0
 entity_type = 0
@@ -454,7 +894,7 @@ base_hp_override = 6
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_046"]
+[sub_resource type="Resource" id="Resource_se_090"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 138.0
 entity_type = 0
@@ -464,7 +904,7 @@ base_hp_override = 2
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_047"]
+[sub_resource type="Resource" id="Resource_se_091"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 138.0
 entity_type = 0
@@ -474,7 +914,27 @@ base_hp_override = 6
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_048"]
+[sub_resource type="Resource" id="Resource_se_092"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 141.0
+entity_type = 0
+lane_x = -1.5
+rarity_tier = 2
+base_hp_override = 6
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_093"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 141.0
+entity_type = 0
+lane_x = 1.5
+rarity_tier = 2
+base_hp_override = 6
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_094"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 144.0
 entity_type = 0
@@ -484,7 +944,7 @@ base_hp_override = 4
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_049"]
+[sub_resource type="Resource" id="Resource_se_095"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 144.0
 entity_type = 0
@@ -494,7 +954,17 @@ base_hp_override = 4
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_050"]
+[sub_resource type="Resource" id="Resource_se_096"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 147.0
+entity_type = 0
+lane_x = 0.0
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_097"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 150.0
 entity_type = 2
@@ -504,481 +974,11 @@ base_hp_override = 0
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_051"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 160.0
-entity_type = 0
-lane_x = -3.0
-rarity_tier = 0
-base_hp_override = 2
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_052"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 160.0
-entity_type = 0
-lane_x = -1.5
-rarity_tier = 0
-base_hp_override = 2
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_053"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 160.0
-entity_type = 0
-lane_x = 0.0
-rarity_tier = 1
-base_hp_override = 4
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_054"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 160.0
-entity_type = 0
-lane_x = 1.5
-rarity_tier = 0
-base_hp_override = 2
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_055"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 160.0
-entity_type = 0
-lane_x = 3.0
-rarity_tier = 0
-base_hp_override = 2
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_056"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 170.0
-entity_type = 1
-lane_x = -3.0
-rarity_tier = 1
-base_hp_override = 22
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_057"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 170.0
-entity_type = 0
-lane_x = 0.0
-rarity_tier = 1
-base_hp_override = 4
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_058"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 170.0
-entity_type = 1
-lane_x = 3.0
-rarity_tier = 1
-base_hp_override = 22
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_059"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 180.0
-entity_type = 3
-lane_x = -2.5
-rarity_tier = 0
-base_hp_override = 1
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_060"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 180.0
-entity_type = 0
-lane_x = 1.5
-rarity_tier = 1
-base_hp_override = 4
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_061"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 180.0
-entity_type = 0
-lane_x = 3.5
-rarity_tier = 1
-base_hp_override = 4
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_062"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 190.0
-entity_type = 1
-lane_x = -2.0
-rarity_tier = 2
-base_hp_override = 18
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_063"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 194.0
-entity_type = 0
-lane_x = 0.0
-rarity_tier = 0
-base_hp_override = 2
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_064"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 198.0
-entity_type = 1
-lane_x = 2.0
-rarity_tier = 2
-base_hp_override = 18
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_065"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 206.0
-entity_type = 0
-lane_x = -2.5
-rarity_tier = 2
-base_hp_override = 6
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_066"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 206.0
-entity_type = 0
-lane_x = 2.5
-rarity_tier = 2
-base_hp_override = 6
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_067"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 214.0
-entity_type = 3
-lane_x = -3.5
-rarity_tier = 0
-base_hp_override = 1
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_068"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 215.0
-entity_type = 0
-lane_x = -2.0
-rarity_tier = 1
-base_hp_override = 4
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_069"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 215.0
-entity_type = 0
-lane_x = -0.7
-rarity_tier = 1
-base_hp_override = 4
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_070"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 215.0
-entity_type = 0
-lane_x = 0.7
-rarity_tier = 1
-base_hp_override = 4
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_071"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 215.0
-entity_type = 0
-lane_x = 2.0
-rarity_tier = 1
-base_hp_override = 4
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_072"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 216.0
-entity_type = 3
-lane_x = 3.5
-rarity_tier = 0
-base_hp_override = 1
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_073"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 222.0
-entity_type = 0
-lane_x = -1.5
-rarity_tier = 1
-base_hp_override = 4
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_074"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 222.0
-entity_type = 0
-lane_x = 0.0
-rarity_tier = 1
-base_hp_override = 4
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_075"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 222.0
-entity_type = 0
-lane_x = 1.5
-rarity_tier = 1
-base_hp_override = 4
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_076"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 224.0
-entity_type = 3
-lane_x = 0.0
-rarity_tier = 0
-base_hp_override = 1
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_077"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 235.0
-entity_type = 1
-lane_x = 0.0
-rarity_tier = 1
-base_hp_override = 22
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_078"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 235.0
-entity_type = 1
-lane_x = -2.8
-rarity_tier = 2
-base_hp_override = 18
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_079"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 235.0
-entity_type = 1
-lane_x = 2.8
-rarity_tier = 2
-base_hp_override = 18
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_080"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 244.0
-entity_type = 0
-lane_x = -2.0
-rarity_tier = 1
-base_hp_override = 4
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_081"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 244.0
-entity_type = 0
-lane_x = 0.0
-rarity_tier = 2
-base_hp_override = 6
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_082"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 244.0
-entity_type = 0
-lane_x = 2.0
-rarity_tier = 1
-base_hp_override = 4
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_083"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 250.0
-entity_type = 2
-lane_x = 0.0
-rarity_tier = 0
-base_hp_override = 0
-gate_type = 2
-gate_value = 2
-
-[sub_resource type="Resource" id="Resource_se_084"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 256.0
-entity_type = 0
-lane_x = -4.0
-rarity_tier = 1
-base_hp_override = 4
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_085"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 256.0
-entity_type = 0
-lane_x = -1.5
-rarity_tier = 1
-base_hp_override = 4
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_086"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 256.0
-entity_type = 0
-lane_x = 0.0
-rarity_tier = 2
-base_hp_override = 6
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_087"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 256.0
-entity_type = 0
-lane_x = 1.5
-rarity_tier = 1
-base_hp_override = 4
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_088"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 256.0
-entity_type = 0
-lane_x = 4.0
-rarity_tier = 1
-base_hp_override = 4
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_089"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 264.0
-entity_type = 1
-lane_x = -3.5
-rarity_tier = 2
-base_hp_override = 18
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_090"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 264.0
-entity_type = 1
-lane_x = 0.0
-rarity_tier = 2
-base_hp_override = 18
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_091"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 264.0
-entity_type = 1
-lane_x = 3.5
-rarity_tier = 2
-base_hp_override = 18
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_092"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 272.0
-entity_type = 0
-lane_x = -3.0
-rarity_tier = 2
-base_hp_override = 6
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_093"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 272.0
-entity_type = 0
-lane_x = -2.0
-rarity_tier = 1
-base_hp_override = 4
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_094"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 272.0
-entity_type = 0
-lane_x = -1.0
-rarity_tier = 2
-base_hp_override = 6
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_095"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 272.0
-entity_type = 0
-lane_x = 1.0
-rarity_tier = 2
-base_hp_override = 6
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_096"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 272.0
-entity_type = 0
-lane_x = 2.0
-rarity_tier = 1
-base_hp_override = 4
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_097"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 272.0
-entity_type = 0
-lane_x = 3.0
-rarity_tier = 2
-base_hp_override = 6
-gate_type = 2
-gate_value = 1
-
 [sub_resource type="Resource" id="Resource_se_098"]
 script = ExtResource("2_spawn_event")
-trigger_distance = 280.0
+trigger_distance = 155.0
 entity_type = 0
-lane_x = -4.0
+lane_x = -2.0
 rarity_tier = 1
 base_hp_override = 4
 gate_type = 2
@@ -986,19 +986,19 @@ gate_value = 1
 
 [sub_resource type="Resource" id="Resource_se_099"]
 script = ExtResource("2_spawn_event")
-trigger_distance = 280.0
-entity_type = 1
-lane_x = -2.5
-rarity_tier = 1
-base_hp_override = 22
+trigger_distance = 155.0
+entity_type = 0
+lane_x = 0.0
+rarity_tier = 0
+base_hp_override = 2
 gate_type = 2
 gate_value = 1
 
 [sub_resource type="Resource" id="Resource_se_100"]
 script = ExtResource("2_spawn_event")
-trigger_distance = 280.0
+trigger_distance = 155.0
 entity_type = 0
-lane_x = 0.0
+lane_x = 2.0
 rarity_tier = 1
 base_hp_override = 4
 gate_type = 2
@@ -1006,117 +1006,87 @@ gate_value = 1
 
 [sub_resource type="Resource" id="Resource_se_101"]
 script = ExtResource("2_spawn_event")
-trigger_distance = 280.0
-entity_type = 1
-lane_x = 2.5
-rarity_tier = 1
-base_hp_override = 22
+trigger_distance = 160.0
+entity_type = 0
+lane_x = -3.0
+rarity_tier = 0
+base_hp_override = 2
 gate_type = 2
 gate_value = 1
 
 [sub_resource type="Resource" id="Resource_se_102"]
 script = ExtResource("2_spawn_event")
-trigger_distance = 280.0
+trigger_distance = 160.0
 entity_type = 0
-lane_x = 4.0
-rarity_tier = 1
-base_hp_override = 4
+lane_x = -1.5
+rarity_tier = 0
+base_hp_override = 2
 gate_type = 2
 gate_value = 1
 
 [sub_resource type="Resource" id="Resource_se_103"]
 script = ExtResource("2_spawn_event")
-trigger_distance = 288.0
-entity_type = 3
-lane_x = -4.5
-rarity_tier = 0
-base_hp_override = 1
+trigger_distance = 160.0
+entity_type = 0
+lane_x = 0.0
+rarity_tier = 1
+base_hp_override = 4
 gate_type = 2
 gate_value = 1
 
 [sub_resource type="Resource" id="Resource_se_104"]
 script = ExtResource("2_spawn_event")
-trigger_distance = 288.0
-entity_type = 1
-lane_x = -2.0
-rarity_tier = 2
-base_hp_override = 18
+trigger_distance = 160.0
+entity_type = 0
+lane_x = 1.5
+rarity_tier = 0
+base_hp_override = 2
 gate_type = 2
 gate_value = 1
 
 [sub_resource type="Resource" id="Resource_se_105"]
 script = ExtResource("2_spawn_event")
-trigger_distance = 288.0
-entity_type = 1
-lane_x = 2.0
-rarity_tier = 2
-base_hp_override = 18
+trigger_distance = 160.0
+entity_type = 0
+lane_x = 3.0
+rarity_tier = 0
+base_hp_override = 2
 gate_type = 2
 gate_value = 1
 
 [sub_resource type="Resource" id="Resource_se_106"]
 script = ExtResource("2_spawn_event")
-trigger_distance = 288.0
-entity_type = 3
-lane_x = 4.5
-rarity_tier = 0
-base_hp_override = 1
+trigger_distance = 165.0
+entity_type = 0
+lane_x = -2.5
+rarity_tier = 2
+base_hp_override = 6
 gate_type = 2
 gate_value = 1
 
 [sub_resource type="Resource" id="Resource_se_107"]
 script = ExtResource("2_spawn_event")
-trigger_distance = 296.0
+trigger_distance = 165.0
 entity_type = 0
-lane_x = -3.5
-rarity_tier = 2
-base_hp_override = 6
+lane_x = 0.0
+rarity_tier = 1
+base_hp_override = 4
 gate_type = 2
 gate_value = 1
 
 [sub_resource type="Resource" id="Resource_se_108"]
 script = ExtResource("2_spawn_event")
-trigger_distance = 296.0
+trigger_distance = 165.0
 entity_type = 0
-lane_x = -2.0
-rarity_tier = 1
-base_hp_override = 4
+lane_x = 2.5
+rarity_tier = 2
+base_hp_override = 6
 gate_type = 2
 gate_value = 1
 
 [sub_resource type="Resource" id="Resource_se_109"]
 script = ExtResource("2_spawn_event")
-trigger_distance = 296.0
-entity_type = 0
-lane_x = 0.0
-rarity_tier = 2
-base_hp_override = 6
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_110"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 296.0
-entity_type = 0
-lane_x = 2.0
-rarity_tier = 1
-base_hp_override = 4
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_111"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 296.0
-entity_type = 0
-lane_x = 3.5
-rarity_tier = 2
-base_hp_override = 6
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_112"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 304.0
+trigger_distance = 170.0
 entity_type = 1
 lane_x = -3.0
 rarity_tier = 1
@@ -1124,39 +1094,19 @@ base_hp_override = 22
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_113"]
+[sub_resource type="Resource" id="Resource_se_110"]
 script = ExtResource("2_spawn_event")
-trigger_distance = 304.0
+trigger_distance = 170.0
 entity_type = 0
-lane_x = -1.5
-rarity_tier = 1
-base_hp_override = 4
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_114"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 304.0
-entity_type = 1
 lane_x = 0.0
 rarity_tier = 1
-base_hp_override = 22
-gate_type = 2
-gate_value = 1
-
-[sub_resource type="Resource" id="Resource_se_115"]
-script = ExtResource("2_spawn_event")
-trigger_distance = 304.0
-entity_type = 0
-lane_x = 1.5
-rarity_tier = 1
 base_hp_override = 4
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_116"]
+[sub_resource type="Resource" id="Resource_se_111"]
 script = ExtResource("2_spawn_event")
-trigger_distance = 304.0
+trigger_distance = 170.0
 entity_type = 1
 lane_x = 3.0
 rarity_tier = 1
@@ -1164,29 +1114,79 @@ base_hp_override = 22
 gate_type = 2
 gate_value = 1
 
+[sub_resource type="Resource" id="Resource_se_112"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 175.0
+entity_type = 1
+lane_x = 0.0
+rarity_tier = 2
+base_hp_override = 18
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_113"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 175.0
+entity_type = 0
+lane_x = -2.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_114"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 175.0
+entity_type = 0
+lane_x = 2.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_115"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 180.0
+entity_type = 3
+lane_x = -2.5
+rarity_tier = 0
+base_hp_override = 1
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_116"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 180.0
+entity_type = 0
+lane_x = 1.5
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
 [sub_resource type="Resource" id="Resource_se_117"]
 script = ExtResource("2_spawn_event")
-trigger_distance = 312.0
+trigger_distance = 180.0
 entity_type = 0
-lane_x = -4.0
-rarity_tier = 2
-base_hp_override = 6
+lane_x = 3.5
+rarity_tier = 1
+base_hp_override = 4
 gate_type = 2
 gate_value = 1
 
 [sub_resource type="Resource" id="Resource_se_118"]
 script = ExtResource("2_spawn_event")
-trigger_distance = 312.0
+trigger_distance = 185.0
 entity_type = 0
-lane_x = -2.0
-rarity_tier = 2
-base_hp_override = 6
+lane_x = -3.0
+rarity_tier = 1
+base_hp_override = 4
 gate_type = 2
 gate_value = 1
 
 [sub_resource type="Resource" id="Resource_se_119"]
 script = ExtResource("2_spawn_event")
-trigger_distance = 312.0
+trigger_distance = 185.0
 entity_type = 0
 lane_x = 0.0
 rarity_tier = 2
@@ -1196,6 +1196,996 @@ gate_value = 1
 
 [sub_resource type="Resource" id="Resource_se_120"]
 script = ExtResource("2_spawn_event")
+trigger_distance = 185.0
+entity_type = 0
+lane_x = 3.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_121"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 190.0
+entity_type = 1
+lane_x = -2.0
+rarity_tier = 2
+base_hp_override = 18
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_122"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 194.0
+entity_type = 0
+lane_x = 0.0
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_123"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 198.0
+entity_type = 1
+lane_x = 2.0
+rarity_tier = 2
+base_hp_override = 18
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_124"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 202.0
+entity_type = 0
+lane_x = -1.8
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_125"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 202.0
+entity_type = 0
+lane_x = 1.8
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_126"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 206.0
+entity_type = 0
+lane_x = -2.5
+rarity_tier = 2
+base_hp_override = 6
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_127"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 206.0
+entity_type = 0
+lane_x = 2.5
+rarity_tier = 2
+base_hp_override = 6
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_128"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 210.0
+entity_type = 1
+lane_x = 2.5
+rarity_tier = 1
+base_hp_override = 22
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_129"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 210.0
+entity_type = 0
+lane_x = -2.5
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_130"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 210.0
+entity_type = 0
+lane_x = 0.0
+rarity_tier = 2
+base_hp_override = 6
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_131"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 214.0
+entity_type = 3
+lane_x = -3.5
+rarity_tier = 0
+base_hp_override = 1
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_132"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 215.0
+entity_type = 0
+lane_x = -2.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_133"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 215.0
+entity_type = 0
+lane_x = -0.7
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_134"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 215.0
+entity_type = 0
+lane_x = 0.7
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_135"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 215.0
+entity_type = 0
+lane_x = 2.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_136"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 216.0
+entity_type = 3
+lane_x = 3.5
+rarity_tier = 0
+base_hp_override = 1
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_137"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 218.0
+entity_type = 0
+lane_x = -2.0
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_138"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 218.0
+entity_type = 0
+lane_x = 0.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_139"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 218.0
+entity_type = 0
+lane_x = 2.0
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_140"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 222.0
+entity_type = 0
+lane_x = -1.5
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_141"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 222.0
+entity_type = 0
+lane_x = 0.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_142"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 222.0
+entity_type = 0
+lane_x = 1.5
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_143"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 224.0
+entity_type = 3
+lane_x = 0.0
+rarity_tier = 0
+base_hp_override = 1
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_144"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 228.0
+entity_type = 0
+lane_x = -3.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_145"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 228.0
+entity_type = 0
+lane_x = -1.0
+rarity_tier = 2
+base_hp_override = 6
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_146"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 228.0
+entity_type = 0
+lane_x = 1.0
+rarity_tier = 2
+base_hp_override = 6
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_147"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 228.0
+entity_type = 0
+lane_x = 3.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_148"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 235.0
+entity_type = 1
+lane_x = 0.0
+rarity_tier = 1
+base_hp_override = 22
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_149"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 235.0
+entity_type = 1
+lane_x = -2.8
+rarity_tier = 2
+base_hp_override = 18
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_150"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 235.0
+entity_type = 1
+lane_x = 2.8
+rarity_tier = 2
+base_hp_override = 18
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_151"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 240.0
+entity_type = 0
+lane_x = -2.2
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_152"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 240.0
+entity_type = 0
+lane_x = 0.0
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_153"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 240.0
+entity_type = 0
+lane_x = 2.2
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_154"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 244.0
+entity_type = 0
+lane_x = -2.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_155"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 244.0
+entity_type = 0
+lane_x = 0.0
+rarity_tier = 2
+base_hp_override = 6
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_156"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 244.0
+entity_type = 0
+lane_x = 2.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_157"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 247.0
+entity_type = 0
+lane_x = -1.5
+rarity_tier = 2
+base_hp_override = 6
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_158"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 247.0
+entity_type = 0
+lane_x = 1.5
+rarity_tier = 2
+base_hp_override = 6
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_159"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 250.0
+entity_type = 2
+lane_x = 0.0
+rarity_tier = 0
+base_hp_override = 0
+gate_type = 2
+gate_value = 2
+
+[sub_resource type="Resource" id="Resource_se_160"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 256.0
+entity_type = 0
+lane_x = -4.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_161"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 256.0
+entity_type = 0
+lane_x = -1.5
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_162"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 256.0
+entity_type = 0
+lane_x = 0.0
+rarity_tier = 2
+base_hp_override = 6
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_163"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 256.0
+entity_type = 0
+lane_x = 1.5
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_164"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 256.0
+entity_type = 0
+lane_x = 4.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_165"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 260.0
+entity_type = 0
+lane_x = -2.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_166"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 260.0
+entity_type = 0
+lane_x = 0.0
+rarity_tier = 2
+base_hp_override = 6
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_167"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 260.0
+entity_type = 0
+lane_x = 2.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_168"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 264.0
+entity_type = 1
+lane_x = -3.5
+rarity_tier = 2
+base_hp_override = 18
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_169"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 264.0
+entity_type = 1
+lane_x = 0.0
+rarity_tier = 2
+base_hp_override = 18
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_170"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 264.0
+entity_type = 1
+lane_x = 3.5
+rarity_tier = 2
+base_hp_override = 18
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_171"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 268.0
+entity_type = 0
+lane_x = -3.0
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_172"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 268.0
+entity_type = 0
+lane_x = -1.5
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_173"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 268.0
+entity_type = 0
+lane_x = 1.5
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_174"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 268.0
+entity_type = 0
+lane_x = 3.0
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_175"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 272.0
+entity_type = 0
+lane_x = -3.0
+rarity_tier = 2
+base_hp_override = 6
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_176"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 272.0
+entity_type = 0
+lane_x = -2.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_177"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 272.0
+entity_type = 0
+lane_x = -1.0
+rarity_tier = 2
+base_hp_override = 6
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_178"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 272.0
+entity_type = 0
+lane_x = 1.0
+rarity_tier = 2
+base_hp_override = 6
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_179"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 272.0
+entity_type = 0
+lane_x = 2.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_180"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 272.0
+entity_type = 0
+lane_x = 3.0
+rarity_tier = 2
+base_hp_override = 6
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_181"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 276.0
+entity_type = 1
+lane_x = 0.0
+rarity_tier = 2
+base_hp_override = 18
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_182"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 276.0
+entity_type = 0
+lane_x = -2.5
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_183"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 276.0
+entity_type = 0
+lane_x = 2.5
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_184"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 280.0
+entity_type = 0
+lane_x = -4.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_185"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 280.0
+entity_type = 1
+lane_x = -2.5
+rarity_tier = 1
+base_hp_override = 22
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_186"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 280.0
+entity_type = 0
+lane_x = 0.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_187"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 280.0
+entity_type = 1
+lane_x = 2.5
+rarity_tier = 1
+base_hp_override = 22
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_188"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 280.0
+entity_type = 0
+lane_x = 4.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_189"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 284.0
+entity_type = 0
+lane_x = -3.5
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_190"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 284.0
+entity_type = 0
+lane_x = 0.0
+rarity_tier = 2
+base_hp_override = 6
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_191"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 284.0
+entity_type = 0
+lane_x = 3.5
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_192"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 288.0
+entity_type = 3
+lane_x = -4.5
+rarity_tier = 0
+base_hp_override = 1
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_193"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 288.0
+entity_type = 1
+lane_x = -2.0
+rarity_tier = 2
+base_hp_override = 18
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_194"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 288.0
+entity_type = 1
+lane_x = 2.0
+rarity_tier = 2
+base_hp_override = 18
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_195"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 288.0
+entity_type = 3
+lane_x = 4.5
+rarity_tier = 0
+base_hp_override = 1
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_196"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 292.0
+entity_type = 0
+lane_x = -2.0
+rarity_tier = 2
+base_hp_override = 6
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_197"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 292.0
+entity_type = 0
+lane_x = 0.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_198"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 292.0
+entity_type = 0
+lane_x = 2.0
+rarity_tier = 2
+base_hp_override = 6
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_199"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 296.0
+entity_type = 0
+lane_x = -3.5
+rarity_tier = 2
+base_hp_override = 6
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_200"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 296.0
+entity_type = 0
+lane_x = -2.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_201"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 296.0
+entity_type = 0
+lane_x = 0.0
+rarity_tier = 2
+base_hp_override = 6
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_202"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 296.0
+entity_type = 0
+lane_x = 2.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_203"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 296.0
+entity_type = 0
+lane_x = 3.5
+rarity_tier = 2
+base_hp_override = 6
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_204"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 300.0
+entity_type = 0
+lane_x = -3.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_205"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 300.0
+entity_type = 0
+lane_x = -1.0
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_206"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 300.0
+entity_type = 0
+lane_x = 1.0
+rarity_tier = 0
+base_hp_override = 2
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_207"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 300.0
+entity_type = 0
+lane_x = 3.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_208"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 304.0
+entity_type = 1
+lane_x = -3.0
+rarity_tier = 1
+base_hp_override = 22
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_209"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 304.0
+entity_type = 0
+lane_x = -1.5
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_210"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 304.0
+entity_type = 1
+lane_x = 0.0
+rarity_tier = 1
+base_hp_override = 22
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_211"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 304.0
+entity_type = 0
+lane_x = 1.5
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_212"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 304.0
+entity_type = 1
+lane_x = 3.0
+rarity_tier = 1
+base_hp_override = 22
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_213"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 308.0
+entity_type = 0
+lane_x = -2.5
+rarity_tier = 2
+base_hp_override = 6
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_214"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 308.0
+entity_type = 0
+lane_x = 0.0
+rarity_tier = 1
+base_hp_override = 4
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_215"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 308.0
+entity_type = 0
+lane_x = 2.5
+rarity_tier = 2
+base_hp_override = 6
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_216"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 312.0
+entity_type = 0
+lane_x = -4.0
+rarity_tier = 2
+base_hp_override = 6
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_217"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 312.0
+entity_type = 0
+lane_x = -2.0
+rarity_tier = 2
+base_hp_override = 6
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_218"]
+script = ExtResource("2_spawn_event")
+trigger_distance = 312.0
+entity_type = 0
+lane_x = 0.0
+rarity_tier = 2
+base_hp_override = 6
+gate_type = 2
+gate_value = 1
+
+[sub_resource type="Resource" id="Resource_se_219"]
+script = ExtResource("2_spawn_event")
 trigger_distance = 312.0
 entity_type = 0
 lane_x = 2.0
@@ -1204,7 +2194,7 @@ base_hp_override = 6
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_121"]
+[sub_resource type="Resource" id="Resource_se_220"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 312.0
 entity_type = 0
@@ -1214,7 +2204,7 @@ base_hp_override = 6
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_122"]
+[sub_resource type="Resource" id="Resource_se_221"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 316.0
 entity_type = 3
@@ -1224,7 +2214,7 @@ base_hp_override = 1
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_123"]
+[sub_resource type="Resource" id="Resource_se_222"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 316.0
 entity_type = 3
@@ -1234,7 +2224,7 @@ base_hp_override = 1
 gate_type = 2
 gate_value = 1
 
-[sub_resource type="Resource" id="Resource_se_124"]
+[sub_resource type="Resource" id="Resource_se_223"]
 script = ExtResource("2_spawn_event")
 trigger_distance = 320.0
 entity_type = 4
@@ -1258,6 +2248,6 @@ fog_color = Color(0.25, 0.08, 0.04, 1.0)
 fog_density = 0.024
 river_width_world = 12.0
 base_scroll_speed = 10.0
-timeline_events = Array[ExtResource("2_spawn_event")]([SubResource("Resource_se_001"), SubResource("Resource_se_002"), SubResource("Resource_se_003"), SubResource("Resource_se_004"), SubResource("Resource_se_005"), SubResource("Resource_se_006"), SubResource("Resource_se_007"), SubResource("Resource_se_008"), SubResource("Resource_se_009"), SubResource("Resource_se_010"), SubResource("Resource_se_011"), SubResource("Resource_se_012"), SubResource("Resource_se_013"), SubResource("Resource_se_014"), SubResource("Resource_se_015"), SubResource("Resource_se_016"), SubResource("Resource_se_017"), SubResource("Resource_se_018"), SubResource("Resource_se_019"), SubResource("Resource_se_020"), SubResource("Resource_se_021"), SubResource("Resource_se_022"), SubResource("Resource_se_023"), SubResource("Resource_se_024"), SubResource("Resource_se_025"), SubResource("Resource_se_026"), SubResource("Resource_se_027"), SubResource("Resource_se_028"), SubResource("Resource_se_029"), SubResource("Resource_se_030"), SubResource("Resource_se_031"), SubResource("Resource_se_032"), SubResource("Resource_se_033"), SubResource("Resource_se_034"), SubResource("Resource_se_035"), SubResource("Resource_se_036"), SubResource("Resource_se_037"), SubResource("Resource_se_038"), SubResource("Resource_se_039"), SubResource("Resource_se_040"), SubResource("Resource_se_041"), SubResource("Resource_se_042"), SubResource("Resource_se_043"), SubResource("Resource_se_044"), SubResource("Resource_se_045"), SubResource("Resource_se_046"), SubResource("Resource_se_047"), SubResource("Resource_se_048"), SubResource("Resource_se_049"), SubResource("Resource_se_050"), SubResource("Resource_se_051"), SubResource("Resource_se_052"), SubResource("Resource_se_053"), SubResource("Resource_se_054"), SubResource("Resource_se_055"), SubResource("Resource_se_056"), SubResource("Resource_se_057"), SubResource("Resource_se_058"), SubResource("Resource_se_059"), SubResource("Resource_se_060"), SubResource("Resource_se_061"), SubResource("Resource_se_062"), SubResource("Resource_se_063"), SubResource("Resource_se_064"), SubResource("Resource_se_065"), SubResource("Resource_se_066"), SubResource("Resource_se_067"), SubResource("Resource_se_068"), SubResource("Resource_se_069"), SubResource("Resource_se_070"), SubResource("Resource_se_071"), SubResource("Resource_se_072"), SubResource("Resource_se_073"), SubResource("Resource_se_074"), SubResource("Resource_se_075"), SubResource("Resource_se_076"), SubResource("Resource_se_077"), SubResource("Resource_se_078"), SubResource("Resource_se_079"), SubResource("Resource_se_080"), SubResource("Resource_se_081"), SubResource("Resource_se_082"), SubResource("Resource_se_083"), SubResource("Resource_se_084"), SubResource("Resource_se_085"), SubResource("Resource_se_086"), SubResource("Resource_se_087"), SubResource("Resource_se_088"), SubResource("Resource_se_089"), SubResource("Resource_se_090"), SubResource("Resource_se_091"), SubResource("Resource_se_092"), SubResource("Resource_se_093"), SubResource("Resource_se_094"), SubResource("Resource_se_095"), SubResource("Resource_se_096"), SubResource("Resource_se_097"), SubResource("Resource_se_098"), SubResource("Resource_se_099"), SubResource("Resource_se_100"), SubResource("Resource_se_101"), SubResource("Resource_se_102"), SubResource("Resource_se_103"), SubResource("Resource_se_104"), SubResource("Resource_se_105"), SubResource("Resource_se_106"), SubResource("Resource_se_107"), SubResource("Resource_se_108"), SubResource("Resource_se_109"), SubResource("Resource_se_110"), SubResource("Resource_se_111"), SubResource("Resource_se_112"), SubResource("Resource_se_113"), SubResource("Resource_se_114"), SubResource("Resource_se_115"), SubResource("Resource_se_116"), SubResource("Resource_se_117"), SubResource("Resource_se_118"), SubResource("Resource_se_119"), SubResource("Resource_se_120"), SubResource("Resource_se_121"), SubResource("Resource_se_122"), SubResource("Resource_se_123"), SubResource("Resource_se_124")])
+timeline_events = Array[ExtResource("2_spawn_event")]([SubResource("Resource_se_001"), SubResource("Resource_se_002"), SubResource("Resource_se_003"), SubResource("Resource_se_004"), SubResource("Resource_se_005"), SubResource("Resource_se_006"), SubResource("Resource_se_007"), SubResource("Resource_se_008"), SubResource("Resource_se_009"), SubResource("Resource_se_010"), SubResource("Resource_se_011"), SubResource("Resource_se_012"), SubResource("Resource_se_013"), SubResource("Resource_se_014"), SubResource("Resource_se_015"), SubResource("Resource_se_016"), SubResource("Resource_se_017"), SubResource("Resource_se_018"), SubResource("Resource_se_019"), SubResource("Resource_se_020"), SubResource("Resource_se_021"), SubResource("Resource_se_022"), SubResource("Resource_se_023"), SubResource("Resource_se_024"), SubResource("Resource_se_025"), SubResource("Resource_se_026"), SubResource("Resource_se_027"), SubResource("Resource_se_028"), SubResource("Resource_se_029"), SubResource("Resource_se_030"), SubResource("Resource_se_031"), SubResource("Resource_se_032"), SubResource("Resource_se_033"), SubResource("Resource_se_034"), SubResource("Resource_se_035"), SubResource("Resource_se_036"), SubResource("Resource_se_037"), SubResource("Resource_se_038"), SubResource("Resource_se_039"), SubResource("Resource_se_040"), SubResource("Resource_se_041"), SubResource("Resource_se_042"), SubResource("Resource_se_043"), SubResource("Resource_se_044"), SubResource("Resource_se_045"), SubResource("Resource_se_046"), SubResource("Resource_se_047"), SubResource("Resource_se_048"), SubResource("Resource_se_049"), SubResource("Resource_se_050"), SubResource("Resource_se_051"), SubResource("Resource_se_052"), SubResource("Resource_se_053"), SubResource("Resource_se_054"), SubResource("Resource_se_055"), SubResource("Resource_se_056"), SubResource("Resource_se_057"), SubResource("Resource_se_058"), SubResource("Resource_se_059"), SubResource("Resource_se_060"), SubResource("Resource_se_061"), SubResource("Resource_se_062"), SubResource("Resource_se_063"), SubResource("Resource_se_064"), SubResource("Resource_se_065"), SubResource("Resource_se_066"), SubResource("Resource_se_067"), SubResource("Resource_se_068"), SubResource("Resource_se_069"), SubResource("Resource_se_070"), SubResource("Resource_se_071"), SubResource("Resource_se_072"), SubResource("Resource_se_073"), SubResource("Resource_se_074"), SubResource("Resource_se_075"), SubResource("Resource_se_076"), SubResource("Resource_se_077"), SubResource("Resource_se_078"), SubResource("Resource_se_079"), SubResource("Resource_se_080"), SubResource("Resource_se_081"), SubResource("Resource_se_082"), SubResource("Resource_se_083"), SubResource("Resource_se_084"), SubResource("Resource_se_085"), SubResource("Resource_se_086"), SubResource("Resource_se_087"), SubResource("Resource_se_088"), SubResource("Resource_se_089"), SubResource("Resource_se_090"), SubResource("Resource_se_091"), SubResource("Resource_se_092"), SubResource("Resource_se_093"), SubResource("Resource_se_094"), SubResource("Resource_se_095"), SubResource("Resource_se_096"), SubResource("Resource_se_097"), SubResource("Resource_se_098"), SubResource("Resource_se_099"), SubResource("Resource_se_100"), SubResource("Resource_se_101"), SubResource("Resource_se_102"), SubResource("Resource_se_103"), SubResource("Resource_se_104"), SubResource("Resource_se_105"), SubResource("Resource_se_106"), SubResource("Resource_se_107"), SubResource("Resource_se_108"), SubResource("Resource_se_109"), SubResource("Resource_se_110"), SubResource("Resource_se_111"), SubResource("Resource_se_112"), SubResource("Resource_se_113"), SubResource("Resource_se_114"), SubResource("Resource_se_115"), SubResource("Resource_se_116"), SubResource("Resource_se_117"), SubResource("Resource_se_118"), SubResource("Resource_se_119"), SubResource("Resource_se_120"), SubResource("Resource_se_121"), SubResource("Resource_se_122"), SubResource("Resource_se_123"), SubResource("Resource_se_124"), SubResource("Resource_se_125"), SubResource("Resource_se_126"), SubResource("Resource_se_127"), SubResource("Resource_se_128"), SubResource("Resource_se_129"), SubResource("Resource_se_130"), SubResource("Resource_se_131"), SubResource("Resource_se_132"), SubResource("Resource_se_133"), SubResource("Resource_se_134"), SubResource("Resource_se_135"), SubResource("Resource_se_136"), SubResource("Resource_se_137"), SubResource("Resource_se_138"), SubResource("Resource_se_139"), SubResource("Resource_se_140"), SubResource("Resource_se_141"), SubResource("Resource_se_142"), SubResource("Resource_se_143"), SubResource("Resource_se_144"), SubResource("Resource_se_145"), SubResource("Resource_se_146"), SubResource("Resource_se_147"), SubResource("Resource_se_148"), SubResource("Resource_se_149"), SubResource("Resource_se_150"), SubResource("Resource_se_151"), SubResource("Resource_se_152"), SubResource("Resource_se_153"), SubResource("Resource_se_154"), SubResource("Resource_se_155"), SubResource("Resource_se_156"), SubResource("Resource_se_157"), SubResource("Resource_se_158"), SubResource("Resource_se_159"), SubResource("Resource_se_160"), SubResource("Resource_se_161"), SubResource("Resource_se_162"), SubResource("Resource_se_163"), SubResource("Resource_se_164"), SubResource("Resource_se_165"), SubResource("Resource_se_166"), SubResource("Resource_se_167"), SubResource("Resource_se_168"), SubResource("Resource_se_169"), SubResource("Resource_se_170"), SubResource("Resource_se_171"), SubResource("Resource_se_172"), SubResource("Resource_se_173"), SubResource("Resource_se_174"), SubResource("Resource_se_175"), SubResource("Resource_se_176"), SubResource("Resource_se_177"), SubResource("Resource_se_178"), SubResource("Resource_se_179"), SubResource("Resource_se_180"), SubResource("Resource_se_181"), SubResource("Resource_se_182"), SubResource("Resource_se_183"), SubResource("Resource_se_184"), SubResource("Resource_se_185"), SubResource("Resource_se_186"), SubResource("Resource_se_187"), SubResource("Resource_se_188"), SubResource("Resource_se_189"), SubResource("Resource_se_190"), SubResource("Resource_se_191"), SubResource("Resource_se_192"), SubResource("Resource_se_193"), SubResource("Resource_se_194"), SubResource("Resource_se_195"), SubResource("Resource_se_196"), SubResource("Resource_se_197"), SubResource("Resource_se_198"), SubResource("Resource_se_199"), SubResource("Resource_se_200"), SubResource("Resource_se_201"), SubResource("Resource_se_202"), SubResource("Resource_se_203"), SubResource("Resource_se_204"), SubResource("Resource_se_205"), SubResource("Resource_se_206"), SubResource("Resource_se_207"), SubResource("Resource_se_208"), SubResource("Resource_se_209"), SubResource("Resource_se_210"), SubResource("Resource_se_211"), SubResource("Resource_se_212"), SubResource("Resource_se_213"), SubResource("Resource_se_214"), SubResource("Resource_se_215"), SubResource("Resource_se_216"), SubResource("Resource_se_217"), SubResource("Resource_se_218"), SubResource("Resource_se_219"), SubResource("Resource_se_220"), SubResource("Resource_se_221"), SubResource("Resource_se_222"), SubResource("Resource_se_223")])
 total_distance = 320.0
 wave_events = Array[Dictionary]([])

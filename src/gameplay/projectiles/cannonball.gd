@@ -208,6 +208,12 @@ func _on_hit(target: Node) -> void:
 	# Ignore player, followers, other cannonballs, and non-combat items
 	if target.is_in_group("player") or target.is_in_group("follower") or target.is_in_group("cannonballs") or target.is_in_group("collectibles") or target.is_in_group("multiplier_gate"):
 		return
+
+	# Ignore already destroyed boss subparts
+	if target is BossComponentDelegate and is_instance_valid(target.boss_node):
+		var comp_var = "hp_" + target.component_name
+		if comp_var in target.boss_node and target.boss_node.get(comp_var) <= 0:
+			return
 		
 	if target.is_in_group("destructible") or target.is_in_group("enemies") or target.is_in_group("boss") or target.has_method("take_damage"):
 		_is_destroyed = true

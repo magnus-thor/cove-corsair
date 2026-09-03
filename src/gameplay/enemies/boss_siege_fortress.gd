@@ -68,6 +68,7 @@ func _physics_process(delta: float) -> void:
 			if abs(global_position.z - _target_z) < 0.5:
 				current_state = State.COMBAT
 				_attack_timer = 0.5
+				_minion_timer = 3.5 # First minion wave arrives 1.5s into combat!
 				
 		State.COMBAT:
 			_process_combat(delta)
@@ -111,7 +112,7 @@ func _process_combat(delta: float) -> void:
 			
 	# Reinforcement Minions
 	_minion_timer += delta
-	var minion_cd = 8.0 if current_phase == 1 else 6.0
+	var minion_cd = 5.0 if current_phase == 1 else 4.0
 	if _minion_timer >= minion_cd:
 		_minion_timer = 0.0
 		_spawn_bastion_minions()
@@ -163,28 +164,40 @@ func _trigger_geyser_slam() -> void:
 	if not player or not is_instance_valid(player):
 		return
 		
-	# Spawn 2 thermal geysers near player's path
-	for offset_x in [-2.5, 2.5]:
+	# Telegraphed lane-based volcanic pillars:
+	# Always leaves a clear, readable 3.8m+ lane for the player to maneuver through.
+	var px = player.global_position.x
+	var target_lanes: Array[float] = []
+	if px < -1.2:
+		# Player is on the left; erupt left & center, leaving right corridor wide open
+		target_lanes = [-3.5, 0.0]
+	elif px > 1.2:
+		# Player is on the right; erupt right & center, leaving left corridor wide open
+		target_lanes = [3.5, 0.0]
+	else:
+		# Player is in center; erupt flanking lanes at +/- 3.6, keeping 4.0m center corridor clear
+		target_lanes = [-3.6, 3.6]
+
+	for lx in target_lanes:
 		if thermal_geyser_scene:
 			var geyser = thermal_geyser_scene.instantiate() as Node3D
 			get_tree().current_scene.add_child(geyser)
-			geyser.global_position = Vector3(player.global_position.x + offset_x, 0.0, player.global_position.z + randf_range(-1.0, 2.0))
+			geyser.global_position = Vector3(lx, 0.0, player.global_position.z + randf_range(-0.5, 1.5))
 
 func _start_ram_overdrive() -> void:
 	current_state = State.RAMMING
 	_charge_dir = 1
-	AudioManager.play_sfx("cannon_shots", 0.5, 0.7, 4.0)
+	AudioManager.play_sfx("gate_passes", 0.6, 0.8, 4.0)
 	
 	if boss_sprite:
 		var tween = create_tween()
-		tween.tween_property(boss_sprite, "modulate", Color(4.0, 0.8, 0.1, 1.0), 0.15)
-		tween.tween_property(boss_sprite, "modulate", Color.WHITE, 0.15)
-		tween.tween_property(boss_sprite, "modulate", Color(4.0, 0.8, 0.1, 1.0), 0.15)
-		tween.tween_property(boss_sprite, "modulate", Color.WHITE, 0.15)
+		tween.tween_property(boss_sprite, "modulate", Color(3.0, 1.0, 0.2, 1.0), 0.2)
+		tween.tween_property(boss_sprite, "modulate", Color(1.4, 0.6, 0.3, 1.0), 0.3)
 
 func _process_ram_overdrive(delta: float) -> void:
 	var player = get_tree().get_first_node_in_group("player")
 	var player_z = player.global_position.z if player else 0.0
+	_minion_timer += delta * 0.5
 	
 	if _charge_dir == 1:
 		# Rapid forward thrust
@@ -206,23 +219,50 @@ func _process_ram_overdrive(delta: float) -> void:
 			current_state = State.COMBAT
 
 func _spawn_bastion_minions() -> void:
-	var parent = get_tree().get_first_node_in_group("level_controller")
-	if not parent: parent = get_parent()
-	if not parent: return
+	var root = get_tree().current_scene
+	if not root: root = get_tree().get_first_node_in_group("level_controller")
+	if not root: root = get_parent()
+	if not root: return
 	
-	if randf() < 0.5 and iron_gunner_scene:
-		var gunner = iron_gunner_scene.instantiate() as Area3D
-		parent.add_child(gunner)
-		gunner.global_position = Vector3(randf_range(-3.5, 3.5), 0.1, global_position.z + 4.0)
-	elif brimstone_raft_scene:
-		var raft = brimstone_raft_scene.instantiate() as Area3D
-		parent.add_child(raft)
-		raft.global_position = Vector3(randf_range(-3.0, 3.0), 0.1, global_position.z + 4.0)
+	AudioManager.play_sfx("gate_passes", 1.2, 1.4, 0.0)
+	
+	# Structure escort waves based on phase
+	var spawns: Array[Dictionary] = []
+	if current_phase == 1:
+		# Phase 1: 1 Iron Gunner escort + 1 Brimstone Raft
+		var side = -1.0 if randf() < 0.5 else 1.0
+		spawns.append({"type": "gunner", "pos": Vector3(-2.2 * side, 0.1, global_position.z + 3.5)})
+		spawns.append({"type": "raft", "pos": Vector3(2.2 * side, 0.1, global_position.z + 4.5)})
+	elif current_phase == 2:
+		# Phase 2: Dual Brimstone Rafts charging ahead
+		spawns.append({"type": "raft", "pos": Vector3(-2.6, 0.1, global_position.z + 3.5)})
+		spawns.append({"type": "raft", "pos": Vector3(2.6, 0.1, global_position.z + 3.5)})
+	else:
+		# Phase 3: 1 Iron Gunner center + dual flanking Brimstone Rafts
+		spawns.append({"type": "gunner", "pos": Vector3(0.0, 0.1, global_position.z + 4.0)})
+		spawns.append({"type": "raft", "pos": Vector3(-3.0, 0.1, global_position.z + 3.2)})
+		spawns.append({"type": "raft", "pos": Vector3(3.0, 0.1, global_position.z + 3.2)})
+
+	for s in spawns:
+		var mob: Area3D = null
+		if s["type"] == "gunner" and iron_gunner_scene:
+			mob = iron_gunner_scene.instantiate() as Area3D
+		elif s["type"] == "raft" and brimstone_raft_scene:
+			mob = brimstone_raft_scene.instantiate() as Area3D
+			
+		if mob:
+			root.add_child(mob)
+			mob.global_position = s["pos"]
+			if GameState.boss_spawned:
+				print("[BOSS MINION] Spawning %s at pos: %s | HP: %d" % [mob.name, mob.global_position, mob.current_hp])
 
 # Damage Routing
 func damage_component(comp_name: String, amount: int, _from_bow: bool) -> void:
 	if _is_defeated:
 		return
+		
+	if GameState.boss_spawned:
+		print("[BOSS HIT] The Siege Fortress [%s] took %d dmg | HP: %d/%d" % [comp_name, amount, current_hp, max_hp])
 		
 	match comp_name:
 		"port_turret":
@@ -273,19 +313,17 @@ func damage_component(comp_name: String, amount: int, _from_bow: bool) -> void:
 	else:
 		_check_phase()
 
-func _flash_node(node: Variant) -> void:
-	if not is_instance_valid(node) or not (node is Node3D):
-		return
-	var orig_sc = node.scale
-	var tween = create_tween()
-	tween.tween_property(node, "scale", orig_sc * 1.2, 0.05)
-	tween.tween_property(node, "scale", orig_sc, 0.08)
+func _flash_node(_node: Variant) -> void:
+	_flash_boss_main()
 
 func _flash_boss_main() -> void:
 	if not boss_sprite:
 		return
+	if _flash_tweens.has("boss_main") and is_instance_valid(_flash_tweens["boss_main"]):
+		_flash_tweens["boss_main"].kill()
 	var tween = create_tween()
-	tween.tween_property(boss_sprite, "modulate", Color(2.5, 0.8, 0.4, 1.0), 0.05)
+	_flash_tweens["boss_main"] = tween
+	boss_sprite.modulate = Color(2.5, 0.8, 0.4, 1.0)
 	tween.tween_property(boss_sprite, "modulate", Color(1.4, 0.6, 0.3, 1.0), 0.1)
 
 func _destroy_subpart(node: Variant) -> void:
@@ -298,12 +336,19 @@ func _destroy_subpart(node: Variant) -> void:
 		if root:
 			root.add_child(vfx)
 			vfx.global_position = node.global_position
-	if is_instance_valid(node) and "visible" in node:
-		node.visible = false
-	if is_instance_valid(node) and node is Node:
-		node.remove_from_group("boss")
-		node.remove_from_group("destructible")
-		node.remove_from_group("enemies")
+	if is_instance_valid(node):
+		if "visible" in node:
+			node.visible = false
+		if node is Node:
+			node.remove_from_group("boss")
+			node.remove_from_group("destructible")
+			node.remove_from_group("enemies")
+		if node is CollisionObject3D:
+			node.set_deferred("monitoring", false)
+			node.set_deferred("monitorable", false)
+			for child in node.get_children():
+				if child is CollisionShape3D:
+					child.set_deferred("disabled", true)
 
 func _check_phase() -> void:
 	if current_phase == 1 and current_hp <= int(max_hp * 0.65):

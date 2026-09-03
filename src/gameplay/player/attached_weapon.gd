@@ -166,12 +166,14 @@ func _process_targeting(delta: float) -> void:
 	var player = get_tree().get_first_node_in_group("player")
 	var boat_z = player.global_position.z if (player and is_instance_valid(player)) else global_position.z
 	
-	# Priority 1: Active enemy mobs, hazards, and destructibles
+	# Priority 1: Active enemy mobs, destructibles, and destructible obstacles
 	var spawn_candidates: Array[Node] = []
-	for grp in ["enemies", "hazards", "destructible", "destructible_obstacles", "obstacles"]:
+	for grp in ["enemies", "destructible", "destructible_obstacles", "obstacles"]:
 		for node in get_tree().get_nodes_in_group(grp):
 			if is_instance_valid(node) and not node.is_in_group("boss") and not (node is BossWarBarge) and not (node is BossComponentDelegate):
-				spawn_candidates.append(node)
+				# Must be something that can actually take damage
+				if node.has_method("take_damage") or (node.get_parent() and node.get_parent().has_method("take_damage")):
+					spawn_candidates.append(node)
 				
 	# Check other crew targets to avoid redundant targeting
 	var claimed_targets: Dictionary = {}
@@ -185,6 +187,7 @@ func _process_targeting(delta: float) -> void:
 	var min_dist = INF
 	var min_unclaimed_dist = INF
 	var max_range = weapon_data.detection_range if ("detection_range" in weapon_data and weapon_data.detection_range > 0.0) else 32.0
+	var m_pos_ref = muzzle_point.global_position if muzzle_point else global_position
 
 	var processed: Dictionary = {}
 	for target in spawn_candidates:
@@ -193,7 +196,15 @@ func _process_targeting(delta: float) -> void:
 		processed[target] = true
 		
 		var node3d = target as Node3D
-		if node3d.global_position.z > (boat_z + 2.5):
+		# Must be in front of the boat
+		if node3d.global_position.z > (boat_z - 0.2):
+			continue
+			
+		var to_target = (node3d.global_position - m_pos_ref)
+		to_target.y = 0.0
+		var dir_norm = to_target.normalized()
+		# Forward combat arc: reject targets beyond +/- 70 degrees from upstream (-Z)
+		if -dir_norm.z < 0.35:
 			continue
 			
 		var dist = global_position.distance_to(node3d.global_position)
@@ -228,7 +239,13 @@ func _process_targeting(delta: float) -> void:
 			processed[target] = true
 			
 			var node3d = target as Node3D
-			if node3d.global_position.z > (boat_z + 2.5):
+			if node3d.global_position.z > (boat_z - 0.2):
+				continue
+				
+			var to_target = (node3d.global_position - m_pos_ref)
+			to_target.y = 0.0
+			var dir_norm = to_target.normalized()
+			if -dir_norm.z < 0.35:
 				continue
 				
 			var dist = global_position.distance_to(node3d.global_position)
@@ -242,6 +259,8 @@ func _process_targeting(delta: float) -> void:
 		var m_pos = muzzle_point.global_position if muzzle_point else global_position
 		var dir_to_target = (current_target.global_position - m_pos)
 		dir_to_target.y = 0.0 # Maintain flat water level trajectory
+		if dir_to_target.z >= -0.2:
+			dir_to_target.z = -0.2 # Clamp to forward
 		aim_direction = dir_to_target.normalized() if dir_to_target.length_squared() > 0.001 else Vector3(0, 0, -1)
 		
 		# Flip sprite left/right based on target relative to boat
