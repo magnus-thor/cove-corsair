@@ -6,6 +6,8 @@ extends Resource
 @export var sprite_texture: Texture2D
 @export var pixel_size: float = 0.006
 @export var y_offset: float = 0.485
+@export var scale: Vector3 = Vector3(1.0, 1.0, 1.0)
+@export var rotation_degrees: Vector3 = Vector3(-60.0, 0.0, 0.0)
 @export var collision_size: Vector3 = Vector3(1.6, 1.0, 2.8)
 @export var max_health: int = 100
 @export var move_speed: float = 8.0

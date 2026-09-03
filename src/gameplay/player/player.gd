@@ -173,8 +173,11 @@ func apply_ship_data(data: ShipData) -> void:
 		sprite.visible = true
 		sprite.texture = data.sprite_texture
 		sprite.pixel_size = data.pixel_size
-		sprite.rotation_degrees = Vector3(player_pitch_deg, 0, 0)
+		var rot = data.rotation_degrees if ("rotation_degrees" in data and data.rotation_degrees != Vector3.ZERO) else Vector3(player_pitch_deg, 0, 0)
+		sprite.rotation_degrees = rot
 		sprite.position = Vector3(0, data.y_offset if "y_offset" in data else 0.485, 0)
+		var sc = data.scale if ("scale" in data and data.scale != Vector3.ZERO) else Vector3.ONE
+		sprite.scale = sc
 		sprite.billboard = BaseMaterial3D.BILLBOARD_DISABLED
 		sprite.alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
 	

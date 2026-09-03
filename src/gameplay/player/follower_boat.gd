@@ -23,10 +23,12 @@ func _ready() -> void:
 		if sprite and player.ship_data.sprite_texture:
 			sprite.texture = player.ship_data.sprite_texture
 			sprite.pixel_size = player.ship_data.pixel_size
-			var pitch = player.player_pitch_deg if "player_pitch_deg" in player else 60.0
-			sprite.rotation_degrees = Vector3(pitch, 0, 0)
+			var pitch = player.player_pitch_deg if "player_pitch_deg" in player else -60.0
+			var rot = player.ship_data.rotation_degrees if ("rotation_degrees" in player.ship_data and player.ship_data.rotation_degrees != Vector3.ZERO) else Vector3(pitch, 0, 0)
+			sprite.rotation_degrees = rot
 			sprite.position = Vector3(0, player.ship_data.y_offset if "y_offset" in player.ship_data else 0.485, 0)
-			sprite.scale = Vector3.ONE * sf
+			var base_sc = player.ship_data.scale if ("scale" in player.ship_data and player.ship_data.scale != Vector3.ZERO) else Vector3.ONE
+			sprite.scale = base_sc * sf
 			
 		var col = get_node_or_null("CollisionShape3D") as CollisionShape3D
 		if col and col.shape is BoxShape3D:

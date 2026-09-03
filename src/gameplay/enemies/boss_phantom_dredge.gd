@@ -137,32 +137,39 @@ func _telegraph_and_strike_mortar(pos: Vector3) -> void:
 	AudioManager.play_sfx("cannon_shots", 0.8, 1.0)
 	
 	var tween = marker.create_tween()
+	var vfx_scene = explosion_scene
+	var tree = get_tree()
 	tween.tween_property(mat, "albedo_color:a", 0.8, 1.1)
-	tween.tween_callback(func():
-		_detonate_poison_mortar(marker.global_position)
-		marker.queue_free()
-	)
+	tween.tween_callback(Callable(BossPhantomDredge, "execute_poison_mortar_detonation").bind(marker.global_position, vfx_scene, tree))
+	tween.tween_callback(marker.queue_free)
 
-func _detonate_poison_mortar(pos: Vector3) -> void:
+static func execute_poison_mortar_detonation(pos: Vector3, vfx_prefab: PackedScene, tree: SceneTree) -> void:
+	if not tree:
+		return
 	AudioManager.play_sfx("barrel_breaks", 0.7, 0.9, 2.0)
 	AudioManager.play_sfx("water_splashes", 0.7, 0.9)
 	
-	if explosion_scene:
-		var vfx = explosion_scene.instantiate() as Node3D
-		get_tree().current_scene.add_child(vfx)
+	if vfx_prefab:
+		var vfx = vfx_prefab.instantiate() as Node3D
+		var root = tree.current_scene
+		if root:
+			root.add_child(vfx)
 		vfx.global_position = pos
 		vfx.scale = Vector3(2.0, 2.0, 2.0)
 		vfx.modulate = Color(0.2, 2.0, 0.6, 1.0)
 		
-	var camera = get_tree().get_first_node_in_group("game_camera")
+	var camera = tree.get_first_node_in_group("game_camera")
 	if camera and camera.has_method("shake"):
 		camera.shake(0.20, 0.20)
 		
-	var player = get_tree().get_first_node_in_group("player")
+	var player = tree.get_first_node_in_group("player")
 	if player and is_instance_valid(player):
 		var dist = player.global_position.distance_to(pos)
 		if dist <= 1.7 and player.has_method("damage_fleet"):
 			player.damage_fleet(1)
+
+func _detonate_poison_mortar(pos: Vector3) -> void:
+	execute_poison_mortar_detonation(pos, explosion_scene, get_tree())
 
 func _start_submerge() -> void:
 	current_state = State.SUBMERGED
