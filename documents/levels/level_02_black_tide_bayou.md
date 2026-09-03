@@ -11,7 +11,7 @@
 * **Target Distance:** $280.0\text{m}$ (Scripted timeline from $0\text{m} \rightarrow 280\text{m}$, Boss encounter triggers at $280\text{m}$)
 * **Base Scroll Speed:** $10.0\text{ m/s}$
 * **River Width (World Units):** $12.0\text{m}$ ($X \in [-6.0, +6.0]$)
-* **Starting Vessel:** [The Sloop](file:///f:/projects/cove-corsair/src/data/resources/user_vessels/sloop_ship.tres) (1 Starting Hull Point)
+* **Starting Vessel:** [The Sloop](file:///f:/projects/cove-corsair/src/data/resources/user_vessels/sloop_ship.tres) (5 Starting Hull Points)
 * **Environment Palette:**
   * **Water Albedo:** Murky Dark Swamp Green `Color(0.04, 0.28, 0.22, 0.92)`
   * **Fog Color:** Deep Marsh Moss Fog `Color(0.06, 0.18, 0.14, 1.0)`
@@ -60,7 +60,7 @@ The level contains 96 scripted timeline events structured into four distinct tac
 ## 4. Boss Specification: The Phantom Dredge
 
 * **Boss Scene:** [`boss_phantom_dredge.tscn`](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_phantom_dredge.tscn) / [`boss_phantom_dredge.gd`](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_phantom_dredge.gd)
-* **Total Health:** $750\text{ HP}$
+* **Total Health:** $450\text{ HP}$
 * **Boss Archetype:** Ghostly Steam-Dredger Paddlewheel Ironclad
 * **Attack Phases & Special Mechanics:**
   * **Phase 1: Dredge Wheel Shockwaves (100% - 60% HP):**

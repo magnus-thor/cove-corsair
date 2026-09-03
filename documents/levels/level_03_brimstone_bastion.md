@@ -11,7 +11,7 @@
 * **Target Distance:** $320.0\text{m}$ (Scripted timeline from $0\text{m} \rightarrow 320\text{m}$, Boss encounter triggers at $320\text{m}$)
 * **Base Scroll Speed:** $10.0\text{ m/s}$
 * **River Width (World Units):** $12.0\text{m}$ ($X \in [-6.0, +6.0]$)
-* **Starting Vessel:** [The Ironclad](file:///f:/projects/cove-corsair/src/data/resources/user_vessels/ironclad_ship.tres) (2 Starting Hull Points)
+* **Starting Vessel:** [The Ironclad](file:///f:/projects/cove-corsair/src/data/resources/user_vessels/ironclad_ship.tres) (8 Starting Hull Points)
 * **Environment Palette:**
   * **Water Albedo:** Fiery Molten Volcanic Red `Color(0.22, 0.06, 0.04, 1.0)`
   * **Fog Color:** Smoky Ash Red `Color(0.25, 0.08, 0.04, 1.0)`

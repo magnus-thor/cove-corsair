@@ -960,7 +960,7 @@ trigger_distance = 280.0
 entity_type = 4
 lane_x = 0.0
 rarity_tier = 4
-base_hp_override = 750
+base_hp_override = 450
 gate_type = 2
 gate_value = 1
 
@@ -970,7 +970,7 @@ level_id = 2
 level_name = "Level 2: Black Tide Bayou"
 target_distance = 280.0
 starting_hull = 1
-boss_hp = 750
+boss_hp = 450
 boss_scene = ExtResource("3_boss")
 biome_type = "black_tide_bayou"
 water_albedo = Color(0.04, 0.28, 0.22, 0.92)

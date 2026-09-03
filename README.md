@@ -123,7 +123,7 @@ Defined in [`src/gameplay/obstacles/multiplier_gate.gd`](file:///f:/projects/cov
 ### 5. Multi-Phase Boss Battles
 Each campaign level culminates in a custom boss battle:
 * **Level 1 Boss:** [Captain Ironjaw's War-Barge](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_war_barge.gd) ($220\text{ HP}$) with destructible swivel guns and exposed boiler core.
-* **Level 2 Boss:** [The Phantom Dredge](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_phantom_dredge.gd) ($750\text{ HP}$) with ghost submersion and toxic shockwave attacks.
+* **Level 2 Boss:** [The Phantom Dredge](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_phantom_dredge.gd) ($450\text{ HP}$) with ghost submersion and toxic shockwave attacks.
 * **Level 3 Boss:** [Brimstone Siege Fortress](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_siege_fortress.gd) ($800\text{ HP}$) with mortar turrets, magma vents, and exposed core meltdown phases.
 
 ---
@@ -154,7 +154,7 @@ flowchart TD
 | Level ID | Level Name | Biome Type | Target Distance | Scroll Speed | Starting Vessel | Boss Encounter | Setup Document |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Level 1** | Smuggler's Run | `smugglers_run` | $250\text{m}$ | $10.0\text{ m/s}$ | The Dinghy | War-Barge ($220\text{ HP}$) | [Level 1 Setup Spec](file:///f:/projects/cove-corsair/documents/levels/level_01_smugglers_run.md) |
-| **Level 2** | Black Tide Bayou | `black_tide_bayou` | $280\text{m}$ | $10.0\text{ m/s}$ | The Sloop | Phantom Dredge ($750\text{ HP}$) | [Level 2 Setup Spec](file:///f:/projects/cove-corsair/documents/levels/level_02_black_tide_bayou.md) |
+| **Level 2** | Black Tide Bayou | `black_tide_bayou` | $280\text{m}$ | $10.0\text{ m/s}$ | The Sloop | Phantom Dredge ($450\text{ HP}$) | [Level 2 Setup Spec](file:///f:/projects/cove-corsair/documents/levels/level_02_black_tide_bayou.md) |
 | **Level 3** | Brimstone Bastion | `brimstone_bastion` | $320\text{m}$ | $10.0\text{ m/s}$ | The Ironclad | Siege Fortress ($800\text{ HP}$) | [Level 3 Setup Spec](file:///f:/projects/cove-corsair/documents/levels/level_03_brimstone_bastion.md) |
 
 ---

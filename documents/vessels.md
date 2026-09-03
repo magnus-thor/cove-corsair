@@ -86,7 +86,7 @@ Campaign levels culminate in multi-phase boss encounters with custom telegraphin
 * **Mechanics:** Locks scroll speed to $6.0\text{ m/s}$, fires swivel gun salvos, and vents steam to expose its Boiler Core ($2\times$ critical hit multiplier).
 
 ### 2. The Phantom Dredge (Level 2)
-* **Script:** [`boss_phantom_dredge.gd`](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_phantom_dredge.gd) | **HP:** $750\text{ HP}$
+* **Script:** [`boss_phantom_dredge.gd`](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_phantom_dredge.gd) | **HP:** $450\text{ HP}$
 * **Components:** Ghostly Paddlewheel & Spectral Boiler.
 * **Mechanics:** Dredge wheel shockwaves, spectral cannon volleys, ghostly submersion invulnerability phases, and high-speed frenzy charges.
 

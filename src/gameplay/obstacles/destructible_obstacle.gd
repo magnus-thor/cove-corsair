@@ -1,5 +1,7 @@
 class_name DestructibleObstacle
 extends Area3D
+## Destructible obstacle utilizing Area3D collision detection and GPUParticles3D VFX
+## shatter behavior (barrel_explosion.tscn) rather than RigidBody3D physics to safeguard 60 FPS performance.
 
 enum ObstacleType { WOODEN_BARREL, FUSE_BARREL, RUNE_BARREL, SEA_MINE, CORAL_REEF }
 

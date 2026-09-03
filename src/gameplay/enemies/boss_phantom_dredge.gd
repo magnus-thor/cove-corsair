@@ -3,8 +3,8 @@ extends Node3D
 
 enum State { APPROACHING, COMBAT, SUBMERGED, DYING }
 
-@export var max_hp: int = 750
-@export var current_hp: int = 750
+@export var max_hp: int = 450
+@export var current_hp: int = 450
 
 @export var approach_speed: float = 12.0
 @export var combat_z_offset: float = -18.0

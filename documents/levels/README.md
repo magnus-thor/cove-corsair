@@ -9,8 +9,8 @@ This directory contains technical specifications for all campaign levels in **Co
 | Level ID | Level Name | Biome Type | Target Distance | Scroll Speed | Starting Vessel | Boss Encounter | Primary Hazards |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Level 1** | [Smuggler's Run](file:///f:/projects/cove-corsair/documents/levels/level_01_smugglers_run.md) | `smugglers_run` (Coastal Island) | $250\text{m}$ | $10.0\text{ m/s}$ | The Dinghy (1 HP) | **Captain Ironjaw's War-Barge** ($220\text{ HP}$) | Reef Outcrops, Spiked Mines, Barricades |
-| **Level 2** | [Black Tide Bayou](file:///f:/projects/cove-corsair/documents/levels/level_02_black_tide_bayou.md) | `black_tide_bayou` (Murky Swamp) | $280\text{m}$ | $10.0\text{ m/s}$ | The Sloop (1 HP) | **The Phantom Dredge** ($750\text{ HP}$) | Biogas Pods, Grave Skiffs, Tide Cutters |
-| **Level 3** | [Brimstone Bastion](file:///f:/projects/cove-corsair/documents/levels/level_03_brimstone_bastion.md) | `brimstone_bastion` (Volcanic Fortress) | $320\text{m}$ | $10.0\text{ m/s}$ | The Ironclad (2 HP) | **Brimstone Siege Fortress** ($800\text{ HP}$) | Thermal Geysers, Iron Gunners, Bombarders |
+| **Level 2** | [Black Tide Bayou](file:///f:/projects/cove-corsair/documents/levels/level_02_black_tide_bayou.md) | `black_tide_bayou` (Murky Swamp) | $280\text{m}$ | $10.0\text{ m/s}$ | The Sloop (5 HP) | **The Phantom Dredge** ($450\text{ HP}$) | Biogas Pods, Grave Skiffs, Tide Cutters |
+| **Level 3** | [Brimstone Bastion](file:///f:/projects/cove-corsair/documents/levels/level_03_brimstone_bastion.md) | `brimstone_bastion` (Volcanic Fortress) | $320\text{m}$ | $10.0\text{ m/s}$ | The Ironclad (8 HP) | **Brimstone Siege Fortress** ($800\text{ HP}$) | Thermal Geysers, Iron Gunners, Bombarders |
 
 ---
 
