@@ -12,8 +12,8 @@ script = ExtResource("1_script")
 [node name="Visuals" type="Node3D" parent="."]
 
 [node name="ChestSprite" type="Sprite3D" parent="Visuals"]
-transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 0.25, 0)
-pixel_size = 0.003
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 0.17, 0)
+pixel_size = 0.0012
 billboard = 0
 alpha_cut = 1
 texture = ExtResource("2_chest_tex")

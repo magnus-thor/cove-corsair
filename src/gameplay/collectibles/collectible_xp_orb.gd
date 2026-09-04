@@ -5,7 +5,7 @@ extends Area3D
 @export var rotation_speed: float = 3.5
 @export var bob_speed: float = 3.5
 @export var bob_height: float = 0.02
-@export var base_water_y: float = 0.13
+@export var base_water_y: float = 0.46
 @export var river_flow_speed: float = 14.0
 @export var magnet_pull_speed: float = 24.0
 
@@ -39,11 +39,11 @@ func _ready() -> void:
 	# Create Sprite3D dynamically
 	var sprite = Sprite3D.new()
 	sprite.name = "XpSprite"
-	sprite.billboard = BaseMaterial3D.BILLBOARD_PARTICLES
+	sprite.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	sprite.alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
 	sprite.texture = preload("res://assets/sprites/ui/coin_icon.svg")
 	sprite.modulate = Color(0.2, 1.0, 0.2) # bright green
-	sprite.pixel_size = 0.006
+	sprite.pixel_size = 0.0021
 	visuals_node.add_child(sprite)
 	
 	scale = Vector3(3.0, 3.0, 3.0)

@@ -21,11 +21,23 @@ var available_assets: Array[Dictionary] = [
 	{"name": "Aft Mortar (Cannon)", "data": preload("res://src/data/resources/user_crew/weapon_aft_mortar.tres")}
 ]
 
+# Available Ammunition Resources for live weapon calibration
+var available_ammunition: Array[Dictionary] = [
+	{"name": "[ Default Weapon Ammo ]", "data": null},
+	{"name": "Standard Ball", "data": preload("res://src/data/resources/user_ammo/ammo_standard_ball.tres")},
+	{"name": "Grape Shot", "data": preload("res://src/data/resources/user_ammo/ammo_grape_shot.tres")},
+	{"name": "Heavy Shot", "data": preload("res://src/data/resources/user_ammo/ammo_heavy_shot.tres")},
+	{"name": "Fire Bomb", "data": preload("res://src/data/resources/user_ammo/ammo_fire_bomb.tres")},
+	{"name": "Coconut Bomb", "data": preload("res://src/data/resources/user_ammo/ammo_coconut_bomb.tres")},
+	{"name": "Throwing Axe", "data": preload("res://src/data/resources/user_ammo/ammo_throwing_axe.tres")}
+]
+
 # UI References
 @onready var ship_option: OptionButton = %ship_option
 @onready var tier_option: OptionButton = %tier_option
 @onready var socket_option: OptionButton = %socket_option
 @onready var asset_option: OptionButton = %asset_option
+@onready var ammo_option: OptionButton = %ammo_option
 
 @onready var slider_pos_x: HSlider = %slider_pos_x
 @onready var slider_pos_y: HSlider = %slider_pos_y
@@ -99,6 +111,13 @@ func _setup_ui() -> void:
 			asset_option.add_item(item["name"])
 		asset_option.selected = 0
 		asset_option.item_selected.connect(_on_asset_selected)
+
+	if ammo_option:
+		ammo_option.clear()
+		for item in available_ammunition:
+			ammo_option.add_item(item["name"])
+		ammo_option.selected = 0
+		ammo_option.item_selected.connect(_on_ammo_selected)
 
 	_refresh_ship_sockets_and_tiers()
 	
@@ -215,6 +234,7 @@ func _on_equip_tier(tier: int) -> void:
 			tier_option.selected = tier - 1
 		if asset_option:
 			asset_option.selected = 0
+		_reapply_selected_ammo()
 		_update_ui_from_current_socket()
 
 func _on_asset_selected(idx: int) -> void:
@@ -228,7 +248,30 @@ func _on_asset_selected(idx: int) -> void:
 		# Reset to default ship tier
 		var selected_tier = tier_option.selected + 1 if tier_option else 1
 		player_boat.apply_tier(selected_tier)
+	_reapply_selected_ammo()
 	_update_ui_from_current_socket()
+
+func _on_ammo_selected(idx: int) -> void:
+	if not player_boat:
+		return
+	var target_ammo: AmmoData = null
+	if idx > 0 and idx < available_ammunition.size():
+		target_ammo = available_ammunition[idx]["data"]
+	_apply_ammo_override(target_ammo)
+
+func _reapply_selected_ammo() -> void:
+	if ammo_option and ammo_option.selected > 0 and ammo_option.selected < available_ammunition.size():
+		var ammo_data: AmmoData = available_ammunition[ammo_option.selected]["data"]
+		_apply_ammo_override(ammo_data)
+
+func _apply_ammo_override(ammo_data: AmmoData) -> void:
+	if not player_boat or not "equipped_weapons" in player_boat:
+		return
+	for socket_name in player_boat.equipped_weapons.keys():
+		var weapon_node = player_boat.equipped_weapons[socket_name]
+		if is_instance_valid(weapon_node) and "weapon_data" in weapon_node and weapon_node.weapon_data:
+			if ammo_data != null:
+				weapon_node.weapon_data.default_ammo = ammo_data
 
 func _on_ship_selected(idx: int) -> void:
 	match idx:
@@ -240,6 +283,7 @@ func _on_ship_selected(idx: int) -> void:
 		_refresh_ship_sockets_and_tiers()
 		var selected_tier = tier_option.selected + 1 if tier_option else 1
 		player_boat.apply_tier(selected_tier)
+		_reapply_selected_ammo()
 	_update_ui_from_current_socket()
 
 func _on_tier_selected(idx: int) -> void:

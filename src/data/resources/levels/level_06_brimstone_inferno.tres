@@ -1,0 +1,164 @@
+[gd_resource type="Resource" script_class="LevelData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/data/level_data.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://src/gameplay/enemies/boss_siege_fortress.tscn" id="2_boss"]
+
+[resource]
+script = ExtResource("1_script")
+level_id = 6
+level_name = "Level 6: Brimstone Inferno"
+target_distance = 320.0
+base_scroll_speed = 11.0
+river_width_world = 12.0
+biome_type = "brimstone_bastion"
+water_albedo = Color(0.35, 0.08, 0.04, 0.95)
+fog_color = Color(0.45, 0.15, 0.08, 1.0)
+fog_density = 0.02
+boss_scene = ExtResource("2_boss")
+boss_hp = 1000
+wave_events = Array[Dictionary]([{
+"distance": 8.0,
+"type": "thermal_geyser",
+"x": -0.4
+}, {
+"distance": 8.0,
+"type": "thermal_geyser",
+"x": 0.4
+}, {
+"distance": 18.0,
+"hp": 30,
+"speed": 2.8,
+"type": "iron_gunners",
+"x_positions": [0.0]
+}, {
+"distance": 30.0,
+"hp": 22,
+"speed": 8.2,
+"type": "brimstone_rafts",
+"x_positions": [-0.5, 0.5]
+}, {
+"distance": 42.0,
+"type": "thermal_geyser",
+"x": -0.6
+}, {
+"distance": 42.0,
+"type": "thermal_geyser",
+"x": 0.0
+}, {
+"distance": 42.0,
+"type": "thermal_geyser",
+"x": 0.6
+}, {
+"distance": 54.0,
+"text": "+2",
+"type": "fleet_gate",
+"value": 2,
+"x": 0.2
+}, {
+"distance": 66.0,
+"count": 8,
+"type": "coin_arc",
+"x_end": 0.45,
+"x_start": -0.45
+}, {
+"distance": 78.0,
+"hp": 34,
+"speed": 3.0,
+"type": "iron_gunners",
+"x_positions": [-0.4, 0.4]
+}, {
+"distance": 92.0,
+"type": "thermal_geyser",
+"x": -0.3
+}, {
+"distance": 92.0,
+"type": "thermal_geyser",
+"x": 0.3
+}, {
+"distance": 106.0,
+"hp": 24,
+"speed": 8.5,
+"type": "brimstone_rafts",
+"x_positions": [-0.6, 0.0, 0.6]
+}, {
+"distance": 122.0,
+"hp": 140,
+"speed": 1.4,
+"type": "mini_boss_bombard",
+"x": 0.0
+}, {
+"distance": 140.0,
+"count": 9,
+"type": "coin_arc",
+"x_end": 0.5,
+"x_start": -0.5
+}, {
+"distance": 154.0,
+"text": "+2",
+"type": "fleet_gate",
+"value": 2,
+"x": -0.25
+}, {
+"distance": 168.0,
+"type": "thermal_geyser",
+"x": -0.55
+}, {
+"distance": 168.0,
+"type": "thermal_geyser",
+"x": 0.55
+}, {
+"distance": 182.0,
+"hp": 36,
+"speed": 3.2,
+"type": "iron_gunners",
+"x_positions": [-0.45, 0.45]
+}, {
+"distance": 196.0,
+"hp": 26,
+"speed": 8.8,
+"type": "brimstone_rafts",
+"x_positions": [-0.35, 0.35]
+}, {
+"distance": 210.0,
+"type": "thermal_geyser",
+"x": 0.0
+}, {
+"distance": 222.0,
+"text": "+2",
+"type": "fleet_gate",
+"value": 2,
+"x": 0.3
+}, {
+"distance": 236.0,
+"hp": 38,
+"speed": 3.2,
+"type": "iron_gunners",
+"x_positions": [-0.5, 0.0, 0.5]
+}, {
+"distance": 252.0,
+"count": 10,
+"type": "coin_arc",
+"x_end": 0.5,
+"x_start": -0.5
+}, {
+"distance": 268.0,
+"type": "thermal_geyser",
+"x": -0.45
+}, {
+"distance": 268.0,
+"type": "thermal_geyser",
+"x": 0.45
+}, {
+"distance": 282.0,
+"hp": 28,
+"speed": 9.0,
+"type": "brimstone_rafts",
+"x_positions": [-0.55, 0.0, 0.55]
+}, {
+"distance": 302.0,
+"message": "THE INFERNAL SIEGE FORTRESS AWAKENS (1000 HP)!",
+"type": "warning"
+}, {
+"distance": 320.0,
+"type": "boss"
+}])

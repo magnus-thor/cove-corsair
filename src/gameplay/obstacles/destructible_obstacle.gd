@@ -94,8 +94,8 @@ func update_obstacle_visuals() -> void:
 			ObstacleType.CORAL_REEF:
 				tex = coral_reef_tex
 				p_size = 0.0028
-				y_off = 1.86
-				sc = Vector3(0.95, 0.95, 0.95)
+				y_off = 2.00
+				sc = Vector3(0.71, 0.71, 0.71)
 				rot_deg = Vector3(0.0, 40.0, 0.0)
 				doubloons_drop = 4
 				

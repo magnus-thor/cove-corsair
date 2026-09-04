@@ -5,9 +5,13 @@ extends CanvasLayer
 signal game_started
 
 @onready var start_button: Button = %StartButton
+@onready var shipyard_button: Button = %ShipyardButton
 @onready var btn_lvl_1: Button = %BtnLvl1
 @onready var btn_lvl_2: Button = %BtnLvl2
 @onready var btn_lvl_3: Button = %BtnLvl3
+@onready var btn_lvl_4: Button = %BtnLvl4
+@onready var btn_lvl_5: Button = %BtnLvl5
+@onready var btn_lvl_6: Button = %BtnLvl6
 @onready var subtitle_label: Label = %GameSubtitle
 @onready var main_control: Control = $Control
 
@@ -16,7 +20,10 @@ var pulse_tween: Tween
 const LEVEL_NAMES: Dictionary = {
 	1: "Level 1: Smuggler's Run",
 	2: "Level 2: Black Tide Bayou",
-	3: "Level 3: Brimstone Bastion"
+	3: "Level 3: Brimstone Bastion",
+	4: "Level 4: Smuggler's Nightmare",
+	5: "Level 5: Black Tide Abyss",
+	6: "Level 6: Brimstone Inferno"
 }
 
 func _ready() -> void:
@@ -24,11 +31,19 @@ func _ready() -> void:
 		start_button.pressed.connect(_on_start_button_pressed)
 		_setup_button_pulse()
 		
+	if shipyard_button:
+		shipyard_button.pressed.connect(_on_shipyard_button_pressed)
+		
 	if btn_lvl_1: btn_lvl_1.pressed.connect(func(): _select_level(1))
 	if btn_lvl_2: btn_lvl_2.pressed.connect(func(): _select_level(2))
 	if btn_lvl_3: btn_lvl_3.pressed.connect(func(): _select_level(3))
+	if btn_lvl_4: btn_lvl_4.pressed.connect(func(): _select_level(4))
+	if btn_lvl_5: btn_lvl_5.pressed.connect(func(): _select_level(5))
+	if btn_lvl_6: btn_lvl_6.pressed.connect(func(): _select_level(6))
 	
+	GameState.active_vessel_changed.connect(_on_active_vessel_changed)
 	_update_level_buttons()
+	_refresh_player_ship()
 
 func _setup_button_pulse() -> void:
 	if not start_button:
@@ -36,8 +51,29 @@ func _setup_button_pulse() -> void:
 	
 	start_button.pivot_offset = start_button.custom_minimum_size / 2.0
 	pulse_tween = create_tween().set_loops()
-	pulse_tween.tween_property(start_button, "scale", Vector2(1.05, 1.05), 0.8).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	pulse_tween.tween_property(start_button, "scale", Vector2(1.04, 1.04), 0.8).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	pulse_tween.tween_property(start_button, "scale", Vector2(1.0, 1.0), 0.8).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+
+func _on_active_vessel_changed(_v_id: String) -> void:
+	_refresh_player_ship()
+
+func _refresh_player_ship() -> void:
+	var player = get_tree().get_first_node_in_group("player")
+	if player and player.has_method("apply_ship_data"):
+		var ship = GameState.get_active_ship_resource()
+		if ship:
+			player.apply_ship_data(ship)
+
+func _on_shipyard_button_pressed() -> void:
+	AudioManager.play_sfx("gate_passes")
+	var shipyard_scene = preload("res://src/ui/shipyard_ui.tscn")
+	if shipyard_scene:
+		var shipyard = shipyard_scene.instantiate()
+		get_parent().add_child(shipyard)
+		if shipyard.has_signal("shipyard_closed"):
+			shipyard.shipyard_closed.connect(func():
+				_refresh_player_ship()
+			)
 
 func _select_level(lvl: int) -> void:
 	if GameState.current_level == lvl:
@@ -47,12 +83,8 @@ func _select_level(lvl: int) -> void:
 	AudioManager.play_sfx("coin_pickups", 1.0, 1.2)
 	_update_level_buttons()
 	
-	# Update active ship and level controller live
-	var player = get_tree().get_first_node_in_group("player")
-	if player and player.has_method("apply_ship_data"):
-		var ship = GameState.get_current_ship_resource()
-		if ship:
-			player.apply_ship_data(ship)
+	# Keep player flagship as user equipped active vessel
+	_refresh_player_ship()
 			
 	var level_ctrl = get_tree().get_first_node_in_group("level_controller")
 	if level_ctrl and is_instance_valid(level_ctrl):
@@ -76,8 +108,6 @@ func _update_level_buttons() -> void:
 	if subtitle_label:
 		subtitle_label.text = LEVEL_NAMES.get(cur, "COVE OF PLUNDER").to_upper()
 		
-	var normal_style = preload("res://src/ui/start_screen.tscn").instantiate().get_node("Control/BottomContainer/LevelSelectContainer/BtnLvl1").get_theme_stylebox("normal")
-	
 	var sel_style = StyleBoxFlat.new()
 	sel_style.bg_color = Color(0.18, 0.55, 0.85, 0.95)
 	sel_style.border_color = Color(1.0, 0.85, 0.2, 1.0)
@@ -102,15 +132,13 @@ func _update_level_buttons() -> void:
 	unsel_style.corner_radius_bottom_right = 8
 	unsel_style.corner_radius_bottom_left = 8
 	
-	if btn_lvl_1:
-		btn_lvl_1.add_theme_stylebox_override("normal", sel_style if cur == 1 else unsel_style)
-		btn_lvl_1.modulate = Color.WHITE if cur == 1 else Color(0.7, 0.7, 0.7, 0.9)
-	if btn_lvl_2:
-		btn_lvl_2.add_theme_stylebox_override("normal", sel_style if cur == 2 else unsel_style)
-		btn_lvl_2.modulate = Color.WHITE if cur == 2 else Color(0.7, 0.7, 0.7, 0.9)
-	if btn_lvl_3:
-		btn_lvl_3.add_theme_stylebox_override("normal", sel_style if cur == 3 else unsel_style)
-		btn_lvl_3.modulate = Color.WHITE if cur == 3 else Color(0.7, 0.7, 0.7, 0.9)
+	var buttons = [btn_lvl_1, btn_lvl_2, btn_lvl_3, btn_lvl_4, btn_lvl_5, btn_lvl_6]
+	for i in range(buttons.size()):
+		var btn = buttons[i]
+		if btn:
+			var lvl_idx = i + 1
+			btn.add_theme_stylebox_override("normal", sel_style if cur == lvl_idx else unsel_style)
+			btn.modulate = Color.WHITE if cur == lvl_idx else Color(0.75, 0.75, 0.75, 0.9)
 
 func _on_start_button_pressed() -> void:
 	if not start_button or start_button.disabled:

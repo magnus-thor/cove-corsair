@@ -36,7 +36,7 @@ Hazards test lateral swerving precision and introduce biome-specific mechanics (
 
 | Hazard Name | Biome | Durability | Hazard Effect & Mechanics |
 | :--- | :--- | :--- | :--- |
-| **Reef Outcrop** | Level 1 | Indestructible | Environmental rock barrier occupying channel center ($X = 0.0, scale_x = 2.0, scale_z = 5.0$). Forces immediate swerving. |
+| **Reef Outcrop** | Level 1 | Indestructible | Environmental rock barrier occupying channel center ($X = 0.0, scale_x = 1.5, scale_z = 3.75$). Forces immediate swerving. |
 | **Spiked Sea Mine** | Level 1 | $1\text{ HP}$ | Floating mine detonating instantly on contact with player hull or follower skiffs, dealing $1\text{ Hull Damage}$. |
 | **Biogas Pod** | Level 2 | $2\text{ HP}$ | Toxic swamp pod; detonates upon destruction into a lingering poison cloud ($3.0\text{m}$ radius). |
 | **Thermal Geyser** | Level 3 | Indestructible | Erupts periodically with red floor telegraphing, launching vertical lava plumes dealing instant hull damage. |

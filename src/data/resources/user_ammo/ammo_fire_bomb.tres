@@ -10,4 +10,6 @@ damage = 4
 projectile_speed = 20.0
 splash_radius = 2.0
 sprite_texture = ExtResource("2_tex")
-scale_multiplier = 1.15
+scale_multiplier = 1.44
+pixel_size = 0.0005
+y_offset = 2.75

@@ -27,7 +27,7 @@
 | **Obstacle** | Fuse Barrel | $3\text{-}4\text{ HP}$ | Red explosive barrel; detonates on destruction to clear adjacent lane obstacles. |
 | **Obstacle** | Rune Barrel | $4\text{-}10\text{ HP}$ | Heavy obstacle requiring high firepower or multiplier support. |
 | **Obstacle** | Armored Barrel Chest | $6\text{ HP}$ | High-tier obstacle dropping bonus doubloons / chest rewards. |
-| **Hazard** | Reef Outcrop | Indestructible | Environmental rock barrier occupying $X = 0.0$ ($scale_x = 2.0, scale_z = 5.0$). Forces player to swerve left or right. |
+| **Hazard** | Reef Outcrop | Indestructible | Environmental rock barrier occupying $X = 0.0$ ($scale_x = 1.5, scale_z = 3.75$). Forces player to swerve left or right. |
 | **Mob** | Skeleton Rowers | $3\text{ HP}$ ($1.5\text{ m/s}$) | Slow-moving forward enemy craft. |
 | **Mob** | Raider Skiffs | $8\text{-}10\text{ HP}$ ($2.5\text{-}3.5\text{ m/s}$) | Fast-moving aggressive hostile skiff. |
 | **Mob** | Turtle Rafts | $20\text{-}30\text{ HP}$ ($1.5\text{ m/s}$) | Heavy armored enemy barge requiring sustained fire. |

@@ -30,6 +30,7 @@ const SpawnEvent = preload("res://src/data/spawn_event.gd")
 @export var harvester_scene: PackedScene = preload("res://src/gameplay/enemies/enemy_mini_boss_harvester.tscn")
 
 @export var thermal_geyser_scene: PackedScene = preload("res://src/gameplay/obstacles/hazard_thermal_geyser.tscn")
+@export var whirlpool_scene: PackedScene = preload("res://src/gameplay/obstacles/hazard_whirlpool.tscn")
 @export var iron_gunner_scene: PackedScene = preload("res://src/gameplay/enemies/enemy_iron_gunner.tscn")
 @export var brimstone_raft_scene: PackedScene = preload("res://src/gameplay/enemies/enemy_brimstone_raft.tscn")
 @export var bombard_scene: PackedScene = preload("res://src/gameplay/enemies/enemy_mini_boss_bombard.tscn")
@@ -497,6 +498,16 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 				add_child(geyser)
 				geyser.global_position = Vector3(x_world, 0.0, z_spawn)
 
+		# ── Whirlpool Hazard ──────────────────────────────────────────────────
+		"whirlpool":
+			var x_norm = float(event.get("x", 0.0))
+			var x_world = normalized_to_world_x(x_norm)
+			if whirlpool_scene:
+				var pool = whirlpool_scene.instantiate() as Area3D
+				add_child(pool)
+				pool.global_position = Vector3(x_world, 0.0, z_spawn)
+
+
 		# ── Iron Gunners (Level 3) ────────────────────────────────────────────
 		"iron_gunners":
 			var x_positions: Array = event.get("x_positions", [0.0])
@@ -736,13 +747,23 @@ func _spawn_boss() -> void:
 
 	if spawn_prefab:
 		var boss      = spawn_prefab.instantiate() as Node3D
+		if level_data and "boss_hp" in level_data and level_data.boss_hp > 0:
+			if "max_hp" in boss:
+				boss.max_hp = level_data.boss_hp
+				boss.current_hp = level_data.boss_hp
+			if boss is BossSiegeFortress:
+				var scale_factor: float = float(level_data.boss_hp) / 800.0
+				boss.hp_port_turret = int(round(150.0 * scale_factor))
+				boss.hp_starboard_turret = int(round(150.0 * scale_factor))
+				boss.hp_prow_ram = int(round(150.0 * scale_factor))
+				boss.hp_furnace_core = level_data.boss_hp - (boss.hp_port_turret + boss.hp_starboard_turret + boss.hp_prow_ram)
 		var main_root = get_tree().current_scene
 		if main_root:
 			main_root.add_child(boss)
 		else:
 			add_child(boss)
 		boss.global_position = Vector3(0.0, 0.0, player_z - 18.0)
-		print("[BOSS] Spawned boss for ", level_data.level_name if level_data else "Level")
+		print("[BOSS] Spawned boss for ", level_data.level_name if level_data else "Level", " with HP: ", level_data.boss_hp if (level_data and "boss_hp" in level_data) else "default")
 
 		# Lock camera to boss arena
 		var camera = get_tree().get_first_node_in_group("game_camera")

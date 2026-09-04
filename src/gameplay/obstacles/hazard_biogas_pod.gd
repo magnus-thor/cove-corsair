@@ -11,6 +11,7 @@ var _is_popped: bool = false
 var _pulse_time: float = 0.0
 
 @onready var pod_mesh: MeshInstance3D = get_node_or_null("PodMesh")
+@onready var pod_sprite: Sprite3D = get_node_or_null("PodSprite") as Sprite3D
 @onready var collision_shape: CollisionShape3D = get_node_or_null("CollisionShape3D")
 
 func _ready() -> void:
@@ -22,8 +23,10 @@ func _physics_process(delta: float) -> void:
 	if _is_popped:
 		return
 	_pulse_time += delta * 4.0
-	if pod_mesh:
-		var scale_factor = 1.0 + sin(_pulse_time) * 0.12
+	var scale_factor = 1.0 + sin(_pulse_time) * 0.12
+	if pod_sprite:
+		pod_sprite.scale = Vector3(scale_factor, scale_factor * 1.1, scale_factor)
+	elif pod_mesh:
 		pod_mesh.scale = Vector3(scale_factor, scale_factor * 1.1, scale_factor)
 
 func take_damage(amount: int) -> void:
@@ -42,8 +45,11 @@ func explode_corrosive_cloud() -> void:
 	
 	if collision_shape:
 		collision_shape.set_deferred("disabled", true)
+	if pod_sprite:
+		pod_sprite.visible = false
 	if pod_mesh:
 		pod_mesh.visible = false
+
 		
 	AudioManager.play_sfx("barrel_breaks", 1.2, 1.5, 2.0)
 	AudioManager.play_sfx("water_splashes", 0.7, 0.9, 1.0)

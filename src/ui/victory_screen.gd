@@ -29,33 +29,37 @@ func show_victory(doubloons_earned: int, targets_hit: int, stars_earned: int = 3
 	visible = true
 	get_tree().paused = true
 	
-	if GameState.current_level == 1:
-		if title_label:
-			title_label.text = "LEVEL 1 VICTORY"
-		if subtitle_label:
-			subtitle_label.text = "COVE 1 CLEARED: SMUGGLER'S RUN"
-		if boss_label:
-			boss_label.text = "Captain Ironjaw"
-		if next_level_button:
-			next_level_button.text = "NEXT: Black Tide Bayou"
-	elif GameState.current_level == 2:
-		if title_label:
-			title_label.text = "LEVEL 2 VICTORY"
-		if subtitle_label:
-			subtitle_label.text = "COVE 2 CLEARED: BLACK TIDE BAYOU"
-		if boss_label:
-			boss_label.text = "The Phantom Dredge"
-		if next_level_button:
-			next_level_button.text = "NEXT: Brimstone Bastion"
-	else:
-		if title_label:
-			title_label.text = "CAMPAIGN VICTORY!"
-		if subtitle_label:
-			subtitle_label.text = "ALL COVES CONQUERED - PIRATE KING!"
-		if boss_label:
-			boss_label.text = "The Siege Fortress"
-		if next_level_button:
-			next_level_button.text = "PLAY AGAIN"
+	match GameState.current_level:
+		1:
+			if title_label: title_label.text = "LEVEL 1 VICTORY"
+			if subtitle_label: subtitle_label.text = "COVE 1 CLEARED: SMUGGLER'S RUN"
+			if boss_label: boss_label.text = "Captain Ironjaw"
+			if next_level_button: next_level_button.text = "NEXT: Black Tide Bayou"
+		2:
+			if title_label: title_label.text = "LEVEL 2 VICTORY"
+			if subtitle_label: subtitle_label.text = "COVE 2 CLEARED: BLACK TIDE BAYOU"
+			if boss_label: boss_label.text = "The Phantom Dredge"
+			if next_level_button: next_level_button.text = "NEXT: Brimstone Bastion"
+		3:
+			if title_label: title_label.text = "LEVEL 3 VICTORY"
+			if subtitle_label: subtitle_label.text = "COVE 3 CLEARED: BRIMSTONE BASTION"
+			if boss_label: boss_label.text = "The Siege Fortress"
+			if next_level_button: next_level_button.text = "NEXT: Smuggler's Nightmare"
+		4:
+			if title_label: title_label.text = "LEVEL 4 VICTORY"
+			if subtitle_label: subtitle_label.text = "COVE 4 CLEARED: SMUGGLER'S NIGHTMARE"
+			if boss_label: boss_label.text = "Captain Ironjaw (Nightmare)"
+			if next_level_button: next_level_button.text = "NEXT: Black Tide Abyss"
+		5:
+			if title_label: title_label.text = "LEVEL 5 VICTORY"
+			if subtitle_label: subtitle_label.text = "COVE 5 CLEARED: BLACK TIDE ABYSS"
+			if boss_label: boss_label.text = "The Phantom Dredge (Abyss)"
+			if next_level_button: next_level_button.text = "NEXT: Brimstone Inferno"
+		_:
+			if title_label: title_label.text = "CAMPAIGN VICTORY!"
+			if subtitle_label: subtitle_label.text = "ALL 6 COVES CONQUERED - ULTIMATE PIRATE KING!"
+			if boss_label: boss_label.text = "The Infernal Siege Fortress"
+			if next_level_button: next_level_button.text = "PLAY AGAIN"
 			
 	if doubloons_label:
 		doubloons_label.text = "0"
@@ -130,9 +134,10 @@ func _on_retry_pressed() -> void:
 
 func _on_next_level_pressed() -> void:
 	get_tree().paused = false
-	if GameState.current_level >= 3:
+	if GameState.current_level >= 6:
 		GameState.current_level = 1
 	else:
+		GameState.unlock_next_level()
 		GameState.current_level += 1
 	GameState.reset_level()
 	get_tree().reload_current_scene()

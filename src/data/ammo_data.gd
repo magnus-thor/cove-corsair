@@ -7,3 +7,5 @@ extends Resource
 @export var splash_radius: float = 0.0 # AoE explosion radius if > 0
 @export var sprite_texture: Texture2D # custom projectile visual
 @export var scale_multiplier: float = 1.0
+@export var pixel_size: float = 0.005
+@export var y_offset: float = 0.0

@@ -4,7 +4,7 @@ extends Area3D
 @export var rotation_speed: float = 2.5
 @export var bob_speed: float = 2.5
 @export var bob_height: float = 0.05
-@export var base_water_y: float = 0.15
+@export var base_water_y: float = 0.17
 @export var magnet_pull_speed: float = 22.0
 
 var _time: float = 0.0
@@ -22,8 +22,7 @@ func _ready() -> void:
 	body_entered.connect(_on_body_entered)
 	global_position.y = base_water_y
 	
-	# Scale chest up
-	scale = Vector3(2.5, 2.5, 2.5)
+	scale = Vector3(0.96, 0.96, 0.96)
 
 func attract_to(target: Node3D) -> void:
 	if _is_collected:

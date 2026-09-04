@@ -106,7 +106,7 @@ func _apply_ammo_data() -> void:
 		splash_radius_multiplier = ammo_data.splash_radius / 2.5
 	
 	var base_sc = ammo_data.scale_multiplier if ammo_data.scale_multiplier > 0.0 else 1.0
-	scale = Vector3.ONE * (base_sc * 1.25)
+	scale = Vector3.ONE * base_sc
 		
 	var model = get_node_or_null("CannonBallModel")
 	var flare = get_node_or_null("TracerFlare") as Sprite3D
@@ -179,15 +179,17 @@ func _apply_ammo_data() -> void:
 		if model:
 			model.visible = false
 			
-		var sprite_node = get_node_or_null("Sprite3D")
+		var sprite_node = get_node_or_null("Sprite3D") as Sprite3D
 		if not sprite_node:
 			sprite_node = Sprite3D.new()
 			sprite_node.name = "Sprite3D"
-			sprite_node.billboard = BaseMaterial3D.BILLBOARD_PARTICLES
+			sprite_node.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 			sprite_node.alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
 			add_child(sprite_node)
 		sprite_node.texture = ammo_data.sprite_texture
-		sprite_node.pixel_size = 0.005
+		sprite_node.pixel_size = ammo_data.pixel_size if ammo_data.pixel_size > 0.0 else 0.005
+		if "y_offset" in ammo_data and ammo_data.y_offset != 0.0:
+			sprite_node.position.y = ammo_data.y_offset
 
 
 func _physics_process(delta: float) -> void:

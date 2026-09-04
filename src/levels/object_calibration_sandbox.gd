@@ -47,8 +47,9 @@ var zoom_factor: float = 1.0
 # Object Definitions
 var categories: Array[String] = [
 	"Enemies & Mobs",
-	"Barrels & Obstacles",
+	"Barrels, Hazards & Obstacles",
 	"Gates & Collectibles",
+	"Ammunition & Projectiles",
 	"Vessels / Player Ships"
 ]
 
@@ -56,22 +57,50 @@ var enemy_items: Array[Dictionary] = [
 	{"name": "Skeleton Rower", "res": "res://src/data/resources/enemy_vessels/skeleton_rower.tres"},
 	{"name": "Raider Skiff", "res": "res://src/data/resources/enemy_vessels/raider_skiff.tres"},
 	{"name": "Turtle Raft", "res": "res://src/data/resources/enemy_vessels/turtle_raft.tres"},
+	{"name": "Elite Ironclad", "res": "res://src/data/resources/enemy_vessels/enemy_elite_ironclad.tres"},
+	{"name": "Tide Cutter", "scene": "res://src/gameplay/enemies/enemy_tide_cutter.tscn"},
+	{"name": "Iron Gunner", "scene": "res://src/gameplay/enemies/enemy_iron_gunner.tscn"},
+	{"name": "Grave Skiff", "scene": "res://src/gameplay/enemies/enemy_grave_skiff.tscn"},
+	{"name": "Brimstone Raft", "scene": "res://src/gameplay/enemies/enemy_brimstone_raft.tscn"},
+	{"name": "Mini-Boss Harvester", "scene": "res://src/gameplay/enemies/enemy_mini_boss_harvester.tscn"},
+	{"name": "Mini-Boss Bombard", "scene": "res://src/gameplay/enemies/enemy_mini_boss_bombard.tscn"},
 	{"name": "Boss Bone-Beard", "res": "res://src/data/resources/enemy_bosses/boss_bone_beard.tres"},
 	{"name": "Boss War-Barge", "scene": "res://src/gameplay/enemies/boss_war_barge.tscn"},
-	{"name": "Boss Phantom Dredge", "scene": "res://src/gameplay/enemies/boss_phantom_dredge.tscn"}
+	{"name": "Boss Phantom Dredge", "scene": "res://src/gameplay/enemies/boss_phantom_dredge.tscn"},
+	{"name": "Boss Siege Fortress", "scene": "res://src/gameplay/enemies/boss_siege_fortress.tscn"}
 ]
 
 var obstacle_items: Array[Dictionary] = [
 	{"name": "Wooden Barrel", "type": 0}, # ObstacleType.WOODEN_BARREL
 	{"name": "Fuse Barrel", "type": 1},   # FUSE_BARREL
 	{"name": "Rune Barrel", "type": 2},   # RUNE_BARREL
-	{"name": "Spiked Sea Mine", "type": 3}, # SEA_MINE
-	{"name": "Coral Reef", "type": 4}     # CORAL_REEF
+	{"name": "Biogas Hazard Pod", "scene": "res://src/gameplay/obstacles/hazard_biogas_pod.tscn"},
+	{"name": "Thermal Geyser Hazard", "scene": "res://src/gameplay/obstacles/hazard_thermal_geyser.tscn"},
+	{"name": "Hazard Sea Mine", "scene": "res://src/gameplay/obstacles/hazard_sea_mine.tscn"},
+	{"name": "Hazard Coral Reef", "scene": "res://src/gameplay/obstacles/hazard_reef.tscn"},
+	{"name": "Hazard Whirlpool", "scene": "res://src/gameplay/obstacles/hazard_whirlpool.tscn"},
+	{"name": "Barricade Wall", "scene": "res://src/gameplay/obstacles/barricade_wall.tscn"},
+	{"name": "Barricade Log Segment", "scene": "res://src/gameplay/obstacles/barricade_segment.tscn"}
 ]
+
+
 
 var gate_items: Array[Dictionary] = [
 	{"name": "Multiplier Gate Arch", "scene": "res://src/gameplay/obstacles/multiplier_gate.tscn"},
-	{"name": "Collectible Doubloon", "scene": "res://src/gameplay/collectibles/collectible_doubloon.tscn"}
+	{"name": "Reinforced Gate", "scene": "res://src/gameplay/obstacles/reinforced_gate.tscn"},
+	{"name": "Collectible Doubloon", "scene": "res://src/gameplay/collectibles/collectible_doubloon.tscn"},
+	{"name": "Treasure Chest", "scene": "res://src/gameplay/collectibles/collectible_chest.tscn"},
+	{"name": "XP Orb", "class": "CollectibleXpOrb"}
+]
+
+var ammo_items: Array[Dictionary] = [
+	{"name": "Standard Ball", "ammo_res": "res://src/data/resources/user_ammo/ammo_standard_ball.tres"},
+	{"name": "Grape Shot", "ammo_res": "res://src/data/resources/user_ammo/ammo_grape_shot.tres"},
+	{"name": "Heavy Shot", "ammo_res": "res://src/data/resources/user_ammo/ammo_heavy_shot.tres"},
+	{"name": "Fire Bomb", "ammo_res": "res://src/data/resources/user_ammo/ammo_fire_bomb.tres"},
+	{"name": "Coconut Bomb", "ammo_res": "res://src/data/resources/user_ammo/ammo_coconut_bomb.tres"},
+	{"name": "Throwing Axe", "ammo_res": "res://src/data/resources/user_ammo/ammo_throwing_axe.tres"},
+	{"name": "Enemy Cannonball", "scene": "res://src/gameplay/projectiles/enemy_cannonball.tscn"}
 ]
 
 var ship_items: Array[Dictionary] = [
@@ -214,16 +243,19 @@ func _on_category_selected(cat_idx: int) -> void:
 	object_option.clear()
 	
 	match cat_idx:
-		0: # Enemies
+		0: # Enemies & Mobs
 			for item in enemy_items:
 				object_option.add_item(item["name"])
-		1: # Barrels & Obstacles
+		1: # Barrels, Hazards & Obstacles
 			for item in obstacle_items:
 				object_option.add_item(item["name"])
 		2: # Gates & Collectibles
 			for item in gate_items:
 				object_option.add_item(item["name"])
-		3: # Player Ships
+		3: # Ammunition & Projectiles
+			for item in ammo_items:
+				object_option.add_item(item["name"])
+		4: # Player Ships
 			for item in ship_items:
 				object_option.add_item(item["name"])
 				
@@ -269,31 +301,79 @@ func _on_object_selected(obj_idx: int) -> void:
 						if not current_sprite:
 							current_sprite = instance.get_node_or_null("EnemySprite") as Sprite3D
 				
-		1: # Barrels & Obstacles
+		1: # Barrels, Hazards & Obstacles
 			if obj_idx < obstacle_items.size():
-				var type_id = obstacle_items[obj_idx]["type"]
-				var obs_scene = load("res://src/gameplay/obstacles/destructible_barrel.tscn") as PackedScene
-				if obs_scene:
-					var instance = obs_scene.instantiate() as Node3D
-					object_container.add_child(instance)
-					current_object_node = instance
-					if "obstacle_type" in instance:
-						instance.obstacle_type = type_id
-					current_sprite = instance.get_node_or_null("ObstacleSprite") as Sprite3D
+				var item = obstacle_items[obj_idx]
+				if item.has("type"):
+					var type_id = item["type"]
+					var obs_scene = load("res://src/gameplay/obstacles/destructible_barrel.tscn") as PackedScene
+					if obs_scene:
+						var instance = obs_scene.instantiate() as Node3D
+						object_container.add_child(instance)
+						current_object_node = instance
+						if "obstacle_type" in instance:
+							instance.obstacle_type = type_id
+						current_sprite = instance.get_node_or_null("ObstacleSprite") as Sprite3D
+				elif item.has("scene"):
+					var scene_path = item["scene"]
+					var s_res = load(scene_path) as PackedScene
+					if s_res:
+						var instance = s_res.instantiate() as Node3D
+						object_container.add_child(instance)
+						current_object_node = instance
+						current_sprite = instance.get_node_or_null("ObstacleSprite") as Sprite3D
+						if not current_sprite:
+							current_sprite = instance.get_node_or_null("PodMesh") as Sprite3D
 				
 		2: # Gates & Collectibles
 			if obj_idx < gate_items.size():
-				var scene_path = gate_items[obj_idx]["scene"]
-				var scene_res = load(scene_path) as PackedScene
-				if scene_res:
-					var instance = scene_res.instantiate() as Node3D
+				var item = gate_items[obj_idx]
+				if item.has("scene"):
+					var scene_path = item["scene"]
+					var scene_res = load(scene_path) as PackedScene
+					if scene_res:
+						var instance = scene_res.instantiate() as Node3D
+						object_container.add_child(instance)
+						current_object_node = instance
+						current_sprite = instance.get_node_or_null("GateSprite") as Sprite3D
+						if not current_sprite:
+							current_sprite = instance.get_node_or_null("Sprite3D") as Sprite3D
+						if not current_sprite:
+							var visuals = instance.get_node_or_null("Visuals")
+							if visuals:
+								current_sprite = visuals.get_node_or_null("ChestSprite") as Sprite3D
+				elif item.has("class") and item["class"] == "CollectibleXpOrb":
+					var orb_script = load("res://src/gameplay/collectibles/collectible_xp_orb.gd")
+					var instance = Area3D.new()
+					instance.set_script(orb_script)
 					object_container.add_child(instance)
 					current_object_node = instance
-					current_sprite = instance.get_node_or_null("GateSprite") as Sprite3D
-					if not current_sprite:
+
+		3: # Ammunition & Projectiles
+			if obj_idx < ammo_items.size():
+				var item = ammo_items[obj_idx]
+				if item.has("ammo_res"):
+					var res_path = item["ammo_res"]
+					var ammo_data = load(res_path) as AmmoData
+					current_resource = ammo_data
+					var cannonball_scene = load("res://src/gameplay/projectiles/cannonball.tscn") as PackedScene
+					if cannonball_scene:
+						var instance = cannonball_scene.instantiate() as Area3D
+						if "ammo_data" in instance:
+							instance.ammo_data = ammo_data
+						object_container.add_child(instance)
+						current_object_node = instance
+						current_sprite = instance.get_node_or_null("Sprite3D") as Sprite3D
+				elif item.has("scene"):
+					var scene_path = item["scene"]
+					var s_res = load(scene_path) as PackedScene
+					if s_res:
+						var instance = s_res.instantiate() as Node3D
+						object_container.add_child(instance)
+						current_object_node = instance
 						current_sprite = instance.get_node_or_null("Sprite3D") as Sprite3D
 						
-		3: # Player Ships
+		4: # Player Ships
 			if obj_idx < ship_items.size():
 				var res_path = ship_items[obj_idx]["res"]
 				var s_data = load(res_path) as ShipData
@@ -342,15 +422,21 @@ func _update_ui_from_current_object() -> void:
 	var pos_y = current_object_node.position.y
 	
 	var cat_idx = category_option.selected if category_option else 0
-	if cat_idx == 0 or cat_idx == 1: # Enemies & Obstacles: height is visual sprite position
+	if cat_idx == 0 or cat_idx == 1 or cat_idx == 3: # Enemies, Obstacles, Ammo: height is position y or sprite position
 		if current_sprite:
 			pos_y = current_sprite.position.y
+		else:
+			pos_y = current_object_node.position.y
 	elif cat_idx == 2: # Gates & Collectibles
 		var name_str = object_option.get_item_text(object_option.selected) if object_option else ""
 		if "Gate" in name_str:
 			var visuals_node = current_object_node.get_node_or_null("Visuals") as Node3D
 			if visuals_node:
 				pos_y = visuals_node.position.y
+		else:
+			pos_y = current_object_node.position.y
+	elif cat_idx == 4: # Player Ships
+		pos_y = current_object_node.position.y
 				
 	base_y_position = pos_y
 	
@@ -387,7 +473,7 @@ func _on_slider_changed(_val: float) -> void:
 	
 	var cat_idx = category_option.selected if category_option else 0
 	
-	if cat_idx == 3: # Vessels: root Y position is the y_offset
+	if cat_idx == 4: # Vessels: root Y position is the y_offset
 		current_object_node.position.y = new_pos_y
 		if current_sprite:
 			current_sprite.position.y = 0.0
@@ -398,8 +484,12 @@ func _on_slider_changed(_val: float) -> void:
 			var visuals_node = current_object_node.get_node_or_null("Visuals") as Node3D
 			if visuals_node:
 				visuals_node.position.y = new_pos_y
-		else: # Doubloon
+		else:
 			current_object_node.position.y = new_pos_y
+	elif cat_idx == 3: # Ammo & Projectiles
+		current_object_node.position.y = new_pos_y
+		if current_sprite:
+			current_sprite.position.y = 0.0
 	else: # Mobs and Obstacles: root stays at Y=0, sprite moves to Y=new_pos_y
 		current_object_node.position.y = 0.0
 		if current_sprite:
@@ -437,7 +527,9 @@ func _process(delta: float) -> void:
 		bob_time += delta * 2.2
 		offset_y += sin(bob_time) * 0.04
 		
-	if cat_idx == 3: # Vessels
+	if cat_idx == 4: # Vessels
+		current_object_node.position = Vector3(0.0, offset_y, 0.0)
+	elif cat_idx == 3: # Ammo
 		current_object_node.position = Vector3(0.0, offset_y, 0.0)
 	elif cat_idx == 2: # Gates & Collectibles
 		var name_str = object_option.get_item_text(object_option.selected) if object_option else ""
@@ -446,7 +538,7 @@ func _process(delta: float) -> void:
 			var visuals_node = current_object_node.get_node_or_null("Visuals") as Node3D
 			if visuals_node:
 				visuals_node.position.y = offset_y
-		else: # Doubloon
+		else:
 			current_object_node.position = Vector3(0.0, offset_y, 0.0)
 	else: # Enemies and Obstacles
 		current_object_node.position = Vector3.ZERO

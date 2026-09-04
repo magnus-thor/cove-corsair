@@ -163,6 +163,7 @@ func _process_deck_idle(delta: float) -> void:
 		wander_tween.parallel().tween_property(sprite_3d, "position:z", offset_z, 0.4)
 
 func _process_targeting(delta: float) -> void:
+	var is_crew: bool = _is_crew()
 	var player = get_tree().get_first_node_in_group("player")
 	var boat_z = player.global_position.z if (player and is_instance_valid(player)) else global_position.z
 	

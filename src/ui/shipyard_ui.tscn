@@ -1,0 +1,343 @@
+[gd_scene format=3 uid="uid://dxu8eeh7lwes8"]
+
+[ext_resource type="Script" path="res://src/ui/shipyard_ui.gd" id="1_shipyard_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.07, 0.11, 0.17, 0.96)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.95, 0.82, 0.25, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+shadow_color = Color(0, 0, 0, 0.6)
+shadow_size = 14
+shadow_offset = Vector2(0, 6)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
+bg_color = Color(0.11, 0.16, 0.24, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.35, 0.5, 0.7, 0.7)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_subbox"]
+bg_color = Color(0.06, 0.09, 0.14, 0.8)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.45, 0.6, 0.5)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_buy"]
+bg_color = Color(0.16, 0.62, 0.3, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.98, 0.88, 0.35, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_upgrade"]
+bg_color = Color(0.18, 0.5, 0.85, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.45, 0.85, 1, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_equip"]
+bg_color = Color(0.85, 0.62, 0.12, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.92, 0.45, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_close"]
+bg_color = Color(0.2, 0.25, 0.34, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.5, 0.6, 0.75, 0.8)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_arrow"]
+bg_color = Color(0.14, 0.2, 0.3, 0.85)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.85, 0.75, 0.3, 0.8)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="ShipyardUI" type="CanvasLayer"]
+layer = 20
+script = ExtResource("1_shipyard_script")
+
+[node name="BackdropOverlay" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.04, 0.08, 0.8)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MainPanel" type="PanelContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(460, 680)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Margin" type="MarginContainer" parent="CenterContainer/MainPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="CenterContainer/MainPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="HeaderBox" type="VBoxContainer" parent="CenterContainer/MainPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/MainPanel/Margin/VBox/HeaderBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.84, 0.1, 1)
+theme_override_colors/font_outline_color = Color(0.2, 0.12, 0.04, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 26
+text = "PORT COVE SHIPYARD"
+horizontal_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="CenterContainer/MainPanel/Margin/VBox/HeaderBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.85, 0.95, 1)
+theme_override_font_sizes/font_size = 13
+text = "OUTFIT YOUR NAVAL FLEET & CREW"
+horizontal_alignment = 1
+
+[node name="PurseLabel" type="Label" parent="CenterContainer/MainPanel/Margin/VBox/HeaderBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.35, 1)
+theme_override_font_sizes/font_size = 16
+text = "🪙 0 DOUBLOONS"
+horizontal_alignment = 1
+
+[node name="HSeparator1" type="HSeparator" parent="CenterContainer/MainPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="CarouselHBox" type="HBoxContainer" parent="CenterContainer/MainPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="BtnPrev" type="Button" parent="CenterContainer/MainPanel/Margin/VBox/CarouselHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 56)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_arrow")
+text = "◀"
+
+[node name="CardPanel" type="PanelContainer" parent="CenterContainer/MainPanel/Margin/VBox/CarouselHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="CardMargin" type="MarginContainer" parent="CenterContainer/MainPanel/Margin/VBox/CarouselHBox/CardPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 12
+
+[node name="CardVBox" type="VBoxContainer" parent="CenterContainer/MainPanel/Margin/VBox/CarouselHBox/CardPanel/CardMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="VesselNameLabel" type="Label" parent="CenterContainer/MainPanel/Margin/VBox/CarouselHBox/CardPanel/CardMargin/CardVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.8, 1)
+theme_override_colors/font_outline_color = Color(0.1, 0.1, 0.1, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 20
+text = "THE DINGHY"
+horizontal_alignment = 1
+
+[node name="VesselArchetypeLabel" type="Label" parent="CenterContainer/MainPanel/Margin/VBox/CarouselHBox/CardPanel/CardMargin/CardVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.8, 0.9, 1)
+theme_override_font_sizes/font_size = 12
+text = "Agility Skiff"
+horizontal_alignment = 1
+
+[node name="TierBadgeLabel" type="Label" parent="CenterContainer/MainPanel/Margin/VBox/CarouselHBox/CardPanel/CardMargin/CardVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "TIER 1 / 3"
+horizontal_alignment = 1
+
+[node name="PreviewContainer" type="CenterContainer" parent="CenterContainer/MainPanel/Margin/VBox/CarouselHBox/CardPanel/CardMargin/CardVBox"]
+custom_minimum_size = Vector2(0, 130)
+layout_mode = 2
+
+[node name="VesselPreviewRect" type="TextureRect" parent="CenterContainer/MainPanel/Margin/VBox/CarouselHBox/CardPanel/CardMargin/CardVBox/PreviewContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 120)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="StatsGrid" type="GridContainer" parent="CenterContainer/MainPanel/Margin/VBox/CarouselHBox/CardPanel/CardMargin/CardVBox"]
+layout_mode = 2
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 4
+columns = 3
+
+[node name="StatHpLabel" type="Label" parent="CenterContainer/MainPanel/Margin/VBox/CarouselHBox/CardPanel/CardMargin/CardVBox/StatsGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 12
+text = "Hull: 1 HP"
+horizontal_alignment = 1
+
+[node name="StatSpeedLabel" type="Label" parent="CenterContainer/MainPanel/Margin/VBox/CarouselHBox/CardPanel/CardMargin/CardVBox/StatsGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 12
+text = "Speed: 12 m/s"
+horizontal_alignment = 1
+
+[node name="StatFirerateLabel" type="Label" parent="CenterContainer/MainPanel/Margin/VBox/CarouselHBox/CardPanel/CardMargin/CardVBox/StatsGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 12
+text = "Reload: 0.20s"
+horizontal_alignment = 1
+
+[node name="HardpointsDescLabel" type="Label" parent="CenterContainer/MainPanel/Margin/VBox/CarouselHBox/CardPanel/CardMargin/CardVBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 1)
+theme_override_font_sizes/font_size = 11
+text = "Armed: Bow Chaser Cannon"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="BtnNext" type="Button" parent="CenterContainer/MainPanel/Margin/VBox/CarouselHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 56)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_arrow")
+text = "▶"
+
+[node name="UpgradePreviewBox" type="PanelContainer" parent="CenterContainer/MainPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_subbox")
+
+[node name="Margin" type="MarginContainer" parent="CenterContainer/MainPanel/Margin/VBox/UpgradePreviewBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="UpgradePreviewLabel" type="Label" parent="CenterContainer/MainPanel/Margin/VBox/UpgradePreviewBox/Margin"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.9, 0.5, 1)
+theme_override_font_sizes/font_size = 12
+text = "Tier 2 Blueprint: Monkey Bomber (+Coconut/Fire Bombs)"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="ActionButtonsBox" type="VBoxContainer" parent="CenterContainer/MainPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="BuyButton" type="Button" parent="CenterContainer/MainPanel/Margin/VBox/ActionButtonsBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_buy")
+text = "BUY VESSEL: 450 🪙"
+
+[node name="UpgradeButton" type="Button" parent="CenterContainer/MainPanel/Margin/VBox/ActionButtonsBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_upgrade")
+text = "UPGRADE TO TIER 2: 160 🪙"
+
+[node name="EquipButton" type="Button" parent="CenterContainer/MainPanel/Margin/VBox/ActionButtonsBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_equip")
+text = "SELECT AS FLAGSHIP"
+
+[node name="CloseButton" type="Button" parent="CenterContainer/MainPanel/Margin/VBox/ActionButtonsBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_close")
+text = "⚓ RETURN TO HARBOR"

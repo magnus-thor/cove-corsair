@@ -1,0 +1,170 @@
+[gd_resource type="Resource" script_class="LevelData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/data/level_data.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://src/gameplay/enemies/boss_war_barge.tscn" id="2_boss"]
+
+[resource]
+script = ExtResource("1_script")
+level_id = 4
+level_name = "Level 4: Smuggler's Nightmare"
+target_distance = 250.0
+base_scroll_speed = 10.5
+river_width_world = 12.0
+biome_type = "smugglers_run"
+water_albedo = Color(0.04, 0.35, 0.55, 0.92)
+fog_color = Color(0.18, 0.28, 0.42, 1.0)
+fog_density = 0.008
+boss_scene = ExtResource("2_boss")
+boss_hp = 300
+wave_events = Array[Dictionary]([{
+"distance": 8.0,
+"hp": 4,
+"obstacle_type": "wooden",
+"type": "obstacles",
+"x_positions": [-0.5, 0.5]
+}, {
+"distance": 15.0,
+"hp": 5,
+"speed": 2.2,
+"type": "skeleton_rowers",
+"x_positions": [-0.3, 0.3]
+}, {
+"distance": 22.0,
+"type": "reef_hazard",
+"x": -0.65,
+"scale_x": 2.2,
+"scale_z": 6.0
+}, {
+"distance": 28.0,
+"type": "sea_mine",
+"x": 0.2
+}, {
+"distance": 35.0,
+"hp": 4,
+"obstacle_type": "fuse",
+"type": "obstacles",
+"x_positions": [-0.4, 0.0, 0.4]
+}, {
+"distance": 42.0,
+"hp": 6,
+"speed": 2.4,
+"type": "skeleton_rowers",
+"x_positions": [-0.6, 0.6]
+}, {
+"distance": 50.0,
+"text": "+2",
+"type": "fleet_gate",
+"value": 2,
+"x": 0.0
+}, {
+"distance": 58.0,
+"count": 6,
+"type": "coin_arc",
+"x_end": 0.4,
+"x_start": -0.4
+}, {
+"distance": 66.0,
+"hp": 12,
+"speed": 3.4,
+"type": "raider_skiffs",
+"x_positions": [-0.35]
+}, {
+"distance": 74.0,
+"hp": 14,
+"speed": 7.5,
+"type": "kamikaze_rafts",
+"x_positions": [-0.5, 0.5]
+}, {
+"distance": 84.0,
+"type": "reef_hazard",
+"x": 0.6,
+"scale_x": 2.2,
+"scale_z": 7.0
+}, {
+"distance": 92.0,
+"hp": 5,
+"obstacle_type": "rune",
+"type": "obstacles",
+"x_positions": [-0.45, 0.0]
+}, {
+"distance": 100.0,
+"text": "+1",
+"type": "fleet_gate",
+"value": 1,
+"x": 0.3
+}, {
+"distance": 110.0,
+"hp": 14,
+"speed": 3.6,
+"type": "raider_skiffs",
+"x_positions": [0.4]
+}, {
+"distance": 118.0,
+"type": "sea_mine",
+"x": -0.25
+}, {
+"distance": 126.0,
+"hp": 6,
+"speed": 2.5,
+"type": "skeleton_rowers",
+"x_positions": [-0.55, 0.0, 0.55]
+}, {
+"distance": 136.0,
+"count": 7,
+"type": "coin_arc",
+"x_end": 0.5,
+"x_start": -0.5
+}, {
+"distance": 145.0,
+"gap_lane": 0.0,
+"hp": 3,
+"type": "barricade",
+"x_points": [-0.7, -0.35, 0.35, 0.7]
+}, {
+"distance": 156.0,
+"hp": 16,
+"speed": 7.8,
+"type": "kamikaze_rafts",
+"x_positions": [-0.4, 0.4]
+}, {
+"distance": 168.0,
+"hp": 14,
+"speed": 3.5,
+"type": "raider_skiffs",
+"x_positions": [-0.3, 0.3]
+}, {
+"distance": 178.0,
+"text": "+2",
+"type": "fleet_gate",
+"value": 2,
+"x": -0.2
+}, {
+"distance": 190.0,
+"hp": 6,
+"obstacle_type": "fuse",
+"type": "obstacles",
+"x_positions": [-0.6, -0.2, 0.2, 0.6]
+}, {
+"distance": 202.0,
+"type": "sea_mine",
+"x": 0.35
+}, {
+"distance": 212.0,
+"hp": 7,
+"speed": 2.8,
+"type": "skeleton_rowers",
+"x_positions": [-0.4, 0.0, 0.4]
+}, {
+"distance": 224.0,
+"count": 8,
+"type": "coin_arc",
+"x_end": 0.5,
+"x_start": -0.5
+}, {
+"distance": 236.0,
+"message": "NIGHTMARE FLAGSHIP APPROACHING!",
+"type": "warning"
+}, {
+"distance": 250.0,
+"type": "boss"
+}])

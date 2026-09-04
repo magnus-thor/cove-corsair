@@ -59,6 +59,36 @@ corner_radius_top_right = 14
 corner_radius_bottom_right = 14
 corner_radius_bottom_left = 14
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_shipyard_normal"]
+bg_color = Color(0.16, 0.42, 0.72, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.98, 0.85, 0.25, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.4)
+shadow_size = 6
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_shipyard_hover"]
+bg_color = Color(0.2, 0.52, 0.84, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.92, 0.4, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.45)
+shadow_size = 8
+shadow_offset = Vector2(0, 4)
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lvl_normal"]
 bg_color = Color(0.12, 0.18, 0.25, 0.85)
 border_width_left = 2
@@ -99,10 +129,10 @@ grow_vertical = 2
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_top = 70.0
-offset_bottom = 180.0
+offset_top = 50.0
+offset_bottom = 160.0
 grow_horizontal = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 8
 alignment = 1
 
 [node name="GameTitle" type="Label" parent="Control/HeaderContainer"]
@@ -111,7 +141,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.84, 0, 1)
 theme_override_colors/font_outline_color = Color(0.24, 0.14, 0.05, 1)
 theme_override_constants/outline_size = 8
-theme_override_font_sizes/font_size = 44
+theme_override_font_sizes/font_size = 42
 text = "PIRATE RUNNERS"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -122,7 +152,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.95, 0.92, 1)
 theme_override_colors/font_outline_color = Color(0.1, 0.1, 0.1, 0.8)
 theme_override_constants/outline_size = 3
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 16
 text = "COVE OF PLUNDER"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -133,51 +163,96 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -240.0
-offset_bottom = -40.0
+offset_top = -290.0
+offset_bottom = -25.0
 grow_horizontal = 2
 grow_vertical = 0
-theme_override_constants/separation = 12
-alignment = 1
-
-[node name="LevelSelectContainer" type="HBoxContainer" parent="Control/BottomContainer"]
-layout_mode = 2
 theme_override_constants/separation = 10
 alignment = 1
 
-[node name="BtnLvl1" type="Button" parent="Control/BottomContainer/LevelSelectContainer"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(95, 36)
+[node name="LevelSelectRow1" type="HBoxContainer" parent="Control/BottomContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 13
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="BtnLvl1" type="Button" parent="Control/BottomContainer/LevelSelectRow1"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(95, 32)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
 theme_override_styles/normal = SubResource("StyleBoxFlat_lvl_normal")
 text = "Level 1"
 
-[node name="BtnLvl2" type="Button" parent="Control/BottomContainer/LevelSelectContainer"]
+[node name="BtnLvl2" type="Button" parent="Control/BottomContainer/LevelSelectRow1"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(95, 36)
+custom_minimum_size = Vector2(95, 32)
 layout_mode = 2
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 theme_override_styles/normal = SubResource("StyleBoxFlat_lvl_normal")
 text = "Level 2"
 
-[node name="BtnLvl3" type="Button" parent="Control/BottomContainer/LevelSelectContainer"]
+[node name="BtnLvl3" type="Button" parent="Control/BottomContainer/LevelSelectRow1"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(95, 36)
+custom_minimum_size = Vector2(95, 32)
 layout_mode = 2
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 theme_override_styles/normal = SubResource("StyleBoxFlat_lvl_normal")
 text = "Level 3"
 
-[node name="StartButton" type="Button" parent="Control/BottomContainer"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(220, 56)
+[node name="LevelSelectRow2" type="HBoxContainer" parent="Control/BottomContainer"]
 layout_mode = 2
-size_flags_horizontal = 4
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="BtnLvl4" type="Button" parent="Control/BottomContainer/LevelSelectRow2"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(95, 32)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_lvl_normal")
+text = "Level 4"
+
+[node name="BtnLvl5" type="Button" parent="Control/BottomContainer/LevelSelectRow2"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(95, 32)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_lvl_normal")
+text = "Level 5"
+
+[node name="BtnLvl6" type="Button" parent="Control/BottomContainer/LevelSelectRow2"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(95, 32)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_lvl_normal")
+text = "Level 6"
+
+[node name="ActionHBox" type="HBoxContainer" parent="Control/BottomContainer"]
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="ShipyardButton" type="Button" parent="Control/BottomContainer/ActionHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 52)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.8, 1)
+theme_override_colors/font_outline_color = Color(0.05, 0.1, 0.2, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_shipyard_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_shipyard_hover")
+text = "⚓ SHIPYARD"
+
+[node name="StartButton" type="Button" parent="Control/BottomContainer/ActionHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 52)
+layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.1, 0.25, 0.1, 1)
 theme_override_constants/outline_size = 4
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 20
 theme_override_styles/normal = SubResource("StyleBoxFlat_start_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_start_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_start_pressed")
@@ -190,7 +265,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.78, 0.82, 0.85, 1)
 theme_override_colors/font_outline_color = Color(0.05, 0.05, 0.05, 0.8)
 theme_override_constants/outline_size = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 text = "Swipe / Drag to Steer & Aim Cannons"
 horizontal_alignment = 1
 vertical_alignment = 1

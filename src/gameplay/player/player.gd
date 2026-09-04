@@ -241,8 +241,9 @@ func apply_ship_data(data: ShipData) -> void:
 		
 		equipped_weapons.clear()
 
-	# Initialize active tier to 1 using data.tier_upgrades
-	apply_tier(1)
+	# Initialize active tier using GameState active vessel tier
+	var active_tier: int = GameState.get_active_ship_tier() if ("get_active_ship_tier" in GameState) else 1
+	apply_tier(active_tier)
 		
 	health_changed.emit(current_health, max_health)
 

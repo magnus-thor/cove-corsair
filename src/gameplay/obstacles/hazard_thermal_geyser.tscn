@@ -1,6 +1,7 @@
 [gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/obstacles/hazard_thermal_geyser.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/hazards/hazard_thermal_geyser.png" id="2_geyser_tex"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_telegraph"]
 transparency = 1
@@ -32,14 +33,14 @@ radius = 1.6
 [node name="HazardThermalGeyser" type="Node3D" groups=["hazards"]]
 script = ExtResource("1_script")
 
-[node name="TelegraphMesh" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
-mesh = SubResource("CylinderMesh_telegraph")
+[node name="GeyserSprite" type="Sprite3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.798636, 0.601815, 0, -0.601815, 0.798636, 0, 0.38, 0)
+pixel_size = 0.0036
+alpha_cut = 1
+texture = ExtResource("2_geyser_tex")
 
-[node name="GeyserMesh" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
-visible = false
-mesh = SubResource("CylinderMesh_geyser")
+
+
 
 [node name="DamageArea" type="Area3D" parent="."]
 collision_layer = 4
