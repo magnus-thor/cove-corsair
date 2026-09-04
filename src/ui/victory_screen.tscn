@@ -77,6 +77,30 @@ corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_menu_normal"]
+bg_color = Color(0.18, 0.48, 0.85, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.95, 0.82, 0.25, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_menu_hover"]
+bg_color = Color(0.25, 0.58, 0.95, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 0.92, 0.4, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
 [node name="VictoryScreen" type="CanvasLayer"]
 layer = 20
 visible = false
@@ -98,7 +122,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="CenterContainer"]
-custom_minimum_size = Vector2(380, 0)
+custom_minimum_size = Vector2(440, 0)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
@@ -256,12 +280,12 @@ horizontal_alignment = 2
 
 [node name="ActionButtonsContainer" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 10
 alignment = 1
 
 [node name="RetryButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ActionButtonsContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(110, 44)
+custom_minimum_size = Vector2(90, 44)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.92, 0.95, 1)
 theme_override_font_sizes/font_size = 15
@@ -270,15 +294,29 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_retry_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_retry_normal")
 text = "RETRY"
 
+[node name="StartScreenButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ActionButtonsContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(135, 44)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.1, 0.15, 0.3, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 15
+theme_override_styles/normal = SubResource("StyleBoxFlat_menu_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_menu_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_menu_normal")
+text = "🏠 START SCREEN"
+
 [node name="NextLevelButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ActionButtonsContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(140, 44)
+custom_minimum_size = Vector2(125, 44)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.05, 0.2, 0.1, 1)
 theme_override_constants/outline_size = 3
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 15
 theme_override_styles/normal = SubResource("StyleBoxFlat_next_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_next_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_next_normal")
 text = "NEXT LEVEL"
+

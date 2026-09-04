@@ -116,10 +116,8 @@ func load_level_resource(res: LevelData) -> void:
 			var htex: Texture2D = level_data.horizon_texture if ("horizon_texture" in level_data and level_data.horizon_texture) else null
 			if not htex:
 				var tex_path := "res://assets/textures/horizon_smugglers_run.png"
-				if FileAccess.file_exists(tex_path):
-					var img := Image.load_from_file(ProjectSettings.globalize_path(tex_path))
-					if img and not img.is_empty():
-						htex = ImageTexture.create_from_image(img)
+				if ResourceLoader.exists(tex_path):
+					htex = load(tex_path) as Texture2D
 			if htex:
 				_horizon_backdrop.bind_texture(htex)
 

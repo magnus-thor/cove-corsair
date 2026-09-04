@@ -15,6 +15,7 @@ extends CanvasLayer
 @onready var boss_label: Label = %BossLabel
 @onready var retry_button: Button = %RetryButton
 @onready var next_level_button: Button = %NextLevelButton
+@onready var start_screen_button: Button = %StartScreenButton
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -24,6 +25,8 @@ func _ready() -> void:
 		retry_button.pressed.connect(_on_retry_pressed)
 	if next_level_button:
 		next_level_button.pressed.connect(_on_next_level_pressed)
+	if start_screen_button:
+		start_screen_button.pressed.connect(_on_start_screen_pressed)
 
 func show_victory(doubloons_earned: int, targets_hit: int, stars_earned: int = 3) -> void:
 	visible = true
@@ -143,4 +146,13 @@ func _on_next_level_pressed() -> void:
 	GameState.should_auto_start = true
 	GameState.reset_level()
 	get_tree().reload_current_scene()
+
+func _on_start_screen_pressed() -> void:
+	if AudioManager and AudioManager.has_method("play_sfx"):
+		AudioManager.play_sfx("gate_passes")
+	get_tree().paused = false
+	GameState.should_auto_start = false
+	GameState.reset_level()
+	get_tree().reload_current_scene()
+
 
