@@ -328,9 +328,9 @@ func _physics_process(delta: float) -> void:
 	if not GameState.is_game_active:
 		# Floating / Bobbing on water
 		float_time += delta * bob_frequency
-		var hover_height = lerp(min_hover_height, max_hover_height, (sin(float_time) + 1.0) * 0.5)
+		var idle_hover_height = lerp(min_hover_height, max_hover_height, (sin(float_time) + 1.0) * 0.5)
 		if visuals:
-			visuals.position.y = hover_height
+			visuals.position.y = idle_hover_height
 			visuals.rotation_degrees.x = sin(float_time * 1.5) * 2.0
 			
 			var hardpoints = get_node_or_null("Hardpoints")
@@ -629,7 +629,7 @@ func remove_follower(follower: Node3D) -> void:
 		follower_boats.erase(follower)
 		_update_follower_positions()
 
-func leak_threat(threat_node: Node3D) -> void:
+func leak_threat(_threat_node: Node3D) -> void:
 	if is_game_over or not GameState.is_game_active:
 		return
 		
@@ -676,7 +676,7 @@ func leak_threat(threat_node: Node3D) -> void:
 		spawn_floating_text_at_position("-HULL", Color(1.0, 0.1, 0.1))
 		take_hit(1, "leak_threat")
 
-func damage_fleet(amount: int = 1) -> void:
+func damage_fleet(_amount: int = 1) -> void:
 	leak_threat(null)
 
 func add_follower_ships(amount: int) -> void:

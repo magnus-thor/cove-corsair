@@ -129,6 +129,7 @@ func _animate_stars(stars_earned: int) -> void:
 
 func _on_retry_pressed() -> void:
 	get_tree().paused = false
+	GameState.should_auto_start = true
 	GameState.reset_level()
 	get_tree().reload_current_scene()
 
@@ -139,6 +140,7 @@ func _on_next_level_pressed() -> void:
 	else:
 		GameState.unlock_next_level()
 		GameState.current_level += 1
+	GameState.should_auto_start = true
 	GameState.reset_level()
 	get_tree().reload_current_scene()
 

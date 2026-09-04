@@ -1,0 +1,252 @@
+[gd_scene format=3 uid="uid://c7m8lal0p1q2r"]
+
+[ext_resource type="Script" path="res://src/ui/settings_menu.gd" id="1_settings_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.09, 0.12, 0.18, 0.96)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.95, 0.82, 0.25, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+shadow_color = Color(0, 0, 0, 0.6)
+shadow_size = 12
+shadow_offset = Vector2(0, 6)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
+bg_color = Color(0.18, 0.52, 0.85, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.95, 0.85, 0.3, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
+bg_color = Color(0.25, 0.62, 0.95, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.92, 0.4, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_toggle"]
+bg_color = Color(0.15, 0.2, 0.28, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.5, 0.6, 0.7, 0.6)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="SettingsMenu" type="CanvasLayer"]
+process_mode = 3
+layer = 25
+script = ExtResource("1_settings_script")
+
+[node name="Backdrop" type="ColorRect" parent="."]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.65)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="CenterContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(420, 430)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_colors/font_outline_color = Color(0.15, 0.08, 0.02, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 24
+text = "⚙ AUDIO & SETTINGS"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="MasterSection" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="HBoxHeader" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MasterSection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MasterSection/HBoxHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 15
+text = "Master Volume"
+
+[node name="MasterValLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MasterSection/HBoxHeader"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 15
+text = "100%"
+horizontal_alignment = 2
+
+[node name="HBoxControls" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MasterSection"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="MasterSlider" type="HSlider" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MasterSection/HBoxControls"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+step = 1.0
+value = 100.0
+
+[node name="MasterMuteBtn" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MasterSection/HBoxControls"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(85, 30)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_toggle")
+text = "🔊 ON"
+
+[node name="MusicSection" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="HBoxHeader" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MusicSection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MusicSection/HBoxHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 15
+text = "Music / BGM"
+
+[node name="MusicValLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MusicSection/HBoxHeader"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 15
+text = "100%"
+horizontal_alignment = 2
+
+[node name="HBoxControls" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MusicSection"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="MusicSlider" type="HSlider" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MusicSection/HBoxControls"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+step = 1.0
+value = 100.0
+
+[node name="MusicMuteBtn" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MusicSection/HBoxControls"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(85, 30)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_toggle")
+text = "🎵 ON"
+
+[node name="SFXSection" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="HBoxHeader" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/SFXSection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/SFXSection/HBoxHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 15
+text = "Sound Effects (SFX)"
+
+[node name="SFXValLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/SFXSection/HBoxHeader"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 15
+text = "100%"
+horizontal_alignment = 2
+
+[node name="HBoxControls" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/SFXSection"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SFXSlider" type="HSlider" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/SFXSection/HBoxControls"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+step = 1.0
+value = 100.0
+
+[node name="SFXMuteBtn" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/SFXSection/HBoxControls"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(85, 30)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_toggle")
+text = "💥 ON"
+
+[node name="HSeparator2" type="HSeparator" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="CloseButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 44)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.1, 0.2, 0.4, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+text = "✖ CLOSE"

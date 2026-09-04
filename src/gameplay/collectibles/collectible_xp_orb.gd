@@ -21,8 +21,8 @@ func _ready() -> void:
 	
 	collision_layer = 8
 	collision_mask = 1
-	monitoring = true
-	monitorable = true
+	set_deferred("monitoring", true)
+	set_deferred("monitorable", true)
 	
 	# Create CollisionShape3D dynamically
 	var col_shape = CollisionShape3D.new()
@@ -138,7 +138,7 @@ func _is_player_node(node: Node) -> bool:
 		return true
 	return false
 
-func collect_orb(player_ref: Node = null) -> void:
+func collect_orb(_player_ref: Node = null) -> void:
 	if _is_collected:
 		return
 	_is_collected = true

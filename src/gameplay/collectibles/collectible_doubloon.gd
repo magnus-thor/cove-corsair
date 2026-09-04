@@ -141,7 +141,7 @@ func _is_player_node(node: Node) -> bool:
 		return true
 	return false
 
-func collect_coin(player_ref: Node = null) -> void:
+func collect_coin(_player_ref: Node = null) -> void:
 	if _is_collected:
 		return
 	_is_collected = true

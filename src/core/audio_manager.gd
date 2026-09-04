@@ -43,9 +43,49 @@ func _ready() -> void:
 	if instance == null:
 		instance = self
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	_setup_buses()
 	_setup_music_player()
 	_setup_sfx_pool()
 	_scan_and_load_sfx()
+
+func _setup_buses() -> void:
+	if AudioServer.get_bus_index("BGM") == -1:
+		AudioServer.add_bus()
+		var bgm_idx = AudioServer.bus_count - 1
+		AudioServer.set_bus_name(bgm_idx, "BGM")
+		AudioServer.set_bus_send(bgm_idx, "Master")
+	if AudioServer.get_bus_index("SFX") == -1:
+		AudioServer.add_bus()
+		var sfx_idx = AudioServer.bus_count - 1
+		AudioServer.set_bus_name(sfx_idx, "SFX")
+		AudioServer.set_bus_send(sfx_idx, "Master")
+
+func set_bus_volume(bus_name: String, linear_vol: float) -> void:
+	var idx = AudioServer.get_bus_index(bus_name)
+	if idx != -1:
+		var clamped_vol = clamp(linear_vol, 0.0001, 1.0)
+		var db_val = linear_to_db(clamped_vol) if linear_vol > 0.0001 else -80.0
+		AudioServer.set_bus_volume_db(idx, db_val)
+
+func get_bus_volume(bus_name: String) -> float:
+	var idx = AudioServer.get_bus_index(bus_name)
+	if idx != -1:
+		var db_val = AudioServer.get_bus_volume_db(idx)
+		if db_val <= -79.0:
+			return 0.0
+		return db_to_linear(db_val)
+	return 1.0
+
+func set_bus_muted(bus_name: String, muted: bool) -> void:
+	var idx = AudioServer.get_bus_index(bus_name)
+	if idx != -1:
+		AudioServer.set_bus_mute(idx, muted)
+
+func is_bus_muted(bus_name: String) -> bool:
+	var idx = AudioServer.get_bus_index(bus_name)
+	if idx != -1:
+		return AudioServer.is_bus_mute(idx)
+	return false
 
 func _setup_music_player() -> void:
 	music_player = AudioStreamPlayer.new()

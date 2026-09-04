@@ -6,6 +6,7 @@ signal game_started
 
 @onready var start_button: Button = %StartButton
 @onready var shipyard_button: Button = %ShipyardButton
+@onready var settings_button: Button = %SettingsButton
 @onready var reset_button: Button = %ResetButton
 @onready var btn_lvl_1: Button = %BtnLvl1
 @onready var btn_lvl_2: Button = %BtnLvl2
@@ -34,6 +35,9 @@ func _ready() -> void:
 		
 	if shipyard_button:
 		shipyard_button.pressed.connect(_on_shipyard_button_pressed)
+
+	if settings_button:
+		settings_button.pressed.connect(_on_settings_button_pressed)
 
 	if reset_button:
 		reset_button.pressed.connect(_on_reset_button_pressed)
@@ -78,6 +82,14 @@ func _on_shipyard_button_pressed() -> void:
 			shipyard.shipyard_closed.connect(func():
 				_refresh_player_ship()
 			)
+
+func _on_settings_button_pressed() -> void:
+	if AudioManager and AudioManager.has_method("play_sfx"):
+		AudioManager.play_sfx("gate_passes")
+	var settings_scene = preload("res://src/ui/settings_menu.tscn")
+	if settings_scene:
+		var settings = settings_scene.instantiate()
+		get_parent().add_child(settings)
 
 func _on_reset_button_pressed() -> void:
 	GameState.reset_save_data()

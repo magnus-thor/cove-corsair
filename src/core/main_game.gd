@@ -8,10 +8,21 @@ var start_screen: StartScreen
 var victory_screen: VictoryScreen
 
 func _ready() -> void:
-	GameState.is_game_active = false
-	_pause_player_shooting()
-	_setup_start_screen()
+	if GameState.should_auto_start:
+		GameState.should_auto_start = false
+		_start_game_immediately()
+	else:
+		GameState.is_game_active = false
+		_pause_player_shooting()
+		_setup_start_screen()
 	_setup_victory_screen()
+
+func _start_game_immediately() -> void:
+	GameState.is_game_active = true
+	var player = get_tree().get_first_node_in_group("player")
+	if player and "is_shooting_enabled" in player:
+		player.is_shooting_enabled = true
+	AudioManager.play_music()
 
 func _pause_player_shooting() -> void:
 	var player = get_tree().get_first_node_in_group("player")

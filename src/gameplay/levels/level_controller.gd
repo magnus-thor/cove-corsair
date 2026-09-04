@@ -11,8 +11,6 @@ extends Node3D
 @export var level_data: LevelData = preload("res://src/data/resources/levels/level_01_smugglers_run.tres")
 @export var spawn_z_ahead: float = -70.0
 
-const SpawnEvent = preload("res://src/data/spawn_event.gd")
-
 # Prefabs
 @export var coin_scene: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
 @export var barrel_scene: PackedScene = preload("res://src/gameplay/obstacles/destructible_barrel.tscn")
@@ -252,14 +250,11 @@ func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> vo
 				barrel.global_position = Vector3(x_pos, 0.05, z_spawn)
 				var hp = event.base_hp_override if event.base_hp_override > 0 else (2 if event.rarity_tier == SpawnEvent.RarityTier.COMMON else (4 if event.rarity_tier == SpawnEvent.RarityTier.NORMAL else 6))
 				barrel.hp = hp
-				var type_name = "WOODEN"
 				if "obstacle_type" in barrel:
 					if event.rarity_tier == SpawnEvent.RarityTier.RARE:
 						barrel.obstacle_type = DestructibleObstacle.ObstacleType.RUNE_BARREL
-						type_name = "RUNE"
 					elif event.rarity_tier == SpawnEvent.RarityTier.NORMAL:
 						barrel.obstacle_type = DestructibleObstacle.ObstacleType.FUSE_BARREL
-						type_name = "FUSE"
 					else:
 						barrel.obstacle_type = DestructibleObstacle.ObstacleType.WOODEN_BARREL
 
@@ -775,7 +770,7 @@ func _spawn_boss() -> void:
 		else:
 			add_child(boss)
 		boss.global_position = Vector3(0.0, 0.0, player_z - 18.0)
-		print("[BOSS] Spawned boss for ", level_data.level_name if level_data else "Level", " with HP: ", level_data.boss_hp if (level_data and "boss_hp" in level_data) else "default")
+		print("[BOSS] Spawned boss for ", level_data.level_name if level_data else "Level", " with HP: ", str(level_data.boss_hp) if (level_data and "boss_hp" in level_data) else "default")
 
 		# Lock camera to boss arena
 		var camera = get_tree().get_first_node_in_group("game_camera")

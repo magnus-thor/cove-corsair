@@ -6,19 +6,20 @@ var _initialized: bool = false
 
 @onready var title_label: Label = $Control/Panel/VBoxContainer/TitleLabel
 @onready var score_label: Label = $Control/Panel/VBoxContainer/ScoreLabel
-@onready var play_again_button: Button = $Control/Panel/VBoxContainer/PlayAgainButton
+@onready var restart_button: Button = %RestartButton
+@onready var start_screen_button: Button = %StartScreenButton
 
 func _ready() -> void:
-	# Ensure the UI responds even when the game is paused
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	
-	# Wire up the play again button click signal
-	play_again_button.pressed.connect(_on_play_again_button_pressed)
+	if restart_button:
+		restart_button.pressed.connect(_on_restart_button_pressed)
+	if start_screen_button:
+		start_screen_button.pressed.connect(_on_start_screen_button_pressed)
 	
 	_initialized = true
 	_update_ui()
 	
-	# Initial transparent state for animations
 	var background = $Control/Background
 	var panel = $Control/Panel
 	
@@ -26,7 +27,6 @@ func _ready() -> void:
 	panel.scale = Vector2(0.8, 0.8)
 	panel.modulate.a = 0.0
 	
-	# Defer the animation setup to ensure layout size is calculated for center pivot offset
 	call_deferred("_setup_animation")
 
 func _setup_animation() -> void:
@@ -46,16 +46,29 @@ func set_result(victory: bool, score: int) -> void:
 		_update_ui()
 
 func _update_ui() -> void:
+	if not title_label or not score_label:
+		return
 	if _victory:
 		title_label.text = "VICTORY!"
-		title_label.add_theme_color_override("font_color", Color(0.24, 0.81, 0.45)) # Emerald Green
+		title_label.add_theme_color_override("font_color", Color(0.24, 0.81, 0.45))
 	else:
 		title_label.text = "DEFEAT!"
-		title_label.add_theme_color_override("font_color", Color(0.95, 0.26, 0.26)) # Premium Coral/Red
+		title_label.add_theme_color_override("font_color", Color(0.95, 0.26, 0.26))
 	
 	score_label.text = "Barrels Sunk: %d" % _score
 
-func _on_play_again_button_pressed() -> void:
+func _on_restart_button_pressed() -> void:
+	if AudioManager and AudioManager.has_method("play_sfx"):
+		AudioManager.play_sfx("gate_passes")
 	get_tree().paused = false
+	GameState.should_auto_start = true
+	GameState.reset_level()
+	get_tree().reload_current_scene()
+
+func _on_start_screen_button_pressed() -> void:
+	if AudioManager and AudioManager.has_method("play_sfx"):
+		AudioManager.play_sfx("gate_passes")
+	get_tree().paused = false
+	GameState.should_auto_start = false
 	GameState.reset_level()
 	get_tree().reload_current_scene()

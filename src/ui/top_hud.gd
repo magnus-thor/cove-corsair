@@ -6,6 +6,7 @@ extends CanvasLayer
 @onready var level_progress_bar: ProgressBar = $MarginContainer/HBoxContainer/ProgressContainer/HBoxContainer/LevelProgressBar
 @onready var multiplier_panel: Control = $MarginContainer/HBoxContainer/MultiplierPanel
 @onready var multiplier_label: Label = $MarginContainer/HBoxContainer/MultiplierPanel/MarginContainer/MultiplierLabel
+@onready var pause_button: Button = %PauseButton
 
 var _gold_tween: Tween
 var _multiplier_tween: Tween
@@ -14,9 +15,13 @@ var _displayed_gold: int = 0
 var is_boss_mode: bool = false
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	# Ensure pivot centers for punch scale animations
 	_update_pivots()
 	get_viewport().size_changed.connect(_update_pivots)
+	
+	if pause_button:
+		pause_button.pressed.connect(_on_pause_button_pressed)
 	
 	GameState.doubloons_changed.connect(_on_doubloons_changed)
 	GameState.multiplier_changed.connect(_on_multiplier_changed)
@@ -32,6 +37,23 @@ func _ready() -> void:
 	level_progress_bar.value = GameState.distance_traveled
 	if "current_level" in GameState:
 		level_title.text = "WORLD %d - COVE RUN" % GameState.current_level
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not GameState.is_game_active or get_tree().paused:
+		return
+	if event.is_action_pressed("ui_cancel") or (event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_P):
+		get_viewport().set_input_as_handled()
+		_on_pause_button_pressed()
+
+func _on_pause_button_pressed() -> void:
+	if not GameState.is_game_active or get_tree().paused:
+		return
+	if AudioManager and AudioManager.has_method("play_sfx"):
+		AudioManager.play_sfx("gate_passes")
+	var pause_scene = preload("res://src/ui/pause_menu.tscn")
+	if pause_scene:
+		var pause_menu = pause_scene.instantiate()
+		get_parent().add_child(pause_menu)
 
 func _on_boss_spawned(boss_name: String, max_hp: int) -> void:
 	is_boss_mode = true

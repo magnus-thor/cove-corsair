@@ -102,17 +102,17 @@ func _spawn_gas_cloud_area() -> void:
 	tween.tween_property(mat, "albedo_color:a", 0.0, cloud_duration * 0.5)
 
 	# Active ticking damage timer
-	var elapsed: float = 0.0
+	var tracker: Dictionary = {"elapsed": 0.0}
 	var timer = Timer.new()
 	timer.wait_time = tick_interval
 	timer.autostart = true
 	cloud_root.add_child(timer)
 	
 	timer.timeout.connect(func():
-		elapsed += tick_interval
+		tracker["elapsed"] += tick_interval
 		_player_damage_cooldown = max(0.0, _player_damage_cooldown - tick_interval)
 		_damage_enemies_in_cloud(cloud_root.global_position, cloud_radius)
-		if elapsed >= cloud_duration:
+		if tracker["elapsed"] >= cloud_duration:
 			timer.stop()
 			cloud_root.queue_free()
 	)

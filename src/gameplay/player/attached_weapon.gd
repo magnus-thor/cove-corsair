@@ -162,7 +162,7 @@ func _process_deck_idle(delta: float) -> void:
 		wander_tween.tween_property(sprite_3d, "position:x", offset_x, 0.4)
 		wander_tween.parallel().tween_property(sprite_3d, "position:z", offset_z, 0.4)
 
-func _process_targeting(delta: float) -> void:
+func _process_targeting(_delta: float) -> void:
 	var is_crew: bool = _is_crew()
 	var player = get_tree().get_first_node_in_group("player")
 	var boat_z = player.global_position.z if (player and is_instance_valid(player)) else global_position.z
@@ -279,9 +279,9 @@ func _process_targeting(delta: float) -> void:
 		if sprite_3d:
 			sprite_3d.flip_h = false
 
-func try_fire(projectile_scene, world_container = null) -> void:
-	if projectile_scene is float or projectile_scene is int:
-		var delta = float(projectile_scene)
+func try_fire(p_projectile_scene = null, world_container = null) -> void:
+	if p_projectile_scene is float or p_projectile_scene is int:
+		var delta = float(p_projectile_scene)
 		if not weapon_data:
 			return
 		fire_timer += delta
@@ -292,7 +292,7 @@ func try_fire(projectile_scene, world_container = null) -> void:
 				parent = get_parent()
 			_execute_fire(self.projectile_scene, parent)
 	else:
-		_execute_fire(projectile_scene, world_container)
+		_execute_fire(p_projectile_scene, world_container)
 
 func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 	if not weapon_data or not proj_scene or not world_container or not muzzle_point:
@@ -357,7 +357,7 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 				socket_name,
 				ball.global_position,
 				proj_dir,
-				current_target.name if (current_target and is_instance_valid(current_target)) else "none"
+				str(current_target.name) if (current_target and is_instance_valid(current_target)) else "none"
 			])
 
 func _trigger_throw_anim() -> void:

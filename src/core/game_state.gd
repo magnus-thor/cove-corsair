@@ -5,10 +5,15 @@ extends Node
 signal doubloons_changed(new_amount: int)
 signal multiplier_changed(new_multiplier: float, mode: String)
 signal progress_changed(current_distance: float, total_distance: float)
+@warning_ignore("unused_signal")
 signal distance_target_reached
+@warning_ignore("unused_signal")
 signal level_completed(doubloons: int, targets: int)
+@warning_ignore("unused_signal")
 signal campaign_completed(total_doubloons: int, total_targets: int)
+@warning_ignore("unused_signal")
 signal boss_spawned_event(boss_name: String, max_val: int)
+@warning_ignore("unused_signal")
 signal boss_health_changed(current: int, max_val: int)
 signal active_vessel_changed(vessel_id: String)
 
@@ -25,6 +30,14 @@ var vessel_tiers: Dictionary = {
 var active_vessel: String = "dinghy"
 var unlocked_levels: int = 1
 
+# Persistent Audio Preferences
+var master_volume: float = 1.0
+var music_volume: float = 1.0
+var sfx_volume: float = 1.0
+var master_muted: bool = false
+var music_muted: bool = false
+var sfx_muted: bool = false
+
 # In-Run Transient State
 var run_doubloons: int = 0
 var targets_destroyed: int = 0
@@ -35,6 +48,7 @@ var level_distance_target: float = 250.0 # meters / units to reach boss or finis
 var distance_traveled: float = 0.0
 var is_game_active: bool = false
 var boss_spawned: bool = false
+var should_auto_start: bool = false
 
 const VESSEL_CATALOG: Dictionary = {
 	"dinghy": {
@@ -110,6 +124,19 @@ const LEVEL_SHIPS: Dictionary = {
 
 func _ready() -> void:
 	load_game()
+	apply_audio_settings()
+
+func apply_audio_settings() -> void:
+	if not AudioManager:
+		return
+	if AudioManager.has_method("set_bus_volume"):
+		AudioManager.set_bus_volume("Master", master_volume)
+		AudioManager.set_bus_volume("BGM", music_volume)
+		AudioManager.set_bus_volume("SFX", sfx_volume)
+	if AudioManager.has_method("set_bus_muted"):
+		AudioManager.set_bus_muted("Master", master_muted)
+		AudioManager.set_bus_muted("BGM", music_muted)
+		AudioManager.set_bus_muted("SFX", sfx_muted)
 
 func get_current_level_resource() -> LevelData:
 	var path = LEVEL_RESOURCES.get(current_level, LEVEL_RESOURCES[1])
@@ -249,7 +276,13 @@ func save_game() -> void:
 		"owned_vessels": owned_vessels,
 		"vessel_tiers": vessel_tiers,
 		"active_vessel": active_vessel,
-		"unlocked_levels": unlocked_levels
+		"unlocked_levels": unlocked_levels,
+		"master_volume": master_volume,
+		"music_volume": music_volume,
+		"sfx_volume": sfx_volume,
+		"master_muted": master_muted,
+		"music_muted": music_muted,
+		"sfx_muted": sfx_muted
 	}
 	var file = FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file:
@@ -263,6 +296,12 @@ func load_game() -> void:
 	vessel_tiers = {"dinghy": 1, "sloop": 1, "ironclad": 1}
 	active_vessel = "dinghy"
 	unlocked_levels = 1
+	master_volume = 1.0
+	music_volume = 1.0
+	sfx_volume = 1.0
+	master_muted = false
+	music_muted = false
+	sfx_muted = false
 
 	if not FileAccess.file_exists(SAVE_PATH):
 		return
@@ -307,6 +346,13 @@ func load_game() -> void:
 
 		if data.has("unlocked_levels"):
 			unlocked_levels = clamp(int(data["unlocked_levels"]), 1, 6)
+
+		if data.has("master_volume"): master_volume = clamp(float(data["master_volume"]), 0.0, 1.0)
+		if data.has("music_volume"): music_volume = clamp(float(data["music_volume"]), 0.0, 1.0)
+		if data.has("sfx_volume"): sfx_volume = clamp(float(data["sfx_volume"]), 0.0, 1.0)
+		if data.has("master_muted"): master_muted = bool(data["master_muted"])
+		if data.has("music_muted"): music_muted = bool(data["music_muted"])
+		if data.has("sfx_muted"): sfx_muted = bool(data["sfx_muted"])
 
 		doubloons_changed.emit(doubloons)
 	else:

@@ -16,8 +16,8 @@ func _ready() -> void:
 	add_to_group("collectibles")
 	collision_layer = 8
 	collision_mask = 1
-	monitoring = true
-	monitorable = true
+	set_deferred("monitoring", true)
+	set_deferred("monitorable", true)
 	area_entered.connect(_on_area_entered)
 	body_entered.connect(_on_body_entered)
 	global_position.y = base_water_y
@@ -77,6 +77,12 @@ func collect_chest() -> void:
 		return
 	_is_collected = true
 	
+	set_deferred("monitoring", false)
+	set_deferred("monitorable", false)
+	for child in get_children():
+		if child is CollisionShape3D:
+			child.set_deferred("disabled", true)
+			
 	var player = get_tree().get_first_node_in_group("player")
 	if player and player.has_method("add_evolution_xp"):
 		player.add_evolution_xp(50.0)

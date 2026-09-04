@@ -47,8 +47,8 @@ func setup(p_direction: Vector3, p_ammo_data: AmmoData) -> void:
 func _ready() -> void:
 	top_level = true
 	add_to_group("cannonballs")
-	monitoring = false
-	monitorable = false
+	set_deferred("monitoring", false)
+	set_deferred("monitorable", false)
 	damage = ammo_data.damage if ammo_data else 1
 	_apply_visual_styling()
 	if ammo_data:
