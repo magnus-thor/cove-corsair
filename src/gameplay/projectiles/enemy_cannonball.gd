@@ -51,12 +51,8 @@ func _on_hit(target: Node) -> void:
 			else:
 				if player.has_method("leak_threat"):
 					player.leak_threat(player)
-				else:
-					player.current_health -= 1
-					if player.has_signal("health_changed"):
-						player.health_changed.emit(player.current_health, player.max_health)
-					if player.current_health <= 0 and player.has_method("game_over"):
-						player.game_over(false)
+				elif player.has_method("take_hit"):
+					player.take_hit(1, "enemy_cannonball")
 						
 		var splash_scene = preload("res://src/gameplay/vfx/hit_splash.tscn")
 		if splash_scene:

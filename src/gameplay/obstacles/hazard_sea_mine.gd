@@ -14,7 +14,7 @@ func die() -> void:
 	_spawn_explosion()
 	AudioManager.play_sfx("barrel_breaks")
 	
-	# Apply knockback to the player if close (meaning they touched the mine)
+	# Apply knockback and deal 1 fleet damage to the player if close (direct contact)
 	var player = get_tree().get_first_node_in_group("player")
 	if player and is_instance_valid(player):
 		var dist = global_position.distance_to(player.global_position)
@@ -26,6 +26,10 @@ func die() -> void:
 			if "target_x" in player and "half_width" in player:
 				player.target_x = clamp(player.target_x + knockback_dir * 2.8, -player.half_width, player.half_width)
 				player.position.x = player.target_x
+			
+			# Deal 1 fleet/hull damage on direct contact
+			if player.has_method("leak_threat"):
+				player.leak_threat(self)
 	
 	doubloons_drop = 0 # Mine is a hazard and does not drop gold
 	

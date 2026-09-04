@@ -45,7 +45,10 @@ func _physics_process(delta: float) -> void:
 	var player = get_tree().get_first_node_in_group("player")
 	var player_z = player.global_position.z if player else 0.0
 	if global_position.z > (player_z + 3.0):
-		if obstacle_type == ObstacleType.FUSE_BARREL or obstacle_type == ObstacleType.SEA_MINE:
+		# All hazard types deal pass-by damage — any obstacle that scrolls past
+		# the player represents a navigational failure. Coral reef is excluded
+		# because it is handled separately by hazard_reef.gd.
+		if obstacle_type != ObstacleType.CORAL_REEF:
 			if player and player.has_method("leak_threat"):
 				player.leak_threat(self)
 		queue_free()
@@ -187,8 +190,6 @@ func _apply_explosion_damage() -> void:
 	targets.append_array(get_tree().get_nodes_in_group("enemies"))
 	
 	var player = get_tree().get_first_node_in_group("player")
-	if player and is_instance_valid(player):
-		targets.append(player)
 		
 	var processed: Dictionary = {}
 	for obj in targets:
@@ -198,6 +199,12 @@ func _apply_explosion_damage() -> void:
 				var dist = (obj as Node3D).global_position.distance_to(global_position)
 				if dist <= radius and obj.has_method("take_damage"):
 					obj.take_damage(dmg)
+					
+	# Player uses leak_threat, not take_damage — route correctly.
+	if player and is_instance_valid(player):
+		var player_dist = (player as Node3D).global_position.distance_to(global_position)
+		if player_dist <= radius and player.has_method("leak_threat"):
+			player.leak_threat(self)
 
 func _spawn_explosion() -> void:
 	if barrel_explosion_scene:

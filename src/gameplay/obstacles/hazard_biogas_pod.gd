@@ -9,6 +9,8 @@ extends Area3D
 
 var _is_popped: bool = false
 var _pulse_time: float = 0.0
+## Per-cloud player damage cooldown (seconds). Prevents fleet-wipe on first tick.
+var _player_damage_cooldown: float = 0.0
 
 @onready var pod_mesh: MeshInstance3D = get_node_or_null("PodMesh")
 @onready var pod_sprite: Sprite3D = get_node_or_null("PodSprite") as Sprite3D
@@ -108,6 +110,7 @@ func _spawn_gas_cloud_area() -> void:
 	
 	timer.timeout.connect(func():
 		elapsed += tick_interval
+		_player_damage_cooldown = max(0.0, _player_damage_cooldown - tick_interval)
 		_damage_enemies_in_cloud(cloud_root.global_position, cloud_radius)
 		if elapsed >= cloud_duration:
 			timer.stop()
@@ -132,3 +135,12 @@ func _damage_enemies_in_cloud(center: Vector3, radius: float) -> void:
 				var dist = (obj as Node3D).global_position.distance_to(center)
 				if dist <= radius and obj.has_method("take_damage"):
 					obj.take_damage(damage_per_tick)
+	
+	# Damage the player fleet with a 1.0 s cooldown to prevent instant fleet-wipe.
+	var player = get_tree().get_first_node_in_group("player")
+	if player and is_instance_valid(player) and _player_damage_cooldown <= 0.0:
+		var player_dist = (player as Node3D).global_position.distance_to(center)
+		if player_dist <= radius:
+			_player_damage_cooldown = 1.0
+			if player.has_method("leak_threat"):
+				player.leak_threat(self)

@@ -225,6 +225,24 @@ func reset_level() -> void:
 	progress_changed.emit(distance_traveled, level_distance_target)
 	multiplier_changed.emit(active_multiplier, multiplier_mode)
 
+func reset_save_data() -> void:
+	doubloons = 0
+	owned_vessels = ["dinghy"]
+	vessel_tiers = {
+		"dinghy": 1,
+		"sloop": 1,
+		"ironclad": 1
+	}
+	active_vessel = "dinghy"
+	unlocked_levels = 1
+	current_level = 1
+	reset_level()
+	if FileAccess.file_exists(SAVE_PATH):
+		DirAccess.remove_absolute(SAVE_PATH)
+	save_game()
+	doubloons_changed.emit(doubloons)
+	active_vessel_changed.emit(active_vessel)
+
 func save_game() -> void:
 	var save_dict: Dictionary = {
 		"doubloons": doubloons,

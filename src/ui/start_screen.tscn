@@ -113,6 +113,37 @@ corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_reset_normal"]
+bg_color = Color(0.65, 0.18, 0.18, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.95, 0.4, 0.4, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.4)
+shadow_size = 6
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_reset_hover"]
+bg_color = Color(0.8, 0.22, 0.22, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.6, 0.6, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.45)
+shadow_size = 8
+shadow_offset = Vector2(0, 4)
+
+
 [node name="StartScreen" type="CanvasLayer"]
 layer = 15
 script = ExtResource("1_start_script")
@@ -235,29 +266,42 @@ alignment = 1
 
 [node name="ShipyardButton" type="Button" parent="Control/BottomContainer/ActionHBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(160, 52)
+custom_minimum_size = Vector2(140, 52)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.95, 0.8, 1)
 theme_override_colors/font_outline_color = Color(0.05, 0.1, 0.2, 1)
 theme_override_constants/outline_size = 3
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 15
 theme_override_styles/normal = SubResource("StyleBoxFlat_shipyard_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_shipyard_hover")
 text = "⚓ SHIPYARD"
 
 [node name="StartButton" type="Button" parent="Control/BottomContainer/ActionHBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(180, 52)
+custom_minimum_size = Vector2(160, 52)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.1, 0.25, 0.1, 1)
 theme_override_constants/outline_size = 4
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 19
 theme_override_styles/normal = SubResource("StyleBoxFlat_start_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_start_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_start_pressed")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_start_disabled")
 text = "SET SAIL"
+
+[node name="ResetButton" type="Button" parent="Control/BottomContainer/ActionHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 52)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.9, 1)
+theme_override_colors/font_outline_color = Color(0.2, 0.05, 0.05, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 15
+theme_override_styles/normal = SubResource("StyleBoxFlat_reset_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_reset_hover")
+text = "🔄 RESET"
+
 
 [node name="TapHint" type="Label" parent="Control/BottomContainer"]
 unique_name_in_owner = true

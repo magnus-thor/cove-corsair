@@ -671,12 +671,10 @@ func leak_threat(threat_node: Node3D) -> void:
 			
 			follower.destroy_follower()
 	else:
-		# If no followers exist, inflict 1 point of Hull damage to the player
-		current_health -= 1
-		health_changed.emit(current_health, max_health)
+		# If no followers exist, inflict 1 point of Hull damage to the player.
+		# Spawn the floating label first so it's visible even if game_over fires.
 		spawn_floating_text_at_position("-HULL", Color(1.0, 0.1, 0.1))
-		if current_health <= 0:
-			game_over(false)
+		take_hit(1, "leak_threat")
 
 func damage_fleet(amount: int = 1) -> void:
 	leak_threat(null)

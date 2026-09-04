@@ -54,12 +54,8 @@ func _on_area_entered(area: Area3D) -> void:
 		return
 	if area.is_in_group("player") or (area.get_parent() and area.get_parent().is_in_group("player")):
 		var player = get_tree().get_first_node_in_group("player")
-		if player and "current_health" in player:
-			player.current_health -= 1
-			if player.has_signal("health_changed"):
-				player.health_changed.emit(player.current_health, player.max_health)
-			if player.current_health <= 0 and player.has_method("game_over"):
-				player.game_over(false)
+		if player and player.has_method("take_hit"):
+			player.take_hit(1, "tide_cutter_ram")
 		die()
 
 func take_damage(amount: int) -> void:

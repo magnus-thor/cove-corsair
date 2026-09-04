@@ -6,6 +6,7 @@ signal game_started
 
 @onready var start_button: Button = %StartButton
 @onready var shipyard_button: Button = %ShipyardButton
+@onready var reset_button: Button = %ResetButton
 @onready var btn_lvl_1: Button = %BtnLvl1
 @onready var btn_lvl_2: Button = %BtnLvl2
 @onready var btn_lvl_3: Button = %BtnLvl3
@@ -33,6 +34,9 @@ func _ready() -> void:
 		
 	if shipyard_button:
 		shipyard_button.pressed.connect(_on_shipyard_button_pressed)
+
+	if reset_button:
+		reset_button.pressed.connect(_on_reset_button_pressed)
 		
 	if btn_lvl_1: btn_lvl_1.pressed.connect(func(): _select_level(1))
 	if btn_lvl_2: btn_lvl_2.pressed.connect(func(): _select_level(2))
@@ -75,8 +79,14 @@ func _on_shipyard_button_pressed() -> void:
 				_refresh_player_ship()
 			)
 
-func _select_level(lvl: int) -> void:
-	if GameState.current_level == lvl:
+func _on_reset_button_pressed() -> void:
+	GameState.reset_save_data()
+	_select_level(1, true)
+	if AudioManager and AudioManager.has_method("play_sfx"):
+		AudioManager.play_sfx("coin_pickups", 0.8, 0.8)
+
+func _select_level(lvl: int, force: bool = false) -> void:
+	if not force and GameState.current_level == lvl:
 		return
 		
 	GameState.current_level = lvl
@@ -102,6 +112,7 @@ func _select_level(lvl: int) -> void:
 	var hud = get_tree().get_first_node_in_group("top_hud")
 	if hud and "level_title" in hud and hud.level_title:
 		hud.level_title.text = LEVEL_NAMES.get(lvl, "Level %d" % lvl)
+
 
 func _update_level_buttons() -> void:
 	var cur = GameState.current_level
