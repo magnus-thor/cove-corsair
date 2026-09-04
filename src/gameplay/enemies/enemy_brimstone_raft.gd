@@ -35,6 +35,7 @@ func _physics_process(delta: float) -> void:
 	if player and is_instance_valid(player):
 		var target_x = player.global_position.x
 		global_position.x = move_toward(global_position.x, target_x, steer_speed * delta)
+		global_position.x = clampf(global_position.x, -4.6, 4.6)
 		
 	var player_z = player.global_position.z if player else 0.0
 	if global_position.z > (player_z + 3.0):

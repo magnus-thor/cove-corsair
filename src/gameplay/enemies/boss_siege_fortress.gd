@@ -9,7 +9,7 @@ enum State { APPROACHING, COMBAT, RAMMING, DYING }
 @export var approach_speed: float = 12.0
 @export var combat_z_offset: float = -19.0
 @export var weave_speed: float = 1.1
-@export var patrol_width: float = 3.5
+@export var patrol_width: float = 2.6
 
 # Component HP
 var hp_port_turret: int = 150
@@ -252,7 +252,9 @@ func _spawn_bastion_minions() -> void:
 			
 		if mob:
 			root.add_child(mob)
-			mob.global_position = s["pos"]
+			var pos_clamped: Vector3 = s["pos"]
+			pos_clamped.x = clampf(pos_clamped.x, -4.2, 4.2)
+			mob.global_position = pos_clamped
 			if GameState.boss_spawned:
 				print("[BOSS MINION] Spawning %s at pos: %s | HP: %d" % [mob.name, mob.global_position, mob.current_hp])
 

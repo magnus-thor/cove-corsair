@@ -36,6 +36,7 @@ func _physics_process(delta: float) -> void:
 	if player and is_instance_valid(player):
 		var target_x = player.global_position.x
 		global_position.x = move_toward(global_position.x, target_x, steer_speed * delta)
+		global_position.x = clampf(global_position.x, -4.8, 4.8)
 		
 		# Slight bank tilt
 		var diff = target_x - global_position.x

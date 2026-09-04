@@ -21,7 +21,7 @@ enum ShipTier {RAFT, SLOOP, GALLEON}
 @export var ironclad_ship_data: ShipData = preload("res://src/data/resources/user_vessels/ironclad_ship.tres")
 
 ## Width of the river channel boundaries. The boat can move within [-river_width/2, river_width/2]
-@export var river_width: float = 11.0
+@export var river_width: float = 12.0
 
 ## Touch/drag input sensitivity scaling factor.
 @export var sensitivity: float = 0.015
@@ -353,6 +353,7 @@ func _physics_process(delta: float) -> void:
 	# 3. Smooth swerve horizontal interpolation
 	var previous_x = position.x
 	position.x = lerp(position.x, target_x, lerp_speed * speed_multiplier * delta)
+	position.x = clamp(position.x, -half_width, half_width)
 	var x_velocity = (position.x - previous_x) / delta if delta > 0.0 else 0.0
 	
 	# 4. Dynamic Roll and Yaw Banking

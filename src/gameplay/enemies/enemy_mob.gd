@@ -119,6 +119,7 @@ func _physics_process(delta: float) -> void:
 	# Active Combatant Homing / Steering
 	if has_meta("is_kamikaze") and get_meta("is_kamikaze") and player and is_instance_valid(player):
 		global_position.x = move_toward(global_position.x, player.global_position.x, 2.5 * delta)
+		global_position.x = clampf(global_position.x, -4.2, 4.2)
 		
 	# Active Combatant Shooting
 	var mob_name_lower = ""

@@ -156,7 +156,7 @@ func spawn_obstacles() -> void:
 				elif "mob_type" in enemy:
 					enemy.mob_type = chosen_type
 				
-				var lane_x = randf_range(-4.0, 4.0)
+				var lane_x = randf_range(-3.8, 3.8)
 				var rand_z = -randf_range(8.0, segment_length - 8.0)
 				enemy.position = Vector3(lane_x, 0.0, rand_z)
 
@@ -200,10 +200,13 @@ func spawn_scenery() -> void:
 			continue
 			
 		var rand_x = 0.0
-		if shore == 1:
-			rand_x = randf_range(-14.0, -7.5)
+		var is_left: bool = (shore == 1)
+		if is_left:
+			# Left bank: roots strictly at X <= -6.5 (ranging outward from -6.5 to -10.5)
+			rand_x = randf_range(-10.5, -6.5)
 		else:
-			rand_x = randf_range(7.5, 14.0)
+			# Right bank: roots strictly at X >= +6.5 (ranging outward from +6.5 to +10.5)
+			rand_x = randf_range(6.5, 10.5)
 			
 		var rand_z = randf_range(zone.x, zone.y)
 		
@@ -213,6 +216,7 @@ func spawn_scenery() -> void:
 			var base_inst = base_scene.instantiate() as Node3D
 			scenery_container.add_child(base_inst)
 			base_inst.position = Vector3(rand_x, 0.0, rand_z)
+			base_inst.scale = Vector3(randf_range(1.0, 1.3), randf_range(0.7, 1.0), randf_range(1.0, 1.3))
 			_clean_shadow_nodes(base_inst)
 			
 			if randf() < 0.6:
@@ -223,6 +227,8 @@ func spawn_scenery() -> void:
 					base_inst.add_child(palm_inst)
 					palm_inst.rotation.y = randf_range(0.0, TAU)
 					_clean_shadow_nodes(palm_inst)
+
+			_enforce_navigable_clearance(base_inst, is_left)
 
 func _clean_shadow_nodes(node: Node) -> void:
 	if not node:
@@ -242,3 +248,58 @@ func _clean_shadow_nodes(node: Node) -> void:
 			
 	for child in node.get_children():
 		_clean_shadow_nodes(child)
+
+# ── Navigable corridor clearance enforcement ──────────────────────────────────
+
+func _collect_mesh_instances(node: Node, result: Array[MeshInstance3D]) -> void:
+	if node is MeshInstance3D:
+		result.append(node as MeshInstance3D)
+	for child in node.get_children():
+		_collect_mesh_instances(child, result)
+
+func _get_relative_transform(node: Node3D, root: Node3D) -> Transform3D:
+	var xform := Transform3D.IDENTITY
+	var curr: Node = node
+	while curr and curr != root and curr is Node3D:
+		xform = (curr as Node3D).transform * xform
+		curr = curr.get_parent()
+	return xform
+
+func _enforce_navigable_clearance(prop: Node3D, is_left: bool, buffer: float = 0.05) -> void:
+	if not prop:
+		return
+	
+	var min_x := INF
+	var max_x := -INF
+	var mesh_instances: Array[MeshInstance3D] = []
+	_collect_mesh_instances(prop, mesh_instances)
+	
+	for mi in mesh_instances:
+		if not mi.mesh:
+			continue
+		var aabb: AABB = mi.mesh.get_aabb()
+		var rel_xform: Transform3D = _get_relative_transform(mi, self)
+		for i in range(8):
+			var corner := aabb.position + Vector3(
+				aabb.size.x if (i & 1) else 0.0,
+				aabb.size.y if (i & 2) else 0.0,
+				aabb.size.z if (i & 4) else 0.0
+			)
+			var pt := rel_xform * corner
+			min_x = minf(min_x, pt.x)
+			max_x = maxf(max_x, pt.x)
+			
+	if min_x == INF or max_x == -INF:
+		return
+		
+	var lane_limit: float = 6.0 + buffer
+	if is_left:
+		# Left bank: navigable water is X >= -6.0. Visual geometry must be strictly <= -lane_limit (-6.05).
+		if max_x > -lane_limit:
+			var overshoot: float = max_x - (-lane_limit)
+			prop.position.x -= overshoot
+	else:
+		# Right bank: navigable water is X <= +6.0. Visual geometry must be strictly >= +lane_limit (+6.05).
+		if min_x < lane_limit:
+			var undershoot: float = lane_limit - min_x
+			prop.position.x += undershoot

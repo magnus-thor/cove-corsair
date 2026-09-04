@@ -80,7 +80,9 @@ func _physics_process(delta: float) -> void:
 		
 	# Mirror movement with tight lerp delay
 	var target_pos = player.global_position + player.global_transform.basis * target_offset
+	target_pos.x = clampf(target_pos.x, -5.0, 5.0)
 	global_position = global_position.lerp(target_pos, lerp_speed * delta)
+	global_position.x = clampf(global_position.x, -5.0, 5.0)
 	
 	# Match rotation
 	global_transform.basis = global_transform.basis.slerp(player.global_transform.basis, rotation_lerp_speed * delta)

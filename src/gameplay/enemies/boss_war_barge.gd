@@ -9,7 +9,7 @@ enum State { APPROACHING, COMBAT, DYING }
 @export var approach_speed: float = 12.0
 @export var combat_z_offset: float = -18.0
 @export var weave_speed: float = 1.3
-@export var patrol_width: float = 3.4
+@export var patrol_width: float = 2.8
 
 var combat_time: float = 0.0
 var enraged_shoot_timer: float = 0.0
@@ -171,7 +171,8 @@ func _spawn_pressure_skiff(x_norm: float, speed_val: float) -> void:
 			if player and "river_width" in player:
 				river_width = player.river_width
 			var x_world = x_norm * (river_width / 2.0)
-			skiff.global_position = Vector3(global_position.x + x_world, 0.1, global_position.z + 2.5)
+			var spawn_x = clampf(global_position.x + x_world, -4.2, 4.2)
+			skiff.global_position = Vector3(spawn_x, 0.1, global_position.z + 2.5)
 
 func _deploy_center_kegs() -> void:
 	_spawn_pressure_keg(-0.18, 5.5)
@@ -185,7 +186,8 @@ func _spawn_pressure_keg(x_norm: float, speed_val: float) -> void:
 			parent = get_parent()
 		if parent:
 			parent.add_child(keg)
-			keg.global_position = Vector3(global_position.x + x_norm * 6.0, 0.05, global_position.z + 3.0)
+			var spawn_x = clampf(global_position.x + x_norm * 6.0, -5.0, 5.0)
+			keg.global_position = Vector3(spawn_x, 0.05, global_position.z + 3.0)
 			if "forward_speed" in keg:
 				keg.forward_speed = speed_val
 			if "obstacle_type" in keg:
@@ -357,7 +359,8 @@ func _eject_mine() -> void:
 		if parent:
 			parent.add_child(mine)
 			var offset_x = randf_range(-2.5, 2.5)
-			mine.global_position = Vector3(global_position.x + offset_x, 0.3, global_position.z + 3.0)
+			var spawn_x = clampf(global_position.x + offset_x, -5.0, 5.0)
+			mine.global_position = Vector3(spawn_x, 0.3, global_position.z + 3.0)
 			if "forward_speed" in mine:
 				mine.forward_speed = 4.0
 			print("[BOSS SPAWN] Spiked Sea Mine ejected at %s | Speed: 4.0" % mine.global_position)

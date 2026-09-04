@@ -37,6 +37,7 @@ func _physics_process(delta: float) -> void:
 	
 	# Slight sway and paddle rocking
 	global_position.x += sin(_time * 1.5) * 0.8 * delta
+	global_position.x = clampf(global_position.x, -4.1, 4.1)
 	if sprite_node:
 		sprite_node.position.y = 1.2 + sin(_time * 3.0) * 0.06
 		

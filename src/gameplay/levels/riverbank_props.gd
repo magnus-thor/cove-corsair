@@ -47,18 +47,21 @@ func _generate() -> void:
 			_spawn_tropical()
 
 # ── X helpers ─────────────────────────────────────────────────────────────────
-# OUTER band:  cliff / rock masses.  Centre range –11.5 .. –9.5 (left).
-# INNER band:  shoals / foliage.      Centre range –8.8 .. –7.4 (left).
+# Bank Chunk Root Anchor Offsets:
+#   Left Bank Meshes:  roots strictly at X <= -6.5 (ranging outward from -6.5 to -10.5).
+#   Right Bank Meshes: roots strictly at X >= +6.5 (ranging outward from +6.5 to +10.5).
+# OUTER band: cliff / rock masses.  Range -10.5 .. -8.5 (left), +8.5 .. +10.5 (right).
+# INNER band: shoals / foliage.     Range  -8.5 .. -6.5 (left), +6.5 ..  +8.5 (right).
 
 func _rand_x_outer() -> float:
 	if side == "left":
-		return randf_range(-11.5, -9.5)
-	return randf_range(9.5, 11.5)
+		return randf_range(-10.5, -8.5)
+	return randf_range(8.5, 10.5)
 
 func _rand_x_inner() -> float:
 	if side == "left":
-		return randf_range(-8.8, -7.4)
-	return randf_range(7.4, 8.8)
+		return randf_range(-8.5, -6.5)
+	return randf_range(6.5, 8.5)
 
 # ── Biome: Tropical / Smuggler's Run ──────────────────────────────────────────
 
@@ -90,7 +93,7 @@ func _spawn_tropical() -> void:
 			var rock := rock_res.instantiate() as Node3D
 			add_child(rock)
 			rock.position = Vector3(_rand_x_outer(), -0.2, z_pos)
-			var base_s := randf_range(1.6, 2.4)
+			var base_s := randf_range(1.4, 2.0)
 			rock.scale    = Vector3(
 				base_s,
 				base_s * randf_range(0.7, 1.1),
@@ -98,6 +101,7 @@ func _spawn_tropical() -> void:
 			)
 			rock.rotation.y = randf_range(0.0, TAU)
 			_kill_shadows(rock)
+			_enforce_navigable_clearance(rock)
 
 		# Sandy Shoals & Palm Clusters – inner band
 		if randf() < 0.85:
@@ -111,9 +115,9 @@ func _spawn_tropical() -> void:
 					z_pos + randf_range(-1.5, 1.5)
 				)
 				shoal.scale    = Vector3(
-					randf_range(1.2, 1.7),
-					randf_range(0.7, 1.1),
-					randf_range(1.2, 1.7)
+					randf_range(1.1, 1.4),
+					randf_range(0.7, 1.0),
+					randf_range(1.1, 1.4)
 				)
 				shoal.rotation.y = randf_range(0.0, TAU)
 				_kill_shadows(shoal)
@@ -125,11 +129,15 @@ func _spawn_tropical() -> void:
 						var palm := palm_res.instantiate() as Node3D
 						shoal.add_child(palm)
 						palm.position    = Vector3(
-							randf_range(-0.25, 0.25), 0.0, randf_range(-0.25, 0.25)
+							randf_range(-0.2, 0.2), 0.0, randf_range(-0.2, 0.2)
 						)
-						palm.scale       = Vector3.ONE * randf_range(0.9, 1.35)
-						palm.rotation.y  = randf_range(0.0, TAU)
+						palm.scale       = Vector3.ONE * randf_range(0.8, 1.2)
+						# Orient palm lean away from the river corridor
+						var palm_lean_rot: float = randf_range(0.0, TAU)
+						palm.rotation.y  = palm_lean_rot
 						_kill_shadows(palm)
+
+				_enforce_navigable_clearance(shoal)
 
 # ── Biome: Black Tide Bayou ────────────────────────────────────────────────────
 
@@ -155,12 +163,13 @@ func _spawn_bayou() -> void:
 			add_child(rock)
 			rock.position    = Vector3(_rand_x_outer(), -0.3, z_pos)
 			rock.scale       = Vector3(
-				randf_range(1.4, 2.0),
-				randf_range(3.0, 5.5),
-				randf_range(1.4, 2.0)
+				randf_range(1.3, 1.8),
+				randf_range(3.0, 5.0),
+				randf_range(1.3, 1.8)
 			)
 			rock.rotation.y  = randf_range(0.0, TAU)
 			_apply_tint(rock, tint_cliff)
+			_enforce_navigable_clearance(rock)
 
 		# Mangrove shoal with optional bioluminescent lantern
 		if randf() < 0.75:
@@ -181,6 +190,8 @@ func _spawn_bayou() -> void:
 
 				if randf() < 0.6:
 					_spawn_lantern(shoal)
+
+				_enforce_navigable_clearance(shoal)
 
 func _spawn_lantern(parent: Node3D) -> void:
 	var post      := MeshInstance3D.new()
@@ -237,12 +248,13 @@ func _spawn_bastion() -> void:
 			add_child(rock)
 			rock.position    = Vector3(_rand_x_outer(), -0.3, z_pos)
 			rock.scale       = Vector3(
-				randf_range(1.6, 2.4),
-				randf_range(4.5, 7.0),
-				randf_range(1.6, 2.4)
+				randf_range(1.4, 2.0),
+				randf_range(4.0, 6.0),
+				randf_range(1.4, 2.0)
 			)
 			rock.rotation.y  = randf_range(0.0, TAU)
 			_apply_tint(rock, tint_rock)
+			_enforce_navigable_clearance(rock)
 
 		# Fortress piece inner band
 		if randf() < 0.75:
@@ -260,6 +272,8 @@ func _spawn_bastion() -> void:
 
 				if is_tower or randf() < 0.5:
 					_spawn_brazier(piece)
+
+				_enforce_navigable_clearance(piece)
 
 func _spawn_brazier(parent: Node3D) -> void:
 	var bowl     := MeshInstance3D.new()
@@ -316,3 +330,62 @@ func _apply_tint(node: Node, tint: Color) -> void:
 			GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	for child in node.get_children():
 		_apply_tint(child, tint)
+
+# ── Navigable corridor clearance enforcement ──────────────────────────────────
+
+## Recursively collects all MeshInstance3D nodes in the given hierarchy.
+func _collect_mesh_instances(node: Node, result: Array[MeshInstance3D]) -> void:
+	if node is MeshInstance3D:
+		result.append(node as MeshInstance3D)
+	for child in node.get_children():
+		_collect_mesh_instances(child, result)
+
+## Computes the local transform of node relative to root by walking parent transforms.
+func _get_relative_transform(node: Node3D, root: Node3D) -> Transform3D:
+	var xform := Transform3D.IDENTITY
+	var curr: Node = node
+	while curr and curr != root and curr is Node3D:
+		xform = (curr as Node3D).transform * xform
+		curr = curr.get_parent()
+	return xform
+
+## Enforces that no visual geometry in the prop hierarchy crosses the +/- 6.0 navigable lane boundary.
+## If any geometry overshoots the channel limit, the prop is shifted outward.
+func _enforce_navigable_clearance(prop: Node3D, buffer: float = 0.05) -> void:
+	if not prop:
+		return
+	
+	var min_x := INF
+	var max_x := -INF
+	var mesh_instances: Array[MeshInstance3D] = []
+	_collect_mesh_instances(prop, mesh_instances)
+	
+	for mi in mesh_instances:
+		if not mi.mesh:
+			continue
+		var aabb: AABB = mi.mesh.get_aabb()
+		var rel_xform: Transform3D = _get_relative_transform(mi, self)
+		for i in range(8):
+			var corner := aabb.position + Vector3(
+				aabb.size.x if (i & 1) else 0.0,
+				aabb.size.y if (i & 2) else 0.0,
+				aabb.size.z if (i & 4) else 0.0
+			)
+			var pt := rel_xform * corner
+			min_x = minf(min_x, pt.x)
+			max_x = maxf(max_x, pt.x)
+			
+	if min_x == INF or max_x == -INF:
+		return
+		
+	var lane_limit: float = 6.0 + buffer
+	if side == "left":
+		# Left bank: navigable water is X >= -6.0. Visual geometry must be strictly <= -lane_limit (-6.05).
+		if max_x > -lane_limit:
+			var overshoot: float = max_x - (-lane_limit)
+			prop.position.x -= overshoot
+	else:
+		# Right bank: navigable water is X <= +6.0. Visual geometry must be strictly >= +lane_limit (+6.05).
+		if min_x < lane_limit:
+			var undershoot: float = lane_limit - min_x
+			prop.position.x += undershoot

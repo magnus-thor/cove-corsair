@@ -34,25 +34,26 @@ func _generate_tropical_scenery() -> void:
 	for i in range(steps):
 		var z_pos = -strip_length / 2.0 + (i * step_size) + randf_range(-1.5, 1.5)
 		
-		# 1. Cliffs
-		var cliff_x = randf_range(-18.0, -14.0) if side == "left" else randf_range(14.0, 18.0)
+		# 1. Cliffs (Outer band: roots strictly in [-10.5, -8.5] / [8.5, 10.5])
+		var cliff_x = randf_range(-10.5, -8.5) if side == "left" else randf_range(8.5, 10.5)
 		var rock_res = load(rocks_paths.pick_random())
 		if rock_res:
 			var rock = rock_res.instantiate() as Node3D
 			add_child(rock)
 			rock.position = Vector3(cliff_x, -0.2, z_pos)
-			rock.scale = Vector3(randf_range(1.8, 2.8), randf_range(4.5, 7.0), randf_range(1.8, 2.8))
+			rock.scale = Vector3(randf_range(1.4, 2.0), randf_range(4.0, 6.0), randf_range(1.4, 2.0))
 			rock.rotation.y = randf_range(0.0, TAU)
 			_clean_shadow_nodes(rock)
+			_enforce_navigable_clearance(rock)
 			
-		# 2. Sandy Shoals
-		var shoal_x = randf_range(-14.0, -9.5) if side == "left" else randf_range(9.5, 14.0)
+		# 2. Sandy Shoals (Inner band: roots strictly in [-8.5, -6.5] / [6.5, 8.5])
+		var shoal_x = randf_range(-8.5, -6.5) if side == "left" else randf_range(6.5, 8.5)
 		var shoal_res = load(sand_island_path if randf() < 0.6 else rock_island_path)
 		if shoal_res:
 			var shoal = shoal_res.instantiate() as Node3D
 			add_child(shoal)
-			shoal.position = Vector3(shoal_x, -0.1, z_pos + randf_range(-2.0, 2.0))
-			shoal.scale = Vector3(randf_range(1.2, 1.8), randf_range(0.8, 1.2), randf_range(1.2, 1.8))
+			shoal.position = Vector3(shoal_x, -0.1, z_pos + randf_range(-1.5, 1.5))
+			shoal.scale = Vector3(randf_range(1.1, 1.4), randf_range(0.7, 1.0), randf_range(1.1, 1.4))
 			shoal.rotation.y = randf_range(0.0, TAU)
 			_clean_shadow_nodes(shoal)
 			
@@ -61,41 +62,43 @@ func _generate_tropical_scenery() -> void:
 				if palm_res:
 					var palm = palm_res.instantiate() as Node3D
 					shoal.add_child(palm)
-					palm.position = Vector3(randf_range(-0.5, 0.5), 0.0, randf_range(-0.5, 0.5))
-					palm.scale = Vector3.ONE * randf_range(0.8, 1.3)
+					palm.position = Vector3(randf_range(-0.2, 0.2), 0.0, randf_range(-0.2, 0.2))
+					palm.scale = Vector3.ONE * randf_range(0.8, 1.2)
 					palm.rotation.y = randf_range(0.0, TAU)
 					_clean_shadow_nodes(palm)
+
+			_enforce_navigable_clearance(shoal)
 
 func _generate_bayou_scenery() -> void:
 	var rock_island_path = "res://assets/models/rocks-sand-b.glb"
 	var rocks_paths = ["res://assets/models/rocks-a.glb", "res://assets/models/rocks-c.glb"]
-	var platform_path = "res://assets/models/structure-platform-small.glb"
 	
 	var steps = 4
 	var step_size = strip_length / steps
 	for i in range(steps):
 		var z_pos = -strip_length / 2.0 + (i * step_size) + randf_range(-1.5, 1.5)
 		
-		# 1. Dark Mossy Mangrove Cliffs
-		var cliff_x = randf_range(-17.0, -13.0) if side == "left" else randf_range(13.0, 17.0)
+		# 1. Dark Mossy Mangrove Cliffs (Outer band: roots strictly in [-10.5, -8.5] / [8.5, 10.5])
+		var cliff_x = randf_range(-10.5, -8.5) if side == "left" else randf_range(8.5, 10.5)
 		var rock_res = load(rocks_paths.pick_random())
 		if rock_res:
 			var rock = rock_res.instantiate() as Node3D
 			add_child(rock)
 			rock.position = Vector3(cliff_x, -0.3, z_pos)
-			rock.scale = Vector3(randf_range(2.0, 3.2), randf_range(4.0, 6.5), randf_range(2.0, 3.2))
+			rock.scale = Vector3(randf_range(1.4, 2.0), randf_range(3.5, 5.5), randf_range(1.4, 2.0))
 			rock.rotation.y = randf_range(0.0, TAU)
 			_tint_node(rock, Color(0.35, 0.48, 0.38))
 			_clean_shadow_nodes(rock)
+			_enforce_navigable_clearance(rock)
 			
-		# 2. Mangrove Shoals & Root Archs
-		var shoal_x = randf_range(-13.0, -9.0) if side == "left" else randf_range(9.0, 13.0)
+		# 2. Mangrove Shoals & Root Archs (Inner band: roots strictly in [-8.5, -6.5] / [6.5, 8.5])
+		var shoal_x = randf_range(-8.5, -6.5) if side == "left" else randf_range(6.5, 8.5)
 		var shoal_res = load(rock_island_path)
 		if shoal_res:
 			var shoal = shoal_res.instantiate() as Node3D
 			add_child(shoal)
 			shoal.position = Vector3(shoal_x, -0.15, z_pos + randf_range(-1.5, 1.5))
-			shoal.scale = Vector3(randf_range(1.3, 2.0), randf_range(0.7, 1.1), randf_range(1.3, 2.0))
+			shoal.scale = Vector3(randf_range(1.0, 1.3), randf_range(0.6, 0.9), randf_range(1.0, 1.3))
 			shoal.rotation.y = randf_range(0.0, TAU)
 			_tint_node(shoal, Color(0.28, 0.42, 0.32))
 			_clean_shadow_nodes(shoal)
@@ -103,6 +106,8 @@ func _generate_bayou_scenery() -> void:
 			# Bioluminescent Lantern on wooden post
 			if randf() < 0.65:
 				_spawn_bayou_lantern(shoal)
+
+			_enforce_navigable_clearance(shoal)
 
 func _spawn_bayou_lantern(parent_node: Node3D) -> void:
 	var post = MeshInstance3D.new()
@@ -141,27 +146,28 @@ func _generate_bastion_scenery() -> void:
 	for i in range(steps):
 		var z_pos = -strip_length / 2.0 + (i * step_size) + randf_range(-1.5, 1.5)
 		
-		# 1. Towering Basalt Columns
-		var cliff_x = randf_range(-17.0, -13.5) if side == "left" else randf_range(13.5, 17.0)
+		# 1. Towering Basalt Columns (Outer band: roots strictly in [-10.5, -8.5] / [8.5, 10.5])
+		var cliff_x = randf_range(-10.5, -8.5) if side == "left" else randf_range(8.5, 10.5)
 		var rock_res = load(rocks_paths.pick_random())
 		if rock_res:
 			var rock = rock_res.instantiate() as Node3D
 			add_child(rock)
 			rock.position = Vector3(cliff_x, -0.3, z_pos)
-			rock.scale = Vector3(randf_range(2.2, 3.5), randf_range(5.0, 8.5), randf_range(2.2, 3.5))
+			rock.scale = Vector3(randf_range(1.4, 2.0), randf_range(4.0, 6.5), randf_range(1.4, 2.0))
 			rock.rotation.y = randf_range(0.0, TAU)
 			_tint_node(rock, Color(0.18, 0.18, 0.22)) # Dark basalt
 			_clean_shadow_nodes(rock)
+			_enforce_navigable_clearance(rock)
 			
-		# 2. Iron Fortress Battlements
-		var wall_x = randf_range(-13.0, -9.5) if side == "left" else randf_range(9.5, 13.0)
+		# 2. Iron Fortress Battlements (Inner band: roots strictly in [-8.5, -6.5] / [6.5, 8.5])
+		var wall_x = randf_range(-8.5, -6.5) if side == "left" else randf_range(6.5, 8.5)
 		var is_tower = (i % 2 == 0)
 		var res = load(tower_path if is_tower else wall_path)
 		if res:
 			var fortress_piece = res.instantiate() as Node3D
 			add_child(fortress_piece)
 			fortress_piece.position = Vector3(wall_x, 0.0, z_pos)
-			fortress_piece.scale = Vector3.ONE * randf_range(1.2, 1.6)
+			fortress_piece.scale = Vector3.ONE * randf_range(0.9, 1.2)
 			fortress_piece.rotation.y = 0.0 if side == "left" else PI
 			_tint_node(fortress_piece, Color(0.3, 0.25, 0.25))
 			_clean_shadow_nodes(fortress_piece)
@@ -169,6 +175,8 @@ func _generate_bastion_scenery() -> void:
 			# Lava Brazier on battlement
 			if is_tower or randf() < 0.5:
 				_spawn_lava_brazier(fortress_piece)
+
+			_enforce_navigable_clearance(fortress_piece)
 
 func _spawn_lava_brazier(parent_node: Node3D) -> void:
 	var brazier = MeshInstance3D.new()
@@ -206,7 +214,6 @@ func _tint_node(node: Node, tint: Color) -> void:
 		node.material_override = mat
 	for child in node.get_children():
 		_tint_node(child, tint)
-
 					
 func _clean_shadow_nodes(node: Node) -> void:
 	if not node:
@@ -226,3 +233,62 @@ func _clean_shadow_nodes(node: Node) -> void:
 			
 	for child in node.get_children():
 		_clean_shadow_nodes(child)
+
+# ── Navigable corridor clearance enforcement ──────────────────────────────────
+
+## Recursively collects all MeshInstance3D nodes in the given hierarchy.
+func _collect_mesh_instances(node: Node, result: Array[MeshInstance3D]) -> void:
+	if node is MeshInstance3D:
+		result.append(node as MeshInstance3D)
+	for child in node.get_children():
+		_collect_mesh_instances(child, result)
+
+## Computes the local transform of node relative to root by walking parent transforms.
+func _get_relative_transform(node: Node3D, root: Node3D) -> Transform3D:
+	var xform := Transform3D.IDENTITY
+	var curr: Node = node
+	while curr and curr != root and curr is Node3D:
+		xform = (curr as Node3D).transform * xform
+		curr = curr.get_parent()
+	return xform
+
+## Enforces that no visual geometry in the prop hierarchy crosses the +/- 6.0 navigable lane boundary.
+## If any geometry overshoots the channel limit, the prop is shifted outward.
+func _enforce_navigable_clearance(prop: Node3D, buffer: float = 0.05) -> void:
+	if not prop:
+		return
+	
+	var min_x := INF
+	var max_x := -INF
+	var mesh_instances: Array[MeshInstance3D] = []
+	_collect_mesh_instances(prop, mesh_instances)
+	
+	for mi in mesh_instances:
+		if not mi.mesh:
+			continue
+		var aabb: AABB = mi.mesh.get_aabb()
+		var rel_xform: Transform3D = _get_relative_transform(mi, self)
+		for i in range(8):
+			var corner := aabb.position + Vector3(
+				aabb.size.x if (i & 1) else 0.0,
+				aabb.size.y if (i & 2) else 0.0,
+				aabb.size.z if (i & 4) else 0.0
+			)
+			var pt := rel_xform * corner
+			min_x = minf(min_x, pt.x)
+			max_x = maxf(max_x, pt.x)
+			
+	if min_x == INF or max_x == -INF:
+		return
+		
+	var lane_limit: float = 6.0 + buffer
+	if side == "left":
+		# Left bank: navigable water is X >= -6.0. Visual geometry must be strictly <= -lane_limit (-6.05).
+		if max_x > -lane_limit:
+			var overshoot: float = max_x - (-lane_limit)
+			prop.position.x -= overshoot
+	else:
+		# Right bank: navigable water is X <= +6.0. Visual geometry must be strictly >= +lane_limit (+6.05).
+		if min_x < lane_limit:
+			var undershoot: float = lane_limit - min_x
+			prop.position.x += undershoot

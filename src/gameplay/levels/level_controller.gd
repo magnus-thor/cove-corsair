@@ -46,6 +46,7 @@ var is_boss_spawned: bool = false
 
 func _ready() -> void:
 	add_to_group("level_controller")
+	_setup_boundary_walls()
 	
 	if debug_level_override > 0:
 		GameState.current_level = debug_level_override
@@ -239,11 +240,11 @@ func normalized_to_world_x(norm_x: float) -> float:
 
 func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> void:
 	var z_spawn = spawn_z_ahead if z_pos_override == 0.0 else z_pos_override
-	var x_pos = clampf(event.lane_x, -7.5, 7.5)
 	var is_brimstone: bool = level_data != null and (level_data.biome_type == "brimstone_bastion" or level_data.level_id == 3)
 	
 	match event.entity_type:
 		SpawnEvent.EntityType.BARREL:
+			var x_pos = clampf(event.lane_x, -5.2, 5.2)
 			if barrel_scene:
 				var barrel = barrel_scene.instantiate() as Area3D
 				barrel.name = "Barrel_%.1fm_x%.1f" % [current_distance, x_pos]
@@ -265,6 +266,7 @@ func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> vo
 		SpawnEvent.EntityType.MOB:
 			if is_brimstone:
 				if event.rarity_tier == SpawnEvent.RarityTier.ELITE or event.base_hp_override >= 40:
+					var x_pos = clampf(event.lane_x, -4.1, 4.1)
 					if bombard_scene:
 						var bombard = bombard_scene.instantiate() as Area3D
 						bombard.name = "MiniBossBombard_%.1fm" % current_distance
@@ -274,6 +276,7 @@ func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> vo
 						bombard.current_hp = bombard.max_hp
 						bombard.forward_speed = 1.3
 				elif event.rarity_tier == SpawnEvent.RarityTier.RARE or event.base_hp_override == 18:
+					var x_pos = clampf(event.lane_x, -4.5, 4.5)
 					if brimstone_raft_scene:
 						var raft = brimstone_raft_scene.instantiate() as Area3D
 						raft.name = "BrimstoneRaft_%.1fm_x%.1f" % [current_distance, x_pos]
@@ -283,6 +286,7 @@ func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> vo
 						raft.current_hp = raft.max_hp
 						raft.forward_speed = 7.8
 				else:
+					var x_pos = clampf(event.lane_x, -4.5, 4.5)
 					if iron_gunner_scene:
 						var gunner = iron_gunner_scene.instantiate() as Area3D
 						var label = "IronGunnerScout" if (event.base_hp_override > 0 and event.base_hp_override < 20) else "IronGunner"
@@ -294,6 +298,7 @@ func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> vo
 						gunner.forward_speed = 2.6
 			else:
 				if event.rarity_tier == SpawnEvent.RarityTier.ELITE or event.base_hp_override >= 40:
+					var x_pos = clampf(event.lane_x, -4.1, 4.1)
 					if harvester_scene:
 						var harv = harvester_scene.instantiate() as Area3D
 						harv.name = "MiniBossHarvester_%.1fm" % current_distance
@@ -302,6 +307,7 @@ func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> vo
 						harv.max_hp = event.base_hp_override if event.base_hp_override > 0 else 45
 						harv.current_hp = harv.max_hp
 				elif (event.rarity_tier == SpawnEvent.RarityTier.RARE and event.base_hp_override >= 8) or event.base_hp_override == 8:
+					var x_pos = clampf(event.lane_x, -4.5, 4.5)
 					if tide_cutter_scene:
 						var cutter = tide_cutter_scene.instantiate() as Area3D
 						cutter.name = "TideCutter_%.1fm_x%.1f" % [current_distance, x_pos]
@@ -311,6 +317,7 @@ func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> vo
 						cutter.current_hp = cutter.max_hp
 						cutter.forward_speed = 4.5
 				else:
+					var x_pos = clampf(event.lane_x, -4.2, 4.2)
 					if grave_skiff_scene:
 						var skiff = grave_skiff_scene.instantiate() as Area3D
 						skiff.name = "GraveSkiff_%.1fm_x%.1f" % [current_distance, x_pos]
@@ -321,6 +328,7 @@ func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> vo
 						skiff.forward_speed = 2.4
 
 		SpawnEvent.EntityType.MULTIPLIER_GATE:
+			var x_pos = clampf(event.lane_x, -3.9, 3.9)
 			if multiplier_gate_scene:
 				var gate = multiplier_gate_scene.instantiate() as Area3D
 				gate.name = "MultiplierGate_%.1fm" % current_distance
@@ -336,6 +344,7 @@ func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> vo
 
 		SpawnEvent.EntityType.HAZARD:
 			if is_brimstone:
+				var x_pos = clampf(event.lane_x, -4.2, 4.2)
 				if thermal_geyser_scene:
 					var geyser = thermal_geyser_scene.instantiate() as Node3D
 					geyser.name = "ThermalGeyser_%.1fm_x%.1f" % [current_distance, x_pos]
@@ -343,6 +352,7 @@ func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> vo
 					geyser.global_position = Vector3(x_pos, 0.0, z_spawn)
 			else:
 				if event.rarity_tier == SpawnEvent.RarityTier.RARE or event.base_hp_override >= 5:
+					var x_pos = clampf(event.lane_x, -4.5, 4.5)
 					var reef_prefab = preload("res://src/gameplay/obstacles/hazard_reef.tscn")
 					if reef_prefab:
 						var reef = reef_prefab.instantiate() as Area3D
@@ -350,6 +360,7 @@ func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> vo
 						add_child(reef)
 						reef.global_position = Vector3(x_pos, 0.0, z_spawn)
 				elif biogas_pod_scene:
+					var x_pos = clampf(event.lane_x, -5.2, 5.2)
 					var pod = biogas_pod_scene.instantiate() as Area3D
 					pod.name = "BiogasPod_%.1fm_x%.1f" % [current_distance, x_pos]
 					add_child(pod)
@@ -377,7 +388,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 			for i in range(count):
 				var t      = float(i) / float(count - 1) if count > 1 else 0.5
 				var x_norm = lerp(x_start, x_end, t)
-				var x_world = normalized_to_world_x(x_norm)
+				var x_world = clampf(normalized_to_world_x(x_norm), -5.2, 5.2)
 				var z_offset = -abs(sin(t * PI)) * 2.0
 				var z_pos    = z_spawn + z_offset - (i * 1.2)
 				if coin_scene:
@@ -391,7 +402,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 			var hp           = int(event.get("hp", 4))
 			var obs_type_str: String = event.get("obstacle_type", "wooden")
 			for x_norm in x_positions:
-				var x_world = normalized_to_world_x(float(x_norm))
+				var x_world = clampf(normalized_to_world_x(float(x_norm)), -5.2, 5.2)
 				if barrel_scene:
 					var barrel = barrel_scene.instantiate() as Area3D
 					add_child(barrel)
@@ -409,7 +420,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 		"obstacle":
 			var x_norm  = float(event.get("x", 0.0))
 			var hp      = int(event.get("hp", 4))
-			var x_world = normalized_to_world_x(x_norm)
+			var x_world = clampf(normalized_to_world_x(x_norm), -5.2, 5.2)
 			if barrel_scene:
 				var barrel = barrel_scene.instantiate() as Area3D
 				add_child(barrel)
@@ -427,7 +438,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 				var gate    = gate_prefab.instantiate() as Area3D
 				add_child(gate)
 				var x_norm  = float(event.get("x", 0.0))
-				var x_world = normalized_to_world_x(x_norm)
+				var x_world = clampf(normalized_to_world_x(x_norm), -3.9, 3.9)
 				gate.global_position = Vector3(x_world, 0.0, z_spawn)
 				var gate_val    = int(event.get("value", 1))
 				var gate_text   = str(event.get("text", "+%d" % gate_val))
@@ -441,7 +452,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 		# ── Biogas Pod (Level 2) ──────────────────────────────────────────────
 		"biogas_pod":
 			var x_norm = float(event.get("x", 0.0))
-			var x_world = normalized_to_world_x(x_norm)
+			var x_world = clampf(normalized_to_world_x(x_norm), -5.2, 5.2)
 			if biogas_pod_scene:
 				var pod = biogas_pod_scene.instantiate() as Area3D
 				add_child(pod)
@@ -453,7 +464,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 			var hp = int(event.get("hp", 14))
 			var speed_val = float(event.get("speed", 3.2))
 			for x_norm in x_positions:
-				var x_world = normalized_to_world_x(float(x_norm))
+				var x_world = clampf(normalized_to_world_x(float(x_norm)), -4.6, 4.6)
 				if grave_skiff_scene:
 					var skiff = grave_skiff_scene.instantiate() as Area3D
 					add_child(skiff)
@@ -468,7 +479,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 			var hp = int(event.get("hp", 20))
 			var speed_val = float(event.get("speed", 6.8))
 			for x_norm in x_positions:
-				var x_world = normalized_to_world_x(float(x_norm))
+				var x_world = clampf(normalized_to_world_x(float(x_norm)), -4.6, 4.6)
 				if tide_cutter_scene:
 					var cutter = tide_cutter_scene.instantiate() as Area3D
 					add_child(cutter)
@@ -480,7 +491,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 		# ── Mini Boss Harvester (Level 2) ─────────────────────────────────────
 		"mini_boss_harvester":
 			var x_norm = float(event.get("x", 0.0))
-			var x_world = normalized_to_world_x(x_norm)
+			var x_world = clampf(normalized_to_world_x(x_norm), -4.1, 4.1)
 			if harvester_scene:
 				var harvester = harvester_scene.instantiate() as Area3D
 				add_child(harvester)
@@ -492,7 +503,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 		# ── Thermal Geyser (Level 3) ──────────────────────────────────────────
 		"thermal_geyser":
 			var x_norm = float(event.get("x", 0.0))
-			var x_world = normalized_to_world_x(x_norm)
+			var x_world = clampf(normalized_to_world_x(x_norm), -4.2, 4.2)
 			if thermal_geyser_scene:
 				var geyser = thermal_geyser_scene.instantiate() as Node3D
 				add_child(geyser)
@@ -501,7 +512,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 		# ── Whirlpool Hazard ──────────────────────────────────────────────────
 		"whirlpool":
 			var x_norm = float(event.get("x", 0.0))
-			var x_world = normalized_to_world_x(x_norm)
+			var x_world = clampf(normalized_to_world_x(x_norm), -4.2, 4.2)
 			if whirlpool_scene:
 				var pool = whirlpool_scene.instantiate() as Area3D
 				add_child(pool)
@@ -514,7 +525,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 			var hp = int(event.get("hp", 22))
 			var speed_val = float(event.get("speed", 2.6))
 			for x_norm in x_positions:
-				var x_world = normalized_to_world_x(float(x_norm))
+				var x_world = clampf(normalized_to_world_x(float(x_norm)), -4.6, 4.6)
 				if iron_gunner_scene:
 					var gunner = iron_gunner_scene.instantiate() as Area3D
 					add_child(gunner)
@@ -529,7 +540,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 			var hp = int(event.get("hp", 18))
 			var speed_val = float(event.get("speed", 7.8))
 			for x_norm in x_positions:
-				var x_world = normalized_to_world_x(float(x_norm))
+				var x_world = clampf(normalized_to_world_x(float(x_norm)), -4.6, 4.6)
 				if brimstone_raft_scene:
 					var raft = brimstone_raft_scene.instantiate() as Area3D
 					add_child(raft)
@@ -541,7 +552,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 		# ── Mini Boss Bombard (Level 3) ───────────────────────────────────────
 		"mini_boss_bombard":
 			var x_norm = float(event.get("x", 0.0))
-			var x_world = normalized_to_world_x(x_norm)
+			var x_world = clampf(normalized_to_world_x(x_norm), -4.1, 4.1)
 			if bombard_scene:
 				var bombard = bombard_scene.instantiate() as Area3D
 				add_child(bombard)
@@ -556,7 +567,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 			var hp = int(event.get("hp", 6))
 			var mob_speed = float(event.get("speed", 2.0))
 			for x_norm in x_positions:
-				var x_world = normalized_to_world_x(float(x_norm))
+				var x_world = clampf(normalized_to_world_x(float(x_norm)), -4.6, 4.6)
 				if enemy_mob_scene:
 					var mob = enemy_mob_scene.instantiate() as Area3D
 					add_child(mob)
@@ -574,7 +585,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 			var hp = int(event.get("hp", 10))
 			var skiff_speed = float(event.get("speed", 3.0))
 			for x_norm in x_positions:
-				var x_world = normalized_to_world_x(float(x_norm))
+				var x_world = clampf(normalized_to_world_x(float(x_norm)), -4.2, 4.2)
 				if enemy_mob_scene:
 					var enemy = enemy_mob_scene.instantiate() as Area3D
 					add_child(enemy)
@@ -592,7 +603,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 			var hp = int(event.get("hp", 14))
 			var raft_speed = float(event.get("speed", 7.0))
 			for x_norm in x_positions:
-				var x_world = normalized_to_world_x(float(x_norm))
+				var x_world = clampf(normalized_to_world_x(float(x_norm)), -4.2, 4.2)
 				if enemy_mob_scene:
 					var raft = enemy_mob_scene.instantiate() as Area3D
 					add_child(raft)
@@ -608,7 +619,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 		# ── Sea Mine ──────────────────────────────────────────────────────────
 		"sea_mine":
 			var x_norm  = float(event.get("x", 0.0))
-			var x_world = normalized_to_world_x(x_norm)
+			var x_world = clampf(normalized_to_world_x(x_norm), -5.2, 5.2)
 			if sea_mine_scene:
 				var mine = sea_mine_scene.instantiate() as Node3D
 				add_child(mine)
@@ -617,9 +628,10 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 		# ── Reef hazard ───────────────────────────────────────────────────────
 		"reef_hazard":
 			var x_norm   = float(event.get("x", 0.0))
-			var x_world  = normalized_to_world_x(x_norm)
-			var scale_x  = float(event.get("scale_x", 3.0))
+			var scale_x  = clampf(float(event.get("scale_x", 2.0)), 1.0, 2.0)
 			var scale_z  = float(event.get("scale_z", 8.0))
+			var half_w   = 1.2 * scale_x
+			var x_world  = clampf(normalized_to_world_x(x_norm), -5.8 + half_w, 5.8 - half_w)
 			var reef_prefab = preload("res://src/gameplay/obstacles/hazard_reef.tscn")
 			if reef_prefab:
 				var reef = reef_prefab.instantiate() as Area3D
@@ -633,7 +645,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 			var hp         = int(event.get("hp", 8))
 			var raft_speed = float(event.get("speed", 1.8))
 			for x_norm in x_positions:
-				var x_world = normalized_to_world_x(float(x_norm))
+				var x_world = clampf(normalized_to_world_x(float(x_norm)), -4.4, 4.4)
 				if enemy_mob_scene:
 					var enemy = enemy_mob_scene.instantiate() as Area3D
 					add_child(enemy)
@@ -673,7 +685,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 			var barrel_hp   = int(event.get("barrel_hp", 4))
 			var barrel_type: String = event.get("barrel_type", "wooden")
 			for x_norm in barrel_positions:
-				var x_world = normalized_to_world_x(float(x_norm))
+				var x_world = clampf(normalized_to_world_x(float(x_norm)), -5.2, 5.2)
 				if barrel_scene:
 					var barrel = barrel_scene.instantiate() as Area3D
 					add_child(barrel)
@@ -690,7 +702,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 			var mob_type: String = event.get("mob_type", "skeleton_rower")
 			var mob_speed     = float(event.get("mob_speed", 2.0))
 			for x_norm in mob_positions:
-				var x_world = normalized_to_world_x(float(x_norm))
+				var x_world = clampf(normalized_to_world_x(float(x_norm)), -4.2, 4.2)
 				if enemy_mob_scene:
 					var mob = enemy_mob_scene.instantiate() as Area3D
 					add_child(mob)
@@ -769,3 +781,34 @@ func _spawn_boss() -> void:
 		var camera = get_tree().get_first_node_in_group("game_camera")
 		if camera and camera.has_method("start_boss_focus"):
 			camera.start_boss_focus(boss)
+
+## Constructs invisible StaticBody3D physical collision walls bounding the navigable corridor at X = +/- 6.0
+func _setup_boundary_walls() -> void:
+	if get_node_or_null("BoundaryWall_Left") and get_node_or_null("BoundaryWall_Right"):
+		return
+		
+	# Left invisible collision wall: center at X = -6.5, width 1.0 -> inner face at X = -6.0
+	var left_wall := StaticBody3D.new()
+	left_wall.name = "BoundaryWall_Left"
+	left_wall.add_to_group("boundary_wall")
+	left_wall.add_to_group("scenery_barrier")
+	left_wall.position = Vector3(-6.5, 0.5, 0.0)
+	var left_col := CollisionShape3D.new()
+	var box_shape_l := BoxShape3D.new()
+	box_shape_l.size = Vector3(1.0, 10.0, 500.0)
+	left_col.shape = box_shape_l
+	left_wall.add_child(left_col)
+	add_child(left_wall)
+	
+	# Right invisible collision wall: center at X = +6.5, width 1.0 -> inner face at X = +6.0
+	var right_wall := StaticBody3D.new()
+	right_wall.name = "BoundaryWall_Right"
+	right_wall.add_to_group("boundary_wall")
+	right_wall.add_to_group("scenery_barrier")
+	right_wall.position = Vector3(6.5, 0.5, 0.0)
+	var right_col := CollisionShape3D.new()
+	var box_shape_r := BoxShape3D.new()
+	box_shape_r.size = Vector3(1.0, 10.0, 500.0)
+	right_col.shape = box_shape_r
+	right_wall.add_child(right_col)
+	add_child(right_wall)

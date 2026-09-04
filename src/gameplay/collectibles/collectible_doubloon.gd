@@ -65,7 +65,7 @@ func _trigger_spawn_bounce(horizontal_scatter: Vector2 = Vector2.ZERO) -> void:
 	var target_y = base_water_y
 	var peak_y = base_water_y + randf_range(0.8, 1.4)
 	
-	var target_x = start_pos.x + horizontal_scatter.x
+	var target_x = clampf(start_pos.x + horizontal_scatter.x, -5.4, 5.4)
 	var target_z = start_pos.z + horizontal_scatter.y
 	
 	var tween = create_tween().set_parallel(false)

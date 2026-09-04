@@ -9,7 +9,7 @@ enum State { APPROACHING, COMBAT, SUBMERGED, DYING }
 @export var approach_speed: float = 12.0
 @export var combat_z_offset: float = -18.0
 @export var weave_speed: float = 1.3
-@export var patrol_width: float = 3.6
+@export var patrol_width: float = 3.0
 
 # Phase thresholds
 var current_phase: int = 1
@@ -269,6 +269,7 @@ func _spawn_bayou_adds(lane_x_override: float = NAN, type_choice: int = -1) -> v
 	if not parent: return
 	
 	var lx = randf_range(-3.5, 3.5) if is_nan(lane_x_override) else lane_x_override
+	lx = clampf(lx, -4.2, 4.2)
 	var use_skiff = (randf() < 0.55) if type_choice < 0 else (type_choice == 0)
 	
 	if use_skiff and grave_skiff_scene:
