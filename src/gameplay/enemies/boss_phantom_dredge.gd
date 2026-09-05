@@ -23,7 +23,7 @@ var _minion_timer: float = 0.0
 var _mortar_timer: float = 0.0
 var _is_defeated: bool = false
 var current_state: State = State.APPROACHING
-var _base_y: float = 1.33
+var _base_y: float = 1.45
 var _flash_tween: Tween
 
 # Prefabs
@@ -41,7 +41,7 @@ func _ready() -> void:
 	add_to_group("enemies")
 	add_to_group("boss")
 	current_hp = max_hp
-	_base_y = 0.0
+	_base_y = 1.45
 	if visual_container:
 		visual_container.position.y = _base_y
 	

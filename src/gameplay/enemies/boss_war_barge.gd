@@ -42,7 +42,7 @@ var _attack_timer: float = 0.0
 var _is_left_turn: bool = true
 var _flash_tweens: Dictionary = {}
 var _is_defeated: bool = false
-var _y_base: float = 1.38
+var _y_base: float = 0.22
 
 # Phase 2 Steam Venting variables
 var is_venting_steam: bool = false

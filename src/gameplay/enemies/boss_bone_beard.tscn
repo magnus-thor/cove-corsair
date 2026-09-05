@@ -19,6 +19,7 @@ explosion_scene = ExtResource("4_explosion")
 powder_keg_scene = ExtResource("5_keg")
 
 [node name="BossMesh" parent="." instance=ExtResource("2_frigate_mesh")]
+transform = Transform3D(4.48, 0, 0, 0, 4.48, 0, 0, 0, 4.48, 0, 2.15, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)

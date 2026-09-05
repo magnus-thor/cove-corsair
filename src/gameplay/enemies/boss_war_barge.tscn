@@ -80,6 +80,7 @@ orientation = 1
 script = ExtResource("1_boss_script")
 
 [node name="BossMesh" parent="." instance=ExtResource("2_barge_mesh")]
+transform = Transform3D(-0.11726, 0, -3.35795, 0, 3.36, 0, 3.35795, 0, -0.11726, 0, 0.22, 0)
 
 [node name="HitBox" type="Area3D" parent="." node_paths=PackedStringArray("boss_node") groups=["boss", "destructible", "enemies"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)

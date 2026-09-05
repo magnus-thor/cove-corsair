@@ -64,7 +64,7 @@ var enemy_items: Array[Dictionary] = [
 	{"name": "Brimstone Raft", "scene": "res://src/gameplay/enemies/enemy_brimstone_raft.tscn"},
 	{"name": "Mini-Boss Harvester", "scene": "res://src/gameplay/enemies/enemy_mini_boss_harvester.tscn"},
 	{"name": "Mini-Boss Bombard", "scene": "res://src/gameplay/enemies/enemy_mini_boss_bombard.tscn"},
-	{"name": "Boss Bone-Beard", "res": "res://src/data/resources/enemy_bosses/boss_bone_beard.tres"},
+	{"name": "Boss Bone-Beard", "scene": "res://src/gameplay/enemies/boss_bone_beard.tscn"},
 	{"name": "Boss War-Barge", "scene": "res://src/gameplay/enemies/boss_war_barge.tscn"},
 	{"name": "Boss Phantom Dredge", "scene": "res://src/gameplay/enemies/boss_phantom_dredge.tscn"},
 	{"name": "Boss Siege Fortress", "scene": "res://src/gameplay/enemies/boss_siege_fortress.tscn"}
@@ -440,7 +440,13 @@ func _update_ui_from_current_object() -> void:
 		rot_x = s_data.rotation_degrees.x
 		rot_y = s_data.rotation_degrees.y
 	elif cat_idx == 0 or cat_idx == 1 or cat_idx == 3: # Enemies, Obstacles, Ammo
-		if current_sprite:
+		var boss_mesh = current_object_node.get_node_or_null("BossMesh") if current_object_node.get_node_or_null("BossMesh") else current_object_node.get_node_or_null("VisualContainer")
+		if boss_mesh:
+			pos_y = boss_mesh.position.y
+			sc = boss_mesh.scale.x
+			rot_x = boss_mesh.rotation_degrees.x
+			rot_y = boss_mesh.rotation_degrees.y
+		elif current_sprite:
 			pos_y = current_sprite.position.y
 			psize = current_sprite.pixel_size
 			sc = current_object_node.scale.x
@@ -531,19 +537,29 @@ func _on_slider_changed(_val: float) -> void:
 			current_sprite.pixel_size = new_psize
 		current_object_node.scale = Vector3.ONE * new_scale
 		current_object_node.rotation_degrees.y = new_rot_y
-	else: # Mobs and Obstacles: root stays at Y=0, sprite moves to Y=new_pos_y
-		current_object_node.position.y = 0.0
-		if current_sprite:
-			current_sprite.position.y = new_pos_y
-			current_sprite.rotation_degrees.x = new_rot_x
-			current_sprite.pixel_size = new_psize
+	else: # Mobs, Bosses and Obstacles
+		var boss_mesh = current_object_node.get_node_or_null("BossMesh") if current_object_node.get_node_or_null("BossMesh") else current_object_node.get_node_or_null("VisualContainer")
+		if boss_mesh:
+			current_object_node.position = Vector3.ZERO
+			boss_mesh.position.y = new_pos_y
+			boss_mesh.scale = Vector3.ONE * new_scale
+			boss_mesh.rotation_degrees = Vector3(new_rot_x, new_rot_y, 0.0)
+			var health_bar = current_object_node.get_node_or_null("HealthBarSprite") as Sprite3D
+			if health_bar:
+				health_bar.position.y = new_pos_y + (new_scale * 1.2)
 		else:
-			current_object_node.rotation_degrees.x = new_rot_x
-		current_object_node.scale = Vector3.ONE * new_scale
-		current_object_node.rotation_degrees.y = new_rot_y
-		var health_bar = current_object_node.get_node_or_null("HealthBarSprite") as Sprite3D
-		if health_bar:
-			health_bar.position.y = new_pos_y + 0.85
+			current_object_node.position.y = 0.0
+			if current_sprite:
+				current_sprite.position.y = new_pos_y
+				current_sprite.rotation_degrees.x = new_rot_x
+				current_sprite.pixel_size = new_psize
+			else:
+				current_object_node.rotation_degrees.x = new_rot_x
+			current_object_node.scale = Vector3.ONE * new_scale
+			current_object_node.rotation_degrees.y = new_rot_y
+			var health_bar = current_object_node.get_node_or_null("HealthBarSprite") as Sprite3D
+			if health_bar:
+				health_bar.position.y = new_pos_y + 0.85
 			
 	if current_resource:
 		if "y_offset" in current_resource:

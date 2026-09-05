@@ -25,6 +25,8 @@ Player vessels define handling speed, hull durability, collision boundaries, and
 ### Hardpoint Sockets & Upgrade Roadmaps
 
 #### 🚤 1.1 The Dinghy ([`dinghy_ship.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_vessels/dinghy_ship.tres))
+* **3D Model:** `res://assets/models/user/vessels/the_dinghy.glb`
+* **Calibrated Transform:** `y_offset = 0.26`, `scale = Vector3(3.80, 3.80, 3.80)`, `rotation = Vector3(0, 0, 0)`
 * **Hardpoint Sockets:**
   * `BowMount`: Front chaser mount (scale: $1.0$)
   * `MidDeckCrew`: Center deck socket (scale: $0.35$)
@@ -35,6 +37,8 @@ Player vessels define handling speed, hull durability, collision boundaries, and
   * **Tier 3:** Adds [`crew_skeleton_tosser.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_crew/crew_skeleton_tosser.tres) at `AftDeckCrew`.
 
 #### ⛵ 1.2 The Sloop ([`sloop_ship.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_vessels/sloop_ship.tres))
+* **3D Model:** `res://assets/models/user/vessels/the_sloop.glb`
+* **Calibrated Transform:** `y_offset = 0.33`, `scale = Vector3(2.00, 2.00, 2.00)`, `rotation = Vector3(0, -90, 0)`
 * **Hardpoint Sockets:** `BowMount`, `MidDeckCrew`, `AftDeckCrew`, `PortSwivelMount`, `StarboardSwivelMount`
 * **Tier Progression:**
   * **Tier 1:** [`weapon_bow_chaser.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_crew/weapon_bow_chaser.tres) on `BowMount`.
@@ -42,6 +46,8 @@ Player vessels define handling speed, hull durability, collision boundaries, and
   * **Tier 3:** Adds dual `Port & Starboard Swivel Guns` for broadside coverage.
 
 #### 🛡️ 1.3 The Ironclad ([`ironclad_ship.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_vessels/ironclad_ship.tres))
+* **3D Model:** `res://assets/models/user/vessels/the_ironclad.glb`
+* **Calibrated Transform:** `y_offset = 0.35`, `scale = Vector3(2.00, 2.00, 2.00)`, `rotation = Vector3(0, -90, 0)`
 * **Hardpoint Sockets:** `BowMount`, `MonkeyCrew`, `SkeletonCrew`, `PortSwivelMount1`, `PortSwivelMount2`, `StarboardSwivelMount1`, `StarboardSwivelMount2`
 * **Tier Progression:**
   * **Tier 1:** Frontal Cannon Battery (`BowMount`).
@@ -84,19 +90,27 @@ Campaign levels culminate in multi-phase boss encounters with custom telegraphin
 
 ### 1. Captain Ironjaw's War-Barge (Level 1)
 * **Script:** [`boss_war_barge.gd`](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_war_barge.gd) | **HP:** $220\text{ HP}$
+* **3D Model:** `res://assets/models/enemy/vessels/boss_war_barge.glb`
+* **Calibrated Transform:** `y_offset = 0.22`, `scale = Vector3(3.36, 3.36, 3.36)`, `rotation = Vector3(0, 92, 0)`
 * **Components:** Port Swivel ($30\text{ HP}$), Starboard Swivel ($30\text{ HP}$), Front Armor ($40\text{ HP}$).
 * **Mechanics:** Locks scroll speed to $6.0\text{ m/s}$, fires swivel gun salvos, and vents steam to expose its Boiler Core ($2\times$ critical hit multiplier).
 
 ### 2. The Phantom Dredge (Level 2)
 * **Script:** [`boss_phantom_dredge.gd`](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_phantom_dredge.gd) | **HP:** $450\text{ HP}$
+* **3D Model:** `res://assets/models/enemy/vessels/boss_phantom_dredge.glb`
+* **Calibrated Transform:** `y_offset = 1.45`, `scale = Vector3(1.00, 1.00, 1.00)`, `rotation = Vector3(0, 0, 0)`
 * **Components:** Ghostly Paddlewheel & Spectral Boiler.
 * **Mechanics:** Dredge wheel shockwaves, spectral cannon volleys, ghostly submersion invulnerability phases, and high-speed frenzy charges.
 
 ### 3. Brimstone Siege Fortress (Level 3)
 * **Script:** [`boss_siege_fortress.gd`](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_siege_fortress.gd) | **HP:** $800\text{ HP}$
-* **Components:** Port Mortar ($100\text{ HP}$), Starboard Mortar ($100\text{ HP}$), Magma Core Shield ($150\text{ HP}$).
-* **Mechanics:** Dual mortar siege telegraphing, lateral magma vent eruption streams, and exposed Magma Core meltdown ($2.5\times$ critical damage).
+* **3D Model:** `res://assets/models/enemy/vessels/boss_siege_fortress.glb`
+* **Calibrated Transform:** `y_offset = 0.50`, `scale = Vector3(4.74, 4.74, 4.74)`, `rotation = Vector3(0, 0, 0)`
+* **Components:** Port Turret ($150\text{ HP}$), Starboard Turret ($150\text{ HP}$), Prow Ram ($150\text{ HP}$), Furnace Core ($350\text{ HP}$).
+* **Mechanics:** Dual mortar siege telegraphing, lateral magma vent eruption streams, and exposed Furnace Core meltdown.
 
-### 4. Captain Bonebeard (Bonus / Special Boss)
+### 4. Captain Bone-Beard (Bonus / Special Boss)
 * **Script:** [`boss_bone_beard.gd`](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_bone_beard.gd) | **HP:** $500\text{ HP}$
+* **3D Model:** `res://assets/models/enemy/vessels/captain_bone-beard’s_twin_frigate.glb`
+* **Calibrated Transform:** `y_offset = 2.15`, `scale = Vector3(4.48, 4.48, 4.48)`, `rotation = Vector3(0, 0, 0)`
 * **Mechanics:** Ghostly pirate captain vessel spawning skeleton minion rowers and firing cursed skull ordnance.

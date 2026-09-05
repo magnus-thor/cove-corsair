@@ -24,13 +24,17 @@ var _attack_timer: float = 0.0
 var _weave_time: float = 0.0
 var _target_z: float = -18.0
 var _is_defeated: bool = false
-var _current_base_y: float = 0.0
+var _current_base_y: float = 2.15
 
 func _ready() -> void:
 	_clean_shadow_nodes(self)
 	add_to_group("enemies")
 	add_to_group("destructible")
 	current_hp = max_hp
+	if boss_sprite:
+		boss_sprite.position.y = _current_base_y
+		boss_sprite.scale = Vector3(4.48, 4.48, 4.48)
+		boss_sprite.rotation_degrees = Vector3.ZERO
 	_update_health_bar()
 	area_entered.connect(_on_area_entered)
 	

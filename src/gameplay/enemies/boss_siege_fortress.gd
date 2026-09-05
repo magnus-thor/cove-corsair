@@ -29,7 +29,7 @@ var _ram_timer: float = 0.0
 var _minion_timer: float = 0.0
 var _is_defeated: bool = false
 var _charge_dir: int = 1
-var _y_base: float = 1.4
+var _y_base: float = 0.5
 var _flash_tweens: Dictionary = {}
 
 # Prefabs
@@ -50,6 +50,10 @@ func _ready() -> void:
 	add_to_group("enemies")
 	add_to_group("boss")
 	current_hp = max_hp
+	if boss_sprite:
+		boss_sprite.position.y = _y_base
+		boss_sprite.scale = Vector3(4.74, 4.74, 4.74)
+		boss_sprite.rotation_degrees = Vector3.ZERO
 	
 	GameState.boss_spawned_event.emit("The Siege Fortress", max_hp)
 	GameState.boss_health_changed.emit(current_hp, max_hp)
