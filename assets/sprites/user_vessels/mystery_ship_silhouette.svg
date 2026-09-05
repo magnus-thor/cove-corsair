@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 200" width="240" height="200">
+  <defs>
+    <filter id="silDrop" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+  <g filter="url(#silDrop)">
+    <!-- Hull silhouette -->
+    <path d="M 30 135 C 35 155, 60 170, 120 170 C 185 170, 215 150, 220 125 C 222 120, 205 118, 195 125 C 175 130, 85 130, 50 122 C 38 120, 28 125, 30 135 Z" fill="#201A17" opacity="0.9"/>
+    
+    <!-- Masts & Spars -->
+    <rect x="80" y="45" width="5" height="90" fill="#201A17" opacity="0.9"/>
+    <rect x="135" y="25" width="6" height="110" fill="#201A17" opacity="0.9"/>
+    <rect x="180" y="55" width="4" height="80" fill="#201A17" opacity="0.9"/>
+    <path d="M 195 130 L 235 105" stroke="#201A17" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
+
+    <!-- Sails silhouettes -->
+    <!-- Fore mast sails -->
+    <path d="M 60 55 C 80 50, 95 50, 105 55 C 95 85, 75 85, 60 85 Z" fill="#2A221E" opacity="0.92"/>
+    <path d="M 55 90 C 80 85, 100 85, 110 90 C 100 120, 70 120, 55 120 Z" fill="#2A221E" opacity="0.92"/>
+
+    <!-- Main mast sails -->
+    <path d="M 115 35 C 140 30, 160 30, 170 35 C 160 65, 135 65, 115 65 Z" fill="#2A221E" opacity="0.92"/>
+    <path d="M 110 70 C 140 65, 165 65, 175 70 C 165 100, 130 100, 110 100 Z" fill="#2A221E" opacity="0.92"/>
+
+    <!-- Aft sail -->
+    <path d="M 175 65 C 190 60, 205 65, 205 85 C 195 105, 175 110, 175 110 Z" fill="#2A221E" opacity="0.92"/>
+
+    <!-- Jolly roger flag -->
+    <path d="M 135 25 L 155 30 L 135 35 Z" fill="#201A17" opacity="0.95"/>
+  </g>
+</svg>

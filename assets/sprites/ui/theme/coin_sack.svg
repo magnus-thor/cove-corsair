@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <radialGradient id="sackGrad" cx="45%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#C28751" />
+      <stop offset="60%" stop-color="#8E5629" />
+      <stop offset="100%" stop-color="#542E13" />
+    </radialGradient>
+    <linearGradient id="tiedNeck" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#D4AA6A" />
+      <stop offset="50%" stop-color="#FFE8A3" />
+      <stop offset="100%" stop-color="#A57538" />
+    </linearGradient>
+    <radialGradient id="coinGrad" cx="40%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#FFF280" />
+      <stop offset="60%" stop-color="#FFBA08" />
+      <stop offset="100%" stop-color="#C27803" />
+    </radialGradient>
+    <filter id="sackShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="2.5" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#sackShadow)">
+    <!-- Ruffled top of sack -->
+    <path d="M 23 16 C 20 11, 23 6, 28 8 C 32 9, 32 6, 36 8 C 41 6, 44 11, 41 16 Z" fill="#9A6031" stroke="#381D0B" stroke-width="2" stroke-linejoin="round"/>
+    
+    <!-- Main sack body -->
+    <path d="M 23 18 C 12 25, 10 44, 18 53 C 24 59, 40 59, 46 53 C 54 44, 52 25, 41 18 Z" fill="url(#sackGrad)" stroke="#381D0B" stroke-width="2.5" stroke-linejoin="round"/>
+
+    <!-- Sack folds highlight -->
+    <path d="M 20 28 C 17 38, 21 47, 26 53" fill="none" stroke="#DCA26D" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+    <path d="M 44 28 C 47 38, 43 47, 38 53" fill="none" stroke="#381D0B" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+
+    <!-- Tied rope string -->
+    <ellipse cx="32" cy="18.5" rx="10" ry="3.5" fill="url(#tiedNeck)" stroke="#381D0B" stroke-width="1.8"/>
+    <!-- Hanging rope knot ends -->
+    <path d="M 33 21 C 36 24, 38 27, 39 30 M 31 21 C 30 25, 28 28, 29 31" fill="none" stroke="#FFE8A3" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- Gold coin seal / medallion in center -->
+    <circle cx="32" cy="38" r="11" fill="url(#coinGrad)" stroke="#693B00" stroke-width="1.8"/>
+    <circle cx="32" cy="38" r="8.5" fill="none" stroke="#FFF7BA" stroke-width="1.2" stroke-dasharray="2 1.5"/>
+    <polygon points="32,32 33.5,35.5 37,36 34.5,38.5 35.5,42 32,40 28.5,42 29.5,38.5 27,36 30.5,35.5" fill="#FFEFA6" stroke="#B87300" stroke-width="0.8"/>
+  </g>
+</svg>

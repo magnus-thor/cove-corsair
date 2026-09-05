@@ -183,7 +183,12 @@ func _update_expedition_display() -> void:
 	if expedition_num_label:
 		expedition_num_label.text = "EXPEDITION %02d:" % cur
 	if expedition_name_label:
-		expedition_name_label.text = LEVEL_NAMES.get(cur, "COVE RUN")
+		var exp_name = LEVEL_NAMES.get(cur, "COVE RUN")
+		expedition_name_label.text = exp_name
+		if exp_name.length() > 16:
+			expedition_name_label.add_theme_font_size_override("font_size", 28)
+		else:
+			expedition_name_label.add_theme_font_size_override("font_size", 32)
 	if expedition_meta_label:
 		var biome = LEVEL_BIOMES.get(cur, "Open Waters")
 		var dist = LEVEL_DISTANCES.get(cur, 250)
