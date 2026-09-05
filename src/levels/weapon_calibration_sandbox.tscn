@@ -92,107 +92,226 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="PanelContainer" type="PanelContainer" parent="DebugUI/Control"]
-layout_mode = 0
-offset_left = 20.0
+[node name="btn_toggle_ui" type="Button" parent="DebugUI/Control"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -140.0
 offset_top = 20.0
-offset_right = 450.0
-offset_bottom = 680.0
+offset_right = -20.0
+offset_bottom = 55.0
+grow_horizontal = 0
+text = "Hide UI (H)"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="DebugUI/Control/PanelContainer"]
+[node name="PanelContainer" type="PanelContainer" parent="DebugUI/Control"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -370.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="DebugUI/Control/PanelContainer"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 16
 
-[node name="TitleLabel" type="Label" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+[node name="LeftCol" type="VBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="TitleLabel" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol"]
 layout_mode = 2
 text = "WEAPON CALIBRATION SANDBOX"
 label_settings = SubResource("LabelSettings_title")
 
-[node name="HSeparator1" type="HSeparator" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+[node name="HSeparator1" type="HSeparator" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol"]
 layout_mode = 2
 
-[node name="ShipRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+[node name="ShipRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/VBoxContainer/ShipRow"]
-custom_minimum_size = Vector2(90, 0)
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ShipRow"]
+custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 text = "Vessel:"
 
-[node name="ship_option" type="OptionButton" parent="DebugUI/Control/PanelContainer/VBoxContainer/ShipRow"]
+[node name="ship_option" type="OptionButton" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ShipRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="TierRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+[node name="TierRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/VBoxContainer/TierRow"]
-custom_minimum_size = Vector2(90, 0)
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/TierRow"]
+custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
-text = "Active Tier:"
+text = "Tier:"
 
-[node name="tier_option" type="OptionButton" parent="DebugUI/Control/PanelContainer/VBoxContainer/TierRow"]
+[node name="tier_option" type="OptionButton" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/TierRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="SocketRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+[node name="AssetRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/VBoxContainer/SocketRow"]
-custom_minimum_size = Vector2(90, 0)
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/AssetRow"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+text = "Asset:"
+
+[node name="asset_option" type="OptionButton" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/AssetRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AmmoRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/AmmoRow"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+text = "Ammo:"
+
+[node name="ammo_option" type="OptionButton" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/AmmoRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HSeparatorCam" type="HSeparator" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol"]
+layout_mode = 2
+
+[node name="CameraViewRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/CameraViewRow"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+text = "Camera:"
+
+[node name="btn_cam_rear" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/CameraViewRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Behind"
+
+[node name="btn_cam_top" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/CameraViewRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Top"
+
+[node name="btn_cam_lane" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/CameraViewRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Lane"
+
+[node name="btn_cam_side" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/CameraViewRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Side"
+
+[node name="ZoomRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ZoomRow"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+text = "Zoom:"
+
+[node name="btn_zoom_out" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ZoomRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = " - "
+
+[node name="slider_zoom" type="HSlider" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ZoomRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+min_value = 0.25
+max_value = 2.5
+step = 0.05
+value = 1.0
+
+[node name="btn_zoom_in" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ZoomRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = " + "
+
+[node name="btn_zoom_reset" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ZoomRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Reset"
+
+[node name="ActionRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol"]
+layout_mode = 2
+
+[node name="btn_fire_toggle" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ActionRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Auto-Fire: OFF"
+
+[node name="btn_clear_all" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ActionRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Clear"
+
+[node name="btn_print_dict" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ActionRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Print Dict"
+
+[node name="VSeparator" type="VSeparator" parent="DebugUI/Control/PanelContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="RightCol" type="VBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="SocketRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/SocketRow"]
+custom_minimum_size = Vector2(75, 0)
 layout_mode = 2
 text = "Cal Socket:"
 
-[node name="socket_option" type="OptionButton" parent="DebugUI/Control/PanelContainer/VBoxContainer/SocketRow"]
+[node name="socket_option" type="OptionButton" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/SocketRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="AssetRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+[node name="PosXRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/VBoxContainer/AssetRow"]
-custom_minimum_size = Vector2(90, 0)
-layout_mode = 2
-text = "Equip Asset:"
-
-[node name="asset_option" type="OptionButton" parent="DebugUI/Control/PanelContainer/VBoxContainer/AssetRow"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="AmmoRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/VBoxContainer/AmmoRow"]
-custom_minimum_size = Vector2(90, 0)
-layout_mode = 2
-text = "Select Ammo:"
-
-[node name="ammo_option" type="OptionButton" parent="DebugUI/Control/PanelContainer/VBoxContainer/AmmoRow"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="HSeparator2" type="HSeparator" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="PosXRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosXRow"]
-custom_minimum_size = Vector2(65, 0)
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosXRow"]
+custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 text = "Pos X:"
 
-[node name="btn_pos_x_dec" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosXRow"]
+[node name="btn_pos_x_dec" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosXRow"]
 unique_name_in_owner = true
 layout_mode = 2
 text = " - "
 
-[node name="slider_pos_x" type="HSlider" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosXRow"]
+[node name="slider_pos_x" type="HSlider" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosXRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -201,31 +320,31 @@ min_value = -6.0
 max_value = 6.0
 step = 0.01
 
-[node name="btn_pos_x_inc" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosXRow"]
+[node name="btn_pos_x_inc" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosXRow"]
 unique_name_in_owner = true
 layout_mode = 2
 text = " + "
 
-[node name="input_pos_x" type="LineEdit" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosXRow"]
+[node name="input_pos_x" type="LineEdit" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosXRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(55, 0)
+custom_minimum_size = Vector2(45, 0)
 layout_mode = 2
 text = "0.00"
 
-[node name="PosYRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+[node name="PosYRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosYRow"]
-custom_minimum_size = Vector2(65, 0)
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosYRow"]
+custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 text = "Pos Y:"
 
-[node name="btn_pos_y_dec" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosYRow"]
+[node name="btn_pos_y_dec" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosYRow"]
 unique_name_in_owner = true
 layout_mode = 2
 text = " - "
 
-[node name="slider_pos_y" type="HSlider" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosYRow"]
+[node name="slider_pos_y" type="HSlider" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosYRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -234,31 +353,31 @@ min_value = -6.0
 max_value = 6.0
 step = 0.01
 
-[node name="btn_pos_y_inc" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosYRow"]
+[node name="btn_pos_y_inc" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosYRow"]
 unique_name_in_owner = true
 layout_mode = 2
 text = " + "
 
-[node name="input_pos_y" type="LineEdit" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosYRow"]
+[node name="input_pos_y" type="LineEdit" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosYRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(55, 0)
+custom_minimum_size = Vector2(45, 0)
 layout_mode = 2
 text = "0.00"
 
-[node name="PosZRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+[node name="PosZRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosZRow"]
-custom_minimum_size = Vector2(65, 0)
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosZRow"]
+custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 text = "Pos Z:"
 
-[node name="btn_pos_z_dec" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosZRow"]
+[node name="btn_pos_z_dec" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosZRow"]
 unique_name_in_owner = true
 layout_mode = 2
 text = " - "
 
-[node name="slider_pos_z" type="HSlider" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosZRow"]
+[node name="slider_pos_z" type="HSlider" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosZRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -267,31 +386,31 @@ min_value = -6.0
 max_value = 6.0
 step = 0.01
 
-[node name="btn_pos_z_inc" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosZRow"]
+[node name="btn_pos_z_inc" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosZRow"]
 unique_name_in_owner = true
 layout_mode = 2
 text = " + "
 
-[node name="input_pos_z" type="LineEdit" parent="DebugUI/Control/PanelContainer/VBoxContainer/PosZRow"]
+[node name="input_pos_z" type="LineEdit" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosZRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(55, 0)
+custom_minimum_size = Vector2(45, 0)
 layout_mode = 2
 text = "0.00"
 
-[node name="RotYRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+[node name="RotYRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/VBoxContainer/RotYRow"]
-custom_minimum_size = Vector2(65, 0)
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/RotYRow"]
+custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 text = "Rot Y:"
 
-[node name="btn_rot_y_dec" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/RotYRow"]
+[node name="btn_rot_y_dec" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/RotYRow"]
 unique_name_in_owner = true
 layout_mode = 2
 text = " - "
 
-[node name="slider_rot_y" type="HSlider" parent="DebugUI/Control/PanelContainer/VBoxContainer/RotYRow"]
+[node name="slider_rot_y" type="HSlider" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/RotYRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -300,31 +419,31 @@ min_value = -180.0
 max_value = 180.0
 step = 1.0
 
-[node name="btn_rot_y_inc" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/RotYRow"]
+[node name="btn_rot_y_inc" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/RotYRow"]
 unique_name_in_owner = true
 layout_mode = 2
 text = " + "
 
-[node name="input_rot_y" type="LineEdit" parent="DebugUI/Control/PanelContainer/VBoxContainer/RotYRow"]
+[node name="input_rot_y" type="LineEdit" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/RotYRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(55, 0)
+custom_minimum_size = Vector2(45, 0)
 layout_mode = 2
 text = "0.0°"
 
-[node name="ScaleRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+[node name="ScaleRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/VBoxContainer/ScaleRow"]
-custom_minimum_size = Vector2(65, 0)
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/ScaleRow"]
+custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
-text = "Size / Scale:"
+text = "Scale:"
 
-[node name="btn_scale_dec" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/ScaleRow"]
+[node name="btn_scale_dec" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/ScaleRow"]
 unique_name_in_owner = true
 layout_mode = 2
 text = " - "
 
-[node name="slider_scale" type="HSlider" parent="DebugUI/Control/PanelContainer/VBoxContainer/ScaleRow"]
+[node name="slider_scale" type="HSlider" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/ScaleRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -334,61 +453,49 @@ max_value = 12.0
 step = 0.01
 value = 1.0
 
-[node name="btn_scale_inc" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/ScaleRow"]
+[node name="btn_scale_inc" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/ScaleRow"]
 unique_name_in_owner = true
 layout_mode = 2
 text = " + "
 
-[node name="input_scale" type="LineEdit" parent="DebugUI/Control/PanelContainer/VBoxContainer/ScaleRow"]
+[node name="input_scale" type="LineEdit" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/ScaleRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(55, 0)
+custom_minimum_size = Vector2(45, 0)
 layout_mode = 2
 text = "1.00x"
 
-[node name="HSeparator3" type="HSeparator" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+[node name="TierButtonsRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol"]
 layout_mode = 2
 
-[node name="btn_tier1" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+[node name="btn_tier1" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/TierButtonsRow"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Equip Bow Cannon (Tier 1)"
+size_flags_horizontal = 3
+text = "Tier 1"
 
-[node name="btn_tier2" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+[node name="btn_tier2" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/TierButtonsRow"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Add Monkey Bomber (Tier 2)"
+size_flags_horizontal = 3
+text = "Tier 2"
 
-[node name="btn_tier3" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+[node name="btn_tier3" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/TierButtonsRow"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Add Skeleton Deckhand (Tier 3)"
+size_flags_horizontal = 3
+text = "Tier 3"
 
-[node name="ResetRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
+[node name="ResetRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol"]
 layout_mode = 2
 
-[node name="btn_reset_socket" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/ResetRow"]
+[node name="btn_reset_socket" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/ResetRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Reset Socket"
 
-[node name="btn_reset_all" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer/ResetRow"]
+[node name="btn_reset_all" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/ResetRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Reset All"
-
-[node name="btn_fire_toggle" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Auto-Fire: OFF"
-
-[node name="btn_clear_all" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Clear All"
-
-[node name="btn_print_dict" type="Button" parent="DebugUI/Control/PanelContainer/VBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Print Dictionary to Console"
