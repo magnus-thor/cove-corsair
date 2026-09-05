@@ -46,6 +46,8 @@ var _flash_tweens: Dictionary = {}
 @onready var prow_ram_node: Node3D = $ProwRam
 @onready var furnace_core_node: Node3D = $FurnaceCore
 
+var _base_mesh_scale: Vector3 = Vector3(4.74, 4.74, 4.74)
+
 func _ready() -> void:
 	add_to_group("enemies")
 	add_to_group("boss")
@@ -54,6 +56,7 @@ func _ready() -> void:
 		boss_sprite.position.y = _y_base
 		boss_sprite.scale = Vector3(4.74, 4.74, 4.74)
 		boss_sprite.rotation_degrees = Vector3.ZERO
+		_base_mesh_scale = boss_sprite.scale
 	
 	GameState.boss_spawned_event.emit("The Siege Fortress", max_hp)
 	GameState.boss_health_changed.emit(current_hp, max_hp)
@@ -332,15 +335,15 @@ func _flash_boss_main() -> void:
 		return
 	if _flash_tweens.has("boss_main") and is_instance_valid(_flash_tweens["boss_main"]):
 		_flash_tweens["boss_main"].kill()
+		boss_sprite.scale = _base_mesh_scale
 	var tween = create_tween()
 	_flash_tweens["boss_main"] = tween
 	if "modulate" in boss_sprite:
 		boss_sprite.modulate = Color(2.5, 0.8, 0.4, 1.0)
 		tween.tween_property(boss_sprite, "modulate", Color(1.4, 0.6, 0.3, 1.0), 0.1)
 	else:
-		var sc = boss_sprite.scale
-		tween.tween_property(boss_sprite, "scale", sc * 1.08, 0.05)
-		tween.tween_property(boss_sprite, "scale", sc, 0.1)
+		tween.tween_property(boss_sprite, "scale", _base_mesh_scale * 1.06, 0.04)
+		tween.tween_property(boss_sprite, "scale", _base_mesh_scale, 0.08)
 
 func _destroy_subpart(node: Variant) -> void:
 	if not is_instance_valid(node):

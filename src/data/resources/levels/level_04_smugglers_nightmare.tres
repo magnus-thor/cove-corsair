@@ -33,7 +33,7 @@ wave_events = Array[Dictionary]([{
 "type": "reef_hazard",
 "x": -0.65,
 "scale_x": 2.2,
-"scale_z": 6.0
+"scale_z": 1.0
 }, {
 "distance": 28.0,
 "type": "sea_mine",
@@ -79,7 +79,7 @@ wave_events = Array[Dictionary]([{
 "type": "reef_hazard",
 "x": 0.6,
 "scale_x": 2.2,
-"scale_z": 7.0
+"scale_z": 1.0
 }, {
 "distance": 92.0,
 "hp": 5,

@@ -151,8 +151,8 @@ wave_events = Array[Dictionary]([{
 "x_positions": [-0.6, -0.2, 0.2, 0.6]
 }, {
 "distance": 144.0,
-"scale_x": 1.5,
-"scale_z": 3.75,
+"scale_x": 1.2,
+"scale_z": 1.0,
 "type": "reef_hazard",
 "x": 0.0
 }, {

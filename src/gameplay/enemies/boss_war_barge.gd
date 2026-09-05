@@ -56,6 +56,8 @@ var is_charging: bool = false
 var charge_direction: int = 1 # 1 = forward, -1 = retreating
 var original_combat_z: float = -18.0
 
+var _base_mesh_scale: Vector3 = Vector3.ONE
+
 func _ready() -> void:
 	_clean_shadow_nodes(self)
 	add_to_group("enemies")
@@ -63,6 +65,9 @@ func _ready() -> void:
 	
 	current_hp = max_hp
 	original_combat_z = combat_z_offset
+	
+	if boss_sprite:
+		_base_mesh_scale = boss_sprite.scale
 	
 	# Initial UI Trigger
 	GameState.boss_spawned_event.emit("Captain Ironjaw's War-Barge", max_hp)
@@ -398,17 +403,18 @@ func _start_ram_charge() -> void:
 	ram_timer = 0.0
 	AudioManager.play_sfx("cannon_shots") # Warning sound
 	
-	# Flash red indicators
-	# Flash red indicators
 	if is_instance_valid(boss_sprite):
+		if _flash_tweens.has(boss_sprite) and is_instance_valid(_flash_tweens[boss_sprite]) and _flash_tweens[boss_sprite].is_valid():
+			_flash_tweens[boss_sprite].kill()
+			boss_sprite.scale = _base_mesh_scale
 		var tween = create_tween()
+		_flash_tweens[boss_sprite] = tween
 		if "modulate" in boss_sprite:
 			tween.tween_property(boss_sprite, "modulate", Color(3.0, 0.3, 0.3, 1.0), 0.1)
 			tween.tween_property(boss_sprite, "modulate", Color.WHITE, 0.15)
 		else:
-			var sc = boss_sprite.scale
-			tween.tween_property(boss_sprite, "scale", sc * 1.1, 0.1)
-			tween.tween_property(boss_sprite, "scale", sc, 0.15)
+			tween.tween_property(boss_sprite, "scale", _base_mesh_scale * 1.1, 0.1)
+			tween.tween_property(boss_sprite, "scale", _base_mesh_scale, 0.15)
 
 func _process_ram_charge(delta: float) -> void:
 	var player = get_tree().get_first_node_in_group("player")
@@ -457,6 +463,7 @@ func _flash_boss_main() -> void:
 		return
 	if _flash_tweens.has(boss_sprite) and is_instance_valid(_flash_tweens[boss_sprite]) and _flash_tweens[boss_sprite].is_valid():
 		_flash_tweens[boss_sprite].kill()
+		boss_sprite.scale = _base_mesh_scale
 		
 	var tween = create_tween()
 	_flash_tweens[boss_sprite] = tween
@@ -464,21 +471,23 @@ func _flash_boss_main() -> void:
 		tween.tween_property(boss_sprite, "modulate", Color(2.5, 0.5, 0.5, 1.0), 0.06)
 		tween.tween_property(boss_sprite, "modulate", Color.WHITE, 0.1)
 	else:
-		var sc = boss_sprite.scale
-		tween.tween_property(boss_sprite, "scale", sc * 1.08, 0.06)
-		tween.tween_property(boss_sprite, "scale", sc, 0.1)
+		tween.tween_property(boss_sprite, "scale", _base_mesh_scale * 1.06, 0.04)
+		tween.tween_property(boss_sprite, "scale", _base_mesh_scale, 0.08)
 
 func _show_crit_flash() -> void:
 	if not is_instance_valid(boss_sprite):
 		return
+	if _flash_tweens.has(boss_sprite) and is_instance_valid(_flash_tweens[boss_sprite]) and _flash_tweens[boss_sprite].is_valid():
+		_flash_tweens[boss_sprite].kill()
+		boss_sprite.scale = _base_mesh_scale
 	var tween = create_tween()
+	_flash_tweens[boss_sprite] = tween
 	if "modulate" in boss_sprite:
 		tween.tween_property(boss_sprite, "modulate", Color(1.0, 1.0, 3.0, 1.0), 0.05) # Blue flash for crit
 		tween.tween_property(boss_sprite, "modulate", Color.WHITE, 0.15)
 	else:
-		var sc = boss_sprite.scale
-		tween.tween_property(boss_sprite, "scale", sc * 1.15, 0.05)
-		tween.tween_property(boss_sprite, "scale", sc, 0.15)
+		tween.tween_property(boss_sprite, "scale", _base_mesh_scale * 1.12, 0.05)
+		tween.tween_property(boss_sprite, "scale", _base_mesh_scale, 0.12)
 
 func _check_phase_transition() -> void:
 	if current_phase == 1 and current_hp <= int(max_hp * 0.68):

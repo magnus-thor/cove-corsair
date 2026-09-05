@@ -57,10 +57,15 @@ func _setup_button_pulse() -> void:
 	if not start_button:
 		return
 	
-	start_button.pivot_offset = start_button.custom_minimum_size / 2.0
+	start_button.resized.connect(_update_start_button_pivot)
+	_update_start_button_pivot()
 	pulse_tween = create_tween().set_loops()
-	pulse_tween.tween_property(start_button, "scale", Vector2(1.04, 1.04), 0.8).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	pulse_tween.tween_property(start_button, "scale", Vector2(1.03, 1.03), 0.8).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	pulse_tween.tween_property(start_button, "scale", Vector2(1.0, 1.0), 0.8).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+
+func _update_start_button_pivot() -> void:
+	if start_button:
+		start_button.pivot_offset = start_button.size * 0.5
 
 func _on_active_vessel_changed(_v_id: String) -> void:
 	_refresh_player_ship()
@@ -132,28 +137,34 @@ func _update_level_buttons() -> void:
 		subtitle_label.text = LEVEL_NAMES.get(cur, "COVE OF PLUNDER").to_upper()
 		
 	var sel_style = StyleBoxFlat.new()
-	sel_style.bg_color = Color(0.18, 0.55, 0.85, 0.95)
+	sel_style.bg_color = Color(0.18, 0.52, 0.85, 0.95)
 	sel_style.border_color = Color(1.0, 0.85, 0.2, 1.0)
-	sel_style.border_width_left = 2
-	sel_style.border_width_top = 2
-	sel_style.border_width_right = 2
-	sel_style.border_width_bottom = 2
-	sel_style.corner_radius_top_left = 8
-	sel_style.corner_radius_top_right = 8
-	sel_style.corner_radius_bottom_right = 8
-	sel_style.corner_radius_bottom_left = 8
+	sel_style.border_width_left = 3
+	sel_style.border_width_top = 3
+	sel_style.border_width_right = 3
+	sel_style.border_width_bottom = 3
+	sel_style.corner_radius_top_left = 12
+	sel_style.corner_radius_top_right = 12
+	sel_style.corner_radius_bottom_right = 12
+	sel_style.corner_radius_bottom_left = 12
+	sel_style.shadow_color = Color(0, 0, 0, 0.45)
+	sel_style.shadow_size = 7
+	sel_style.shadow_offset = Vector2(0, 3)
 	
 	var unsel_style = StyleBoxFlat.new()
-	unsel_style.bg_color = Color(0.12, 0.18, 0.25, 0.8)
-	unsel_style.border_color = Color(0.4, 0.5, 0.6, 0.5)
-	unsel_style.border_width_left = 1
-	unsel_style.border_width_top = 1
-	unsel_style.border_width_right = 1
-	unsel_style.border_width_bottom = 1
-	unsel_style.corner_radius_top_left = 8
-	unsel_style.corner_radius_top_right = 8
-	unsel_style.corner_radius_bottom_right = 8
-	unsel_style.corner_radius_bottom_left = 8
+	unsel_style.bg_color = Color(0.1, 0.16, 0.24, 0.88)
+	unsel_style.border_color = Color(0.35, 0.52, 0.72, 0.8)
+	unsel_style.border_width_left = 2
+	unsel_style.border_width_top = 2
+	unsel_style.border_width_right = 2
+	unsel_style.border_width_bottom = 2
+	unsel_style.corner_radius_top_left = 12
+	unsel_style.corner_radius_top_right = 12
+	unsel_style.corner_radius_bottom_right = 12
+	unsel_style.corner_radius_bottom_left = 12
+	unsel_style.shadow_color = Color(0, 0, 0, 0.3)
+	unsel_style.shadow_size = 4
+	unsel_style.shadow_offset = Vector2(0, 2)
 	
 	var buttons = [btn_lvl_1, btn_lvl_2, btn_lvl_3, btn_lvl_4, btn_lvl_5, btn_lvl_6]
 	for i in range(buttons.size()):
@@ -161,7 +172,7 @@ func _update_level_buttons() -> void:
 		if btn:
 			var lvl_idx = i + 1
 			btn.add_theme_stylebox_override("normal", sel_style if cur == lvl_idx else unsel_style)
-			btn.modulate = Color.WHITE if cur == lvl_idx else Color(0.75, 0.75, 0.75, 0.9)
+			btn.modulate = Color.WHITE if cur == lvl_idx else Color(0.85, 0.88, 0.92, 0.95)
 
 func _on_start_button_pressed() -> void:
 	if not start_button or start_button.disabled:

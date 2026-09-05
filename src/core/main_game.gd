@@ -22,6 +22,9 @@ func _start_game_immediately() -> void:
 	var player = get_tree().get_first_node_in_group("player")
 	if player and "is_shooting_enabled" in player:
 		player.is_shooting_enabled = true
+	var hud = get_tree().get_first_node_in_group("top_hud")
+	if hud and hud.has_method("on_game_started"):
+		hud.on_game_started()
 	AudioManager.play_music()
 
 func _pause_player_shooting() -> void:
@@ -40,6 +43,10 @@ func _on_game_started() -> void:
 	var player = get_tree().get_first_node_in_group("player")
 	if player and "is_shooting_enabled" in player:
 		player.is_shooting_enabled = true
+		
+	var hud = get_tree().get_first_node_in_group("top_hud")
+	if hud and hud.has_method("on_game_started"):
+		hud.on_game_started()
 		
 	AudioManager.play_music()
 

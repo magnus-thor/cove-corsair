@@ -2,6 +2,7 @@ extends CanvasLayer
 
 @onready var gold_container: Control = $MarginContainer/HBoxContainer/GoldPanel
 @onready var gold_label: Label = $MarginContainer/HBoxContainer/GoldPanel/MarginContainer/HBoxContainer/GoldLabel
+@onready var progress_container: Control = $MarginContainer/HBoxContainer/ProgressContainer
 @onready var level_title: Label = $MarginContainer/HBoxContainer/ProgressContainer/LevelTitle
 @onready var level_progress_bar: ProgressBar = $MarginContainer/HBoxContainer/ProgressContainer/HBoxContainer/LevelProgressBar
 @onready var multiplier_panel: Control = $MarginContainer/HBoxContainer/MultiplierPanel
@@ -54,6 +55,32 @@ func _ready() -> void:
 			else:
 				level_title.text = "WORLD %d - COVE RUN" % GameState.current_level
 
+		# If game hasn't started yet, hide distance progress and multiplier
+		if "is_game_active" in GameState and not GameState.is_game_active:
+			_set_run_hud_visible(false)
+
+func on_game_started() -> void:
+	_set_run_hud_visible(true, true)
+
+func _set_run_hud_visible(vis: bool, animate: bool = false) -> void:
+	if not progress_container or not multiplier_panel:
+		return
+	if vis:
+		progress_container.visible = true
+		multiplier_panel.visible = true
+		if animate:
+			progress_container.modulate.a = 0.0
+			multiplier_panel.modulate.a = 0.0
+			var t = create_tween().set_parallel(true)
+			t.tween_property(progress_container, "modulate:a", 1.0, 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+			t.tween_property(multiplier_panel, "modulate:a", 1.0, 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		else:
+			progress_container.modulate.a = 1.0
+			multiplier_panel.modulate.a = 1.0
+	else:
+		progress_container.visible = false
+		multiplier_panel.visible = false
+
 func _update_pivots() -> void:
 	if gold_container:
 		gold_container.pivot_offset = gold_container.size * 0.5
@@ -103,6 +130,8 @@ func _update_multiplier_text(val: float, mode: String) -> void:
 	multiplier_label.text = prefix + val_str
 
 func _on_progress_changed(current: float, total: float) -> void:
+	if progress_container and not progress_container.visible and GameState.is_game_active:
+		_set_run_hud_visible(true, true)
 	if not level_progress_bar:
 		return
 	level_progress_bar.max_value = max(1.0, total)

@@ -1,49 +1,49 @@
-[gd_scene format=3 uid="uid://b7yak4m2p5q8y"]
+[gd_scene load_steps=15 format=3 uid="uid://b7yak4m2p5q8y"]
 
 [ext_resource type="Script" path="res://src/ui/start_screen.gd" id="1_start_script"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_start_normal"]
-bg_color = Color(0.18, 0.72, 0.35, 1)
+bg_color = Color(0.16, 0.68, 0.32, 1)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
 border_color = Color(0.98, 0.85, 0.25, 1)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
-shadow_color = Color(0, 0, 0, 0.45)
-shadow_size = 8
-shadow_offset = Vector2(0, 4)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+shadow_color = Color(0, 0, 0, 0.5)
+shadow_size = 10
+shadow_offset = Vector2(0, 5)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_start_hover"]
-bg_color = Color(0.22, 0.82, 0.4, 1)
+bg_color = Color(0.2, 0.78, 0.38, 1)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
 border_color = Color(1, 0.92, 0.4, 1)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
-shadow_color = Color(0, 0, 0, 0.5)
-shadow_size = 10
-shadow_offset = Vector2(0, 5)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+shadow_color = Color(0, 0, 0, 0.55)
+shadow_size = 12
+shadow_offset = Vector2(0, 6)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_start_pressed"]
-bg_color = Color(0.14, 0.6, 0.28, 1)
+bg_color = Color(0.12, 0.54, 0.24, 1)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
 border_color = Color(0.85, 0.72, 0.18, 1)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
-shadow_color = Color(0, 0, 0, 0.3)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+shadow_color = Color(0, 0, 0, 0.35)
 shadow_size = 4
 shadow_offset = Vector2(0, 2)
 
@@ -54,10 +54,10 @@ border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
 border_color = Color(0.5, 0.5, 0.4, 0.8)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_shipyard_normal"]
 bg_color = Color(0.16, 0.42, 0.72, 1)
@@ -90,28 +90,49 @@ shadow_size = 8
 shadow_offset = Vector2(0, 4)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lvl_normal"]
-bg_color = Color(0.12, 0.18, 0.25, 0.85)
+bg_color = Color(0.1, 0.16, 0.24, 0.88)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.4, 0.6, 0.8, 0.7)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+border_color = Color(0.35, 0.52, 0.72, 0.8)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.3)
+shadow_size = 4
+shadow_offset = Vector2(0, 2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lvl_hover"]
+bg_color = Color(0.15, 0.24, 0.36, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.5, 0.72, 0.95, 0.9)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.35)
+shadow_size = 5
+shadow_offset = Vector2(0, 2)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lvl_selected"]
-bg_color = Color(0.2, 0.5, 0.8, 0.95)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
+bg_color = Color(0.18, 0.52, 0.85, 0.95)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
 border_color = Color(1, 0.85, 0.2, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.45)
+shadow_size = 7
+shadow_offset = Vector2(0, 3)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_reset_normal"]
 bg_color = Color(0.65, 0.18, 0.18, 1)
@@ -173,6 +194,17 @@ shadow_color = Color(0, 0, 0, 0.45)
 shadow_size = 8
 shadow_offset = Vector2(0, 4)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_expedition_card"]
+bg_color = Color(0.06, 0.1, 0.16, 0.72)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.45, 0.65, 0.45)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
 
 [node name="StartScreen" type="CanvasLayer"]
 layer = 15
@@ -190,8 +222,10 @@ grow_vertical = 2
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_top = 50.0
-offset_bottom = 160.0
+offset_left = 20.0
+offset_top = 45.0
+offset_right = -20.0
+offset_bottom = 175.0
 grow_horizontal = 2
 theme_override_constants/separation = 8
 alignment = 1
@@ -199,10 +233,10 @@ alignment = 1
 [node name="GameTitle" type="Label" parent="Control/HeaderContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.84, 0, 1)
-theme_override_colors/font_outline_color = Color(0.24, 0.14, 0.05, 1)
-theme_override_constants/outline_size = 8
-theme_override_font_sizes/font_size = 42
+theme_override_colors/font_color = Color(1, 0.84, 0.05, 1)
+theme_override_colors/font_outline_color = Color(0.18, 0.08, 0.02, 1)
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/font_size = 50
 text = "PIRATE RUNNERS"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -210,10 +244,10 @@ vertical_alignment = 1
 [node name="GameSubtitle" type="Label" parent="Control/HeaderContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.95, 0.95, 0.92, 1)
-theme_override_colors/font_outline_color = Color(0.1, 0.1, 0.1, 0.8)
-theme_override_constants/outline_size = 3
-theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.96, 0.92, 0.82, 1)
+theme_override_colors/font_outline_color = Color(0.1, 0.1, 0.1, 0.9)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 22
 text = "COVE OF PLUNDER"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -224,70 +258,129 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -290.0
+offset_left = 24.0
+offset_top = -490.0
+offset_right = -24.0
 offset_bottom = -25.0
 grow_horizontal = 2
 grow_vertical = 0
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="ExpeditionCard" type="PanelContainer" parent="Control/BottomContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_expedition_card")
+
+[node name="Margin" type="MarginContainer" parent="Control/BottomContainer/ExpeditionCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="ExpeditionVBox" type="VBoxContainer" parent="Control/BottomContainer/ExpeditionCard/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ExpeditionHeader" type="Label" parent="Control/BottomContainer/ExpeditionCard/Margin/ExpeditionVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.88, 0.95, 0.9)
+theme_override_colors/font_outline_color = Color(0.05, 0.08, 0.12, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 15
+text = "⚔ CHOOSE EXPEDITION ⚔"
+horizontal_alignment = 1
+
+[node name="LevelSelectRow1" type="HBoxContainer" parent="Control/BottomContainer/ExpeditionCard/Margin/ExpeditionVBox"]
+layout_mode = 2
 theme_override_constants/separation = 10
 alignment = 1
 
-[node name="LevelSelectRow1" type="HBoxContainer" parent="Control/BottomContainer"]
-layout_mode = 2
-theme_override_constants/separation = 8
-alignment = 1
-
-[node name="BtnLvl1" type="Button" parent="Control/BottomContainer/LevelSelectRow1"]
+[node name="BtnLvl1" type="Button" parent="Control/BottomContainer/ExpeditionCard/Margin/ExpeditionVBox/LevelSelectRow1"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(95, 32)
+custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
 theme_override_styles/normal = SubResource("StyleBoxFlat_lvl_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_lvl_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_lvl_selected")
 text = "Level 1"
 
-[node name="BtnLvl2" type="Button" parent="Control/BottomContainer/LevelSelectRow1"]
+[node name="BtnLvl2" type="Button" parent="Control/BottomContainer/ExpeditionCard/Margin/ExpeditionVBox/LevelSelectRow1"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(95, 32)
+custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
 theme_override_styles/normal = SubResource("StyleBoxFlat_lvl_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_lvl_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_lvl_selected")
 text = "Level 2"
 
-[node name="BtnLvl3" type="Button" parent="Control/BottomContainer/LevelSelectRow1"]
+[node name="BtnLvl3" type="Button" parent="Control/BottomContainer/ExpeditionCard/Margin/ExpeditionVBox/LevelSelectRow1"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(95, 32)
+custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
 theme_override_styles/normal = SubResource("StyleBoxFlat_lvl_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_lvl_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_lvl_selected")
 text = "Level 3"
 
-[node name="LevelSelectRow2" type="HBoxContainer" parent="Control/BottomContainer"]
+[node name="LevelSelectRow2" type="HBoxContainer" parent="Control/BottomContainer/ExpeditionCard/Margin/ExpeditionVBox"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 10
 alignment = 1
 
-[node name="BtnLvl4" type="Button" parent="Control/BottomContainer/LevelSelectRow2"]
+[node name="BtnLvl4" type="Button" parent="Control/BottomContainer/ExpeditionCard/Margin/ExpeditionVBox/LevelSelectRow2"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(95, 32)
+custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
 theme_override_styles/normal = SubResource("StyleBoxFlat_lvl_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_lvl_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_lvl_selected")
 text = "Level 4"
 
-[node name="BtnLvl5" type="Button" parent="Control/BottomContainer/LevelSelectRow2"]
+[node name="BtnLvl5" type="Button" parent="Control/BottomContainer/ExpeditionCard/Margin/ExpeditionVBox/LevelSelectRow2"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(95, 32)
+custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
 theme_override_styles/normal = SubResource("StyleBoxFlat_lvl_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_lvl_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_lvl_selected")
 text = "Level 5"
 
-[node name="BtnLvl6" type="Button" parent="Control/BottomContainer/LevelSelectRow2"]
+[node name="BtnLvl6" type="Button" parent="Control/BottomContainer/ExpeditionCard/Margin/ExpeditionVBox/LevelSelectRow2"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(95, 32)
+custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
 theme_override_styles/normal = SubResource("StyleBoxFlat_lvl_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_lvl_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_lvl_selected")
 text = "Level 6"
+
+[node name="StartButton" type="Button" parent="Control/BottomContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 78)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.08, 0.22, 0.08, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxFlat_start_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_start_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_start_pressed")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_start_disabled")
+text = "⚓ SET SAIL ⚓"
 
 [node name="ActionHBox" type="HBoxContainer" parent="Control/BottomContainer"]
 layout_mode = 2
@@ -296,62 +389,50 @@ alignment = 1
 
 [node name="ShipyardButton" type="Button" parent="Control/BottomContainer/ActionHBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(125, 52)
+custom_minimum_size = Vector2(0, 58)
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1, 0.95, 0.8, 1)
 theme_override_colors/font_outline_color = Color(0.05, 0.1, 0.2, 1)
-theme_override_constants/outline_size = 3
-theme_override_font_sizes/font_size = 14
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 18
 theme_override_styles/normal = SubResource("StyleBoxFlat_shipyard_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_shipyard_hover")
 text = "⚓ SHIPYARD"
 
-[node name="StartButton" type="Button" parent="Control/BottomContainer/ActionHBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(145, 52)
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_outline_color = Color(0.1, 0.25, 0.1, 1)
-theme_override_constants/outline_size = 4
-theme_override_font_sizes/font_size = 18
-theme_override_styles/normal = SubResource("StyleBoxFlat_start_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_start_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_start_pressed")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_start_disabled")
-text = "SET SAIL"
-
 [node name="SettingsButton" type="Button" parent="Control/BottomContainer/ActionHBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(125, 52)
+custom_minimum_size = Vector2(0, 58)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.9, 0.95, 1, 1)
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.92, 0.96, 1, 1)
 theme_override_colors/font_outline_color = Color(0.1, 0.15, 0.25, 1)
-theme_override_constants/outline_size = 3
-theme_override_font_sizes/font_size = 14
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 18
 theme_override_styles/normal = SubResource("StyleBoxFlat_settings_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_settings_hover")
 text = "⚙ SETTINGS"
 
 [node name="ResetButton" type="Button" parent="Control/BottomContainer/ActionHBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(100, 52)
+custom_minimum_size = Vector2(0, 58)
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1, 0.9, 0.9, 1)
 theme_override_colors/font_outline_color = Color(0.2, 0.05, 0.05, 1)
-theme_override_constants/outline_size = 3
-theme_override_font_sizes/font_size = 14
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 17
 theme_override_styles/normal = SubResource("StyleBoxFlat_reset_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_reset_hover")
 text = "🔄 RESET"
 
-
 [node name="TapHint" type="Label" parent="Control/BottomContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.78, 0.82, 0.85, 1)
-theme_override_colors/font_outline_color = Color(0.05, 0.05, 0.05, 0.8)
-theme_override_constants/outline_size = 2
-theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.85, 0.9, 0.94, 0.95)
+theme_override_colors/font_outline_color = Color(0.04, 0.06, 0.08, 0.9)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 16
 text = "Swipe / Drag to Steer & Aim Cannons"
 horizontal_alignment = 1
 vertical_alignment = 1

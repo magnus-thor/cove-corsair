@@ -72,7 +72,10 @@ func _apply_weapon_data() -> void:
 			
 			if model_mesh:
 				model_mesh.visible = true
-				model_mesh.scale = Vector3(0.35, 0.35, 0.35)
+				var crew_scale = Vector3(0.525, 0.525, 0.525)
+				if "model_scale" in weapon_data and weapon_data.model_scale != Vector3.ZERO and weapon_data.model_scale != Vector3(0.4, 0.4, 0.4):
+					crew_scale = weapon_data.model_scale * 1.5
+				model_mesh.scale = crew_scale
 				model_mesh.position = Vector3.ZERO
 
 			if not hop_in_done and model_container:

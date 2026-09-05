@@ -621,16 +621,17 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 		# ── Reef hazard ───────────────────────────────────────────────────────
 		"reef_hazard":
 			var x_norm   = float(event.get("x", 0.0))
-			var scale_x  = clampf(float(event.get("scale_x", 2.0)), 1.0, 2.0)
-			var scale_z  = float(event.get("scale_z", 8.0))
+			var scale_x  = clampf(float(event.get("scale_x", 1.2)), 0.6, 2.5)
+			var scale_z  = clampf(float(event.get("scale_z", 1.0)), 0.8, 1.5)
 			var half_w   = 1.2 * scale_x
 			var x_world  = clampf(normalized_to_world_x(x_norm), -5.8 + half_w, 5.8 - half_w)
 			var reef_prefab = preload("res://src/gameplay/obstacles/hazard_reef.tscn")
 			if reef_prefab:
 				var reef = reef_prefab.instantiate() as Area3D
 				add_child(reef)
-				reef.global_position = Vector3(x_world, -0.05, z_spawn)
+				reef.global_position = Vector3(x_world, 0.0, z_spawn)
 				reef.scale = Vector3(scale_x, 1.0, scale_z)
+
 
 		# ── Armored Turtle Rafts ───────────────────────────────────────────────
 		"turtle_rafts":
