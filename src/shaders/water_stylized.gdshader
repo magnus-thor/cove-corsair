@@ -1,5 +1,6 @@
 shader_type spatial;
-render_mode blend_mix, depth_draw_always, cull_back, diffuse_burley, specular_schlick_ggx;
+render_mode blend_mix, depth_draw_opaque, cull_back, diffuse_burley, specular_schlick_ggx;
+
 
 uniform vec4 albedo : source_color = vec4(0.08, 0.58, 0.82, 0.88);
 uniform float roughness : hint_range(0.0, 1.0) = 0.05;
@@ -37,3 +38,4 @@ void fragment() {
     vec3 ref_sample = texture(texture_refraction, tri_uv).rgb;
     NORMAL = mix(NORMAL, normal_sample, refraction_strength);
 }
+

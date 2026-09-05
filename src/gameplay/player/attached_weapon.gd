@@ -11,6 +11,7 @@ extends Node3D
 @export var projectile_scene: PackedScene = preload("res://src/gameplay/projectiles/cannonball.tscn")
 
 @onready var sprite_3d: Sprite3D = $Sprite3D
+@onready var model_container: Node3D = $ModelContainer
 @onready var muzzle_point: Marker3D = $MuzzlePoint
 
 var fire_timer: float = 0.0
@@ -44,45 +45,94 @@ func _apply_weapon_data() -> void:
 	if not weapon_data:
 		return
 	
-	if sprite_3d:
-		sprite_3d.texture = weapon_data.sprite_texture
-		
-		var w_name = weapon_data.weapon_name.to_lower()
-		var w_type = weapon_data.weapon_type.to_lower()
-		var is_crew = _is_crew()
-		
-		if is_crew:
-			sprite_3d.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
-			sprite_3d.rotation_degrees = Vector3.ZERO
-			sprite_3d.render_priority = 4
-			sprite_3d.pixel_size = 0.0022
-			sprite_3d.position.y = 0.12
-		elif "swivel" in w_name or "bow" in w_name or "chaser" in w_name or w_type == "swivel_gun" or w_type == "cannon":
-			sprite_3d.pixel_size = weapon_data.pixel_size if weapon_data.pixel_size > 0.0 else 0.0016
-			sprite_3d.billboard = BaseMaterial3D.BILLBOARD_DISABLED
-			sprite_3d.rotation_degrees = Vector3(-60.0, 0, 0)
-			sprite_3d.render_priority = 3
-			sprite_3d.position.y = 0.05
-		else:
-			sprite_3d.pixel_size = weapon_data.pixel_size if weapon_data.pixel_size > 0.0 else 0.0028
-			sprite_3d.billboard = BaseMaterial3D.BILLBOARD_DISABLED
-			sprite_3d.rotation_degrees = Vector3(-60.0, 0, 0)
-			sprite_3d.render_priority = 3
-			sprite_3d.position.y = 0.05
+	var is_crew = _is_crew()
+	var w_name = weapon_data.weapon_name.to_lower()
+	var w_type = weapon_data.weapon_type.to_lower()
+
+	if is_crew:
+		if sprite_3d:
+			sprite_3d.visible = false
+		if model_container:
+			model_container.visible = true
+			var glb_path = "res://assets/models/user/crew/monkey_crew.glb"
+			if "skeleton" in w_name or "tosser" in w_name:
+				glb_path = "res://assets/models/user/crew/skeleton_crew.glb"
 			
-		sprite_3d.centered = true
-		sprite_3d.offset = Vector2(0, 0)
+			var model_mesh = model_container.get_node_or_null("CrewMesh")
+			if not model_mesh or model_mesh.get_meta("glb_path", "") != glb_path:
+				for child in model_container.get_children():
+					child.queue_free()
+				if ResourceLoader.exists(glb_path):
+					var scene = load(glb_path)
+					if scene:
+						model_mesh = scene.instantiate()
+						model_mesh.name = "CrewMesh"
+						model_mesh.set_meta("glb_path", glb_path)
+						model_container.add_child(model_mesh)
+			
+			if model_mesh:
+				model_mesh.visible = true
+				model_mesh.scale = Vector3(0.35, 0.35, 0.35)
+				model_mesh.position = Vector3.ZERO
+
+			if not hop_in_done and model_container:
+				hop_in_done = true
+				model_container.scale = Vector3.ZERO
+				var tween = create_tween()
+				tween.tween_property(model_container, "scale", Vector3(1.1, 1.1, 1.1), 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+				tween.tween_property(model_container, "scale", Vector3.ONE, 0.15).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+				AudioManager.play_sfx("gate_passes")
+	else:
+		var cannon_glb = "res://assets/models/user/weapons/cannon.glb"
+		var model_to_load: PackedScene = null
+		if "model_scene" in weapon_data and weapon_data.model_scene:
+			model_to_load = weapon_data.model_scene
+		elif ResourceLoader.exists(cannon_glb) and ("cannon" in w_type or "cannon" in w_name or "chaser" in w_name or "swivel" in w_name or "mortar" in w_name):
+			model_to_load = load(cannon_glb)
 		
-		# Energetic hop-in tween when crew member first equips
-		if is_crew and not hop_in_done:
-			hop_in_done = true
-			sprite_3d.scale = Vector3.ZERO
-			var tween = create_tween()
-			tween.tween_property(sprite_3d, "scale", Vector3(1.2, 1.2, 1.2), 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-			tween.tween_property(sprite_3d, "scale", Vector3.ONE, 0.15).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-			AudioManager.play_sfx("gate_passes")
-		elif not is_crew:
-			sprite_3d.scale = Vector3.ONE
+		if model_to_load:
+			if sprite_3d:
+				sprite_3d.visible = false
+			if model_container:
+				model_container.visible = true
+				var model_mesh = model_container.get_node_or_null("WeaponMesh")
+				if not model_mesh or model_mesh.get_meta("model_source", null) != model_to_load:
+					for child in model_container.get_children():
+						child.queue_free()
+					model_mesh = model_to_load.instantiate()
+					model_mesh.name = "WeaponMesh"
+					model_mesh.set_meta("model_source", model_to_load)
+					model_container.add_child(model_mesh)
+				
+				if model_mesh:
+					model_mesh.visible = true
+					var m_scale = weapon_data.model_scale if ("model_scale" in weapon_data and weapon_data.model_scale != Vector3.ZERO) else Vector3(0.4, 0.4, 0.4)
+					model_mesh.scale = m_scale
+					var m_rot = weapon_data.model_rotation_degrees if ("model_rotation_degrees" in weapon_data and weapon_data.model_rotation_degrees != Vector3.ZERO) else Vector3(0, 90, 0)
+					model_mesh.rotation_degrees = m_rot
+					var m_offset = weapon_data.model_offset if "model_offset" in weapon_data else Vector3(0, 0.12, 0)
+					model_mesh.position = m_offset
+		else:
+			if model_container:
+				model_container.visible = false
+			if sprite_3d:
+				sprite_3d.visible = true
+				sprite_3d.texture = weapon_data.sprite_texture
+				if "swivel" in w_name or "bow" in w_name or "chaser" in w_name or w_type == "swivel_gun" or w_type == "cannon":
+					sprite_3d.pixel_size = weapon_data.pixel_size if weapon_data.pixel_size > 0.0 else 0.0016
+					sprite_3d.billboard = BaseMaterial3D.BILLBOARD_DISABLED
+					sprite_3d.rotation_degrees = Vector3(-60.0, 0, 0)
+					sprite_3d.render_priority = 3
+					sprite_3d.position.y = 0.05
+				else:
+					sprite_3d.pixel_size = weapon_data.pixel_size if weapon_data.pixel_size > 0.0 else 0.0028
+					sprite_3d.billboard = BaseMaterial3D.BILLBOARD_DISABLED
+					sprite_3d.rotation_degrees = Vector3(-60.0, 0, 0)
+					sprite_3d.render_priority = 3
+					sprite_3d.position.y = 0.05
+				sprite_3d.centered = true
+				sprite_3d.offset = Vector2(0, 0)
+				sprite_3d.scale = Vector3.ONE
 		
 	rotation_degrees.y = weapon_data.spread_angle_deg
 	
@@ -101,7 +151,7 @@ func _apply_weapon_data() -> void:
 	idle_timer = randf_range(0.0, TAU)
 
 	var fallback = get_node_or_null("FallbackMesh") as MeshInstance3D
-	if weapon_data.sprite_texture == null:
+	if weapon_data.sprite_texture == null and not is_crew:
 		if not fallback:
 			fallback = MeshInstance3D.new()
 			fallback.name = "FallbackMesh"
@@ -134,20 +184,30 @@ func _physics_process(delta: float) -> void:
 	if is_crew:
 		_process_deck_idle(delta)
 		_process_targeting(delta)
+		# Smooth Y-Axis rotation aiming to face locked targets within 20.0m range
+		if current_target and is_instance_valid(current_target):
+			var m_pos = muzzle_point.global_position if muzzle_point else global_position
+			var to_target = (current_target.global_position - m_pos)
+			to_target.y = 0.0
+			if to_target.length_squared() > 0.001:
+				var target_yaw = atan2(-to_target.x, -to_target.z)
+				rotation.y = lerp_angle(rotation.y, target_yaw, 10.0 * delta)
+		else:
+			rotation.y = lerp_angle(rotation.y, deg_to_rad(weapon_data.spread_angle_deg), 5.0 * delta)
 	else:
 		aim_direction = Vector3(0, 0, -1)
 
 func _process_deck_idle(delta: float) -> void:
-	if not sprite_3d:
-		return
-		
 	idle_timer += delta * 5.0
 	
-	# Idle Bob & Squash/Stretch
-	if not (throw_tween and throw_tween.is_running()):
-		sprite_3d.scale.y = 1.0 + sin(idle_timer) * 0.06
-		sprite_3d.scale.x = 1.0 - sin(idle_timer) * 0.04
-		sprite_3d.rotation_degrees.z = sin(idle_timer * 0.8) * 3.0
+	if model_container and model_container.visible:
+		if not (throw_tween and throw_tween.is_running()):
+			model_container.position.y = sin(idle_timer * 0.8) * 0.02
+	elif sprite_3d and sprite_3d.visible:
+		if not (throw_tween and throw_tween.is_running()):
+			sprite_3d.scale.y = 1.0 + sin(idle_timer) * 0.06
+			sprite_3d.scale.x = 1.0 - sin(idle_timer) * 0.04
+			sprite_3d.rotation_degrees.z = sin(idle_timer * 0.8) * 3.0
 	
 	# Deck Shuffling / Pacing
 	wander_timer -= delta
@@ -158,9 +218,11 @@ func _process_deck_idle(delta: float) -> void:
 		
 		if wander_tween and wander_tween.is_running():
 			wander_tween.kill()
-		wander_tween = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-		wander_tween.tween_property(sprite_3d, "position:x", offset_x, 0.4)
-		wander_tween.parallel().tween_property(sprite_3d, "position:z", offset_z, 0.4)
+		var active_node: Node3D = model_container if (model_container and model_container.visible) else sprite_3d
+		if active_node:
+			wander_tween = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+			wander_tween.tween_property(active_node, "position:x", offset_x, 0.4)
+			wander_tween.parallel().tween_property(active_node, "position:z", offset_z, 0.4)
 
 func _process_targeting(_delta: float) -> void:
 	var is_crew: bool = _is_crew()
@@ -172,7 +234,6 @@ func _process_targeting(_delta: float) -> void:
 	for grp in ["enemies", "destructible", "destructible_obstacles", "obstacles"]:
 		for node in get_tree().get_nodes_in_group(grp):
 			if is_instance_valid(node) and not node.is_in_group("boss") and not (node is BossWarBarge) and not (node is BossComponentDelegate):
-				# Must be something that can actually take damage
 				if node.has_method("take_damage") or (node.get_parent() and node.get_parent().has_method("take_damage")):
 					spawn_candidates.append(node)
 				
@@ -201,14 +262,12 @@ func _process_targeting(_delta: float) -> void:
 		processed[target] = true
 		
 		var node3d = target as Node3D
-		# Must be in front of the boat
 		if node3d.global_position.z > (boat_z - 0.2):
 			continue
 			
 		var to_target = (node3d.global_position - m_pos_ref)
 		to_target.y = 0.0
 		var dir_norm = to_target.normalized()
-		# Forward combat arc: reject targets beyond +/- 70 degrees from upstream (-Z)
 		if -dir_norm.z < 0.35:
 			continue
 			
@@ -223,7 +282,7 @@ func _process_targeting(_delta: float) -> void:
 				
 	best_target = best_unclaimed if best_unclaimed else best_target
 			
-	# If no spawns or threats are alive, fallback to targeting the boss
+	# Fallback to boss
 	if not best_target:
 		var boss_candidates: Array[Node] = []
 		for node in get_tree().get_nodes_in_group("boss"):
@@ -264,20 +323,12 @@ func _process_targeting(_delta: float) -> void:
 	if current_target and is_instance_valid(current_target):
 		var m_pos = muzzle_point.global_position if muzzle_point else global_position
 		var dir_to_target = (current_target.global_position - m_pos)
-		dir_to_target.y = 0.0 # Maintain flat water level trajectory
+		dir_to_target.y = 0.0
 		if dir_to_target.z >= -0.2:
-			dir_to_target.z = -0.2 # Clamp to forward
+			dir_to_target.z = -0.2
 		aim_direction = dir_to_target.normalized() if dir_to_target.length_squared() > 0.001 else Vector3(0, 0, -1)
-		
-		# Flip sprite left/right based on target relative to boat
-		if sprite_3d:
-			var relative_x = current_target.global_position.x - global_position.x
-			sprite_3d.flip_h = (relative_x < 0.0)
 	else:
-		# Default forward direction upstream (-Z) towards approaching enemies
 		aim_direction = Vector3(0, 0, -1)
-		if sprite_3d:
-			sprite_3d.flip_h = false
 
 func try_fire(p_projectile_scene = null, world_container = null) -> void:
 	if p_projectile_scene is float or p_projectile_scene is int:
@@ -302,6 +353,10 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 	
 	if is_crew:
 		_trigger_throw_anim()
+	elif model_container and model_container.visible:
+		var recoil_tween = create_tween()
+		recoil_tween.tween_property(model_container, "position:z", 0.08, 0.04).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		recoil_tween.tween_property(model_container, "position:z", 0.0, 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 		
 	AudioManager.play_sfx("cannon_shots")
 	
@@ -310,7 +365,6 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 		var spawn_pos = muzzle_point.global_position
 		spawn_pos.y = max(0.48, spawn_pos.y)
 		
-		# Mark projectile as fired from BowMount for boss weakpoint checks
 		var socket_name = get_parent().name.to_lower() if get_parent() else ""
 		if "bow" in socket_name:
 			ball.set_meta("from_bow", true)
@@ -319,7 +373,6 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 		if is_crew:
 			proj_dir = aim_direction if aim_direction != Vector3.ZERO else Vector3(0, 0, -1)
 		else:
-			# Naval weapons fire forward along the vessel's heading with their calibrated spread angle
 			if weapon_data.has_method("get_firing_direction"):
 				proj_dir = weapon_data.get_firing_direction(Vector3(0, 0, -1))
 			else:
@@ -350,24 +403,21 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 		var player = get_tree().get_first_node_in_group("player")
 		if player and "base_damage_bonus" in player and "damage" in ball:
 			ball.damage += player.base_damage_bonus
-			
-		if GameState.boss_spawned:
-			print("[WEAPON FIRE] %s (Socket: %s) fired at %s | Dir: %s | Target: %s" % [
-				weapon_data.weapon_name,
-				socket_name,
-				ball.global_position,
-				proj_dir,
-				str(current_target.name) if (current_target and is_instance_valid(current_target)) else "none"
-			])
 
 func _trigger_throw_anim() -> void:
-	if not sprite_3d:
-		return
-	if throw_tween and throw_tween.is_running():
-		throw_tween.kill()
-		
-	throw_tween = create_tween()
-	throw_tween.tween_property(sprite_3d, "scale", Vector3(1.3, 0.7, 1.0), 0.08)
-	throw_tween.tween_property(sprite_3d, "position:y", 0.24, 0.12).set_trans(Tween.TRANS_BOUNCE)
-	throw_tween.tween_property(sprite_3d, "position:y", 0.12, 0.14)
-	throw_tween.parallel().tween_property(sprite_3d, "scale", Vector3(1.0, 1.0, 1.0), 0.14)
+	if model_container and model_container.visible:
+		if throw_tween and throw_tween.is_running():
+			throw_tween.kill()
+		throw_tween = create_tween()
+		# 0.15s procedural pitch tilt tween (pitch back and forward) to simulate axe/bomb toss
+		throw_tween.tween_property(model_container, "rotation_degrees:x", -25.0, 0.06).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		throw_tween.tween_property(model_container, "rotation_degrees:x", 15.0, 0.05).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		throw_tween.tween_property(model_container, "rotation_degrees:x", 0.0, 0.04).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	elif sprite_3d and sprite_3d.visible:
+		if throw_tween and throw_tween.is_running():
+			throw_tween.kill()
+		throw_tween = create_tween()
+		throw_tween.tween_property(sprite_3d, "scale", Vector3(1.3, 0.7, 1.0), 0.08)
+		throw_tween.tween_property(sprite_3d, "position:y", 0.24, 0.12).set_trans(Tween.TRANS_BOUNCE)
+		throw_tween.tween_property(sprite_3d, "position:y", 0.12, 0.14)
+		throw_tween.parallel().tween_property(sprite_3d, "scale", Vector3(1.0, 1.0, 1.0), 0.14)

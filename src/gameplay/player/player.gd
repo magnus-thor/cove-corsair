@@ -161,25 +161,68 @@ func apply_ship_data(data: ShipData) -> void:
 	lerp_speed = data.move_speed * 1.3
 	
 	if visuals:
+		var boat_mesh = visuals.get_node_or_null("BoatMesh")
 		var sprite = visuals.get_node_or_null("BoatSprite") as Sprite3D
-		if not sprite:
-			for child in visuals.get_children():
-				if not child.name.begins_with("Cal_"):
-					child.queue_free()
-			sprite = Sprite3D.new()
-			sprite.name = "BoatSprite"
-			visuals.add_child(sprite)
-			
-		sprite.visible = true
-		sprite.texture = data.sprite_texture
-		sprite.pixel_size = data.pixel_size
-		var rot = data.rotation_degrees if ("rotation_degrees" in data and data.rotation_degrees != Vector3.ZERO) else Vector3(player_pitch_deg, 0, 0)
-		sprite.rotation_degrees = rot
-		sprite.position = Vector3(0, data.y_offset if "y_offset" in data else 0.485, 0)
-		var sc = data.scale if ("scale" in data and data.scale != Vector3.ZERO) else Vector3.ONE
-		sprite.scale = sc
-		sprite.billboard = BaseMaterial3D.BILLBOARD_DISABLED
-		sprite.alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
+
+		# Determine whether this vessel has a 3D model assigned
+		var model_to_load: PackedScene = null
+		if "model_scene" in data and data.model_scene:
+			model_to_load = data.model_scene
+		elif data.ship_id == "dinghy":
+			var dinghy_glb = "res://assets/models/user/vessels/dinghy.glb"
+			if ResourceLoader.exists(dinghy_glb):
+				model_to_load = load(dinghy_glb)
+
+		if model_to_load:
+			if sprite:
+				sprite.visible = false
+			var is_same_model = false
+			if boat_mesh:
+				if boat_mesh.has_meta("model_source") and boat_mesh.get_meta("model_source") == model_to_load:
+					is_same_model = true
+				elif not boat_mesh.has_meta("model_source") and model_to_load.resource_path.ends_with("dinghy.glb"):
+					boat_mesh.set_meta("model_source", model_to_load)
+					is_same_model = true
+
+			if boat_mesh and not is_same_model:
+				visuals.remove_child(boat_mesh)
+				boat_mesh.queue_free()
+				boat_mesh = null
+
+			if not boat_mesh:
+				boat_mesh = model_to_load.instantiate()
+				boat_mesh.name = "BoatMesh"
+				boat_mesh.set_meta("model_source", model_to_load)
+				visuals.add_child(boat_mesh)
+
+			if boat_mesh:
+				boat_mesh.visible = true
+				boat_mesh.position = Vector3(0, data.y_offset if "y_offset" in data else 0.0, 0)
+				boat_mesh.rotation_degrees = data.rotation_degrees if ("rotation_degrees" in data and data.rotation_degrees != Vector3.ZERO) else Vector3.ZERO
+				var sc = data.scale if ("scale" in data and data.scale != Vector3.ZERO) else Vector3.ONE
+				boat_mesh.scale = sc
+				if data.ship_id == "dinghy" and not boat_mesh.has_node("CockpitWaterMask"):
+					var mask = MeshInstance3D.new()
+					mask.name = "CockpitWaterMask"
+					mask.mesh = preload("res://assets/models/user/vessels/dinghy_cockpit_mask.tres")
+					boat_mesh.add_child(mask)
+		elif data.sprite_texture:
+			if boat_mesh:
+				boat_mesh.visible = false
+			if not sprite:
+				sprite = Sprite3D.new()
+				sprite.name = "BoatSprite"
+				visuals.add_child(sprite)
+			sprite.visible = true
+			sprite.texture = data.sprite_texture
+			sprite.pixel_size = data.pixel_size
+			var rot = data.rotation_degrees if ("rotation_degrees" in data and data.rotation_degrees != Vector3.ZERO) else Vector3(player_pitch_deg, 0, 0)
+			sprite.rotation_degrees = rot
+			sprite.position = Vector3(0, data.y_offset if "y_offset" in data else 0.485, 0)
+			var sc = data.scale if ("scale" in data and data.scale != Vector3.ZERO) else Vector3.ONE
+			sprite.scale = sc
+			sprite.billboard = BaseMaterial3D.BILLBOARD_DISABLED
+			sprite.alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
 	
 	# Update main character collision shape
 	var body_col = get_node_or_null("CollisionShape3D") as CollisionShape3D

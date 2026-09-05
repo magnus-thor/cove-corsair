@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://c0hx7vbdrutb7"
-path="res://.godot/imported/the_dinghy.glb-7e34a244b75ee3498ac476f60fcf983c.scn"
+uid="uid://v00jmx7xnglw"
+path="res://.godot/imported/captain_bone-beard’s_twin_frigate.glb-8044c0f7c3545792eb908c827fd45c10.scn"
 
 [deps]
 
-source_file="res://assets/models/user/vessels/the_dinghy.glb"
-dest_files=["res://.godot/imported/the_dinghy.glb-7e34a244b75ee3498ac476f60fcf983c.scn"]
+source_file="res://assets/models/enemy/vessels/captain_bone-beard’s_twin_frigate.glb"
+dest_files=["res://.godot/imported/captain_bone-beard’s_twin_frigate.glb-8044c0f7c3545792eb908c827fd45c10.scn"]
 
 [params]
 

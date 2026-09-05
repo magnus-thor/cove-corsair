@@ -34,15 +34,16 @@ var _flash_tween: Tween
 @export var doubloon_scene: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
 @export var explosion_scene: PackedScene = preload("res://src/gameplay/vfx/barrel_explosion.tscn")
 
-@onready var boss_sprite: Sprite3D = $BossSprite
+@onready var visual_container: Node3D = get_node_or_null("VisualContainer") if get_node_or_null("VisualContainer") else get_node_or_null("BossSprite")
 @onready var hit_box: Area3D = $HitBox
 
 func _ready() -> void:
 	add_to_group("enemies")
 	add_to_group("boss")
 	current_hp = max_hp
-	if boss_sprite:
-		boss_sprite.position.y = _base_y
+	_base_y = 0.0
+	if visual_container:
+		visual_container.position.y = _base_y
 	
 	GameState.boss_spawned_event.emit("The Phantom Dredge", max_hp)
 	GameState.boss_health_changed.emit(current_hp, max_hp)
@@ -77,8 +78,8 @@ func _process_combat(delta: float) -> void:
 	global_position.x = sin(_weave_time) * patrol_width
 	
 	# Bobbing
-	if boss_sprite:
-		boss_sprite.position.y = _base_y + sin(_weave_time * 2.5) * 0.08
+	if visual_container:
+		visual_container.position.y = _base_y + sin(_weave_time * 2.5) * 0.08
 		
 	# Poison Mortar
 	_mortar_timer += delta
@@ -176,11 +177,10 @@ func _start_submerge() -> void:
 	_submerge_duration = 3.8
 	AudioManager.play_sfx("water_splashes", 0.5, 0.7, 2.0)
 	
-	# Submerge animation
-	if boss_sprite:
+	# Submerge animation: Dive down below the water plane (Y = -3.5)
+	if visual_container:
 		var tween = create_tween().set_parallel(true)
-		tween.tween_property(boss_sprite, "position:y", -0.8, 0.6).set_trans(Tween.TRANS_SINE)
-		tween.tween_property(boss_sprite, "modulate:a", 0.25, 0.6)
+		tween.tween_property(visual_container, "position:y", -3.5, 0.8).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 		
 	# Disable hitbox while underwater
 	if hit_box:
@@ -213,7 +213,6 @@ func _rain_submerged_mobs() -> void:
 
 func _process_submerged(delta: float) -> void:
 	_submerge_duration -= delta
-	# Still slowly moves while underwater
 	global_position.x = sin(combat_time * 1.5) * patrol_width
 	
 	if _submerge_duration <= 0.0:
@@ -242,7 +241,6 @@ func _emit_water_shockwave() -> void:
 		shockwave.queue_free()
 	)
 	
-	# Camera shudder
 	var camera = get_tree().get_first_node_in_group("game_camera")
 	if camera and camera.has_method("shake"):
 		camera.shake(0.18, 0.16)
@@ -251,16 +249,14 @@ func _resurface() -> void:
 	current_state = State.COMBAT
 	AudioManager.play_sfx("water_splashes", 0.6, 0.8, 3.0)
 	
-	if boss_sprite:
+	if visual_container:
 		var tween = create_tween().set_parallel(true)
-		tween.tween_property(boss_sprite, "position:y", _base_y, 0.5).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-		tween.tween_property(boss_sprite, "modulate:a", 1.0, 0.4)
+		tween.tween_property(visual_container, "position:y", _base_y, 0.6).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		
 	if hit_box:
 		hit_box.set_deferred("monitoring", true)
 		hit_box.set_deferred("monitorable", true)
 		
-	# Immediate poison mortar burst on resurfacing
 	_fire_poison_mortars()
 
 func _spawn_bayou_adds(lane_x_override: float = NAN, type_choice: int = -1) -> void:
@@ -279,7 +275,6 @@ func _spawn_bayou_adds(lane_x_override: float = NAN, type_choice: int = -1) -> v
 		skiff.max_hp = 12 if current_phase >= 2 else 10
 		skiff.current_hp = skiff.max_hp
 		skiff.forward_speed = 3.0
-		print("[BOSS MINION] Spawning Grave Skiff at x=%.2f | HP=%d" % [lx, skiff.max_hp])
 	elif tide_cutter_scene:
 		var cutter = tide_cutter_scene.instantiate() as Area3D
 		parent.add_child(cutter)
@@ -287,7 +282,6 @@ func _spawn_bayou_adds(lane_x_override: float = NAN, type_choice: int = -1) -> v
 		cutter.max_hp = 16 if current_phase >= 2 else 14
 		cutter.current_hp = cutter.max_hp
 		cutter.forward_speed = 5.0
-		print("[BOSS MINION] Spawning Tide Cutter at x=%.2f | HP=%d" % [lx, cutter.max_hp])
 
 func take_damage(amount: int) -> void:
 	if _is_defeated or current_state == State.SUBMERGED:
@@ -298,7 +292,6 @@ func take_damage(amount: int) -> void:
 	GameState.boss_health_changed.emit(current_hp, max_hp)
 	_flash_boss()
 	
-	# Floating damage number
 	var ft_script = load("res://src/gameplay/vfx/floating_text.gd")
 	if ft_script:
 		var fct = ft_script.new()
@@ -314,13 +307,13 @@ func take_damage(amount: int) -> void:
 		_check_phase()
 
 func _flash_boss() -> void:
-	if not boss_sprite:
+	if not visual_container:
 		return
 	if _flash_tween and _flash_tween.is_valid():
 		_flash_tween.kill()
 	_flash_tween = create_tween()
-	_flash_tween.tween_property(boss_sprite, "modulate", Color(2.0, 3.0, 2.0, 1.0), 0.05)
-	_flash_tween.tween_property(boss_sprite, "modulate", Color.WHITE, 0.1)
+	_flash_tween.tween_property(visual_container, "scale", Vector3(1.06, 1.06, 1.06), 0.05)
+	_flash_tween.tween_property(visual_container, "scale", Vector3.ONE, 0.1)
 
 func _check_phase() -> void:
 	if current_phase == 1 and current_hp <= int(max_hp * 0.7):
@@ -330,8 +323,6 @@ func _check_phase() -> void:
 	elif current_phase == 2 and current_hp <= int(max_hp * 0.3):
 		current_phase = 3
 		weave_speed = 2.0
-		if boss_sprite:
-			boss_sprite.modulate = Color(0.4, 2.2, 0.8, 1.0)
 		AudioManager.play_sfx("gate_passes", 0.7, 0.9)
 
 func boss_defeat() -> void:

@@ -2,21 +2,21 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ct5xgjoafs3ep"
-path.s3tc="res://.godot/imported/Meshy_AI_Monkey_Buccaneer_0831161647_texture_base_color.jpg-8c7ee4160e127bda0b7495ee13a80f51.s3tc.ctex"
-path.etc2="res://.godot/imported/Meshy_AI_Monkey_Buccaneer_0831161647_texture_base_color.jpg-8c7ee4160e127bda0b7495ee13a80f51.etc2.ctex"
+uid="uid://4k4cem71e45g"
+path.s3tc="res://.godot/imported/ghost_sloop_1.jpg-312817ca7dc276d25e153cd2cec7104c.s3tc.ctex"
+path.etc2="res://.godot/imported/ghost_sloop_1.jpg-312817ca7dc276d25e153cd2cec7104c.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "b79645db9872d48b8b1ca1e507749172"
+"md5": "baaa01082b65398c6a0cc2ade1081475"
 }
 
 [deps]
 
-source_file="res://assets/models/user/crew/Meshy_AI_Monkey_Buccaneer_0831161647_texture_base_color.jpg"
-dest_files=["res://.godot/imported/Meshy_AI_Monkey_Buccaneer_0831161647_texture_base_color.jpg-8c7ee4160e127bda0b7495ee13a80f51.s3tc.ctex", "res://.godot/imported/Meshy_AI_Monkey_Buccaneer_0831161647_texture_base_color.jpg-8c7ee4160e127bda0b7495ee13a80f51.etc2.ctex"]
+source_file="res://assets/models/enemy/vessels/ghost_sloop_1.jpg"
+dest_files=["res://.godot/imported/ghost_sloop_1.jpg-312817ca7dc276d25e153cd2cec7104c.s3tc.ctex", "res://.godot/imported/ghost_sloop_1.jpg-312817ca7dc276d25e153cd2cec7104c.etc2.ctex"]
 
 [params]
 

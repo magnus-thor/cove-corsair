@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://dfanf3poxcqt3"
-path="res://.godot/imported/Meshy_AI_Monkey_Buccaneer_0831161647_texture.glb-a0bc6b99759eb4ab0e8ccfa69f036e2d.scn"
+uid="uid://c6g87b3xejoho"
+path="res://.godot/imported/boss_war_barge.glb-a803a46264f116c04cb718e3c850961b.scn"
 
 [deps]
 
-source_file="res://assets/models/user/crew/Meshy_AI_Monkey_Buccaneer_0831161647_texture.glb"
-dest_files=["res://.godot/imported/Meshy_AI_Monkey_Buccaneer_0831161647_texture.glb-a0bc6b99759eb4ab0e8ccfa69f036e2d.scn"]
+source_file="res://assets/models/enemy/vessels/boss_war_barge.glb"
+dest_files=["res://.godot/imported/boss_war_barge.glb-a803a46264f116c04cb718e3c850961b.scn"]
 
 [params]
 

@@ -14,7 +14,7 @@ enum State { APPROACHING, COMBAT, DYING }
 @export var explosion_scene: PackedScene = preload("res://src/gameplay/vfx/barrel_explosion.tscn")
 @export var powder_keg_scene: PackedScene = preload("res://src/gameplay/obstacles/destructible_barrel.tscn")
 
-@onready var boss_sprite: Sprite3D = $BossSprite
+@onready var boss_sprite: Node3D = get_node_or_null("BossMesh") if get_node_or_null("BossMesh") else get_node_or_null("BossSprite")
 @onready var health_bar_progress: ProgressBar = get_node_or_null("HealthBarViewport/HealthBarControl/VBoxContainer/ProgressBar")
 @onready var health_title_label: Label = get_node_or_null("HealthBarViewport/HealthBarControl/VBoxContainer/BossTitleLabel")
 
@@ -24,7 +24,7 @@ var _attack_timer: float = 0.0
 var _weave_time: float = 0.0
 var _target_z: float = -18.0
 var _is_defeated: bool = false
-var _current_base_y: float = 2.612
+var _current_base_y: float = 0.0
 
 func _ready() -> void:
 	_clean_shadow_nodes(self)
@@ -102,8 +102,13 @@ func _flash_red() -> void:
 		_flash_tween.kill()
 
 	_flash_tween = create_tween()
-	_flash_tween.tween_property(boss_sprite, "modulate", Color(3.0, 0.2, 0.2, 1.0), 0.07)
-	_flash_tween.tween_property(boss_sprite, "modulate", Color.WHITE, 0.12)
+	if "modulate" in boss_sprite:
+		_flash_tween.tween_property(boss_sprite, "modulate", Color(3.0, 0.2, 0.2, 1.0), 0.07)
+		_flash_tween.tween_property(boss_sprite, "modulate", Color.WHITE, 0.12)
+	else:
+		var sc = boss_sprite.scale
+		_flash_tween.tween_property(boss_sprite, "scale", sc * 1.08, 0.07)
+		_flash_tween.tween_property(boss_sprite, "scale", sc, 0.12)
 
 func _update_health_bar() -> void:
 	if health_bar_progress:

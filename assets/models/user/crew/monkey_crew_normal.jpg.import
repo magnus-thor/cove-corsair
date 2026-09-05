@@ -2,9 +2,9 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cyjq474145bts"
-path.s3tc="res://.godot/imported/Meshy_AI_Monkey_Buccaneer_0831161647_texture_normal.jpg-0c72ddd20ae709127cb4c799c62a3286.s3tc.ctex"
-path.etc2="res://.godot/imported/Meshy_AI_Monkey_Buccaneer_0831161647_texture_normal.jpg-0c72ddd20ae709127cb4c799c62a3286.etc2.ctex"
+uid="uid://bv4t3l1d7mu27"
+path.s3tc="res://.godot/imported/monkey_crew_normal.jpg-e096f7e76e8b16e07426f3d573611e29.s3tc.ctex"
+path.etc2="res://.godot/imported/monkey_crew_normal.jpg-e096f7e76e8b16e07426f3d573611e29.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
@@ -15,8 +15,8 @@ generator_parameters={
 
 [deps]
 
-source_file="res://assets/models/user/crew/Meshy_AI_Monkey_Buccaneer_0831161647_texture_normal.jpg"
-dest_files=["res://.godot/imported/Meshy_AI_Monkey_Buccaneer_0831161647_texture_normal.jpg-0c72ddd20ae709127cb4c799c62a3286.s3tc.ctex", "res://.godot/imported/Meshy_AI_Monkey_Buccaneer_0831161647_texture_normal.jpg-0c72ddd20ae709127cb4c799c62a3286.etc2.ctex"]
+source_file="res://assets/models/user/crew/monkey_crew_normal.jpg"
+dest_files=["res://.godot/imported/monkey_crew_normal.jpg-e096f7e76e8b16e07426f3d573611e29.s3tc.ctex", "res://.godot/imported/monkey_crew_normal.jpg-e096f7e76e8b16e07426f3d573611e29.etc2.ctex"]
 
 [params]
 
@@ -31,7 +31,7 @@ compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
 roughness/mode=1
-roughness/src_normal="res://assets/models/user/crew/Meshy_AI_Monkey_Buccaneer_0831161647_texture_normal.jpg"
+roughness/src_normal="res://assets/models/user/crew/monkey_crew_normal.jpg"
 process/channel_remap/red=0
 process/channel_remap/green=1
 process/channel_remap/blue=2

@@ -2,21 +2,21 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b65pwepfeip63"
-path.s3tc="res://.godot/imported/the_dinghy_0.jpg-ac33db494f39d00732d9078eae1e11a4.s3tc.ctex"
-path.etc2="res://.godot/imported/the_dinghy_0.jpg-ac33db494f39d00732d9078eae1e11a4.etc2.ctex"
+uid="uid://c3u6s8krpfi86"
+path.s3tc="res://.godot/imported/captain_bone-beard’s_twin_frigate_base_color.jpg-9bda0ac3cea19a944d135b8b670a7840.s3tc.ctex"
+path.etc2="res://.godot/imported/captain_bone-beard’s_twin_frigate_base_color.jpg-9bda0ac3cea19a944d135b8b670a7840.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "380bf89fa65f9a026a4acd533c4551d2"
+"md5": "ceca3783a59f0ef35618331fbc3680ca"
 }
 
 [deps]
 
-source_file="res://assets/models/user/vessels/the_dinghy_0.jpg"
-dest_files=["res://.godot/imported/the_dinghy_0.jpg-ac33db494f39d00732d9078eae1e11a4.s3tc.ctex", "res://.godot/imported/the_dinghy_0.jpg-ac33db494f39d00732d9078eae1e11a4.etc2.ctex"]
+source_file="res://assets/models/enemy/vessels/captain_bone-beard’s_twin_frigate_base_color.jpg"
+dest_files=["res://.godot/imported/captain_bone-beard’s_twin_frigate_base_color.jpg-9bda0ac3cea19a944d135b8b670a7840.s3tc.ctex", "res://.godot/imported/captain_bone-beard’s_twin_frigate_base_color.jpg-9bda0ac3cea19a944d135b8b670a7840.etc2.ctex"]
 
 [params]
 

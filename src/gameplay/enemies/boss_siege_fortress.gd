@@ -40,7 +40,7 @@ var _flash_tweens: Dictionary = {}
 @export var doubloon_scene: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
 @export var explosion_scene: PackedScene = preload("res://src/gameplay/vfx/barrel_explosion.tscn")
 
-@onready var boss_sprite: Sprite3D = $BossSprite
+@onready var boss_sprite: Node3D = get_node_or_null("BossMesh") if get_node_or_null("BossMesh") else get_node_or_null("BossSprite")
 @onready var port_turret_node: Node3D = $PortTurret
 @onready var starboard_turret_node: Node3D = $StarboardTurret
 @onready var prow_ram_node: Node3D = $ProwRam
@@ -191,8 +191,13 @@ func _start_ram_overdrive() -> void:
 	
 	if boss_sprite:
 		var tween = create_tween()
-		tween.tween_property(boss_sprite, "modulate", Color(3.0, 1.0, 0.2, 1.0), 0.2)
-		tween.tween_property(boss_sprite, "modulate", Color(1.4, 0.6, 0.3, 1.0), 0.3)
+		if "modulate" in boss_sprite:
+			tween.tween_property(boss_sprite, "modulate", Color(3.0, 1.0, 0.2, 1.0), 0.2)
+			tween.tween_property(boss_sprite, "modulate", Color(1.4, 0.6, 0.3, 1.0), 0.3)
+		else:
+			var sc = boss_sprite.scale
+			tween.tween_property(boss_sprite, "scale", sc * 1.12, 0.2)
+			tween.tween_property(boss_sprite, "scale", sc, 0.3)
 
 func _process_ram_overdrive(delta: float) -> void:
 	var player = get_tree().get_first_node_in_group("player")
@@ -325,8 +330,13 @@ func _flash_boss_main() -> void:
 		_flash_tweens["boss_main"].kill()
 	var tween = create_tween()
 	_flash_tweens["boss_main"] = tween
-	boss_sprite.modulate = Color(2.5, 0.8, 0.4, 1.0)
-	tween.tween_property(boss_sprite, "modulate", Color(1.4, 0.6, 0.3, 1.0), 0.1)
+	if "modulate" in boss_sprite:
+		boss_sprite.modulate = Color(2.5, 0.8, 0.4, 1.0)
+		tween.tween_property(boss_sprite, "modulate", Color(1.4, 0.6, 0.3, 1.0), 0.1)
+	else:
+		var sc = boss_sprite.scale
+		tween.tween_property(boss_sprite, "scale", sc * 1.08, 0.05)
+		tween.tween_property(boss_sprite, "scale", sc, 0.1)
 
 func _destroy_subpart(node: Variant) -> void:
 	if not is_instance_valid(node):
@@ -360,7 +370,7 @@ func _check_phase() -> void:
 	elif current_phase == 2 and current_hp <= int(max_hp * 0.35):
 		current_phase = 3
 		weave_speed = 1.8
-		if boss_sprite:
+		if boss_sprite and "modulate" in boss_sprite:
 			boss_sprite.modulate = Color(2.5, 0.4, 0.1, 1.0)
 		AudioManager.play_sfx("gate_passes", 0.7, 0.9)
 

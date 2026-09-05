@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/enemies/boss_bone_beard.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/enemy_bosses/Captain Bone-Beard's Twin Frigate.png" id="2_sprite"]
+[ext_resource type="PackedScene" uid="uid://v00jmx7xnglw" path="res://assets/models/enemy/vessels/captain_bone-beard’s_twin_frigate.glb" id="2_frigate_mesh"]
 [ext_resource type="PackedScene" path="res://src/gameplay/collectibles/collectible_doubloon.tscn" id="3_doubloon"]
 [ext_resource type="PackedScene" path="res://src/gameplay/vfx/barrel_explosion.tscn" id="4_explosion"]
 [ext_resource type="PackedScene" path="res://src/gameplay/obstacles/destructible_barrel.tscn" id="5_keg"]
@@ -18,11 +18,7 @@ doubloon_scene = ExtResource("3_doubloon")
 explosion_scene = ExtResource("4_explosion")
 powder_keg_scene = ExtResource("5_keg")
 
-[node name="BossSprite" type="Sprite3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.766044, 0.642788, 0, -0.642788, 0.766044, 0, 2.612, 0)
-pixel_size = 0.0055
-alpha_cut = 1
-texture = ExtResource("2_sprite")
+[node name="BossMesh" parent="." instance=ExtResource("2_frigate_mesh")]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)

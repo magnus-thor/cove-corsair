@@ -7,6 +7,10 @@ extends Resource
 
 @export var weapon_name: String = "Forward Chaser"
 @export var weapon_type: String = "cannon" # "cannon", "swivel_gun", "deck_mortar", "crew_musket", "crew_thrower"
+@export var model_scene: PackedScene
+@export var model_scale: Vector3 = Vector3(0.4, 0.4, 0.4)
+@export var model_rotation_degrees: Vector3 = Vector3(0, 90, 0)
+@export var model_offset: Vector3 = Vector3.ZERO
 @export var sprite_texture: Texture2D
 @export var pixel_size: float = 0.005
 @export var fire_rate: float = 0.2 # Cooldown in seconds

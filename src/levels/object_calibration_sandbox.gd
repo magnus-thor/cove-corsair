@@ -389,14 +389,20 @@ func _on_object_selected(obj_idx: int) -> void:
 					instance.apply_ship_data(s_data)
 				var visuals = instance.get_node_or_null("BoatVisuals")
 				if visuals:
-					current_sprite = visuals.get_node_or_null("BoatSprite") as Sprite3D
+					var spr = visuals.get_node_or_null("BoatSprite") as Sprite3D
+					if spr and spr.visible:
+						current_sprite = spr
+					else:
+						current_sprite = null
 
 	if current_object_node:
-		# Fallback search for any Sprite3D child if not directly found
-		if not current_sprite:
+		# Fallback search for any visible Sprite3D child if not directly found
+		var cat_idx_init = category_option.selected if category_option else 0
+		if not current_sprite and cat_idx_init != 4:
 			for child in current_object_node.find_children("*", "Sprite3D"):
-				current_sprite = child
-				break
+				if child.visible:
+					current_sprite = child
+					break
 				
 		# Freeze physics and forward movement so object stays completely stationary
 		current_object_node.set_physics_process(false)
@@ -420,13 +426,31 @@ func _update_ui_from_current_object() -> void:
 		
 	updating_ui = true
 	var pos_y = current_object_node.position.y
+	var psize = 0.0021
+	var sc = 1.0
+	var rot_x = 0.0
+	var rot_y = 0.0
 	
 	var cat_idx = category_option.selected if category_option else 0
-	if cat_idx == 0 or cat_idx == 1 or cat_idx == 3: # Enemies, Obstacles, Ammo: height is position y or sprite position
+	if cat_idx == 4 and current_resource is ShipData: # Player Ships
+		var s_data = current_resource as ShipData
+		pos_y = s_data.y_offset
+		psize = s_data.pixel_size
+		sc = s_data.scale.x if s_data.scale != Vector3.ZERO else 1.0
+		rot_x = s_data.rotation_degrees.x
+		rot_y = s_data.rotation_degrees.y
+	elif cat_idx == 0 or cat_idx == 1 or cat_idx == 3: # Enemies, Obstacles, Ammo
 		if current_sprite:
 			pos_y = current_sprite.position.y
+			psize = current_sprite.pixel_size
+			sc = current_object_node.scale.x
+			rot_x = current_sprite.rotation_degrees.x
+			rot_y = current_object_node.rotation_degrees.y
 		else:
 			pos_y = current_object_node.position.y
+			sc = current_object_node.scale.x
+			rot_x = current_object_node.rotation_degrees.x
+			rot_y = current_object_node.rotation_degrees.y
 	elif cat_idx == 2: # Gates & Collectibles
 		var name_str = object_option.get_item_text(object_option.selected) if object_option else ""
 		if "Gate" in name_str:
@@ -435,19 +459,13 @@ func _update_ui_from_current_object() -> void:
 				pos_y = visuals_node.position.y
 		else:
 			pos_y = current_object_node.position.y
-	elif cat_idx == 4: # Player Ships
-		pos_y = current_object_node.position.y
+		if current_sprite:
+			psize = current_sprite.pixel_size
+			rot_x = current_sprite.rotation_degrees.x
+		sc = current_object_node.scale.x
+		rot_y = current_object_node.rotation_degrees.y
 				
 	base_y_position = pos_y
-	
-	var psize = current_sprite.pixel_size if current_sprite else 0.0021
-	var sc = current_object_node.scale.x
-	var rot_x = 0.0
-	if current_sprite and current_sprite.rotation_degrees.x != 0.0:
-		rot_x = current_sprite.rotation_degrees.x
-	elif current_object_node:
-		rot_x = current_object_node.rotation_degrees.x
-	var rot_y = current_object_node.rotation_degrees.y
 	
 	if slider_pos_y: slider_pos_y.value = pos_y
 	if slider_psize: slider_psize.value = psize
@@ -473,10 +491,24 @@ func _on_slider_changed(_val: float) -> void:
 	
 	var cat_idx = category_option.selected if category_option else 0
 	
-	if cat_idx == 4: # Vessels: root Y position is the y_offset
-		current_object_node.position.y = new_pos_y
-		if current_sprite:
-			current_sprite.position.y = 0.0
+	if cat_idx == 4: # Player Ships: update BoatMesh or BoatSprite inside visuals
+		current_object_node.position = Vector3.ZERO
+		current_object_node.scale = Vector3.ONE
+		var visuals = current_object_node.get_node_or_null("BoatVisuals")
+		var boat_mesh = visuals.get_node_or_null("BoatMesh") if visuals else null
+		if boat_mesh and boat_mesh.visible:
+			boat_mesh.scale = Vector3.ONE * new_scale
+			boat_mesh.rotation_degrees = Vector3(new_rot_x, new_rot_y, 0.0)
+			boat_mesh.position.y = new_pos_y
+		elif current_sprite:
+			current_sprite.scale = Vector3.ONE * new_scale
+			current_sprite.rotation_degrees = Vector3(new_rot_x, new_rot_y, 0.0)
+			current_sprite.position.y = new_pos_y
+			current_sprite.pixel_size = new_psize
+		var hardpoints = current_object_node.get_node_or_null("Hardpoints")
+		if hardpoints:
+			hardpoints.position.y = new_pos_y
+			hardpoints.rotation_degrees = Vector3(new_rot_x, new_rot_y, 0.0)
 	elif cat_idx == 2: # Gates & Collectibles
 		var name_str = object_option.get_item_text(object_option.selected) if object_option else ""
 		if "Gate" in name_str:
@@ -486,34 +518,42 @@ func _on_slider_changed(_val: float) -> void:
 				visuals_node.position.y = new_pos_y
 		else:
 			current_object_node.position.y = new_pos_y
+		current_object_node.scale = Vector3.ONE * new_scale
+		current_object_node.rotation_degrees.y = new_rot_y
+		if current_sprite:
+			current_sprite.rotation_degrees.x = new_rot_x
+			current_sprite.pixel_size = new_psize
 	elif cat_idx == 3: # Ammo & Projectiles
 		current_object_node.position.y = new_pos_y
 		if current_sprite:
 			current_sprite.position.y = 0.0
+			current_sprite.rotation_degrees.x = new_rot_x
+			current_sprite.pixel_size = new_psize
+		current_object_node.scale = Vector3.ONE * new_scale
+		current_object_node.rotation_degrees.y = new_rot_y
 	else: # Mobs and Obstacles: root stays at Y=0, sprite moves to Y=new_pos_y
 		current_object_node.position.y = 0.0
 		if current_sprite:
 			current_sprite.position.y = new_pos_y
+			current_sprite.rotation_degrees.x = new_rot_x
+			current_sprite.pixel_size = new_psize
+		else:
+			current_object_node.rotation_degrees.x = new_rot_x
+		current_object_node.scale = Vector3.ONE * new_scale
+		current_object_node.rotation_degrees.y = new_rot_y
 		var health_bar = current_object_node.get_node_or_null("HealthBarSprite") as Sprite3D
 		if health_bar:
 			health_bar.position.y = new_pos_y + 0.85
-			
-	current_object_node.scale = Vector3.ONE * new_scale
-	current_object_node.rotation_degrees.y = new_rot_y
-	
-	if current_sprite:
-		current_sprite.rotation_degrees.x = new_rot_x
-	else:
-		current_object_node.rotation_degrees.x = new_rot_x
-	
-	if current_sprite:
-		current_sprite.pixel_size = new_psize
 			
 	if current_resource:
 		if "y_offset" in current_resource:
 			current_resource.y_offset = new_pos_y
 		if "pixel_size" in current_resource:
 			current_resource.pixel_size = new_psize
+		if "scale" in current_resource:
+			current_resource.scale = Vector3.ONE * new_scale
+		if "rotation_degrees" in current_resource:
+			current_resource.rotation_degrees = Vector3(new_rot_x, new_rot_y, 0.0)
 			
 	_update_inputs(new_pos_y, new_psize, new_scale, new_rot_x, new_rot_y)
 
@@ -528,7 +568,15 @@ func _process(delta: float) -> void:
 		offset_y += sin(bob_time) * 0.04
 		
 	if cat_idx == 4: # Vessels
-		current_object_node.position = Vector3(0.0, offset_y, 0.0)
+		var visuals = current_object_node.get_node_or_null("BoatVisuals")
+		var boat_mesh = visuals.get_node_or_null("BoatMesh") if visuals else null
+		if boat_mesh and boat_mesh.visible:
+			boat_mesh.position.y = offset_y
+		elif current_sprite:
+			current_sprite.position.y = offset_y
+		var hardpoints = current_object_node.get_node_or_null("Hardpoints")
+		if hardpoints:
+			hardpoints.position.y = offset_y
 	elif cat_idx == 3: # Ammo
 		current_object_node.position = Vector3(0.0, offset_y, 0.0)
 	elif cat_idx == 2: # Gates & Collectibles

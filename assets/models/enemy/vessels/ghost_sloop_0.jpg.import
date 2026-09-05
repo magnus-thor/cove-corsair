@@ -2,21 +2,21 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ci24lg7dvilr4"
-path.s3tc="res://.godot/imported/the_dinghy_1.jpg-2f5875fb62fed1560b27e6295fe1cf36.s3tc.ctex"
-path.etc2="res://.godot/imported/the_dinghy_1.jpg-2f5875fb62fed1560b27e6295fe1cf36.etc2.ctex"
+uid="uid://bdaj8gdsoya77"
+path.s3tc="res://.godot/imported/ghost_sloop_0.jpg-1c6cbbdcbc4a02a2bff5100b6f23fc8f.s3tc.ctex"
+path.etc2="res://.godot/imported/ghost_sloop_0.jpg-1c6cbbdcbc4a02a2bff5100b6f23fc8f.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "0c493c6f36b2eaef2a7043a5a19568d5"
+"md5": "4afb0bd32600c7945edde6acea5c22d6"
 }
 
 [deps]
 
-source_file="res://assets/models/user/vessels/the_dinghy_1.jpg"
-dest_files=["res://.godot/imported/the_dinghy_1.jpg-2f5875fb62fed1560b27e6295fe1cf36.s3tc.ctex", "res://.godot/imported/the_dinghy_1.jpg-2f5875fb62fed1560b27e6295fe1cf36.etc2.ctex"]
+source_file="res://assets/models/enemy/vessels/ghost_sloop_0.jpg"
+dest_files=["res://.godot/imported/ghost_sloop_0.jpg-1c6cbbdcbc4a02a2bff5100b6f23fc8f.s3tc.ctex", "res://.godot/imported/ghost_sloop_0.jpg-1c6cbbdcbc4a02a2bff5100b6f23fc8f.etc2.ctex"]
 
 [params]
 

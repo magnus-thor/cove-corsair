@@ -38,7 +38,7 @@ size = Vector2(14, 40)
 script = ExtResource("1_script")
 
 [node name="WaterPlane" type="MeshInstance3D" parent="." unique_id=1548549550]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -20)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.4, -20)
 mesh = SubResource("PlaneMesh_ocean")
 
 [node name="RiverLane" type="MeshInstance3D" parent="."]

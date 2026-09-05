@@ -68,7 +68,7 @@ transform = Transform3D(1, 0, 0, 0, 0.90107703, 0.4336591, 0, -0.4336591, 0.9010
 fov = 70.0
 
 [node name="BankPlane" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.01, -10)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.4, -10)
 mesh = SubResource("PlaneMesh_bank")
 
 [node name="RiverLane" type="MeshInstance3D" parent="."]
@@ -273,7 +273,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 min_value = 0.0005
-max_value = 0.01
+max_value = 0.05
 step = 0.0001
 value = 0.0021
 
@@ -307,7 +307,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 min_value = 0.1
-max_value = 3.0
+max_value = 12.0
 step = 0.01
 value = 1.0
 

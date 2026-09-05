@@ -2,14 +2,18 @@
 
 [ext_resource type="Script" path="res://src/data/ship_data.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://assets/sprites/user_vessels/The Sloop.png" id="2_tex"]
+[ext_resource type="PackedScene" uid="uid://bfesco2vc1j1d" path="res://assets/models/user/vessels/the_sloop.glb" id="3_sloop_mesh"]
 
 [resource]
 script = ExtResource("1_script")
 ship_id = "sloop"
 ship_name = "The Sloop"
+model_scene = ExtResource("3_sloop_mesh")
 sprite_texture = ExtResource("2_tex")
 pixel_size = 0.0028
-y_offset = 0.9
+y_offset = 0.0
+scale = Vector3(2.0, 2.0, 2.0)
+rotation_degrees = Vector3(0, -90, 0)
 collision_size = Vector3(1.4, 1.0, 2.5)
 max_health = 5
 move_speed = 11.0

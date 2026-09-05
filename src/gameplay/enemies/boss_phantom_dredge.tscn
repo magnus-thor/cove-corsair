@@ -1,21 +1,19 @@
 [gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/enemies/boss_phantom_dredge.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/enemy_bosses/Ghost Sloop Big.png" id="2_dredge_tex"]
+[ext_resource type="PackedScene" uid="uid://dkpneoghra51r" path="res://assets/models/enemy/vessels/ghost_sloop.glb" id="2_ghost_sloop_mesh"]
 [ext_resource type="Script" path="res://src/gameplay/enemies/boss_hitbox.gd" id="3_hitbox_script"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_boss"]
-size = Vector3(3.6, 2.0, 4.0)
+size = Vector3(4.2, 3.2, 6.5)
 
 [node name="BossPhantomDredge" type="Node3D" groups=["boss", "enemies"]]
 script = ExtResource("1_script")
 
-[node name="BossSprite" type="Sprite3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.968148, 0.25038, 0, -0.25038, 0.968148, 0, 1.46, 0)
-pixel_size = 0.0035
-alpha_cut = 1
-texture = ExtResource("2_dredge_tex")
-modulate = Color(0.4, 1.2, 0.8, 1)
+[node name="VisualContainer" type="Node3D" parent="."]
+
+[node name="GhostSloopMesh" parent="VisualContainer" instance=ExtResource("2_ghost_sloop_mesh")]
+transform = Transform3D(-5.5, 0, -4.80825e-07, 0, 5.5, 0, 4.80825e-07, 0, -5.5, 0, 0, 0)
 
 [node name="HitBox" type="Area3D" parent="." groups=["boss", "destructible", "enemies"]]
 collision_layer = 5
@@ -23,5 +21,5 @@ collision_mask = 7
 script = ExtResource("3_hitbox_script")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="HitBox"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.33, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 shape = SubResource("BoxShape3D_boss")

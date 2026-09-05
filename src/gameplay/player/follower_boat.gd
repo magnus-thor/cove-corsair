@@ -20,14 +20,45 @@ func _ready() -> void:
 		
 	if player and "ship_data" in player and player.ship_data:
 		var sprite = get_node_or_null("Sprite3D") as Sprite3D
-		if sprite and player.ship_data.sprite_texture:
-			sprite.texture = player.ship_data.sprite_texture
-			sprite.pixel_size = player.ship_data.pixel_size
+		var model_mesh = get_node_or_null("BoatMesh")
+		var s_data = player.ship_data
+		var model_to_load: PackedScene = null
+		if "model_scene" in s_data and s_data.model_scene:
+			model_to_load = s_data.model_scene
+		elif s_data.ship_id == "dinghy":
+			var dinghy_glb = "res://assets/models/user/vessels/dinghy.glb"
+			if ResourceLoader.exists(dinghy_glb):
+				model_to_load = load(dinghy_glb)
+
+		if model_to_load:
+			if sprite:
+				sprite.visible = false
+			if not model_mesh:
+				model_mesh = model_to_load.instantiate()
+				model_mesh.name = "BoatMesh"
+				add_child(model_mesh)
+			if model_mesh:
+				model_mesh.visible = true
+				var base_sc = s_data.scale if ("scale" in s_data and s_data.scale != Vector3.ZERO) else Vector3.ONE
+				model_mesh.scale = base_sc * sf
+				model_mesh.position = Vector3(0, s_data.y_offset if "y_offset" in s_data else 0.0, 0)
+				model_mesh.rotation_degrees = s_data.rotation_degrees if ("rotation_degrees" in s_data and s_data.rotation_degrees != Vector3.ZERO) else Vector3.ZERO
+				if s_data.ship_id == "dinghy" and not model_mesh.has_node("CockpitWaterMask"):
+					var mask = MeshInstance3D.new()
+					mask.name = "CockpitWaterMask"
+					mask.mesh = preload("res://assets/models/user/vessels/dinghy_cockpit_mask.tres")
+					model_mesh.add_child(mask)
+		elif sprite and s_data.sprite_texture:
+			if model_mesh:
+				model_mesh.visible = false
+			sprite.visible = true
+			sprite.texture = s_data.sprite_texture
+			sprite.pixel_size = s_data.pixel_size
 			var pitch = player.player_pitch_deg if "player_pitch_deg" in player else -60.0
-			var rot = player.ship_data.rotation_degrees if ("rotation_degrees" in player.ship_data and player.ship_data.rotation_degrees != Vector3.ZERO) else Vector3(pitch, 0, 0)
+			var rot = s_data.rotation_degrees if ("rotation_degrees" in s_data and s_data.rotation_degrees != Vector3.ZERO) else Vector3(pitch, 0, 0)
 			sprite.rotation_degrees = rot
-			sprite.position = Vector3(0, player.ship_data.y_offset if "y_offset" in player.ship_data else 0.485, 0)
-			var base_sc = player.ship_data.scale if ("scale" in player.ship_data and player.ship_data.scale != Vector3.ZERO) else Vector3.ONE
+			sprite.position = Vector3(0, s_data.y_offset if "y_offset" in s_data else 0.485, 0)
+			var base_sc = s_data.scale if ("scale" in s_data and s_data.scale != Vector3.ZERO) else Vector3.ONE
 			sprite.scale = base_sc * sf
 			
 		var col = get_node_or_null("CollisionShape3D") as CollisionShape3D
@@ -58,9 +89,17 @@ func set_target_offset(offset: Vector3) -> void:
 
 func tween_scale(target_sf: float, duration: float) -> void:
 	var sprite = get_node_or_null("Sprite3D") as Sprite3D
-	if sprite:
+	var player = get_tree().get_first_node_in_group("player")
+	var base_sc = Vector3.ONE
+	if player and "ship_data" in player and player.ship_data and "scale" in player.ship_data and player.ship_data.scale != Vector3.ZERO:
+		base_sc = player.ship_data.scale
+	if sprite and sprite.visible:
 		var t = create_tween().set_parallel(true)
-		t.tween_property(sprite, "scale", Vector3.ONE * target_sf, duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		t.tween_property(sprite, "scale", base_sc * target_sf, duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	var model_mesh = get_node_or_null("BoatMesh")
+	if model_mesh and model_mesh.visible:
+		var t_m = create_tween()
+		t_m.tween_property(model_mesh, "scale", base_sc * target_sf, duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	var col = get_node_or_null("CollisionShape3D") as CollisionShape3D
 	if col:
 		var t_col = create_tween()

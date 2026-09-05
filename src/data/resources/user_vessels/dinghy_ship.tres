@@ -2,21 +2,25 @@
 
 [ext_resource type="Script" path="res://src/data/ship_data.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://assets/sprites/user_vessels/The Dinghy.png" id="2_tex"]
+[ext_resource type="PackedScene" uid="uid://dqvdevegruw8w" path="res://assets/models/user/vessels/dinghy.glb" id="3_dinghy_mesh"]
 
 [resource]
 script = ExtResource("1_script")
 ship_id = "dinghy"
 ship_name = "The Dinghy"
+model_scene = ExtResource("3_dinghy_mesh")
 sprite_texture = ExtResource("2_tex")
 pixel_size = 0.0021
-y_offset = 0.55
+y_offset = 0.49
+scale = Vector3(3.8, 3.8, 3.8)
+rotation_degrees = Vector3(0, 0, 0)
 max_health = 3
 move_speed = 12.0
 fire_rate = 0.2
 hardpoint_offsets = {
-"AftDeckCrew": Vector3(0.08, 1.75, 0.45),
-"BowMount": Vector3(0.00, 0.22, -0.75),
-"MidDeckCrew": Vector3(-0.03, 1.43, -0.10)
+"AftDeckCrew": Vector3(0.05, 0.12, 0.55),
+"BowMount": Vector3(0.00, 0.12, -0.85),
+"MidDeckCrew": Vector3(-0.02, 0.12, -0.15)
 }
 hardpoint_rotations = {
 "AftDeckCrew": Vector3(0.0, 0.0, 0.0),
@@ -24,9 +28,9 @@ hardpoint_rotations = {
 "MidDeckCrew": Vector3(0.0, 0.0, 0.0)
 }
 hardpoint_scales = {
-"AftDeckCrew": Vector3(0.35, 0.35, 0.35),
-"BowMount": Vector3(1.00, 1.00, 1.00),
-"MidDeckCrew": Vector3(0.35, 0.35, 0.35)
+"AftDeckCrew": Vector3(1.0, 1.0, 1.0),
+"BowMount": Vector3(1.0, 1.0, 1.0),
+"MidDeckCrew": Vector3(1.0, 1.0, 1.0)
 }
 tier_upgrades = Array[Dictionary]([{
 "BowMount": "res://src/data/resources/user_crew/weapon_bow_chaser.tres"

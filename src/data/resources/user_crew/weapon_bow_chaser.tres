@@ -3,11 +3,16 @@
 [ext_resource type="Script" path="res://src/data/weapon_data.gd" id="1_script"]
 [ext_resource type="Resource" path="res://src/data/resources/user_ammo/ammo_standard_ball.tres" id="2_ammo"]
 [ext_resource type="Resource" path="res://src/data/resources/user_ammo/ammo_heavy_shot.tres" id="3_ammo_heavy"]
+[ext_resource type="PackedScene" path="res://assets/models/user/weapons/cannon.glb" id="4_cannon_mesh"]
 
 [resource]
 script = ExtResource("1_script")
 weapon_name = "Bow Chaser"
 weapon_type = "cannon"
+model_scene = ExtResource("4_cannon_mesh")
+model_scale = Vector3(0.45, 0.45, 0.45)
+model_rotation_degrees = Vector3(0, 90, 0)
+model_offset = Vector3(0, 0.12, 0)
 fire_rate = 0.2
 spread_angle_deg = 0.0
 default_ammo = ExtResource("2_ammo")

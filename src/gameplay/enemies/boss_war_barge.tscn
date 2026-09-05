@@ -1,7 +1,7 @@
 [gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/enemies/boss_war_barge.gd" id="1_boss_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/enemy_bosses/boss_war_barge.png" id="2_barge_tex"]
+[ext_resource type="PackedScene" uid="uid://c6g87b3xejoho" path="res://assets/models/enemy/vessels/boss_war_barge.glb" id="2_barge_mesh"]
 [ext_resource type="Script" path="res://src/gameplay/enemies/boss_component_delegate.gd" id="3_delegate"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_hitbox"]
@@ -79,11 +79,7 @@ orientation = 1
 [node name="BossWarBarge" type="Node3D" groups=["boss", "enemies"]]
 script = ExtResource("1_boss_script")
 
-[node name="BossSprite" type="Sprite3D" parent="."]
-transform = Transform3D(1.1, 0, 0, 0, 0.842648, 0.707078, 0, -0.707078, 0.842648, 0, 1.38, 0)
-pixel_size = 0.0038
-alpha_cut = 1
-texture = ExtResource("2_barge_tex")
+[node name="BossMesh" parent="." instance=ExtResource("2_barge_mesh")]
 
 [node name="HitBox" type="Area3D" parent="." node_paths=PackedStringArray("boss_node") groups=["boss", "destructible", "enemies"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)

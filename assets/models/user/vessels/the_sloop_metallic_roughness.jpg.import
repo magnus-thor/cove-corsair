@@ -2,21 +2,21 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dhli6pvp085h6"
-path.s3tc="res://.godot/imported/Meshy_AI_Monkey_Buccaneer_0831161647_texture_metallic_roughness.jpg-33ba3bdfe93f8c677741e6d9d8665e7a.s3tc.ctex"
-path.etc2="res://.godot/imported/Meshy_AI_Monkey_Buccaneer_0831161647_texture_metallic_roughness.jpg-33ba3bdfe93f8c677741e6d9d8665e7a.etc2.ctex"
+uid="uid://b2sqbdbjjawo0"
+path.s3tc="res://.godot/imported/the_sloop_metallic_roughness.jpg-00de4c0bb199eabd340d9ff0ef757efb.s3tc.ctex"
+path.etc2="res://.godot/imported/the_sloop_metallic_roughness.jpg-00de4c0bb199eabd340d9ff0ef757efb.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "e86f841ec656d2fd8b7b33f26f9a5e55"
+"md5": "928070f0c41b2dd7bfb0479d708bef0b"
 }
 
 [deps]
 
-source_file="res://assets/models/user/crew/Meshy_AI_Monkey_Buccaneer_0831161647_texture_metallic_roughness.jpg"
-dest_files=["res://.godot/imported/Meshy_AI_Monkey_Buccaneer_0831161647_texture_metallic_roughness.jpg-33ba3bdfe93f8c677741e6d9d8665e7a.s3tc.ctex", "res://.godot/imported/Meshy_AI_Monkey_Buccaneer_0831161647_texture_metallic_roughness.jpg-33ba3bdfe93f8c677741e6d9d8665e7a.etc2.ctex"]
+source_file="res://assets/models/user/vessels/the_sloop_metallic_roughness.jpg"
+dest_files=["res://.godot/imported/the_sloop_metallic_roughness.jpg-00de4c0bb199eabd340d9ff0ef757efb.s3tc.ctex", "res://.godot/imported/the_sloop_metallic_roughness.jpg-00de4c0bb199eabd340d9ff0ef757efb.etc2.ctex"]
 
 [params]
 

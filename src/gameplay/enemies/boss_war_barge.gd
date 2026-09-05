@@ -28,7 +28,7 @@ var mortar_timer: float = 0.0
 @onready var left_cannon_node: Node3D = $LeftCannon
 @onready var right_cannon_node: Node3D = $RightCannon
 @onready var boiler_node: Node3D = $BoilerCore
-@onready var boss_sprite: Sprite3D = $BossSprite
+@onready var boss_sprite: Node3D = get_node_or_null("BossMesh") if get_node_or_null("BossMesh") else get_node_or_null("BossSprite")
 @onready var hit_box: Area3D = $HitBox
 @onready var bow_foam: GPUParticles3D = get_node_or_null("BowFoamParticles")
 @onready var bow_crest: MeshInstance3D = get_node_or_null("BowFoamCrest")
@@ -127,7 +127,7 @@ func _process_combat(delta: float) -> void:
 		_deploy_center_kegs()
 		
 	if combat_time >= 45.0:
-		if boss_sprite:
+		if boss_sprite and "modulate" in boss_sprite:
 			boss_sprite.modulate = Color(2.5, 0.4, 0.4, 1.0) # Tint red for enrage
 		_process_enraged_volley(delta)
 	else:
@@ -399,10 +399,16 @@ func _start_ram_charge() -> void:
 	AudioManager.play_sfx("cannon_shots") # Warning sound
 	
 	# Flash red indicators
+	# Flash red indicators
 	if is_instance_valid(boss_sprite):
 		var tween = create_tween()
-		tween.tween_property(boss_sprite, "modulate", Color(3.0, 0.3, 0.3, 1.0), 0.1)
-		tween.tween_property(boss_sprite, "modulate", Color.WHITE, 0.15)
+		if "modulate" in boss_sprite:
+			tween.tween_property(boss_sprite, "modulate", Color(3.0, 0.3, 0.3, 1.0), 0.1)
+			tween.tween_property(boss_sprite, "modulate", Color.WHITE, 0.15)
+		else:
+			var sc = boss_sprite.scale
+			tween.tween_property(boss_sprite, "scale", sc * 1.1, 0.1)
+			tween.tween_property(boss_sprite, "scale", sc, 0.15)
 
 func _process_ram_charge(delta: float) -> void:
 	var player = get_tree().get_first_node_in_group("player")
@@ -454,15 +460,25 @@ func _flash_boss_main() -> void:
 		
 	var tween = create_tween()
 	_flash_tweens[boss_sprite] = tween
-	tween.tween_property(boss_sprite, "modulate", Color(2.5, 0.5, 0.5, 1.0), 0.06)
-	tween.tween_property(boss_sprite, "modulate", Color.WHITE, 0.1)
+	if "modulate" in boss_sprite:
+		tween.tween_property(boss_sprite, "modulate", Color(2.5, 0.5, 0.5, 1.0), 0.06)
+		tween.tween_property(boss_sprite, "modulate", Color.WHITE, 0.1)
+	else:
+		var sc = boss_sprite.scale
+		tween.tween_property(boss_sprite, "scale", sc * 1.08, 0.06)
+		tween.tween_property(boss_sprite, "scale", sc, 0.1)
 
 func _show_crit_flash() -> void:
 	if not is_instance_valid(boss_sprite):
 		return
 	var tween = create_tween()
-	tween.tween_property(boss_sprite, "modulate", Color(1.0, 1.0, 3.0, 1.0), 0.05) # Blue flash for crit
-	tween.tween_property(boss_sprite, "modulate", Color.WHITE, 0.15)
+	if "modulate" in boss_sprite:
+		tween.tween_property(boss_sprite, "modulate", Color(1.0, 1.0, 3.0, 1.0), 0.05) # Blue flash for crit
+		tween.tween_property(boss_sprite, "modulate", Color.WHITE, 0.15)
+	else:
+		var sc = boss_sprite.scale
+		tween.tween_property(boss_sprite, "scale", sc * 1.15, 0.05)
+		tween.tween_property(boss_sprite, "scale", sc, 0.15)
 
 func _check_phase_transition() -> void:
 	if current_phase == 1 and current_hp <= int(max_hp * 0.68):

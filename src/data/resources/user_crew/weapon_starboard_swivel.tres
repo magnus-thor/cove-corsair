@@ -4,11 +4,16 @@
 [ext_resource type="Resource" path="res://src/data/resources/user_ammo/ammo_grape_shot.tres" id="2_ammo"]
 [ext_resource type="Resource" path="res://src/data/resources/user_ammo/ammo_standard_ball.tres" id="3_ammo_ball"]
 [ext_resource type="Texture2D" path="res://assets/sprites/user_crew/weapon_port_swivel.png" id="4_tex"]
+[ext_resource type="PackedScene" path="res://assets/models/user/weapons/cannon.glb" id="5_cannon_mesh"]
 
 [resource]
 script = ExtResource("1_script")
 weapon_name = "Starboard Swivel"
 weapon_type = "swivel_gun"
+model_scene = ExtResource("5_cannon_mesh")
+model_scale = Vector3(0.28, 0.28, 0.28)
+model_rotation_degrees = Vector3(0, 90, 0)
+model_offset = Vector3(0, 0.08, 0)
 sprite_texture = ExtResource("4_tex")
 pixel_size = 0.005
 fire_rate = 0.2

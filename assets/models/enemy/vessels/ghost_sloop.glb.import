@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://dv47ursylajjd"
-path="res://.godot/imported/Hi3D_Stylized Fantasy Orc Pirate Fortress 3D Model_allparts_20260827_211545.glb-eeb9d0f819381d27b998324d57b6590b.scn"
+uid="uid://dkpneoghra51r"
+path="res://.godot/imported/ghost_sloop.glb-5f2ff97dfee1d6c716161a1bd3eb555f.scn"
 
 [deps]
 
-source_file="res://assets/models/enemy/vessels/Hi3D_Stylized Fantasy Orc Pirate Fortress 3D Model_allparts_20260827_211545.glb"
-dest_files=["res://.godot/imported/Hi3D_Stylized Fantasy Orc Pirate Fortress 3D Model_allparts_20260827_211545.glb-eeb9d0f819381d27b998324d57b6590b.scn"]
+source_file="res://assets/models/enemy/vessels/ghost_sloop.glb"
+dest_files=["res://.godot/imported/ghost_sloop.glb-5f2ff97dfee1d6c716161a1bd3eb555f.scn"]
 
 [params]
 

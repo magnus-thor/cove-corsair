@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/enemies/boss_siege_fortress.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/enemy_bosses/boss_war_barge.png" id="2_barge_tex"]
+[ext_resource type="PackedScene" uid="uid://c6g87b3xejoho" path="res://assets/models/enemy/vessels/boss_war_barge.glb" id="2_barge_mesh"]
 [ext_resource type="Script" path="res://src/gameplay/enemies/boss_component_delegate.gd" id="3_delegate"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_turret"]
@@ -16,12 +16,8 @@ size = Vector3(2.8, 1.8, 2.8)
 [node name="BossSiegeFortress" type="Node3D" groups=["boss", "enemies"]]
 script = ExtResource("1_script")
 
-[node name="BossSprite" type="Sprite3D" parent="."]
-transform = Transform3D(1.5, 0, 0, 0, 0.842648, 0.707078, 0, -0.707078, 0.842648, 0, 1.5, 0)
-pixel_size = 0.004
-alpha_cut = 1
-texture = ExtResource("2_barge_tex")
-modulate = Color(1.4, 0.6, 0.3, 1)
+[node name="BossMesh" parent="." instance=ExtResource("2_barge_mesh")]
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 0, 0, 0)
 
 [node name="PortTurret" type="Area3D" parent="." node_paths=PackedStringArray("boss_node") groups=["destructible"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 0.6, 0.4)

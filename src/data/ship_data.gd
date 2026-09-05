@@ -3,6 +3,7 @@ extends Resource
 
 @export var ship_id: String = ""
 @export var ship_name: String = ""
+@export var model_scene: PackedScene = null
 @export var sprite_texture: Texture2D
 @export var pixel_size: float = 0.006
 @export var y_offset: float = 0.485
