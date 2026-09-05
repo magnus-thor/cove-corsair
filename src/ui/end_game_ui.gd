@@ -4,13 +4,18 @@ var _victory: bool = false
 var _score: int = 0
 var _initialized: bool = false
 
-@onready var title_label: Label = $Control/Panel/VBoxContainer/TitleLabel
-@onready var score_label: Label = $Control/Panel/VBoxContainer/ScoreLabel
+@onready var title_label: Label = %TitleLabel
+@onready var subtitle_label: Label = %SubtitleLabel
+@onready var score_label: Label = %ScoreLabel
+@onready var doubloons_label: Label = %DoubloonsLabel
 @onready var restart_button: Button = %RestartButton
 @onready var start_screen_button: Button = %StartScreenButton
+@onready var panel_container: PanelContainer = %PanelContainer
+@onready var backdrop: ColorRect = %Backdrop
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	layer = 20
 	
 	if restart_button:
 		restart_button.pressed.connect(_on_restart_button_pressed)
@@ -19,25 +24,21 @@ func _ready() -> void:
 	
 	_initialized = true
 	_update_ui()
-	
-	var background = $Control/Background
-	var panel = $Control/Panel
-	
-	background.color.a = 0.0
-	panel.scale = Vector2(0.8, 0.8)
-	panel.modulate.a = 0.0
-	
-	call_deferred("_setup_animation")
+	_animate_open()
 
-func _setup_animation() -> void:
-	var background = $Control/Background
-	var panel = $Control/Panel
-	panel.pivot_offset = panel.size / 2.0
-	
-	var tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	tween.tween_property(background, "color:a", 0.7, 0.4)
-	tween.tween_property(panel, "scale", Vector2(1.0, 1.0), 0.5)
-	tween.tween_property(panel, "modulate:a", 1.0, 0.3)
+func _animate_open() -> void:
+	if backdrop:
+		backdrop.color.a = 0.0
+		var t = create_tween()
+		t.tween_property(backdrop, "color:a", 0.82, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		
+	if panel_container:
+		panel_container.pivot_offset = panel_container.size * 0.5
+		panel_container.scale = Vector2(0.8, 0.8)
+		panel_container.modulate.a = 0.0
+		var t = create_tween().set_parallel(true).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		t.tween_property(panel_container, "scale", Vector2.ONE, 0.45)
+		t.tween_property(panel_container, "modulate:a", 1.0, 0.3)
 
 func set_result(victory: bool, score: int) -> void:
 	_victory = victory
@@ -48,14 +49,21 @@ func set_result(victory: bool, score: int) -> void:
 func _update_ui() -> void:
 	if not title_label or not score_label:
 		return
+		
 	if _victory:
 		title_label.text = "VICTORY!"
-		title_label.add_theme_color_override("font_color", Color(0.24, 0.81, 0.45))
+		title_label.add_theme_color_override("font_color", Color(0.96, 0.8, 0.35, 1.0))
+		if subtitle_label:
+			subtitle_label.text = "EXPEDITION TRIUMPHANT!"
 	else:
 		title_label.text = "DEFEAT!"
-		title_label.add_theme_color_override("font_color", Color(0.95, 0.26, 0.26))
+		title_label.add_theme_color_override("font_color", Color(0.85, 0.16, 0.18, 1.0))
+		if subtitle_label:
+			subtitle_label.text = "FLAGSHIP BROUGHT DOWN AT SEA"
 	
-	score_label.text = "Barrels Sunk: %d" % _score
+	score_label.text = str(_score)
+	if doubloons_label:
+		doubloons_label.text = str(GameState.run_doubloons)
 
 func _on_restart_button_pressed() -> void:
 	if AudioManager and AudioManager.has_method("play_sfx"):

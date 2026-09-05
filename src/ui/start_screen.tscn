@@ -296,12 +296,7 @@ theme_override_styles/hover = SubResource("StyleBoxTexture_set_sail_hover")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_set_sail_pressed")
 text = "SET SAIL"
 
-[node name="ActionHBox" type="HBoxContainer" parent="Control/BottomContainer"]
-layout_mode = 2
-theme_override_constants/separation = 14
-alignment = 1
-
-[node name="ShipyardButton" type="Button" parent="Control/BottomContainer/ActionHBox"]
+[node name="ShipyardButton" type="Button" parent="Control/BottomContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 76)
 layout_mode = 2
@@ -319,26 +314,5 @@ theme_override_styles/hover = SubResource("StyleBoxTexture_wood_plank_hover")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_wood_plank_pressed")
 icon = ExtResource("12_icon_anchor")
 expand_icon = true
-text = "SHIPYARD"
-alignment = 1
-
-[node name="ResetButton" type="Button" parent="Control/BottomContainer/ActionHBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 76)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.96, 0.93, 0.86, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.6)
-theme_override_colors/font_outline_color = Color(0.14, 0.07, 0.03, 1)
-theme_override_constants/shadow_offset_y = 4
-theme_override_constants/outline_size = 4
-theme_override_constants/h_separation = 8
-theme_override_fonts/font = ExtResource("3_font_carter")
-theme_override_font_sizes/font_size = 32
-theme_override_styles/normal = SubResource("StyleBoxTexture_wood_plank")
-theme_override_styles/hover = SubResource("StyleBoxTexture_wood_plank_hover")
-theme_override_styles/pressed = SubResource("StyleBoxTexture_wood_plank_pressed")
-icon = ExtResource("13_icon_refresh")
-expand_icon = true
-text = "RESET DATA"
+text = "THE SHIPYARD"
 alignment = 1

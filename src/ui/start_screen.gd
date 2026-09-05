@@ -16,7 +16,7 @@ signal game_started
 
 @onready var start_button: Button = %StartButton
 @onready var shipyard_button: Button = %ShipyardButton
-@onready var reset_button: Button = %ResetButton
+@onready var reset_button: Button = get_node_or_null("%ResetButton")
 @onready var main_control: Control = $Control
 
 var pulse_tween: Tween
@@ -137,6 +137,12 @@ func _on_settings_button_pressed() -> void:
 	if settings_scene:
 		var settings = settings_scene.instantiate()
 		get_parent().add_child(settings)
+		if settings.has_signal("settings_closed"):
+			settings.settings_closed.connect(func():
+				_update_doubloons_display()
+				_select_level(GameState.current_level, true)
+				_refresh_player_ship()
+			)
 
 func _on_reset_button_pressed() -> void:
 	GameState.reset_save_data()

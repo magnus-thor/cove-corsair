@@ -1,170 +1,221 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=8 format=3 uid="uid://c53kfe1ndgame01"]
 
-[ext_resource type="Script" path="res://src/ui/end_game_ui.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/ui/end_game_ui.gd" id="1_end_game_script"]
+[ext_resource type="FontFile" path="res://assets/fonts/LilitaOne-Regular.ttf" id="2_font_lilita"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/coin_icon.svg" id="3_coin_icon"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
-bg_color = Color(0.12, 0.14, 0.19, 0.95)
+bg_color = Color(0.93, 0.88, 0.78, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.24, 0.15, 0.09, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+shadow_color = Color(0, 0, 0, 0.65)
+shadow_size = 18
+shadow_offset = Vector2(0, 8)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stats_box"]
+bg_color = Color(0.85, 0.79, 0.68, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.42, 0.28, 0.16, 0.9)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_retry"]
+bg_color = Color(0.82, 0.58, 0.18, 1)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
-border_color = Color(0.95, 0.82, 0.25, 1)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_left = 16
-corner_radius_bottom_right = 16
-shadow_color = Color(0, 0, 0, 0.6)
-shadow_size = 12
-shadow_offset = Vector2(0, 6)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_restart_normal"]
-bg_color = Color(0.18, 0.72, 0.35, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.98, 0.85, 0.25, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-shadow_color = Color(0, 0, 0, 0.4)
+border_color = Color(1, 0.88, 0.45, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.35)
 shadow_size = 6
 shadow_offset = Vector2(0, 3)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_restart_hover"]
-bg_color = Color(0.22, 0.82, 0.4, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(1, 0.92, 0.4, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-shadow_color = Color(0, 0, 0, 0.45)
-shadow_size = 8
-shadow_offset = Vector2(0, 4)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_menu_normal"]
-bg_color = Color(0.18, 0.48, 0.85, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.98, 0.85, 0.25, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-shadow_color = Color(0, 0, 0, 0.4)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_harbor"]
+bg_color = Color(0.55, 0.35, 0.2, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.24, 0.14, 0.08, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.35)
 shadow_size = 6
 shadow_offset = Vector2(0, 3)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_menu_hover"]
-bg_color = Color(0.25, 0.58, 0.95, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(1, 0.92, 0.4, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-shadow_color = Color(0, 0, 0, 0.45)
-shadow_size = 8
-shadow_offset = Vector2(0, 4)
 
 [node name="EndGameUI" type="CanvasLayer"]
 process_mode = 3
 layer = 20
-script = ExtResource("1_script")
+script = ExtResource("1_end_game_script")
 
-[node name="Control" type="Control" parent="."]
-layout_mode = 3
+[node name="Backdrop" type="ColorRect" parent="."]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08, 0.05, 0.03, 0.82)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Background" type="ColorRect" parent="Control"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0, 0, 0, 0.7)
-
-[node name="Panel" type="PanelContainer" parent="Control"]
-custom_minimum_size = Vector2(500, 320)
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -250.0
-offset_top = -160.0
-offset_right = 250.0
-offset_bottom = 160.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="PanelContainer" type="PanelContainer" parent="CenterContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 580)
+layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Control/Panel"]
+[node name="Margin" type="MarginContainer" parent="CenterContainer/PanelContainer"]
 layout_mode = 2
-theme_override_constants/separation = 24
-alignment = 1
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 24
 
-[node name="TitleLabel" type="Label" parent="Control/Panel/VBoxContainer"]
+[node name="VBox" type="VBoxContainer" parent="CenterContainer/PanelContainer/Margin"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.95, 0.26, 0.26, 1)
-theme_override_colors/font_outline_color = Color(0.2, 0.05, 0.05, 1)
-theme_override_constants/outline_size = 6
-theme_override_font_sizes/font_size = 48
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/PanelContainer/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.16, 0.18, 1)
+theme_override_colors/font_outline_color = Color(0.18, 0.04, 0.04, 1)
+theme_override_constants/outline_size = 10
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 54
 text = "DEFEAT!"
 horizontal_alignment = 1
-vertical_alignment = 1
 
-[node name="ScoreLabel" type="Label" parent="Control/Panel/VBoxContainer"]
+[node name="SubtitleLabel" type="Label" parent="CenterContainer/PanelContainer/Margin/VBox"]
+unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.9, 0.9, 0.92, 1)
+theme_override_colors/font_color = Color(0.24, 0.14, 0.08, 1)
+theme_override_fonts/font = ExtResource("2_font_lilita")
 theme_override_font_sizes/font_size = 24
-text = "Barrels Sunk: 0"
+text = "FLAGSHIP BROUGHT DOWN AT SEA"
 horizontal_alignment = 1
-vertical_alignment = 1
+autowrap_mode = 2
 
-[node name="ActionHBox" type="HBoxContainer" parent="Control/Panel/VBoxContainer"]
+[node name="StatsBox" type="PanelContainer" parent="CenterContainer/PanelContainer/Margin/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 16
-alignment = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_stats_box")
 
-[node name="RestartButton" type="Button" parent="Control/Panel/VBoxContainer/ActionHBox"]
+[node name="StatsMargin" type="MarginContainer" parent="CenterContainer/PanelContainer/Margin/VBox/StatsBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 16
+
+[node name="StatsVBox" type="VBoxContainer" parent="CenterContainer/PanelContainer/Margin/VBox/StatsBox/StatsMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TargetsRow" type="HBoxContainer" parent="CenterContainer/PanelContainer/Margin/VBox/StatsBox/StatsMargin/StatsVBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CenterContainer/PanelContainer/Margin/VBox/StatsBox/StatsMargin/StatsVBox/TargetsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.22, 0.14, 0.08, 1)
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 28
+text = "TARGETS SUNK"
+
+[node name="ScoreLabel" type="Label" parent="CenterContainer/PanelContainer/Margin/VBox/StatsBox/StatsMargin/StatsVBox/TargetsRow"]
 unique_name_in_owner = true
-process_mode = 3
-custom_minimum_size = Vector2(210, 56)
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_outline_color = Color(0.1, 0.25, 0.1, 1)
-theme_override_constants/outline_size = 4
-theme_override_font_sizes/font_size = 16
-theme_override_styles/normal = SubResource("StyleBoxFlat_restart_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_restart_hover")
-text = "🔄 RESTART LEVEL"
+theme_override_colors/font_color = Color(0.2, 0.12, 0.05, 1)
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 32
+text = "0"
+horizontal_alignment = 2
 
-[node name="StartScreenButton" type="Button" parent="Control/Panel/VBoxContainer/ActionHBox"]
-unique_name_in_owner = true
-process_mode = 3
-custom_minimum_size = Vector2(210, 56)
+[node name="DoubloonsRow" type="HBoxContainer" parent="CenterContainer/PanelContainer/Margin/VBox/StatsBox/StatsMargin/StatsVBox"]
 layout_mode = 2
+
+[node name="CoinIcon" type="TextureRect" parent="CenterContainer/PanelContainer/Margin/VBox/StatsBox/StatsMargin/StatsVBox/DoubloonsRow"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("3_coin_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="CenterContainer/PanelContainer/Margin/VBox/StatsBox/StatsMargin/StatsVBox/DoubloonsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.22, 0.14, 0.08, 1)
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 28
+text = "DOUBLOONS SALVAGED"
+
+[node name="DoubloonsLabel" type="Label" parent="CenterContainer/PanelContainer/Margin/VBox/StatsBox/StatsMargin/StatsVBox/DoubloonsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.12, 0.05, 1)
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 32
+text = "0"
+horizontal_alignment = 2
+
+[node name="ActionButtonsBox" type="VBoxContainer" parent="CenterContainer/PanelContainer/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="RestartButton" type="Button" parent="CenterContainer/PanelContainer/Margin/VBox/ActionButtonsBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_outline_color = Color(0.1, 0.15, 0.3, 1)
+theme_override_colors/font_outline_color = Color(0.38, 0.22, 0.05, 1)
 theme_override_constants/outline_size = 4
-theme_override_font_sizes/font_size = 16
-theme_override_styles/normal = SubResource("StyleBoxFlat_menu_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_menu_hover")
-text = "🏠 START SCREEN"
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 34
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_retry")
+text = "🔄 TRY AGAIN"
+clip_text = true
+
+[node name="StartScreenButton" type="Button" parent="CenterContainer/PanelContainer/Margin/VBox/ActionButtonsBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 0.96, 0.88, 1)
+theme_override_colors/font_outline_color = Color(0.16, 0.09, 0.04, 1)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_harbor")
+text = "⚓ RETURN TO HARBOR"
+clip_text = true
