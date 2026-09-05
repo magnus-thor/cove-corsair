@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 120" width="640" height="120">
+  <defs>
+    <!-- Outer Burnished Gold Frame Gradient -->
+    <linearGradient id="goldFrameOuter" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFE885"/>
+      <stop offset="25%" stop-color="#E5B238"/>
+      <stop offset="65%" stop-color="#BA8218"/>
+      <stop offset="100%" stop-color="#6E4806"/>
+    </linearGradient>
+
+    <!-- Inner Gold Bevel -->
+    <linearGradient id="goldFrameInner" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFF2A8"/>
+      <stop offset="35%" stop-color="#E5B238"/>
+      <stop offset="100%" stop-color="#80540A"/>
+    </linearGradient>
+
+    <!-- Rich Crimson Red Wood Plank Fill -->
+    <linearGradient id="crimsonPlankGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#A83232"/>
+      <stop offset="35%" stop-color="#8B2222"/>
+      <stop offset="70%" stop-color="#731818"/>
+      <stop offset="100%" stop-color="#540E0E"/>
+    </linearGradient>
+
+    <filter id="setSailShadow" x="-5%" y="-10%" width="110%" height="135%">
+      <feDropShadow dx="0" dy="7" stdDeviation="5.5" flood-color="#000000" flood-opacity="0.65"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#setSailShadow)">
+    <!-- 1. Outer Gold Beveled Frame with Notched Diamond Tips on Left/Right -->
+    <path d="
+      M 8,60
+      L 34,12
+      Q 40,8 48,8
+      L 592,8
+      Q 600,8 606,12
+      L 632,60
+      L 606,108
+      Q 600,112 592,112
+      L 48,112
+      Q 40,112 34,108 Z
+    " fill="url(#goldFrameOuter)" stroke="#382204" stroke-width="3" stroke-linejoin="round"/>
+
+    <!-- 2. Dark Recessed Inset Border -->
+    <path d="
+      M 16,60
+      L 40,16
+      Q 44,13 50,13
+      L 590,13
+      Q 596,13 600,16
+      L 624,60
+      L 600,104
+      Q 596,107 590,107
+      L 50,107
+      Q 44,107 40,104 Z
+    " fill="#2E0A0A" stroke="#1C0505" stroke-width="2"/>
+
+    <!-- 3. Inner Gold Bezel Ring -->
+    <path d="
+      M 22,60
+      L 44,20
+      Q 48,17 54,17
+      L 586,17
+      Q 592,17 596,20
+      L 618,60
+      L 596,100
+      Q 592,103 586,103
+      L 54,103
+      Q 48,103 44,100 Z
+    " fill="none" stroke="url(#goldFrameInner)" stroke-width="2.5"/>
+
+    <!-- 4. Crimson Red Wood Plank -->
+    <path d="
+      M 26,60
+      L 47,23
+      Q 50,20 56,20
+      L 584,20
+      Q 590,20 593,23
+      L 614,60
+      L 593,97
+      Q 590,100 584,100
+      L 56,100
+      Q 50,100 47,97 Z
+    " fill="url(#crimsonPlankGrad)"/>
+
+    <!-- 5. Horizontal Woodgrain Plank Lines -->
+    <line x1="38" y1="46" x2="602" y2="46" stroke="#420D0D" stroke-width="2" opacity="0.9"/>
+    <line x1="38" y1="48" x2="602" y2="48" stroke="#C44B4B" stroke-width="1" opacity="0.4"/>
+
+    <line x1="34" y1="74" x2="606" y2="74" stroke="#420D0D" stroke-width="2" opacity="0.9"/>
+    <line x1="34" y1="76" x2="606" y2="76" stroke="#C44B4B" stroke-width="1" opacity="0.4"/>
+
+    <!-- Top Highlight on the Wood Face -->
+    <path d="M 54,23 L 586,23" stroke="#D15C5C" stroke-width="1.8" opacity="0.6"/>
+
+    <!-- Corner Gold Studs / Rivets -->
+    <circle cx="56" cy="30" r="3.5" fill="#FFE275" stroke="#4A3105" stroke-width="1.2"/>
+    <circle cx="584" cy="30" r="3.5" fill="#FFE275" stroke="#4A3105" stroke-width="1.2"/>
+    <circle cx="56" cy="90" r="3.5" fill="#FFE275" stroke="#4A3105" stroke-width="1.2"/>
+    <circle cx="584" cy="90" r="3.5" fill="#FFE275" stroke="#4A3105" stroke-width="1.2"/>
+    <circle cx="28" cy="60" r="3" fill="#FFE275" stroke="#4A3105" stroke-width="1.2"/>
+    <circle cx="612" cy="60" r="3" fill="#FFE275" stroke="#4A3105" stroke-width="1.2"/>
+  </g>
+</svg>

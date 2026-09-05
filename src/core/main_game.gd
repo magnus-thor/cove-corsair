@@ -4,8 +4,11 @@ extends Node3D
 @export var start_screen_scene: PackedScene = preload("res://src/ui/start_screen.tscn")
 @export var victory_screen_scene: PackedScene = preload("res://src/ui/victory_screen.tscn")
 
+@export var harbor_bay_scene: PackedScene = preload("res://src/levels/harbor_bay.tscn")
+
 var start_screen: StartScreen
 var victory_screen: VictoryScreen
+var harbor_bay: Node3D
 
 func _ready() -> void:
 	if GameState.should_auto_start:
@@ -14,11 +17,47 @@ func _ready() -> void:
 	else:
 		GameState.is_game_active = false
 		_pause_player_shooting()
+		_setup_harbor_mode()
 		_setup_start_screen()
 	_setup_victory_screen()
 
+func _setup_harbor_mode() -> void:
+	# Hide track segments and river lane during harbor mode
+	var track_mgr = get_tree().get_first_node_in_group("track_manager")
+	if track_mgr:
+		track_mgr.visible = false
+		
+	# Hide LevelController obstacles/props from displaying in the harbor
+	var level_ctrl = get_tree().get_first_node_in_group("level_controller")
+	if level_ctrl:
+		level_ctrl.visible = false
+
+	# Setup Harbor Bay
+	if harbor_bay_scene:
+		harbor_bay = harbor_bay_scene.instantiate() as Node3D
+		add_child(harbor_bay)
+		
+	var camera = get_tree().get_first_node_in_group("game_camera")
+	if camera and camera.has_method("set_harbor_mode"):
+		camera.set_harbor_mode(true)
+
+	var player = get_tree().get_first_node_in_group("player")
+	if player:
+		var hardpoints = player.get_node_or_null("Hardpoints")
+		if hardpoints:
+			hardpoints.visible = false
+
 func _start_game_immediately() -> void:
 	GameState.is_game_active = true
+	var track_mgr = get_tree().get_first_node_in_group("track_manager")
+	if track_mgr:
+		track_mgr.visible = true
+	var level_ctrl = get_tree().get_first_node_in_group("level_controller")
+	if level_ctrl:
+		level_ctrl.visible = true
+	var camera = get_tree().get_first_node_in_group("game_camera")
+	if camera and camera.has_method("set_harbor_mode"):
+		camera.set_harbor_mode(false)
 	var player = get_tree().get_first_node_in_group("player")
 	if player and "is_shooting_enabled" in player:
 		player.is_shooting_enabled = true
@@ -40,9 +79,37 @@ func _setup_start_screen() -> void:
 
 func _on_game_started() -> void:
 	GameState.is_game_active = true
+	
+	# Transition camera to gameplay
+	var camera = get_tree().get_first_node_in_group("game_camera")
+	if camera and camera.has_method("transition_to_gameplay"):
+		camera.transition_to_gameplay(0.85)
+		
+	# Transition harbor bay out
+	if harbor_bay and is_instance_valid(harbor_bay):
+		harbor_bay.transition_out(0.8)
+		
+	# Make runner track and level obstacles visible
+	var track_mgr = get_tree().get_first_node_in_group("track_manager")
+	if track_mgr:
+		track_mgr.visible = true
+		
+	var level_ctrl = get_tree().get_first_node_in_group("level_controller")
+	if level_ctrl:
+		level_ctrl.visible = true
+		
 	var player = get_tree().get_first_node_in_group("player")
-	if player and "is_shooting_enabled" in player:
-		player.is_shooting_enabled = true
+	if player:
+		if "is_shooting_enabled" in player:
+			player.is_shooting_enabled = true
+		var tween = create_tween()
+		var vis = player.get_node_or_null("BoatVisuals")
+		if vis:
+			tween.tween_property(vis, "rotation_degrees:y", 0.0, 0.6).set_trans(Tween.TRANS_SINE)
+		var hardpoints = player.get_node_or_null("Hardpoints")
+		if hardpoints:
+			hardpoints.visible = true
+			tween.tween_property(hardpoints, "rotation_degrees:y", 0.0, 0.6).set_trans(Tween.TRANS_SINE)
 		
 	var hud = get_tree().get_first_node_in_group("top_hud")
 	if hud and hud.has_method("on_game_started"):

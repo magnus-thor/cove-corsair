@@ -9,10 +9,10 @@
 [ext_resource type="Script" path="res://src/core/game_camera.gd" id="8_camera"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
-sky_top_color = Color(0.53, 0.81, 0.98, 1)
-sky_horizon_color = Color(0.7, 0.88, 0.98, 1)
-ground_bottom_color = Color(0.07843, 0.25882, 0.44706, 1)
-ground_horizon_color = Color(0.7, 0.88, 0.98, 1)
+sky_top_color = Color(0.38, 0.68, 0.92, 1)
+sky_horizon_color = Color(1, 0.92, 0.76, 1)
+ground_bottom_color = Color(0.08, 0.28, 0.45, 1)
+ground_horizon_color = Color(0.48, 0.82, 0.88, 1)
 
 [sub_resource type="Sky" id="Sky_sky"]
 sky_material = SubResource("ProceduralSkyMaterial_sky")

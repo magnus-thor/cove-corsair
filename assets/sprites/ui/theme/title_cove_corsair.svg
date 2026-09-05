@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 180" width="720" height="180">
+  <defs>
+    <!-- Lettering Gold Gradient -->
+    <linearGradient id="goldTextGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFE885"/>
+      <stop offset="25%" stop-color="#FFD44D"/>
+      <stop offset="70%" stop-color="#EAA120"/>
+      <stop offset="100%" stop-color="#B86C08"/>
+    </linearGradient>
+
+    <!-- Lettering Highlight Gradient -->
+    <linearGradient id="innerHighlightGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFDF2" stop-opacity="0.9"/>
+      <stop offset="45%" stop-color="#FFE885" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#EAA120" stop-opacity="0.0"/>
+    </linearGradient>
+
+    <!-- Wood Backing Gradient -->
+    <linearGradient id="woodPlaqueGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#55341C"/>
+      <stop offset="35%" stop-color="#3F2513"/>
+      <stop offset="85%" stop-color="#2B180A"/>
+      <stop offset="100%" stop-color="#1A0D05"/>
+    </linearGradient>
+
+    <!-- Drop Shadow Filter -->
+    <filter id="shadowFilter" x="-15%" y="-15%" width="130%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <!-- Group with Shadow -->
+  <g filter="url(#shadowFilter)">
+    <!-- Carved Dark Wood Backing Board -->
+    <!-- Scalloped silhouette shaped around the two words COVE CORSAIR -->
+    <path d="
+      M 48 90
+      C 48 55, 68 40, 102 38
+      C 130 36, 175 35, 230 36
+      C 260 28, 300 24, 360 24
+      C 420 24, 460 28, 490 36
+      C 545 35, 590 36, 618 38
+      C 652 40, 672 55, 672 90
+      C 672 125, 650 142, 615 145
+      C 575 148, 520 152, 470 152
+      C 435 156, 395 158, 360 158
+      C 325 158, 285 156, 250 152
+      C 200 152, 145 148, 105 145
+      C 70 142, 48 125, 48 90 Z
+    " fill="url(#woodPlaqueGrad)" stroke="#160B04" stroke-width="7" stroke-linejoin="round"/>
+
+    <!-- Wood Bevel Rim Highlight (Inner border) -->
+    <path d="
+      M 56 90
+      C 56 60, 74 46, 106 44
+      C 134 42, 178 41, 232 42
+      C 262 34, 302 30, 360 30
+      C 418 30, 458 34, 488 42
+      C 542 41, 586 42, 614 44
+      C 646 46, 664 60, 664 90
+      C 664 120, 644 136, 611 139
+      C 572 142, 518 145, 469 146
+      C 434 149, 394 151, 360 151
+      C 326 151, 286 149, 251 146
+      C 202 145, 148 142, 109 139
+      C 76 136, 56 120, 56 90 Z
+    " fill="none" stroke="#6F4626" stroke-width="2.5" opacity="0.75"/>
+
+    <!-- Wood Grain Carved Cuts -->
+    <path d="M 85 70 Q 120 72 155 69" stroke="#1D0E06" stroke-width="2.5" fill="none" opacity="0.6"/>
+    <path d="M 560 72 Q 600 70 635 73" stroke="#1D0E06" stroke-width="2.5" fill="none" opacity="0.6"/>
+    <path d="M 120 125 Q 160 128 200 126" stroke="#1D0E06" stroke-width="2.5" fill="none" opacity="0.6"/>
+    <path d="M 520 126 Q 560 128 600 125" stroke="#1D0E06" stroke-width="2.5" fill="none" opacity="0.6"/>
+
+    <!-- Bottom Deep Carved Shadow behind Letters -->
+    <text x="360" y="117" text-anchor="middle" font-family="'Carter One', 'Lilita One', Impact, sans-serif" font-weight="900" font-size="88" letter-spacing="4" fill="#180A03" stroke="#140802" stroke-width="12" stroke-linejoin="round">COVE CORSAIR</text>
+
+    <!-- 3D Extrusion Side/Shadow Layer -->
+    <text x="360" y="113" text-anchor="middle" font-family="'Carter One', 'Lilita One', Impact, sans-serif" font-weight="900" font-size="88" letter-spacing="4" fill="#6A3C08" stroke="#381D05" stroke-width="8" stroke-linejoin="round">COVE CORSAIR</text>
+
+    <!-- Main Lettering Face -->
+    <text x="360" y="108" text-anchor="middle" font-family="'Carter One', 'Lilita One', Impact, sans-serif" font-weight="900" font-size="88" letter-spacing="4" fill="url(#goldTextGrad)" stroke="#2C1405" stroke-width="4.5" stroke-linejoin="round">COVE CORSAIR</text>
+
+    <!-- Top Lettering Highlight Line -->
+    <text x="360" y="107" text-anchor="middle" font-family="'Carter One', 'Lilita One', Impact, sans-serif" font-weight="900" font-size="88" letter-spacing="4" fill="url(#innerHighlightGrad)" opacity="0.85">COVE CORSAIR</text>
+  </g>
+</svg>

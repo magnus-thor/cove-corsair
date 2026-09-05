@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 140" width="640" height="140">
+  <defs>
+    <!-- Aged Parchment Body Gradient -->
+    <linearGradient id="scrollPaperGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F5E7CE"/>
+      <stop offset="25%" stop-color="#EAD7B7"/>
+      <stop offset="65%" stop-color="#DFCAA2"/>
+      <stop offset="100%" stop-color="#C7AE82"/>
+    </linearGradient>
+
+    <!-- 3D Scroll Roll Left Gradient -->
+    <linearGradient id="scrollRollL" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#805C33"/>
+      <stop offset="25%" stop-color="#CEB185"/>
+      <stop offset="55%" stop-color="#F7ECD9"/>
+      <stop offset="85%" stop-color="#B28F60"/>
+      <stop offset="100%" stop-color="#5E3F1F"/>
+    </linearGradient>
+
+    <!-- 3D Scroll Roll Right Gradient -->
+    <linearGradient id="scrollRollR" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#5E3F1F"/>
+      <stop offset="15%" stop-color="#B28F60"/>
+      <stop offset="45%" stop-color="#F7ECD9"/>
+      <stop offset="75%" stop-color="#CEB185"/>
+      <stop offset="100%" stop-color="#805C33"/>
+    </linearGradient>
+
+    <!-- Inner Roll Shadows -->
+    <linearGradient id="shadowFoldL" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#472E14" stop-opacity="0.65"/>
+      <stop offset="100%" stop-color="#472E14" stop-opacity="0.0"/>
+    </linearGradient>
+    <linearGradient id="shadowFoldR" x1="100%" y1="0%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#472E14" stop-opacity="0.65"/>
+      <stop offset="100%" stop-color="#472E14" stop-opacity="0.0"/>
+    </linearGradient>
+
+    <filter id="parchmentShadow" x="-5%" y="-10%" width="110%" height="135%">
+      <feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#parchmentShadow)">
+    <!-- Main Center Parchment Body -->
+    <!-- Top & Bottom edges have subtle natural aged paper scalloped curves and small edge notches -->
+    <path d="
+      M 48,15
+      C 100,10 180,16 260,12
+      C 320,9 380,9 440,12
+      C 500,16 560,10 592,15
+      L 592,125
+      C 560,130 500,124 440,128
+      C 380,131 320,131 260,128
+      C 180,124 100,130 48,125 Z
+    " fill="url(#scrollPaperGrad)" stroke="#4A3118" stroke-width="3" stroke-linejoin="round"/>
+
+    <!-- Subtle Parchment Top Highlight Line -->
+    <path d="M 52,19 C 140,14 260,17 320,15 C 380,17 500,14 588,19" stroke="#FFF7E6" stroke-width="1.8" fill="none" opacity="0.85"/>
+
+    <!-- Subtle Parchment Bottom Shadow Line -->
+    <path d="M 52,121 C 140,126 260,123 320,125 C 380,123 500,126 588,121" stroke="#9E7E52" stroke-width="1.8" fill="none" opacity="0.6"/>
+
+    <!-- Left & Right Inset Crease Shadow where paper rolls outward -->
+    <rect x="48" y="15" width="24" height="110" fill="url(#shadowFoldL)"/>
+    <rect x="568" y="15" width="24" height="110" fill="url(#shadowFoldR)"/>
+
+    <!-- Left Scroll Curl Cylinder -->
+    <g>
+      <!-- Roll Cylinder Body -->
+      <path d="
+        M 16,8
+        C 12,8 10,13 10,18
+        L 10,122
+        C 10,127 12,132 16,132
+        L 50,130
+        C 53,130 55,126 55,122
+        L 55,18
+        C 55,14 53,10 50,10 Z
+      " fill="url(#scrollRollL)" stroke="#3B230E" stroke-width="2.5"/>
+      <!-- Top Curl Oval Rim -->
+      <ellipse cx="32" cy="10" rx="19" ry="6.5" fill="#DBC195" stroke="#3B230E" stroke-width="2"/>
+      <ellipse cx="32" cy="10" rx="11" ry="3.8" fill="#5E3F1F"/>
+      <ellipse cx="32" cy="10" rx="5" ry="1.8" fill="#2E1B09"/>
+      <!-- Bottom Curl Oval Rim -->
+      <ellipse cx="32" cy="130" rx="19" ry="6.5" fill="#B59463" stroke="#3B230E" stroke-width="2"/>
+    </g>
+
+    <!-- Right Scroll Curl Cylinder -->
+    <g>
+      <!-- Roll Cylinder Body -->
+      <path d="
+        M 624,8
+        C 628,8 630,13 630,18
+        L 630,122
+        C 630,127 628,132 624,132
+        L 590,130
+        C 587,130 585,126 585,122
+        L 585,18
+        C 585,14 587,10 590,10 Z
+      " fill="url(#scrollRollR)" stroke="#3B230E" stroke-width="2.5"/>
+      <!-- Top Curl Oval Rim -->
+      <ellipse cx="608" cy="10" rx="19" ry="6.5" fill="#DBC195" stroke="#3B230E" stroke-width="2"/>
+      <ellipse cx="608" cy="10" rx="11" ry="3.8" fill="#5E3F1F"/>
+      <ellipse cx="608" cy="10" rx="5" ry="1.8" fill="#2E1B09"/>
+      <!-- Bottom Curl Oval Rim -->
+      <ellipse cx="608" cy="130" rx="19" ry="6.5" fill="#B59463" stroke="#3B230E" stroke-width="2"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 76 76" width="76" height="76">
+  <defs>
+    <linearGradient id="gearBtnBorder" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#80542E"/>
+      <stop offset="50%" stop-color="#5C381B"/>
+      <stop offset="100%" stop-color="#38200E"/>
+    </linearGradient>
+    <linearGradient id="gearBtnBody" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#422917"/>
+      <stop offset="40%" stop-color="#331E10"/>
+      <stop offset="100%" stop-color="#211208"/>
+    </linearGradient>
+    <linearGradient id="brassGear" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE88A"/>
+      <stop offset="45%" stop-color="#D49E32"/>
+      <stop offset="85%" stop-color="#A87216"/>
+      <stop offset="100%" stop-color="#6B4408"/>
+    </linearGradient>
+    <filter id="gearBtnShadow" x="-10%" y="-10%" width="120%" height="135%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3.5" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#gearBtnShadow)">
+    <rect x="5" y="5" width="66" height="66" rx="16" ry="16" fill="url(#gearBtnBorder)" stroke="#1F1006" stroke-width="2.5"/>
+    <rect x="9" y="9" width="58" height="58" rx="12" ry="12" fill="url(#gearBtnBody)"/>
+    <!-- Top inner highlight -->
+    <path d="M 20,11 L 56,11" stroke="#7A522E" stroke-width="1.5" opacity="0.65"/>
+    
+    <!-- Brass Gear Cog Icon -->
+    <g transform="translate(38, 38)">
+      <!-- 8 Cog Teeth -->
+      <path d="M -5,-19 L 5,-19 L 4,-14 L -4,-14 Z" fill="url(#brassGear)"/>
+      <path d="M -5,-19 L 5,-19 L 4,-14 L -4,-14 Z" transform="rotate(45)" fill="url(#brassGear)"/>
+      <path d="M -5,-19 L 5,-19 L 4,-14 L -4,-14 Z" transform="rotate(90)" fill="url(#brassGear)"/>
+      <path d="M -5,-19 L 5,-19 L 4,-14 L -4,-14 Z" transform="rotate(135)" fill="url(#brassGear)"/>
+      <path d="M -5,-19 L 5,-19 L 4,-14 L -4,-14 Z" transform="rotate(180)" fill="url(#brassGear)"/>
+      <path d="M -5,-19 L 5,-19 L 4,-14 L -4,-14 Z" transform="rotate(225)" fill="url(#brassGear)"/>
+      <path d="M -5,-19 L 5,-19 L 4,-14 L -4,-14 Z" transform="rotate(270)" fill="url(#brassGear)"/>
+      <path d="M -5,-19 L 5,-19 L 4,-14 L -4,-14 Z" transform="rotate(315)" fill="url(#brassGear)"/>
+      <!-- Outer Gear Ring -->
+      <circle cx="0" cy="0" r="14.5" fill="url(#brassGear)" stroke="#4A2E05" stroke-width="1.5"/>
+      <!-- Inner Hole -->
+      <circle cx="0" cy="0" r="6" fill="#211208" stroke="#7A5012" stroke-width="1.2"/>
+    </g>
+  </g>
+</svg>

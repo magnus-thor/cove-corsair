@@ -65,18 +65,26 @@ func on_game_started() -> void:
 func _set_run_hud_visible(vis: bool, animate: bool = false) -> void:
 	if not progress_container or not multiplier_panel:
 		return
+	if gold_container:
+		gold_container.visible = vis
 	if vis:
 		progress_container.visible = true
 		multiplier_panel.visible = true
 		if animate:
 			progress_container.modulate.a = 0.0
 			multiplier_panel.modulate.a = 0.0
+			if gold_container:
+				gold_container.modulate.a = 0.0
 			var t = create_tween().set_parallel(true)
 			t.tween_property(progress_container, "modulate:a", 1.0, 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 			t.tween_property(multiplier_panel, "modulate:a", 1.0, 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+			if gold_container:
+				t.tween_property(gold_container, "modulate:a", 1.0, 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		else:
 			progress_container.modulate.a = 1.0
 			multiplier_panel.modulate.a = 1.0
+			if gold_container:
+				gold_container.modulate.a = 1.0
 	else:
 		progress_container.visible = false
 		multiplier_panel.visible = false

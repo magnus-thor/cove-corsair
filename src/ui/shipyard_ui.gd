@@ -3,6 +3,7 @@ extends CanvasLayer
 
 ## Shipyard Interface for Cove Corsair
 ## Handles vessel inspection carousel, purchases, tier upgrades, and equipping active flagship.
+## Authentically themed with Dark Oak, Burnished Gold, Ivory text, and Crimson/Green actions.
 
 signal shipyard_closed
 
@@ -74,24 +75,24 @@ func _update_display() -> void:
 	var is_active = (GameState.active_vessel == v_id)
 	
 	if purse_label:
-		purse_label.text = "🪙 %d DOUBLOONS" % GameState.doubloons
+		purse_label.text = "%d DOUBLOONS" % GameState.doubloons
 		
 	if vessel_name_label:
 		vessel_name_label.text = v_info["name"].to_upper()
 	if vessel_archetype_label:
-		vessel_archetype_label.text = v_info["archetype"]
+		vessel_archetype_label.text = v_info["archetype"].to_upper()
 		
 	if tier_badge_label:
 		if is_owned:
 			if cur_tier >= 3:
-				tier_badge_label.text = "TIER 3 / 3 (MAX)"
-				tier_badge_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+				tier_badge_label.text = "TIER 3 / 3 (MAX MASTERED)"
+				tier_badge_label.add_theme_color_override("font_color", Color(0.98, 0.82, 0.28, 1))
 			else:
 				tier_badge_label.text = "TIER %d / 3" % cur_tier
-				tier_badge_label.add_theme_color_override("font_color", Color(0.3, 0.85, 1.0))
+				tier_badge_label.add_theme_color_override("font_color", Color(0.96, 0.93, 0.86, 1))
 		else:
-			tier_badge_label.text = "NOT OWNED"
-			tier_badge_label.add_theme_color_override("font_color", Color(0.7, 0.4, 0.4))
+			tier_badge_label.text = "UNACQUIRED"
+			tier_badge_label.add_theme_color_override("font_color", Color(0.85, 0.45, 0.45, 1))
 			
 	if vessel_preview_rect:
 		var tex_path = v_info["preview_texture"]
@@ -129,7 +130,7 @@ func _update_display() -> void:
 		if buy_button:
 			buy_button.visible = true
 			var cost = v_info["purchase_price"]
-			buy_button.text = "BUY VESSEL: %d 🪙" % cost
+			buy_button.text = "BUY VESSEL: %d DOUBLOONS" % cost
 			buy_button.disabled = not GameState.can_afford(cost)
 		if upgrade_button:
 			upgrade_button.visible = false
@@ -145,7 +146,7 @@ func _update_display() -> void:
 			if cur_tier < 3:
 				var next_tier = cur_tier + 1
 				var cost = GameState.get_upgrade_cost(v_id, next_tier)
-				upgrade_button.text = "UPGRADE TO TIER %d: %d 🪙" % [next_tier, cost]
+				upgrade_button.text = "UPGRADE TIER %d: %d DOUBLOONS" % [next_tier, cost]
 				upgrade_button.disabled = not GameState.can_afford(cost)
 			else:
 				upgrade_button.text = "MAX TIER MASTERED"

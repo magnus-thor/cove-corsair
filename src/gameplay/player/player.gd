@@ -369,17 +369,22 @@ func _physics_process(delta: float) -> void:
 	# Do NOT call GameState.update_distance() here — it causes double-counting.
 		
 	if not GameState.is_game_active:
-		# Floating / Bobbing on water
+		# Floating / Bobbing on water in calm harbor (3/4 front view facing camera)
 		float_time += delta * bob_frequency
 		var idle_hover_height = lerp(min_hover_height, max_hover_height, (sin(float_time) + 1.0) * 0.5)
 		if visuals:
 			visuals.position.y = idle_hover_height
 			visuals.rotation_degrees.x = sin(float_time * 1.5) * 2.0
+			visuals.rotation_degrees.y = 158.0 + sin(float_time * 0.7) * 2.0
+			visuals.rotation_degrees.z = sin(float_time * 1.1) * 1.5
 			
 			var hardpoints = get_node_or_null("Hardpoints")
 			if hardpoints:
+				hardpoints.visible = false
 				hardpoints.position.y = visuals.position.y
 				hardpoints.rotation_degrees.x = visuals.rotation_degrees.x
+				hardpoints.rotation_degrees.y = visuals.rotation_degrees.y
+				hardpoints.rotation_degrees.z = visuals.rotation_degrees.z
 		return
 
 	# 2. Keyboard fallback controls
@@ -414,6 +419,7 @@ func _physics_process(delta: float) -> void:
 		
 		var hardpoints = get_node_or_null("Hardpoints")
 		if hardpoints:
+			hardpoints.visible = true
 			hardpoints.position.x = visuals.position.x
 			hardpoints.position.z = visuals.position.z
 			hardpoints.position.y = visuals.position.y

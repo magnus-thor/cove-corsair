@@ -1,0 +1,93 @@
+[gd_scene load_steps=16 format=3 uid="uid://c6u7k9e34m6y1"]
+
+[ext_resource type="Script" path="res://src/levels/harbor_bay.gd" id="1_harbor"]
+[ext_resource type="Shader" path="res://src/shaders/water_stylized.gdshader" id="2_water_shader"]
+[ext_resource type="PackedScene" path="res://assets/models/structure-platform-dock.glb" id="3_dock"]
+[ext_resource type="PackedScene" path="res://assets/models/structure-platform-dock-small.glb" id="4_dock_sm"]
+[ext_resource type="PackedScene" path="res://assets/models/barrel.glb" id="5_barrel"]
+[ext_resource type="PackedScene" path="res://assets/models/crate.glb" id="6_crate"]
+[ext_resource type="PackedScene" path="res://assets/models/palm-detailed-bend.glb" id="7_palm_bend"]
+[ext_resource type="PackedScene" path="res://assets/models/palm-detailed-straight.glb" id="8_palm_straight"]
+[ext_resource type="PackedScene" path="res://assets/models/rocks-a.glb" id="9_rock_a"]
+[ext_resource type="PackedScene" path="res://assets/models/rocks-b.glb" id="10_rock_b"]
+[ext_resource type="PackedScene" path="res://assets/models/rocks-c.glb" id="11_rock_c"]
+[ext_resource type="PackedScene" path="res://assets/models/structure.glb" id="12_structure"]
+[ext_resource type="Texture2D" path="res://assets/textures/harbor_sun.svg" id="13_sun_tex"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_noise"]
+noise_type = 2
+frequency = 0.025
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_water"]
+seamless = true
+as_normal_map = true
+noise = SubResource("FastNoiseLite_noise")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_calm_water"]
+render_priority = 0
+shader = ExtResource("2_water_shader")
+shader_parameter/albedo = Color(0.12, 0.65, 0.82, 0.92)
+shader_parameter/roughness = 0.04
+shader_parameter/refraction_strength = 0.035
+shader_parameter/uv1_scale = Vector3(0.08, 0.08, 0.08)
+shader_parameter/flow_speed = Vector2(0.01, -0.025)
+shader_parameter/texture_normal = SubResource("NoiseTexture2D_water")
+shader_parameter/texture_refraction = SubResource("NoiseTexture2D_water")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_water"]
+material = SubResource("ShaderMaterial_calm_water")
+size = Vector2(260, 190)
+
+[node name="HarborBay" type="Node3D"]
+script = ExtResource("1_harbor")
+
+[node name="CalmWater" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, -24)
+mesh = SubResource("PlaneMesh_water")
+
+[node name="HorizonSun" type="Sprite3D" parent="."]
+transform = Transform3D(8.0, 0, 0, 0, 8.0, 0, 0, 0, 8.0, 0, 4.8, -48)
+billboard = 1
+texture = ExtResource("13_sun_tex")
+
+[node name="RightDockMain" parent="." instance=ExtResource("3_dock")]
+transform = Transform3D(1.4, 0, 0.25, 0, 1.25, 0, -0.25, 0, 1.4, 7.8, 0.05, -16.0)
+
+[node name="RightDockPier" parent="." instance=ExtResource("4_dock_sm")]
+transform = Transform3D(1.3, 0, 0.15, 0, 1.2, 0, -0.15, 0, 1.3, 10.4, 0.05, -15.5)
+
+[node name="Barrel1" parent="." instance=ExtResource("5_barrel")]
+transform = Transform3D(0.65, 0, 0, 0, 0.65, 0, 0, 0, 0.65, 9.2, 0.45, -15.8)
+
+[node name="Crate1" parent="." instance=ExtResource("6_crate")]
+transform = Transform3D(0.7, 0, 0.15, 0, 0.7, 0, -0.15, 0, 0.7, 10.0, 0.46, -15.4)
+
+[node name="RightShack" parent="." instance=ExtResource("12_structure")]
+transform = Transform3D(1.3, 0, -0.3, 0, 1.35, 0, 0.3, 0, 1.3, 13.5, 0.0, -18.0)
+
+[node name="RightPalm1" parent="." instance=ExtResource("7_palm_bend")]
+transform = Transform3D(1.6, 0, 0.3, 0, 1.9, 0, -0.3, 0, 1.6, 12.0, 0.0, -19.0)
+
+[node name="RightPalm2" parent="." instance=ExtResource("8_palm_straight")]
+transform = Transform3D(1.7, 0, -0.3, 0, 2.1, 0, 0.3, 0, 1.7, 15.5, 0.0, -20.5)
+
+[node name="RightCliff" parent="." instance=ExtResource("10_rock_b")]
+transform = Transform3D(5.0, 0, 0, 0, 4.0, 0, 0, 0, 5.0, 20.0, -0.4, -30.0)
+
+[node name="LeftDock" parent="." instance=ExtResource("3_dock")]
+transform = Transform3D(1.3, 0, -0.3, 0, 1.2, 0, 0.3, 0, 1.3, -9.8, 0.05, -19.0)
+
+[node name="LeftPalm1" parent="." instance=ExtResource("7_palm_bend")]
+transform = Transform3D(1.6, 0, -0.4, 0, 1.9, 0, 0.4, 0, 1.6, -11.5, 0.0, -20.5)
+
+[node name="LeftPalm2" parent="." instance=ExtResource("8_palm_straight")]
+transform = Transform3D(1.7, 0, 0.3, 0, 2.2, 0, -0.3, 0, 1.7, -14.5, 0.0, -23.0)
+
+[node name="LeftCliff" parent="." instance=ExtResource("9_rock_a")]
+transform = Transform3D(4.8, 0, 0, 0, 3.8, 0, 0, 0, 4.8, -18.5, -0.4, -28.0)
+
+[node name="DistantSeaRockR" parent="." instance=ExtResource("11_rock_c")]
+transform = Transform3D(1.5, 0, 0.3, 0, 1.2, 0, -0.3, 0, 1.5, 6.2, -0.7, -32.0)
+
+[node name="DistantSeaRockL" parent="." instance=ExtResource("11_rock_c")]
+transform = Transform3D(1.4, 0, -0.4, 0, 1.1, 0, 0.4, 0, 1.4, -5.8, -0.75, -34.0)

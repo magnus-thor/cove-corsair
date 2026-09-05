@@ -10,10 +10,43 @@ var is_transitioning: bool = false
 var transition_t: float = 0.0
 var original_transform: Transform3D
 
+const GAMEPLAY_POSITION: Vector3 = Vector3(0.0, 14.5, 12.0)
+const GAMEPLAY_ROTATION: Vector3 = Vector3(-24.5, 0.0, 0.0)
+const HARBOR_POSITION: Vector3 = Vector3(0.0, 2.1, 4.8)
+const HARBOR_ROTATION: Vector3 = Vector3(-13.5, 0.0, 0.0)
+
+var is_in_harbor_mode: bool = true
+var harbor_tween: Tween
+
 func _ready() -> void:
-	base_position = position
-	base_rotation = rotation_degrees
 	add_to_group("game_camera")
+	if not GameState.is_game_active:
+		set_harbor_mode(true)
+	else:
+		set_harbor_mode(false)
+
+func set_harbor_mode(enabled: bool) -> void:
+	is_in_harbor_mode = enabled
+	if enabled:
+		position = HARBOR_POSITION
+		rotation_degrees = HARBOR_ROTATION
+		base_position = HARBOR_POSITION
+		base_rotation = HARBOR_ROTATION
+	else:
+		position = GAMEPLAY_POSITION
+		rotation_degrees = GAMEPLAY_ROTATION
+		base_position = GAMEPLAY_POSITION
+		base_rotation = GAMEPLAY_ROTATION
+
+func transition_to_gameplay(duration: float = 0.85) -> void:
+	is_in_harbor_mode = false
+	if harbor_tween and harbor_tween.is_valid():
+		harbor_tween.kill()
+	base_position = GAMEPLAY_POSITION
+	base_rotation = GAMEPLAY_ROTATION
+	harbor_tween = create_tween().set_parallel(true)
+	harbor_tween.tween_property(self, "position", GAMEPLAY_POSITION, duration).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+	harbor_tween.tween_property(self, "rotation_degrees", GAMEPLAY_ROTATION, duration).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 
 func _process(delta: float) -> void:
 	if is_transitioning and target_node and is_instance_valid(target_node):
@@ -33,7 +66,9 @@ func _process(delta: float) -> void:
 		var look_target = Vector3(0.0, 0.4, arena_mid_z - 1.0)
 		var current_look = global_transform.looking_at(look_target, Vector3.UP)
 		global_transform = global_transform.interpolate_with(current_look, 2.5 * delta)
-	else:
+	elif not is_in_harbor_mode:
+		if harbor_tween and harbor_tween.is_valid() and harbor_tween.is_running():
+			return
 		if shake_timer > 0.0:
 			shake_timer -= delta
 			var offset = Vector3(

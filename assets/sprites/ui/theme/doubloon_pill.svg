@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 76" width="340" height="76">
+  <defs>
+    <linearGradient id="pillBorder" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#80542E"/>
+      <stop offset="50%" stop-color="#5C381B"/>
+      <stop offset="100%" stop-color="#38200E"/>
+    </linearGradient>
+    <linearGradient id="pillBody" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#422917"/>
+      <stop offset="40%" stop-color="#331E10"/>
+      <stop offset="100%" stop-color="#211208"/>
+    </linearGradient>
+    <filter id="pillShadow" x="-5%" y="-10%" width="110%" height="135%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#pillShadow)">
+    <!-- Outer Carved Bevel Rim -->
+    <rect x="4" y="4" width="332" height="68" rx="34" ry="34" fill="url(#pillBorder)" stroke="#1F1006" stroke-width="2.5"/>
+    <!-- Inner Dark Wood Cavity -->
+    <rect x="9" y="9" width="322" height="58" rx="29" ry="29" fill="url(#pillBody)"/>
+    <!-- Top Highlight -->
+    <path d="M 38,11 L 302,11" stroke="#7A522E" stroke-width="1.5" opacity="0.65"/>
+    <!-- Bottom Shadow -->
+    <path d="M 38,65 L 302,65" stroke="#140A04" stroke-width="2" opacity="0.85"/>
+  </g>
+</svg>

@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 150" width="680" height="150">
+  <defs>
+    <!-- Wood Plaque Gradient -->
+    <linearGradient id="plaqueWood" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#5A371E"/>
+      <stop offset="35%" stop-color="#412613"/>
+      <stop offset="80%" stop-color="#2C180A"/>
+      <stop offset="100%" stop-color="#1A0D04"/>
+    </linearGradient>
+
+    <!-- Bevel Highlight -->
+    <linearGradient id="plaqueBevel" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#80542F"/>
+      <stop offset="100%" stop-color="#261205"/>
+    </linearGradient>
+
+    <!-- Drop Shadow Filter -->
+    <filter id="plaqueShadow" x="-10%" y="-15%" width="120%" height="145%">
+      <feDropShadow dx="0" dy="7" stdDeviation="6" flood-color="#000000" flood-opacity="0.65"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#plaqueShadow)">
+    <!-- Carved Dark Wood Backing Board Silhouette -->
+    <path d="
+      M 32 75
+      C 32 45, 52 30, 85 28
+      C 115 26, 160 25, 220 27
+      C 255 18, 300 14, 340 14
+      C 380 14, 425 18, 460 27
+      C 520 25, 565 26, 595 28
+      C 628 30, 648 45, 648 75
+      C 648 105, 628 120, 595 122
+      C 555 125, 500 128, 450 128
+      C 410 134, 370 136, 340 136
+      C 310 136, 270 134, 230 128
+      C 180 128, 125 125, 85 122
+      C 52 120, 32 105, 32 75 Z
+    " fill="url(#plaqueWood)" stroke="#160A03" stroke-width="6" stroke-linejoin="round"/>
+
+    <!-- Inner Bevel Highlight Line -->
+    <path d="
+      M 40 75
+      C 40 50, 58 36, 88 34
+      C 118 32, 162 31, 222 33
+      C 256 24, 301 20, 340 20
+      C 379 20, 424 24, 458 33
+      C 518 31, 562 32, 592 34
+      C 622 36, 640 50, 640 75
+      C 640 100, 622 114, 592 116
+      C 552 119, 498 122, 448 122
+      C 409 127, 369 129, 340 129
+      C 311 129, 271 127, 232 122
+      C 182 122, 128 119, 88 116
+      C 58 114, 40 100, 40 75 Z
+    " fill="none" stroke="url(#plaqueBevel)" stroke-width="2.5" opacity="0.8"/>
+
+    <!-- Carved Horizontal Wood Grain Grooves -->
+    <path d="M 68 58 Q 110 60 150 57" stroke="#180B03" stroke-width="2.5" fill="none" opacity="0.6"/>
+    <path d="M 530 60 Q 570 58 612 61" stroke="#180B03" stroke-width="2.5" fill="none" opacity="0.6"/>
+    <path d="M 95 95 Q 140 98 185 96" stroke="#180B03" stroke-width="2.5" fill="none" opacity="0.6"/>
+    <path d="M 495 96 Q 540 98 585 95" stroke="#180B03" stroke-width="2.5" fill="none" opacity="0.6"/>
+
+    <!-- Subtle Edge Wood Grain Highlight -->
+    <path d="M 68 60 Q 110 62 150 59" stroke="#7A502E" stroke-width="1.2" fill="none" opacity="0.4"/>
+    <path d="M 530 62 Q 570 60 612 63" stroke="#7A502E" stroke-width="1.2" fill="none" opacity="0.4"/>
+  </g>
+</svg>

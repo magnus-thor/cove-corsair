@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 54 64" width="54" height="64">
+  <defs>
+    <!-- Top Facet Light Gold -->
+    <linearGradient id="topFacetR" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFF5B8"/>
+      <stop offset="60%" stop-color="#FFD65C"/>
+      <stop offset="100%" stop-color="#EAA628"/>
+    </linearGradient>
+    <!-- Bottom Facet Shaded Gold -->
+    <linearGradient id="bottomFacetR" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#D9941C"/>
+      <stop offset="60%" stop-color="#B36F0E"/>
+      <stop offset="100%" stop-color="#804805"/>
+    </linearGradient>
+    <filter id="chiselShadowR" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="1" dy="3" stdDeviation="2.5" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+  <g filter="url(#chiselShadowR)">
+    <!-- Base Triangle Outline -->
+    <polygon points="46,32 8,10 8,54" fill="#3D2008" stroke="#261203" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Top Chiseled Facet -->
+    <polygon points="44,32 10,12 10,32" fill="url(#topFacetR)"/>
+    <!-- Bottom Chiseled Facet -->
+    <polygon points="44,32 10,32 10,52" fill="url(#bottomFacetR)"/>
+    <!-- Center Ridge Highlight Line -->
+    <line x1="44" y1="32" x2="10" y2="32" stroke="#FFFEE5" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- Top Outer Edge Highlight -->
+    <line x1="44" y1="32" x2="10" y2="12" stroke="#FFFEE5" stroke-width="1.2" stroke-linecap="round"/>
+  </g>
+</svg>

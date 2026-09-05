@@ -28,7 +28,7 @@ var vessel_tiers: Dictionary = {
 	"ironclad": 1
 }
 var active_vessel: String = "dinghy"
-var unlocked_levels: int = 1
+var unlocked_levels: int = 3
 
 # Persistent Audio Preferences
 var master_volume: float = 1.0
