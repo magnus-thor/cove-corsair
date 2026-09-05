@@ -20,31 +20,31 @@ move_speed = 7.5
 fire_rate = 0.15
 base_cannons = 3
 hardpoint_offsets = {
-"BowMount": Vector3(0, 0.45, -1.2),
-"MonkeyCrew": Vector3(-0.35, 0.94, 1.07),
-"PortSwivelMount1": Vector3(-0.3, 0.73, -1),
-"PortSwivelMount2": Vector3(-0.61, 0.5, -0.47),
-"SkeletonCrew": Vector3(0.35, 1.45, 1.3),
-"StarboardSwivelMount1": Vector3(0.24, 0.9, -0.92),
-"StarboardSwivelMount2": Vector3(0.59, 0.48, -0.34)
+"BowMount": Vector3(0.05, 0.57, -1.47),
+"MonkeyCrew": Vector3(-0.35, 0.83, 0.47),
+"PortSwivelMount1": Vector3(-0.47, 0.47, -1),
+"PortSwivelMount2": Vector3(-0.47, 0.47, -0.28),
+"SkeletonCrew": Vector3(0.35, 0.77, 1.3),
+"StarboardSwivelMount1": Vector3(0.48, 0.44, -1.24),
+"StarboardSwivelMount2": Vector3(0.48, 0.48, -0.34)
 }
 hardpoint_rotations = {
-"BowMount": Vector3(0, 0, 0),
-"MonkeyCrew": Vector3(0, 0, 0),
-"PortSwivelMount1": Vector3(0, 99, 0),
-"PortSwivelMount2": Vector3(0, 99, 0),
-"SkeletonCrew": Vector3(0, 0, 0),
-"StarboardSwivelMount1": Vector3(0, 99, 0),
-"StarboardSwivelMount2": Vector3(0, 94, 0)
+"BowMount": Vector3(0, -180, 0),
+"MonkeyCrew": Vector3(0, -173, 0),
+"PortSwivelMount1": Vector3(0, -176, 0),
+"PortSwivelMount2": Vector3(0, -167, 0),
+"SkeletonCrew": Vector3(0, 163, 0),
+"StarboardSwivelMount1": Vector3(0, -175, 0),
+"StarboardSwivelMount2": Vector3(0, -177, 0)
 }
 hardpoint_scales = {
-"BowMount": Vector3(1, 1, 1),
-"MonkeyCrew": Vector3(0.35, 0.35, 0.35),
-"PortSwivelMount1": Vector3(0.18, 0.18, 0.18),
-"PortSwivelMount2": Vector3(0.15, 0.15, 0.15),
-"SkeletonCrew": Vector3(0.35, 0.35, 0.35),
-"StarboardSwivelMount1": Vector3(0.18, 0.18, 0.18),
-"StarboardSwivelMount2": Vector3(0.18, 0.18, 0.18)
+"BowMount": Vector3(2.17, 2.17, 2.17),
+"MonkeyCrew": Vector3(0.79, 0.79, 0.79),
+"PortSwivelMount1": Vector3(3.2, 3.2, 3.2),
+"PortSwivelMount2": Vector3(3.2, 3.2, 3.2),
+"SkeletonCrew": Vector3(1.24, 1.24, 1.24),
+"StarboardSwivelMount1": Vector3(3.2, 3.2, 3.2),
+"StarboardSwivelMount2": Vector3(3.2, 3.2, 3.2)
 }
 tier_upgrades = Array[Dictionary]([{
 "BowMount": "res://src/data/resources/user_crew/weapon_bow_chaser.tres"

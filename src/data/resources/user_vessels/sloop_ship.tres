@@ -20,25 +20,25 @@ move_speed = 11.0
 fire_rate = 0.16
 base_cannons = 2
 hardpoint_offsets = {
-"AftDeckCrew": Vector3(0.26, 1.05, 0.73),
-"BowMount": Vector3(0, 0.26, -0.75),
-"MidDeckCrew": Vector3(-0.26, 0.84, 0.57),
-"PortSwivelMount": Vector3(-0.45, 1.04, 0.18),
-"StarboardSwivelMount": Vector3(0.45, 1.17, 0.14)
+"AftDeckCrew": Vector3(0.26, 0.77, 0.73),
+"BowMount": Vector3(0, 0.92, -1.55),
+"MidDeckCrew": Vector3(-0.26, 0.62, 0.57),
+"PortSwivelMount": Vector3(-0.32, 0.61, -0.79),
+"StarboardSwivelMount": Vector3(0.31, 0.63, -0.76)
 }
 hardpoint_rotations = {
-"AftDeckCrew": Vector3(0, -52, 0),
-"BowMount": Vector3(0, 0, 0),
-"MidDeckCrew": Vector3(0, 0, 0),
-"PortSwivelMount": Vector3(0, 112, 0),
-"StarboardSwivelMount": Vector3(0, 80, 0)
+"AftDeckCrew": Vector3(0, 158, 0),
+"BowMount": Vector3(0, 180, 0),
+"MidDeckCrew": Vector3(0, 180, 0),
+"PortSwivelMount": Vector3(0, -171, 0),
+"StarboardSwivelMount": Vector3(0, -176, 0)
 }
 hardpoint_scales = {
-"AftDeckCrew": Vector3(0.26, 0.26, 0.26),
+"AftDeckCrew": Vector3(1.4, 1.4, 1.4),
 "BowMount": Vector3(0.75, 0.75, 0.75),
-"MidDeckCrew": Vector3(0.26, 0.26, 0.26),
-"PortSwivelMount": Vector3(0.13, 0.13, 0.13),
-"StarboardSwivelMount": Vector3(0.15, 0.15, 0.15)
+"MidDeckCrew": Vector3(0.63, 0.63, 0.63),
+"PortSwivelMount": Vector3(3.1, 3.1, 3.1),
+"StarboardSwivelMount": Vector3(3.1, 3.1, 3.1)
 }
 tier_upgrades = Array[Dictionary]([{
 "BowMount": "res://src/data/resources/user_crew/weapon_bow_chaser.tres"

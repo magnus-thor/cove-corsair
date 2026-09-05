@@ -28,9 +28,9 @@ Player vessels define handling speed, hull durability, collision boundaries, and
 * **3D Model:** `res://assets/models/user/vessels/the_dinghy.glb`
 * **Calibrated Transform:** `y_offset = 0.26`, `scale = Vector3(3.80, 3.80, 3.80)`, `rotation = Vector3(0, 0, 0)`
 * **Hardpoint Sockets:**
-  * `BowMount`: Front chaser mount (scale: $1.0$)
-  * `MidDeckCrew`: Center deck socket (scale: $0.35$)
-  * `AftDeckCrew`: Aft deck socket (scale: $0.35$)
+  * `BowMount`: Front chaser mount (offset: `(0.00, 0.46, -1.70)`, scale: $1.00$)
+  * `MidDeckCrew`: Center deck socket (offset: `(0.00, 0.45, -1.08)`, scale: $1.25$)
+  * `AftDeckCrew`: Aft deck socket (offset: `(0.05, 0.46, 0.55)`, scale: $2.48$)
 * **Tier Progression:**
   * **Tier 1:** Instantiates [`weapon_bow_chaser.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_crew/weapon_bow_chaser.tres) at `BowMount`.
   * **Tier 2:** Adds [`crew_monkey_bomber.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_crew/crew_monkey_bomber.tres) at `MidDeckCrew`.
@@ -39,7 +39,11 @@ Player vessels define handling speed, hull durability, collision boundaries, and
 #### ⛵ 1.2 The Sloop ([`sloop_ship.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_vessels/sloop_ship.tres))
 * **3D Model:** `res://assets/models/user/vessels/the_sloop.glb`
 * **Calibrated Transform:** `y_offset = 0.33`, `scale = Vector3(2.00, 2.00, 2.00)`, `rotation = Vector3(0, -90, 0)`
-* **Hardpoint Sockets:** `BowMount`, `MidDeckCrew`, `AftDeckCrew`, `PortSwivelMount`, `StarboardSwivelMount`
+* **Hardpoint Sockets:**
+  * `BowMount`: Front cannon mount (scale: $0.75$)
+  * `MidDeckCrew`: Mid-deck crew socket (scale: $0.63$)
+  * `AftDeckCrew`: Aft-deck crew socket (scale: $1.40$)
+  * `PortSwivelMount` & `StarboardSwivelMount`: Lateral swivel mounts (scale: $3.10$)
 * **Tier Progression:**
   * **Tier 1:** [`weapon_bow_chaser.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_crew/weapon_bow_chaser.tres) on `BowMount`.
   * **Tier 2:** Adds `Monkey Bomber` (`MidDeckCrew`) & `Skeleton Tosser` (`AftDeckCrew`).
@@ -48,7 +52,10 @@ Player vessels define handling speed, hull durability, collision boundaries, and
 #### 🛡️ 1.3 The Ironclad ([`ironclad_ship.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_vessels/ironclad_ship.tres))
 * **3D Model:** `res://assets/models/user/vessels/the_ironclad.glb`
 * **Calibrated Transform:** `y_offset = 0.35`, `scale = Vector3(2.00, 2.00, 2.00)`, `rotation = Vector3(0, -90, 0)`
-* **Hardpoint Sockets:** `BowMount`, `MonkeyCrew`, `SkeletonCrew`, `PortSwivelMount1`, `PortSwivelMount2`, `StarboardSwivelMount1`, `StarboardSwivelMount2`
+* **Hardpoint Sockets:**
+  * `BowMount`: Front heavy battery mount (scale: $2.17$)
+  * `MonkeyCrew` & `SkeletonCrew`: Deck crew sockets (scales: $0.79$, $1.24$)
+  * `PortSwivelMount1/2` & `StarboardSwivelMount1/2`: 4 lateral swivel mounts (scale: $3.20$)
 * **Tier Progression:**
   * **Tier 1:** Frontal Cannon Battery (`BowMount`).
   * **Tier 2:** Mid-deck `Monkey Bomber` and `Skeleton Tosser`.
