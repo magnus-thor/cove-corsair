@@ -84,8 +84,10 @@ func collect_chest() -> void:
 			child.set_deferred("disabled", true)
 			
 	var player = get_tree().get_first_node_in_group("player")
-	if player and player.has_method("add_evolution_xp"):
-		player.add_evolution_xp(50.0)
+	if player and player.has_method("add_doubloons"):
+		player.add_doubloons(25)
+	if GameState:
+		GameState.add_doubloons(25)
 		
 	AudioManager.play_sfx("coin_pickups")
 	queue_free()

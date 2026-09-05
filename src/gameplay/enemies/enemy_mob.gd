@@ -247,8 +247,6 @@ func die() -> void:
 	if player:
 		if player.has_method("upgrade_ship"):
 			player.upgrade_ship(1)
-		if player.has_method("add_evolution_xp"):
-			player.add_evolution_xp(10.0)
 		
 	queue_free()
 

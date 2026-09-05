@@ -5,8 +5,6 @@ signal health_changed(current: int, max_hp: int)
 signal score_changed(new_score: int)
 signal doubloons_changed(new_doubloons: int)
 
-enum ShipTier {RAFT, SLOOP, GALLEON}
-
 @export var ship_data: ShipData:
 	set(val):
 		if ship_data == val:
@@ -39,7 +37,7 @@ enum ShipTier {RAFT, SLOOP, GALLEON}
 @export var yaw_lerp_speed: float = 10.0
 
 ## The active ship tier
-@export var current_tier: ShipTier = ShipTier.RAFT
+@export var current_tier: int = 1
 
 ## Cooldown duration between automatic shots in seconds
 @export var shoot_cooldown: float = 0.45
@@ -49,9 +47,6 @@ enum ShipTier {RAFT, SLOOP, GALLEON}
 
 ## Damage bonus applied to all projectiles
 @export var base_damage_bonus: int = 0
-
-## The penalty to power_level when colliding with an obstacle
-@export var collision_penalty: int = 10
 
 ## The cannonball prefab scene to spawn
 @export var cannonball_scene: PackedScene = preload("res://src/gameplay/projectiles/cannonball.tscn")
@@ -67,8 +62,6 @@ var current_health: int = 3
 
 @export var target_score: int = 50
 
-var power_level: int = 0
-var evolution_xp: float = 0.0
 var equipped_weapons: Dictionary = {}
 @export var follower_scene: PackedScene = preload("res://src/gameplay/player/follower_boat.tscn")
 var follower_boats: Array[Node3D] = []
@@ -135,7 +128,6 @@ func _ready() -> void:
 	
 	magnet_area.area_entered.connect(_on_magnet_area_entered)
 	
-	evolution_xp = 0.0
 	var level_ship = GameState.get_current_ship_resource() if GameState.has_method("get_current_ship_resource") else null
 	if level_ship:
 		ship_data = level_ship
@@ -293,8 +285,8 @@ func apply_ship_data(data: ShipData) -> void:
 func apply_tier(tier_level: int) -> void:
 	if not ship_data:
 		return
+	current_tier = tier_level
 	if ship_data.tier_upgrades.is_empty():
-		_apply_weapon_tier_setup()
 		return
 	var index = clamp(tier_level - 1, 0, ship_data.tier_upgrades.size() - 1)
 	var tier_dict: Dictionary = ship_data.tier_upgrades[index]
@@ -439,39 +431,16 @@ func _on_magnet_area_entered(area: Area3D) -> void:
 		area.attract_to(self)
 
 func upgrade_ship(amount: int = 1) -> void:
-	power_level += amount
 	score += amount
 	score_changed.emit(score)
-	_check_tier_updates()
 
 func add_doubloons(amount: int) -> void:
 	doubloons += amount
 	doubloons_changed.emit(doubloons)
 
-func add_evolution_xp(amount: float) -> void:
-	evolution_xp += amount
-	_check_tier_updates()
-
-func _check_tier_updates(force: bool = false) -> void:
-	var old_tier = current_tier
-	
-	var num_tiers = ship_data.tier_upgrades.size() if (ship_data and not ship_data.tier_upgrades.is_empty()) else 3
-	
-	var t2_threshold = 30.0
-	var t3_threshold = 70.0
-	
-	if num_tiers >= 3 and evolution_xp >= t3_threshold:
-		current_tier = ShipTier.GALLEON
-	elif num_tiers >= 2 and evolution_xp >= t2_threshold:
-		current_tier = ShipTier.SLOOP
-	else:
-		current_tier = ShipTier.RAFT
-			
-	if current_tier != old_tier or force:
-		if ship_data and not ship_data.tier_upgrades.is_empty():
-			apply_tier(int(current_tier) + 1)
-		else:
-			_apply_weapon_tier_setup()
+func add_evolution_xp(_amount: float) -> void:
+	# Deprecated legacy in-run evolution: ship tiers are managed via Shipyard meta-progression.
+	pass
 
 func spawn_floating_text_at_position(text_val: String, color_val: Color) -> void:
 	var ft_script = load("res://src/gameplay/vfx/floating_text.gd")
@@ -483,40 +452,6 @@ func spawn_floating_text_at_position(text_val: String, color_val: Color) -> void
 			fct.global_position = global_position + Vector3(randf_range(-0.5, 0.5), 1.5, randf_range(-0.5, 0.5))
 			fct.setup(text_val, color_val)
 
-func _apply_weapon_tier_setup() -> void:
-	clear_weapons()
-	
-	var heavy_ammo = preload("res://src/data/resources/user_ammo/ammo_heavy_shot.tres")
-	
-	match current_tier:
-		ShipTier.RAFT:
-			var bow_weapon = preload("res://src/data/resources/user_crew/weapon_bow_chaser.tres")
-			equip_weapon_to_socket("BowMount", bow_weapon)
-			
-		ShipTier.SLOOP:
-			var bow_weapon = preload("res://src/data/resources/user_crew/weapon_bow_chaser.tres")
-			var port_weapon = preload("res://src/data/resources/user_crew/weapon_port_swivel.tres")
-			var star_weapon = preload("res://src/data/resources/user_crew/weapon_starboard_swivel.tres")
-			equip_weapon_to_socket("BowMount", bow_weapon)
-			equip_weapon_to_socket("PortSwivelMount", port_weapon)
-			equip_weapon_to_socket("StarboardSwivelMount", star_weapon)
-			
-		ShipTier.GALLEON:
-			var bow_weapon = preload("res://src/data/resources/user_crew/weapon_bow_chaser.tres").duplicate()
-			bow_weapon.default_ammo = heavy_ammo
-			
-			var port_weapon = preload("res://src/data/resources/user_crew/weapon_port_swivel.tres").duplicate()
-			port_weapon.default_ammo = heavy_ammo
-			
-			var star_weapon = preload("res://src/data/resources/user_crew/weapon_starboard_swivel.tres").duplicate()
-			star_weapon.default_ammo = heavy_ammo
-			
-			var aft_weapon = preload("res://src/data/resources/user_crew/weapon_deckhand_sniper.tres")
-			
-			equip_weapon_to_socket("BowMount", bow_weapon)
-			equip_weapon_to_socket("PortSwivelMount", port_weapon)
-			equip_weapon_to_socket("StarboardSwivelMount", star_weapon)
-			equip_weapon_to_socket("AftMortarMount", aft_weapon)
 
 
 func take_hit(amount: int = 1, source_info: String = "") -> void:

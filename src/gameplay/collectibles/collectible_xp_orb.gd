@@ -150,10 +150,13 @@ func collect_orb(_player_ref: Node = null) -> void:
 			child.set_deferred("disabled", true)
 			
 	var player = get_tree().get_first_node_in_group("player")
-	if player and player.has_method("add_evolution_xp"):
-		player.add_evolution_xp(value)
+	if player:
+		if player.has_method("add_doubloons"):
+			player.add_doubloons(int(value))
 		if player.has_method("spawn_floating_text_at_position"):
-			player.spawn_floating_text_at_position("+" + str(int(value)) + " XP", Color(0.2, 1.0, 0.2))
+			player.spawn_floating_text_at_position("+" + str(int(value)) + " COINS", Color(1.0, 0.85, 0.2))
+	if GameState:
+		GameState.add_doubloons(int(value))
 		
 	AudioManager.play_sfx("coin_pickups")
 	queue_free()
