@@ -28,7 +28,15 @@ var vessel_tiers: Dictionary = {
 	"ironclad": 1
 }
 var active_vessel: String = "dinghy"
-var unlocked_levels: int = 3
+# Persistent Progression & Level Map State
+var highest_unlocked_level: int = 1
+var current_selected_level: int = 1
+var just_cleared_level: bool = false
+var last_cleared_level: int = 1
+var level_high_scores: Dictionary = {
+	1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0
+}
+var unlocked_levels: int = 1 # Backwards compatibility alias for highest_unlocked_level
 
 # Persistent Audio Preferences
 var master_volume: float = 1.0
@@ -43,7 +51,7 @@ var run_doubloons: int = 0
 var targets_destroyed: int = 0
 var active_multiplier: float = 1.0
 var multiplier_mode: String = "x" # "x" for multiply, "+" for add
-var current_level: int = 1
+var current_level: int = 1 # Backwards compatibility alias for current_selected_level
 var level_distance_target: float = 250.0 # meters / units to reach boss or finish
 var distance_traveled: float = 0.0
 var is_game_active: bool = false
@@ -125,6 +133,13 @@ const LEVEL_SHIPS: Dictionary = {
 func _ready() -> void:
 	load_game()
 	apply_audio_settings()
+	set_performance_mode(false)
+
+func set_performance_mode(is_gameplay: bool) -> void:
+	if is_gameplay:
+		Engine.max_fps = 60
+	else:
+		Engine.max_fps = 30
 
 func apply_audio_settings() -> void:
 	if not AudioManager:
@@ -235,9 +250,26 @@ func update_distance(delta_distance: float) -> void:
 	distance_traveled = min(level_distance_target, distance_traveled + delta_distance)
 	progress_changed.emit(distance_traveled, level_distance_target)
 
-func unlock_next_level() -> void:
-	unlocked_levels = min(6, max(unlocked_levels, current_level + 1))
+func select_level(lvl: int) -> void:
+	current_selected_level = clamp(lvl, 1, 6)
+	current_level = current_selected_level
 	save_game()
+
+func unlock_next_level() -> void:
+	last_cleared_level = current_level
+	if current_level >= highest_unlocked_level:
+		highest_unlocked_level = min(6, current_level + 1)
+		just_cleared_level = true
+		current_selected_level = highest_unlocked_level
+	unlocked_levels = highest_unlocked_level
+	current_level = current_selected_level
+	save_game()
+
+func record_level_score(level_num: int, score: int) -> void:
+	var cur_best: int = int(level_high_scores.get(level_num, 0))
+	if score > cur_best:
+		level_high_scores[level_num] = score
+		save_game()
 
 func is_campaign_complete() -> bool:
 	return current_level >= 6
@@ -263,8 +295,13 @@ func reset_save_data() -> void:
 		"ironclad": 1
 	}
 	active_vessel = "dinghy"
+	highest_unlocked_level = 1
+	current_selected_level = 1
 	unlocked_levels = 1
 	current_level = 1
+	just_cleared_level = false
+	last_cleared_level = 1
+	level_high_scores = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
 	reset_level()
 	if FileAccess.file_exists(SAVE_PATH):
 		DirAccess.remove_absolute(SAVE_PATH)
@@ -278,7 +315,12 @@ func save_game() -> void:
 		"owned_vessels": owned_vessels,
 		"vessel_tiers": vessel_tiers,
 		"active_vessel": active_vessel,
-		"unlocked_levels": unlocked_levels,
+		"highest_unlocked_level": highest_unlocked_level,
+		"current_selected_level": current_selected_level,
+		"just_cleared_level": just_cleared_level,
+		"last_cleared_level": last_cleared_level,
+		"level_high_scores": level_high_scores,
+		"unlocked_levels": highest_unlocked_level,
 		"master_volume": master_volume,
 		"music_volume": music_volume,
 		"sfx_volume": sfx_volume,
@@ -297,7 +339,13 @@ func load_game() -> void:
 	owned_vessels = ["dinghy"]
 	vessel_tiers = {"dinghy": 1, "sloop": 1, "ironclad": 1}
 	active_vessel = "dinghy"
+	highest_unlocked_level = 1
+	current_selected_level = 1
 	unlocked_levels = 1
+	current_level = 1
+	just_cleared_level = false
+	last_cleared_level = 1
+	level_high_scores = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
 	master_volume = 1.0
 	music_volume = 1.0
 	sfx_volume = 1.0
@@ -346,8 +394,27 @@ func load_game() -> void:
 		else:
 			active_vessel = "dinghy"
 
-		if data.has("unlocked_levels"):
-			unlocked_levels = clamp(int(data["unlocked_levels"]), 1, 6)
+		if data.has("highest_unlocked_level"):
+			highest_unlocked_level = clamp(int(data["highest_unlocked_level"]), 1, 6)
+		elif data.has("unlocked_levels"):
+			highest_unlocked_level = clamp(int(data["unlocked_levels"]), 1, 6)
+		unlocked_levels = highest_unlocked_level
+
+		if data.has("current_selected_level"):
+			current_selected_level = clamp(int(data["current_selected_level"]), 1, 6)
+		else:
+			current_selected_level = highest_unlocked_level
+		current_level = current_selected_level
+
+		if data.has("just_cleared_level"):
+			just_cleared_level = bool(data["just_cleared_level"])
+		if data.has("last_cleared_level"):
+			last_cleared_level = clamp(int(data["last_cleared_level"]), 1, 6)
+		if data.has("level_high_scores") and data["level_high_scores"] is Dictionary:
+			for k in data["level_high_scores"]:
+				var lvl_key = int(k)
+				if lvl_key in level_high_scores:
+					level_high_scores[lvl_key] = max(0, int(data["level_high_scores"][k]))
 
 		if data.has("master_volume"): master_volume = clamp(float(data["master_volume"]), 0.0, 1.0)
 		if data.has("music_volume"): music_volume = clamp(float(data["music_volume"]), 0.0, 1.0)
@@ -362,3 +429,7 @@ func load_game() -> void:
 		active_vessel = "dinghy"
 		owned_vessels = ["dinghy"]
 		vessel_tiers["dinghy"] = 1
+		highest_unlocked_level = 1
+		current_selected_level = 1
+		unlocked_levels = 1
+		current_level = 1

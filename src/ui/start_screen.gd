@@ -1,25 +1,16 @@
 class_name StartScreen
 extends CanvasLayer
 
-## Signal emitted when player presses SET SAIL button and fade animation completes
+## Main Start & Progression Screen for Cove Corsair
+## Integrates the scrollable RiverMap, top economy/settings bar, and shipyard dock.
+
 signal game_started
 
+@onready var main_control: Control = $Control
 @onready var doubloons_label: Label = %DoubloonsLabel
 @onready var settings_button: Button = %SettingsButton
-@onready var game_title: Control = get_node_or_null("%GameTitle")
-
-@onready var btn_prev_expedition: BaseButton = %BtnPrevExpedition
-@onready var btn_next_expedition: BaseButton = %BtnNextExpedition
-@onready var expedition_num_label: Label = %ExpeditionNumLabel
-@onready var expedition_name_label: Label = %ExpeditionNameLabel
-@onready var expedition_meta_label: Label = get_node_or_null("%ExpeditionMetaLabel")
-
-@onready var start_button: Button = %StartButton
 @onready var shipyard_button: Button = %ShipyardButton
-@onready var reset_button: Button = get_node_or_null("%ResetButton")
-@onready var main_control: Control = $Control
-
-var pulse_tween: Tween
+@onready var river_map: RiverMap = %RiverMap
 
 const LEVEL_NAMES: Dictionary = {
 	1: "SMUGGLER'S RUN",
@@ -49,31 +40,24 @@ const LEVEL_DISTANCES: Dictionary = {
 }
 
 func _ready() -> void:
-	if start_button:
-		start_button.pressed.connect(_on_start_button_pressed)
-		_setup_button_pulse()
+	GameState.set_performance_mode(false)
+	
+	if river_map:
+		river_map.sail_requested.connect(_on_river_map_sail_requested)
+		river_map.level_selected.connect(_on_river_map_level_selected)
 		
 	if shipyard_button:
 		shipyard_button.pressed.connect(_on_shipyard_button_pressed)
 
 	if settings_button:
 		settings_button.pressed.connect(_on_settings_button_pressed)
-
-	if reset_button:
-		reset_button.pressed.connect(_on_reset_button_pressed)
-		
-	if btn_prev_expedition:
-		btn_prev_expedition.pressed.connect(_on_prev_expedition_pressed)
-		
-	if btn_next_expedition:
-		btn_next_expedition.pressed.connect(_on_next_expedition_pressed)
 		
 	GameState.active_vessel_changed.connect(_on_active_vessel_changed)
 	GameState.doubloons_changed.connect(_on_doubloons_changed)
 	
 	_update_doubloons_display()
-	_update_expedition_display()
 	_refresh_player_ship()
+	_select_level(GameState.current_selected_level, true)
 
 func _update_doubloons_display() -> void:
 	if doubloons_label:
@@ -81,20 +65,6 @@ func _update_doubloons_display() -> void:
 
 func _on_doubloons_changed(_amt: int) -> void:
 	_update_doubloons_display()
-
-func _setup_button_pulse() -> void:
-	if not start_button:
-		return
-	
-	start_button.resized.connect(_update_start_button_pivot)
-	_update_start_button_pivot()
-	pulse_tween = create_tween().set_loops()
-	pulse_tween.tween_property(start_button, "scale", Vector2(1.035, 1.035), 0.8).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	pulse_tween.tween_property(start_button, "scale", Vector2(1.0, 1.0), 0.8).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-
-func _update_start_button_pivot() -> void:
-	if start_button:
-		start_button.pivot_offset = start_button.size * 0.5
 
 func _on_active_vessel_changed(_v_id: String) -> void:
 	_refresh_player_ship()
@@ -105,18 +75,27 @@ func _refresh_player_ship() -> void:
 		var ship = GameState.get_active_ship_resource()
 		if ship:
 			player.apply_ship_data(ship)
+			
+	if river_map and river_map.has_method("_setup_mini_vessel"):
+		river_map._setup_mini_vessel()
 
-func _on_prev_expedition_pressed() -> void:
-	if GameState.current_level > 1:
-		_select_level(GameState.current_level - 1)
-	else:
-		_select_level(6)
+func _on_river_map_level_selected(lvl: int) -> void:
+	_select_level(lvl, false)
 
-func _on_next_expedition_pressed() -> void:
-	if GameState.current_level < 6:
-		_select_level(GameState.current_level + 1)
-	else:
-		_select_level(1)
+func _on_river_map_sail_requested(lvl: int) -> void:
+	_select_level(lvl, true)
+	
+	visible = false
+	game_started.emit()
+	
+	var fade_tween = create_tween().set_parallel(true)
+	if main_control:
+		fade_tween.tween_property(main_control, "modulate:a", 0.0, 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		fade_tween.tween_property(main_control, "position:y", main_control.position.y - 60.0, 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	
+	fade_tween.chain().tween_callback(func():
+		queue_free()
+	)
 
 func _on_shipyard_button_pressed() -> void:
 	AudioManager.play_sfx("gate_passes")
@@ -140,25 +119,15 @@ func _on_settings_button_pressed() -> void:
 		if settings.has_signal("settings_closed"):
 			settings.settings_closed.connect(func():
 				_update_doubloons_display()
-				_select_level(GameState.current_level, true)
+				_select_level(GameState.current_selected_level, true)
 				_refresh_player_ship()
 			)
-
-func _on_reset_button_pressed() -> void:
-	GameState.reset_save_data()
-	_update_doubloons_display()
-	_select_level(1, true)
-	if AudioManager and AudioManager.has_method("play_sfx"):
-		AudioManager.play_sfx("coin_pickups", 0.8, 0.8)
 
 func _select_level(lvl: int, force: bool = false) -> void:
 	if not force and GameState.current_level == lvl:
 		return
 		
-	GameState.current_level = lvl
-	AudioManager.play_sfx("gate_passes", 1.0, 1.1)
-	_update_expedition_display()
-	
+	GameState.select_level(lvl)
 	_refresh_player_ship()
 	
 	var harbor = get_tree().get_first_node_in_group("harbor_bay")
@@ -181,57 +150,3 @@ func _select_level(lvl: int, force: bool = false) -> void:
 	var hud = get_tree().get_first_node_in_group("top_hud")
 	if hud and "level_title" in hud and hud.level_title:
 		hud.level_title.text = LEVEL_NAMES.get(lvl, "Level %d" % lvl)
-
-func _update_expedition_display() -> void:
-	var cur = GameState.current_level
-	var max_unlocked = clamp(GameState.unlocked_levels, 1, 6)
-	
-	if expedition_num_label:
-		expedition_num_label.text = "EXPEDITION %02d:" % cur
-	if expedition_name_label:
-		var exp_name = LEVEL_NAMES.get(cur, "COVE RUN")
-		expedition_name_label.text = exp_name
-		if exp_name.length() > 16:
-			expedition_name_label.add_theme_font_size_override("font_size", 28)
-		else:
-			expedition_name_label.add_theme_font_size_override("font_size", 32)
-	if expedition_meta_label:
-		var biome = LEVEL_BIOMES.get(cur, "Open Waters")
-		var dist = LEVEL_DISTANCES.get(cur, 250)
-		expedition_meta_label.text = "%s  •  Target: %dm" % [biome, dist]
-		
-	if btn_prev_expedition:
-		btn_prev_expedition.disabled = false
-		btn_prev_expedition.modulate = Color.WHITE
-		
-	if btn_next_expedition:
-		btn_next_expedition.disabled = false
-		btn_next_expedition.modulate = Color.WHITE
-
-func _on_start_button_pressed() -> void:
-	if not start_button or start_button.disabled:
-		return
-		
-	start_button.disabled = true
-	
-	if pulse_tween and pulse_tween.is_valid():
-		pulse_tween.kill()
-		
-	start_button.scale = Vector2.ONE
-	
-	if AudioManager and AudioManager.has_method("play_sfx"):
-		AudioManager.play_sfx("gate_passes")
-	
-	# Hide start screen root node immediately
-	visible = false
-	
-	game_started.emit()
-	
-	var fade_tween = create_tween().set_parallel(true)
-	if main_control:
-		fade_tween.tween_property(main_control, "modulate:a", 0.0, 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-		fade_tween.tween_property(main_control, "position:y", main_control.position.y - 60.0, 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	
-	fade_tween.chain().tween_callback(func():
-		queue_free()
-	)

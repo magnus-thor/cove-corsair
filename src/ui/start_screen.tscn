@@ -1,76 +1,37 @@
-[gd_scene load_steps=23 format=3 uid="uid://b7yak4m2p5q8y"]
+[gd_scene load_steps=15 format=3 uid="uid://b7yak4m2p5q8y"]
 
 [ext_resource type="Script" path="res://src/ui/start_screen.gd" id="1_start_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ui/coin_icon.svg" id="2_coin_icon"]
-[ext_resource type="FontFile" path="res://assets/fonts/CarterOne.ttf" id="3_font_carter"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ui/theme/scroll_banner.svg" id="4_scroll_banner"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ui/theme/btn_set_sail.svg" id="5_btn_set_sail"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ui/theme/btn_wood_plank.svg" id="6_btn_wood_plank"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ui/theme/doubloon_pill.svg" id="7_doubloon_pill"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ui/theme/gear_button.svg" id="8_gear_button"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ui/theme/gold_arrow_left.svg" id="9_arrow_left"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ui/theme/gold_arrow_right.svg" id="10_arrow_right"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ui/theme/title_wood_plaque.svg" id="11_title_plaque"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ui/theme/icon_anchor.svg" id="12_icon_anchor"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ui/theme/icon_refresh.svg" id="13_icon_refresh"]
+[ext_resource type="PackedScene" uid="uid://c3q8v41j3kn6e" path="res://src/ui/river_map.tscn" id="2_river_map"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/coin_icon.svg" id="3_coin_icon"]
+[ext_resource type="FontFile" path="res://assets/fonts/CarterOne.ttf" id="4_font_carter"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/theme/doubloon_pill.svg" id="5_doubloon_pill"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/theme/gear_button.svg" id="6_gear_button"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/theme/btn_wood_plank.svg" id="7_btn_wood_plank"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/theme/icon_anchor.svg" id="8_icon_anchor"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_pill"]
-texture = ExtResource("7_doubloon_pill")
+texture = ExtResource("5_doubloon_pill")
 texture_margin_left = 34.0
 texture_margin_top = 10.0
 texture_margin_right = 34.0
 texture_margin_bottom = 10.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_gear"]
-texture = ExtResource("8_gear_button")
+texture = ExtResource("6_gear_button")
 texture_margin_left = 12.0
 texture_margin_top = 12.0
 texture_margin_right = 12.0
 texture_margin_bottom = 12.0
 
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_scroll"]
-texture = ExtResource("4_scroll_banner")
-texture_margin_left = 64.0
-texture_margin_top = 16.0
-texture_margin_right = 64.0
-texture_margin_bottom = 16.0
-content_margin_left = 48.0
-content_margin_top = 10.0
-content_margin_right = 48.0
-content_margin_bottom = 10.0
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_set_sail"]
-texture = ExtResource("5_btn_set_sail")
-texture_margin_left = 42.0
-texture_margin_top = 16.0
-texture_margin_right = 42.0
-texture_margin_bottom = 16.0
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_set_sail_hover"]
-texture = ExtResource("5_btn_set_sail")
-texture_margin_left = 42.0
-texture_margin_top = 16.0
-texture_margin_right = 42.0
-texture_margin_bottom = 16.0
-modulate_color = Color(1.1, 1.05, 0.95, 1)
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_set_sail_pressed"]
-texture = ExtResource("5_btn_set_sail")
-texture_margin_left = 42.0
-texture_margin_top = 16.0
-texture_margin_right = 42.0
-texture_margin_bottom = 16.0
-modulate_color = Color(0.85, 0.85, 0.85, 1)
-
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_wood_plank"]
-texture = ExtResource("6_btn_wood_plank")
+texture = ExtResource("7_btn_wood_plank")
 texture_margin_left = 18.0
 texture_margin_top = 14.0
 texture_margin_right = 18.0
 texture_margin_bottom = 14.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_wood_plank_hover"]
-texture = ExtResource("6_btn_wood_plank")
+texture = ExtResource("7_btn_wood_plank")
 texture_margin_left = 18.0
 texture_margin_top = 14.0
 texture_margin_right = 18.0
@@ -78,7 +39,7 @@ texture_margin_bottom = 14.0
 modulate_color = Color(1.1, 1.08, 0.98, 1)
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_wood_plank_pressed"]
-texture = ExtResource("6_btn_wood_plank")
+texture = ExtResource("7_btn_wood_plank")
 texture_margin_left = 18.0
 texture_margin_top = 14.0
 texture_margin_right = 18.0
@@ -96,6 +57,10 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="RiverMap" parent="Control" instance=ExtResource("2_river_map")]
+unique_name_in_owner = true
+layout_mode = 1
 
 [node name="TopBar" type="HBoxContainer" parent="Control"]
 layout_mode = 1
@@ -130,7 +95,7 @@ alignment = 1
 custom_minimum_size = Vector2(42, 42)
 layout_mode = 2
 size_flags_vertical = 4
-texture = ExtResource("2_coin_icon")
+texture = ExtResource("3_coin_icon")
 expand_mode = 1
 stretch_mode = 5
 
@@ -142,7 +107,7 @@ theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
 theme_override_colors/font_outline_color = Color(0.16, 0.08, 0.03, 1)
 theme_override_constants/shadow_offset_y = 3
 theme_override_constants/outline_size = 5
-theme_override_fonts/font = ExtResource("3_font_carter")
+theme_override_fonts/font = ExtResource("4_font_carter")
 theme_override_font_sizes/font_size = 32
 text = "0 DOUBLOONS"
 vertical_alignment = 1
@@ -155,164 +120,49 @@ size_flags_horizontal = 3
 unique_name_in_owner = true
 custom_minimum_size = Vector2(72, 72)
 layout_mode = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
 theme_override_styles/normal = SubResource("StyleBoxTexture_gear")
 theme_override_styles/hover = SubResource("StyleBoxTexture_gear")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_gear")
 
-[node name="GameTitle" type="Control" parent="Control"]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_left = 12.0
-offset_top = 106.0
-offset_right = -12.0
-offset_bottom = 246.0
-grow_horizontal = 2
-
-[node name="PlaqueBackground" type="TextureRect" parent="Control/GameTitle"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("11_title_plaque")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="TitleLabel" type="Label" parent="Control/GameTitle"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/font_color = Color(1.0, 0.82, 0.35, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
-theme_override_colors/font_outline_color = Color(0.16, 0.08, 0.03, 1)
-theme_override_constants/shadow_offset_y = 6
-theme_override_constants/outline_size = 14
-theme_override_fonts/font = ExtResource("3_font_carter")
-theme_override_font_sizes/font_size = 64
-text = "COVE CORSAIR"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="BottomContainer" type="VBoxContainer" parent="Control"]
+[node name="BottomBar" type="Control" parent="Control"]
 layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 22.0
-offset_top = -435.0
-offset_right = -22.0
-offset_bottom = -28.0
+offset_left = 32.0
+offset_top = -104.0
+offset_right = -32.0
+offset_bottom = -24.0
 grow_horizontal = 2
 grow_vertical = 0
-theme_override_constants/separation = 14
-alignment = 1
+mouse_filter = 2
 
-[node name="ExpeditionCard" type="PanelContainer" parent="Control/BottomContainer"]
-custom_minimum_size = Vector2(0, 134)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxTexture_scroll")
-
-[node name="Margin" type="MarginContainer" parent="Control/BottomContainer/ExpeditionCard"]
-layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 6
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 6
-
-[node name="ExpeditionHBox" type="HBoxContainer" parent="Control/BottomContainer/ExpeditionCard/Margin"]
-layout_mode = 2
-theme_override_constants/separation = 8
-alignment = 1
-
-[node name="BtnPrevExpedition" type="TextureButton" parent="Control/BottomContainer/ExpeditionCard/Margin/ExpeditionHBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(48, 56)
-layout_mode = 2
-size_flags_vertical = 4
-texture_normal = ExtResource("9_arrow_left")
-ignore_texture_size = true
-stretch_mode = 5
-
-[node name="ExpeditionInfoVBox" type="VBoxContainer" parent="Control/BottomContainer/ExpeditionCard/Margin/ExpeditionHBox"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 2
-alignment = 1
-
-[node name="ExpeditionNumLabel" type="Label" parent="Control/BottomContainer/ExpeditionCard/Margin/ExpeditionHBox/ExpeditionInfoVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.24, 0.13, 0.06, 1)
-theme_override_fonts/font = ExtResource("3_font_carter")
-theme_override_font_sizes/font_size = 26
-text = "EXPEDITION 01:"
-horizontal_alignment = 1
-clip_text = true
-text_overrun_behavior = 3
-
-[node name="ExpeditionNameLabel" type="Label" parent="Control/BottomContainer/ExpeditionCard/Margin/ExpeditionHBox/ExpeditionInfoVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.18, 0.08, 0.03, 1)
-theme_override_fonts/font = ExtResource("3_font_carter")
-theme_override_font_sizes/font_size = 32
-text = "SMUGGLER'S RUN"
-horizontal_alignment = 1
-clip_text = true
-text_overrun_behavior = 3
-
-[node name="BtnNextExpedition" type="TextureButton" parent="Control/BottomContainer/ExpeditionCard/Margin/ExpeditionHBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(48, 56)
-layout_mode = 2
-size_flags_vertical = 4
-texture_normal = ExtResource("10_arrow_right")
-ignore_texture_size = true
-stretch_mode = 5
-
-[node name="StartButton" type="Button" parent="Control/BottomContainer"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 96)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.98, 0.95, 0.9, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.7)
-theme_override_colors/font_outline_color = Color(0.18, 0.04, 0.04, 1)
-theme_override_constants/shadow_offset_y = 5
-theme_override_constants/outline_size = 8
-theme_override_fonts/font = ExtResource("3_font_carter")
-theme_override_font_sizes/font_size = 52
-theme_override_styles/normal = SubResource("StyleBoxTexture_set_sail")
-theme_override_styles/hover = SubResource("StyleBoxTexture_set_sail_hover")
-theme_override_styles/pressed = SubResource("StyleBoxTexture_set_sail_pressed")
-text = "SET SAIL"
-
-[node name="ShipyardButton" type="Button" parent="Control/BottomContainer"]
+[node name="ShipyardButton" type="Button" parent="Control/BottomBar"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 76)
-layout_mode = 2
-size_flags_horizontal = 3
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(0.96, 0.93, 0.86, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.6)
 theme_override_colors/font_outline_color = Color(0.14, 0.07, 0.03, 1)
 theme_override_constants/shadow_offset_y = 4
 theme_override_constants/outline_size = 4
 theme_override_constants/h_separation = 8
-theme_override_fonts/font = ExtResource("3_font_carter")
+theme_override_fonts/font = ExtResource("4_font_carter")
 theme_override_font_sizes/font_size = 32
 theme_override_styles/normal = SubResource("StyleBoxTexture_wood_plank")
 theme_override_styles/hover = SubResource("StyleBoxTexture_wood_plank_hover")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_wood_plank_pressed")
-icon = ExtResource("12_icon_anchor")
+icon = ExtResource("8_icon_anchor")
 expand_icon = true
 text = "THE SHIPYARD"
 alignment = 1

@@ -22,6 +22,7 @@ func _ready() -> void:
 	_setup_victory_screen()
 
 func _setup_harbor_mode() -> void:
+	GameState.set_performance_mode(false)
 	# Hide track segments and river lane during harbor mode
 	var track_mgr = get_tree().get_first_node_in_group("track_manager")
 	if track_mgr:
@@ -49,6 +50,7 @@ func _setup_harbor_mode() -> void:
 
 func _start_game_immediately() -> void:
 	GameState.is_game_active = true
+	GameState.set_performance_mode(true)
 	var track_mgr = get_tree().get_first_node_in_group("track_manager")
 	if track_mgr:
 		track_mgr.visible = true
@@ -79,6 +81,7 @@ func _setup_start_screen() -> void:
 
 func _on_game_started() -> void:
 	GameState.is_game_active = true
+	GameState.set_performance_mode(true)
 	
 	# 1. Disable harbor backdrop camera & hide 3D parent node BEFORE chunk instantiation
 	if harbor_bay and is_instance_valid(harbor_bay):
@@ -131,5 +134,6 @@ func _setup_victory_screen() -> void:
 			GameState.level_completed.connect(_on_level_completed)
 
 func _on_level_completed(doubloons: int, targets: int) -> void:
+	GameState.set_performance_mode(false)
 	if victory_screen:
 		victory_screen.show_victory(doubloons, targets, 3)

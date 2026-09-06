@@ -31,38 +31,43 @@ func _ready() -> void:
 func show_victory(doubloons_earned: int, targets_hit: int, stars_earned: int = 3) -> void:
 	visible = true
 	get_tree().paused = true
+	GameState.set_performance_mode(false)
 	
-	match GameState.current_level:
+	# Record high score and advance progression
+	GameState.record_level_score(GameState.current_level, doubloons_earned)
+	GameState.unlock_next_level()
+	
+	match GameState.last_cleared_level:
 		1:
 			if title_label: title_label.text = "LEVEL 1 VICTORY"
 			if subtitle_label: subtitle_label.text = "COVE 1 CLEARED: SMUGGLER'S RUN"
 			if boss_label: boss_label.text = "Captain Ironjaw"
-			if next_level_button: next_level_button.text = "NEXT: Black Tide Bayou"
+			if next_level_button: next_level_button.text = "CONTINUE TO RIVER MAP"
 		2:
 			if title_label: title_label.text = "LEVEL 2 VICTORY"
 			if subtitle_label: subtitle_label.text = "COVE 2 CLEARED: BLACK TIDE BAYOU"
 			if boss_label: boss_label.text = "The Phantom Dredge"
-			if next_level_button: next_level_button.text = "NEXT: Brimstone Bastion"
+			if next_level_button: next_level_button.text = "CONTINUE TO RIVER MAP"
 		3:
 			if title_label: title_label.text = "LEVEL 3 VICTORY"
 			if subtitle_label: subtitle_label.text = "COVE 3 CLEARED: BRIMSTONE BASTION"
 			if boss_label: boss_label.text = "The Siege Fortress"
-			if next_level_button: next_level_button.text = "NEXT: Smuggler's Nightmare"
+			if next_level_button: next_level_button.text = "CONTINUE TO RIVER MAP"
 		4:
 			if title_label: title_label.text = "LEVEL 4 VICTORY"
 			if subtitle_label: subtitle_label.text = "COVE 4 CLEARED: SMUGGLER'S NIGHTMARE"
 			if boss_label: boss_label.text = "Captain Ironjaw (Nightmare)"
-			if next_level_button: next_level_button.text = "NEXT: Black Tide Abyss"
+			if next_level_button: next_level_button.text = "CONTINUE TO RIVER MAP"
 		5:
 			if title_label: title_label.text = "LEVEL 5 VICTORY"
 			if subtitle_label: subtitle_label.text = "COVE 5 CLEARED: BLACK TIDE ABYSS"
 			if boss_label: boss_label.text = "The Phantom Dredge (Abyss)"
-			if next_level_button: next_level_button.text = "NEXT: Brimstone Inferno"
+			if next_level_button: next_level_button.text = "CONTINUE TO RIVER MAP"
 		_:
 			if title_label: title_label.text = "CAMPAIGN VICTORY!"
 			if subtitle_label: subtitle_label.text = "ALL 6 COVES CONQUERED - ULTIMATE PIRATE KING!"
 			if boss_label: boss_label.text = "The Infernal Siege Fortress"
-			if next_level_button: next_level_button.text = "PLAY AGAIN"
+			if next_level_button: next_level_button.text = "CONTINUE TO RIVER MAP"
 			
 	if doubloons_label:
 		doubloons_label.text = "0"
@@ -133,17 +138,15 @@ func _animate_stars(stars_earned: int) -> void:
 func _on_retry_pressed() -> void:
 	get_tree().paused = false
 	GameState.should_auto_start = true
+	GameState.just_cleared_level = false
 	GameState.reset_level()
 	get_tree().reload_current_scene()
 
 func _on_next_level_pressed() -> void:
+	if AudioManager and AudioManager.has_method("play_sfx"):
+		AudioManager.play_sfx("gate_passes")
 	get_tree().paused = false
-	if GameState.current_level >= 6:
-		GameState.current_level = 1
-	else:
-		GameState.unlock_next_level()
-		GameState.current_level += 1
-	GameState.should_auto_start = true
+	GameState.should_auto_start = false
 	GameState.reset_level()
 	get_tree().reload_current_scene()
 

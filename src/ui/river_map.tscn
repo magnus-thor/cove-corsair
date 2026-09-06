@@ -1,0 +1,278 @@
+[gd_scene format=3 uid="uid://c3q8v41j3kn6e"]
+
+[ext_resource type="Script" path="res://src/ui/river_map.gd" id="1_river_script"]
+[ext_resource type="FontFile" path="res://assets/fonts/CarterOne.ttf" id="2_font_carter"]
+[ext_resource type="FontFile" path="res://assets/fonts/LilitaOne-Regular.ttf" id="3_font_lilita"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/hud_boat_icon.svg" id="4_boat_icon"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/theme/btn_set_sail.svg" id="5_btn_set_sail"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_popup_panel"]
+bg_color = Color(0.95, 0.90, 0.80, 1)
+border_width_left = 6
+border_width_top = 6
+border_width_right = 6
+border_width_bottom = 6
+border_color = Color(0.32, 0.18, 0.08, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+shadow_color = Color(0, 0, 0, 0.65)
+shadow_size = 18
+shadow_offset = Vector2(0, 8)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_boss_tag"]
+bg_color = Color(0.72, 0.12, 0.12, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.85, 0.35, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_size = 4
+shadow_offset = Vector2(0, 2)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_set_sail"]
+texture = ExtResource("5_btn_set_sail")
+texture_margin_left = 42.0
+texture_margin_top = 16.0
+texture_margin_right = 42.0
+texture_margin_bottom = 16.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_set_sail_pressed"]
+texture = ExtResource("5_btn_set_sail")
+texture_margin_left = 42.0
+texture_margin_top = 16.0
+texture_margin_right = 42.0
+texture_margin_bottom = 16.0
+modulate_color = Color(0.85, 0.85, 0.85, 1)
+
+[node name="RiverMap" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_river_script")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 2
+
+[node name="MapCanvas" type="Control" parent="ScrollContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(720, 2200)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="TerrainLayer" type="Control" parent="ScrollContainer/MapCanvas"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(720, 2200)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="RiverPathLayer" type="Control" parent="ScrollContainer/MapCanvas"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(720, 2200)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="NodesLayer" type="Control" parent="ScrollContainer/MapCanvas"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(720, 2200)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MiniVessel" type="Node2D" parent="ScrollContainer/MapCanvas"]
+unique_name_in_owner = true
+z_index = 10
+position = Vector2(360, 1920)
+
+[node name="MiniVesselIcon" type="TextureRect" parent="ScrollContainer/MapCanvas/MiniVessel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(58, 58)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -29.0
+offset_top = -29.0
+offset_right = 29.0
+offset_bottom = 29.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(29, 29)
+texture = ExtResource("4_boat_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="UnlockVFX" type="Node2D" parent="ScrollContainer/MapCanvas"]
+unique_name_in_owner = true
+visible = false
+z_index = 20
+
+[node name="ShockwaveRing" type="Line2D" parent="ScrollContainer/MapCanvas/UnlockVFX"]
+points = PackedVector2Array(0, -60, 42, -42, 60, 0, 42, 42, 0, 60, -42, 42, -60, 0, -42, -42, 0, -60)
+width = 8.0
+default_color = Color(1, 0.88, 0.28, 0.9)
+joint_mode = 2
+begin_cap_mode = 2
+end_cap_mode = 2
+
+[node name="PopupScrim" type="ColorRect" parent="."]
+unique_name_in_owner = true
+visible = false
+z_index = 50
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.06, 0.04, 0.02, 0.78)
+
+[node name="Center" type="CenterContainer" parent="PopupScrim"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PopupPanel" type="PanelContainer" parent="PopupScrim/Center"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 420)
+layout_mode = 2
+pivot_offset = Vector2(280, 210)
+theme_override_styles/panel = SubResource("StyleBoxFlat_popup_panel")
+
+[node name="Margin" type="MarginContainer" parent="PopupScrim/Center/PopupPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 24
+
+[node name="VBox" type="VBoxContainer" parent="PopupScrim/Center/PopupPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="TopRow" type="HBoxContainer" parent="PopupScrim/Center/PopupPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="PopupNum" type="Label" parent="PopupScrim/Center/PopupPanel/Margin/VBox/TopRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.55, 0.38, 0.2, 1)
+theme_override_fonts/font = ExtResource("3_font_lilita")
+theme_override_font_sizes/font_size = 24
+text = "EXPEDITION 01"
+
+[node name="BtnClosePopup" type="Button" parent="PopupScrim/Center/PopupPanel/Margin/VBox/TopRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.38, 0.22, 0.1, 1)
+theme_override_fonts/font = ExtResource("2_font_carter")
+theme_override_font_sizes/font_size = 28
+text = "✕"
+flat = true
+
+[node name="PopupTitle" type="Label" parent="PopupScrim/Center/PopupPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.18, 0.08, 0.03, 1)
+theme_override_colors/font_outline_color = Color(1, 0.94, 0.85, 1)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("2_font_carter")
+theme_override_font_sizes/font_size = 36
+text = "SMUGGLER'S RUN"
+horizontal_alignment = 1
+
+[node name="PopupBiome" type="Label" parent="PopupScrim/Center/PopupPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.25, 0.16, 1)
+theme_override_fonts/font = ExtResource("3_font_lilita")
+theme_override_font_sizes/font_size = 22
+text = "Tropical Reef  •  Target: 250m"
+horizontal_alignment = 1
+
+[node name="PopupBossTag" type="PanelContainer" parent="PopupScrim/Center/PopupPanel/Margin/VBox"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_boss_tag")
+
+[node name="PopupBossLabel" type="Label" parent="PopupScrim/Center/PopupPanel/Margin/VBox/PopupBossTag"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.7, 1)
+theme_override_fonts/font = ExtResource("3_font_lilita")
+theme_override_font_sizes/font_size = 20
+text = "☠ BOSS: THE SIEGE FORTRESS"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PopupScore" type="Label" parent="PopupScrim/Center/PopupPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.68, 0.44, 0.08, 1)
+theme_override_fonts/font = ExtResource("3_font_lilita")
+theme_override_font_sizes/font_size = 22
+text = "🏆 HIGH SCORE: 1,450 DOUBLOONS"
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="PopupScrim/Center/PopupPanel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+
+[node name="BtnSetSail" type="Button" parent="PopupScrim/Center/PopupPanel/Margin/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 82)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 0.96, 0.9, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.7)
+theme_override_colors/font_outline_color = Color(0.18, 0.04, 0.04, 1)
+theme_override_constants/shadow_offset_y = 5
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("2_font_carter")
+theme_override_font_sizes/font_size = 46
+theme_override_styles/normal = SubResource("StyleBoxTexture_set_sail")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_set_sail_pressed")
+text = "SET SAIL"

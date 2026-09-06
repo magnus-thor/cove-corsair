@@ -14,6 +14,7 @@ config/name="Cove Corsair"
 run/main_scene="res://src/core/main_game.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
+run/max_fps=60
 
 [autoload]
 
@@ -29,6 +30,7 @@ window/size/window_height_override=800
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 window/handheld/orientation=5
+window/vsync/vsync_mode=1
 
 [physics]
 
