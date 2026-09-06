@@ -99,7 +99,7 @@ func _on_river_map_sail_requested(lvl: int) -> void:
 
 func _on_shipyard_button_pressed() -> void:
 	AudioManager.play_sfx("gate_passes")
-	var shipyard_scene = preload("res://src/ui/shipyard_ui.tscn")
+	var shipyard_scene = preload("res://src/ui/shipyard/shipyard_ui.tscn")
 	if shipyard_scene:
 		var shipyard = shipyard_scene.instantiate()
 		get_parent().add_child(shipyard)

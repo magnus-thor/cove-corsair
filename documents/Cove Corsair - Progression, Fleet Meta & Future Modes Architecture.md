@@ -94,3 +94,30 @@ Instead of scrolling down an infinite river, the camera locks into a stationary 
   *   
   * 2-button or 3-direction touch controls: **High Strike**, **Low Strike**, and **Parry/Riposte** for snappy, rhythm-based mobile combat.
 
+\---
+
+## **🎯 6\. Advanced Weapon Archetypes & Tactical Mechanics *(FUTURE EXPANSION)***
+
+To expand combat utility beyond standard projectile arcs, deck hardpoints and vessel sockets may equip specialized ordnance. These ballistics profiles dictate lane-clearing strategies and the architecture of future mob encounters.
+
+### **Weapon Roster Matrix**
+
+| Weapon Type | Firing Profile | Damage & Range | Tactical Specialty | Synergistic Level Hazards |
+| :---- | :---- | :---- | :---- | :---- |
+| **Standard Cannon** | Linear, single projectile | Moderate DPS, high distance | Versatile forward lane suppression | Basic rowers and isolated blockades |
+| **Scattershot Carronade** | Radial 5-slug cone burst | Lethal proximity burst, sharp drop-off | Multi-lane swarm neutralization | Dense skiff clusters, expansive flotsam |
+| **Harpoon Launcher** | High-speed tethered strike | Negligible raw damage, instant impact | Environmental manipulation and stuns | Remote Fuse Barrels and armored shields |
+| **Greek Fire Siphon** | Persistent thermal spray | Extreme tick damage, $6\\text{m}$ reach | Bypasses shielding, melts infrastructure | Heavy Rafts, vines, and timber walls |
+
+### **Level Design Synergies Enabled by New Weapons**
+
+* **The Siphon Gauntlet (Area Denial & Meltdown):**  
+  * Features impenetrable wooden barricades with flammable structural weak points.  
+  * Armor-plated mobs that negate physical shot damage are vulnerable to prolonged thermal exposure.  
+* **The Harpoon Funnel (Environmental Kinetic Play):**  
+  * Encounters requiring players to retrieve explosive ordnance from adjacent lanes to dismantle shielded positions.  
+  * Kinetic interaction with hazards becomes the primary DPS vector against fortified targets.  
+* **The Carronade Ambush (Reaction-Time Chokepoints):**  
+  * Rapids populated by dense, low-HP suicide skiffs emerging from obscured navigable turns.  
+  * High mob density penalizes precision fire, rewarding broad-coverage carronade volleys.
+

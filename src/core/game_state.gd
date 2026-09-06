@@ -70,7 +70,7 @@ const VESSEL_CATALOG: Dictionary = {
 		"archetype": "Agility Skiff",
 		"resource_path": "res://src/data/resources/user_vessels/dinghy_ship.tres",
 		"purchase_price": 0,
-		"tier_prices": { 2: 75, 3: 200 },
+		"tier_prices": { 2: 350, 3: 750 },
 		"tier_descriptions": {
 			1: "Bow Chaser Cannon",
 			2: "Bow Chaser + Monkey Bomber",
@@ -164,11 +164,17 @@ func get_current_level_resource() -> LevelData:
 		return load(path) as LevelData
 	return null
 
-func get_active_ship_resource() -> ShipData:
-	if active_vessel in VESSEL_CATALOG:
-		var path = VESSEL_CATALOG[active_vessel]["resource_path"]
+func get_vessel_resource(vessel_id: String) -> ShipData:
+	if vessel_id in VESSEL_CATALOG:
+		var path = VESSEL_CATALOG[vessel_id]["resource_path"]
 		if ResourceLoader.exists(path):
 			return load(path) as ShipData
+	return null
+
+func get_active_ship_resource() -> ShipData:
+	var res = get_vessel_resource(active_vessel)
+	if res:
+		return res
 	var fallback_path = LEVEL_SHIPS.get(current_level, LEVEL_SHIPS[1])
 	if ResourceLoader.exists(fallback_path):
 		return load(fallback_path) as ShipData
@@ -187,9 +193,12 @@ func get_vessel_tier(vessel_id: String) -> int:
 	return vessel_tiers.get(vessel_id, 1)
 
 func get_upgrade_cost(vessel_id: String, target_tier: int) -> int:
-	if not VESSEL_CATALOG.has(vessel_id):
-		return 0
-	return VESSEL_CATALOG[vessel_id]["tier_prices"].get(target_tier, 0)
+	var res = get_vessel_resource(vessel_id)
+	if res and res.upgrade_costs.size() >= target_tier and target_tier >= 1:
+		return res.upgrade_costs[target_tier - 1]
+	if VESSEL_CATALOG.has(vessel_id):
+		return VESSEL_CATALOG[vessel_id]["tier_prices"].get(target_tier, 0)
+	return 0
 
 func can_afford(cost: int) -> bool:
 	return doubloons >= cost
@@ -234,6 +243,9 @@ func equip_vessel(vessel_id: String) -> bool:
 	save_game()
 	active_vessel_changed.emit(active_vessel)
 	return true
+
+func set_active_vessel(vessel_id: String) -> bool:
+	return equip_vessel(vessel_id)
 
 func add_doubloons(amount: int) -> void:
 	doubloons += amount

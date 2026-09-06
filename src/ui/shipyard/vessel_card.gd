@@ -2,7 +2,8 @@ class_name VesselCard
 extends PanelContainer
 
 ## Reusable 2-column vessel card component for the Shipyard
-## Displays vessel illustration, index badge, tier ribbon, and quick status pill.
+## Displays vessel illustration, index badge, tier ribbon, and state tag:
+## "EQUIPPED" (green), "OWNED" (neutral wood), or "LOCKED - [Cost] 🪙"
 ## Clicking the card emits card_clicked for inspection drawer selection without auto-equipping.
 
 signal card_clicked(vessel_id: String)
@@ -30,7 +31,6 @@ var style_mystery: StyleBoxFlat
 # Status pill styles
 var style_status_equipped: StyleBoxFlat
 var style_status_owned: StyleBoxFlat
-var style_status_buy: StyleBoxFlat
 var style_status_locked: StyleBoxFlat
 
 func _ready() -> void:
@@ -41,39 +41,39 @@ func _ready() -> void:
 		click_button.mouse_exited.connect(_on_mouse_exited)
 
 func _init_styles() -> void:
-	# Normal Card Style (Parchment with dark chocolate border)
+	# Normal Card Style (Rich Parchment / Teak border)
 	style_normal = StyleBoxFlat.new()
 	style_normal.bg_color = Color(0.93, 0.88, 0.79, 1.0) # #EDE0C9
 	style_normal.border_width_left = 4
 	style_normal.border_width_top = 4
 	style_normal.border_width_right = 4
 	style_normal.border_width_bottom = 4
-	style_normal.border_color = Color(0.24, 0.17, 0.12, 1.0) # #3D2B1E
-	style_normal.corner_radius_top_left = 16
-	style_normal.corner_radius_top_right = 16
-	style_normal.corner_radius_bottom_right = 16
-	style_normal.corner_radius_bottom_left = 16
+	style_normal.border_color = Color(0.26, 0.18, 0.12, 1.0) # #422E1E
+	style_normal.corner_radius_top_left = 18
+	style_normal.corner_radius_top_right = 18
+	style_normal.corner_radius_bottom_right = 18
+	style_normal.corner_radius_bottom_left = 18
 	style_normal.shadow_color = Color(0, 0, 0, 0.45)
 	style_normal.shadow_size = 6
 	style_normal.shadow_offset = Vector2(0, 4)
 
 	# Selected Card Style (Glowing Gold Border)
 	style_selected = StyleBoxFlat.new()
-	style_selected.bg_color = Color(0.96, 0.92, 0.84, 1.0)
-	style_selected.border_width_left = 5
-	style_selected.border_width_top = 5
-	style_selected.border_width_right = 5
-	style_selected.border_width_bottom = 5
-	style_selected.border_color = Color(0.98, 0.78, 0.22, 1.0) # #FBC738
-	style_selected.corner_radius_top_left = 16
-	style_selected.corner_radius_top_right = 16
-	style_selected.corner_radius_bottom_right = 16
-	style_selected.corner_radius_bottom_left = 16
-	style_selected.shadow_color = Color(0.98, 0.78, 0.22, 0.4)
-	style_selected.shadow_size = 12
+	style_selected.bg_color = Color(0.97, 0.93, 0.85, 1.0)
+	style_selected.border_width_left = 6
+	style_selected.border_width_top = 6
+	style_selected.border_width_right = 6
+	style_selected.border_width_bottom = 6
+	style_selected.border_color = Color(1.0, 0.82, 0.25, 1.0) # #FFD140
+	style_selected.corner_radius_top_left = 18
+	style_selected.corner_radius_top_right = 18
+	style_selected.corner_radius_bottom_right = 18
+	style_selected.corner_radius_bottom_left = 18
+	style_selected.shadow_color = Color(1.0, 0.8, 0.2, 0.45)
+	style_selected.shadow_size = 14
 	style_selected.shadow_offset = Vector2(0, 4)
 
-	# Mystery / Locked Card Style (Darker tone)
+	# Mystery / Locked Card Style
 	style_mystery = StyleBoxFlat.new()
 	style_mystery.bg_color = Color(0.72, 0.67, 0.60, 1.0)
 	style_mystery.border_width_left = 4
@@ -81,61 +81,48 @@ func _init_styles() -> void:
 	style_mystery.border_width_right = 4
 	style_mystery.border_width_bottom = 4
 	style_mystery.border_color = Color(0.28, 0.32, 0.36, 1.0)
-	style_mystery.corner_radius_top_left = 16
-	style_mystery.corner_radius_top_right = 16
-	style_mystery.corner_radius_bottom_right = 16
-	style_mystery.corner_radius_bottom_left = 16
+	style_mystery.corner_radius_top_left = 18
+	style_mystery.corner_radius_top_right = 18
+	style_mystery.corner_radius_bottom_right = 18
+	style_mystery.corner_radius_bottom_left = 18
 	style_mystery.shadow_color = Color(0, 0, 0, 0.35)
 	style_mystery.shadow_size = 6
 	style_mystery.shadow_offset = Vector2(0, 4)
 
 	# Status Equipped (Vibrant Green)
 	style_status_equipped = StyleBoxFlat.new()
-	style_status_equipped.bg_color = Color(0.25, 0.76, 0.16, 1.0) # #40C229
+	style_status_equipped.bg_color = Color(0.22, 0.72, 0.18, 1.0) # #38B82E
 	style_status_equipped.border_width_left = 3
 	style_status_equipped.border_width_top = 3
 	style_status_equipped.border_width_right = 3
 	style_status_equipped.border_width_bottom = 3
-	style_status_equipped.border_color = Color(0.14, 0.46, 0.08, 1.0)
+	style_status_equipped.border_color = Color(0.12, 0.44, 0.08, 1.0)
 	style_status_equipped.corner_radius_top_left = 12
 	style_status_equipped.corner_radius_top_right = 12
 	style_status_equipped.corner_radius_bottom_right = 12
 	style_status_equipped.corner_radius_bottom_left = 12
 
-	# Status Owned (Warm Slate / Amber)
+	# Status Owned (Neutral Wood tone)
 	style_status_owned = StyleBoxFlat.new()
-	style_status_owned.bg_color = Color(0.26, 0.34, 0.42, 1.0)
+	style_status_owned.bg_color = Color(0.42, 0.28, 0.18, 1.0) # Warm Wood #6B472E
 	style_status_owned.border_width_left = 3
 	style_status_owned.border_width_top = 3
 	style_status_owned.border_width_right = 3
 	style_status_owned.border_width_bottom = 3
-	style_status_owned.border_color = Color(0.16, 0.22, 0.28, 1.0)
+	style_status_owned.border_color = Color(0.26, 0.16, 0.10, 1.0)
 	style_status_owned.corner_radius_top_left = 12
 	style_status_owned.corner_radius_top_right = 12
 	style_status_owned.corner_radius_bottom_right = 12
 	style_status_owned.corner_radius_bottom_left = 12
 
-	# Status Buy (Warm Bronze / Gold)
-	style_status_buy = StyleBoxFlat.new()
-	style_status_buy.bg_color = Color(0.76, 0.54, 0.22, 1.0)
-	style_status_buy.border_width_left = 3
-	style_status_buy.border_width_top = 3
-	style_status_buy.border_width_right = 3
-	style_status_buy.border_width_bottom = 3
-	style_status_buy.border_color = Color(0.42, 0.28, 0.10, 1.0)
-	style_status_buy.corner_radius_top_left = 12
-	style_status_buy.corner_radius_top_right = 12
-	style_status_buy.corner_radius_bottom_right = 12
-	style_status_buy.corner_radius_bottom_left = 12
-
-	# Status Locked (Dark Muted Slate)
+	# Status Locked (Dark Bronze / Charcoal Wood)
 	style_status_locked = StyleBoxFlat.new()
-	style_status_locked.bg_color = Color(0.22, 0.20, 0.18, 1.0)
+	style_status_locked.bg_color = Color(0.25, 0.20, 0.18, 1.0)
 	style_status_locked.border_width_left = 3
 	style_status_locked.border_width_top = 3
 	style_status_locked.border_width_right = 3
 	style_status_locked.border_width_bottom = 3
-	style_status_locked.border_color = Color(0.12, 0.10, 0.08, 1.0)
+	style_status_locked.border_color = Color(0.16, 0.12, 0.10, 1.0)
 	style_status_locked.corner_radius_top_left = 12
 	style_status_locked.corner_radius_top_right = 12
 	style_status_locked.corner_radius_bottom_right = 12
@@ -206,16 +193,16 @@ func update_status() -> void:
 	var is_active = (GameState.active_vessel == vessel_id)
 	var v_data = GameState.VESSEL_CATALOG[vessel_id]
 	
-	# Tier badge
+	# Current Tier badge: e.g., "TIER 2 / 3"
 	if tier_badge:
 		if is_owned:
 			tier_badge.visible = true
 			if tier_badge_label:
-				tier_badge_label.text = "TIER %d/3" % cur_tier
+				tier_badge_label.text = "TIER %d / 3" % cur_tier
 		else:
 			tier_badge.visible = false
 			
-	# Quick status pill
+	# State Tag: "EQUIPPED" (green), "OWNED" (neutral wood), or "LOCKED - [Cost] 🪙"
 	if is_active:
 		if status_panel:
 			status_panel.add_theme_stylebox_override("panel", style_status_equipped)
@@ -229,19 +216,18 @@ func update_status() -> void:
 			status_panel.add_theme_stylebox_override("panel", style_status_owned)
 		if status_label:
 			status_label.text = "OWNED"
-			status_label.add_theme_color_override("font_color", Color(0.95, 0.95, 0.95, 1))
+			status_label.add_theme_color_override("font_color", Color(1, 0.98, 0.92, 1))
 		if status_icon:
 			status_icon.visible = false
 	else:
-		# Unowned - show price & BUY
 		var price = v_data["purchase_price"]
 		if status_panel:
-			status_panel.add_theme_stylebox_override("panel", style_status_buy)
+			status_panel.add_theme_stylebox_override("panel", style_status_locked)
 		if status_label:
-			status_label.text = "%d BUY" % price
-			status_label.add_theme_color_override("font_color", Color(1, 0.98, 0.9, 1))
+			status_label.text = "LOCKED - %s 🪙" % _format_number(price)
+			status_label.add_theme_color_override("font_color", Color(1.0, 0.92, 0.75, 1))
 		if status_icon:
-			status_icon.visible = true
+			status_icon.visible = false
 			
 	_apply_card_border()
 
@@ -269,9 +255,22 @@ func _on_clicked() -> void:
 func _on_mouse_entered() -> void:
 	if not is_selected and not is_mystery:
 		var hover_style = style_normal.duplicate() as StyleBoxFlat
-		hover_style.border_color = Color(0.85, 0.65, 0.25, 1.0)
-		hover_style.shadow_size = 9
+		hover_style.border_color = Color(0.88, 0.68, 0.28, 1.0)
+		hover_style.shadow_size = 10
 		add_theme_stylebox_override("panel", hover_style)
 
 func _on_mouse_exited() -> void:
 	_apply_card_border()
+
+func _format_number(val: int) -> String:
+	var s = str(abs(val))
+	var res = ""
+	var count = 0
+	for i in range(s.length() - 1, -1, -1):
+		res = s[i] + res
+		count += 1
+		if count % 3 == 0 and i > 0:
+			res = "," + res
+	if val < 0:
+		res = "-" + res
+	return res

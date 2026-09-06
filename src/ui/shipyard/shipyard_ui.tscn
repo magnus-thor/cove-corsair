@@ -1,128 +1,122 @@
-[gd_scene load_steps=21 format=3 uid="uid://dxu8eeh7lwes8"]
+[gd_scene format=3 uid="uid://bd3a5q17b4nmw"]
 
-[ext_resource type="Script" path="res://src/ui/shipyard_ui.gd" id="1_shipyard_script"]
+[ext_resource type="Script" path="res://src/ui/shipyard/shipyard_ui.gd" id="1_shipyard_script"]
 [ext_resource type="FontFile" path="res://assets/fonts/LilitaOne-Regular.ttf" id="2_font_lilita"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ui/theme/coin_sack.svg" id="3_coin_sack"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ui/theme/icon_anchor.svg" id="4_anchor_icon"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ui/theme/icon_padlock.svg" id="5_padlock_icon"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_back_btn"]
-bg_color = Color(0.55, 0.35, 0.2, 1)
+bg_color = Color(0.38, 0.22, 0.12, 1)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
-border_color = Color(0.24, 0.14, 0.08, 1)
+border_color = Color(0.65, 0.44, 0.26, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.4)
+shadow_size = 4
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_active"]
+bg_color = Color(0.85, 0.48, 0.14, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.82, 0.45, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.4)
+shadow_size = 4
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_locked"]
+bg_color = Color(0.24, 0.18, 0.14, 0.85)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.4, 0.3, 0.24, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_soon_badge"]
+bg_color = Color(0.65, 0.22, 0.18, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.9, 0.6, 0.4, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_drawer"]
+bg_color = Color(0.93, 0.88, 0.8, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.3, 0.2, 0.12, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0, 0, 0, 0.6)
+shadow_size = 10
+shadow_offset = Vector2(0, 5)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_bg"]
+bg_color = Color(0.2, 0.14, 0.08, 0.85)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_hp"]
+bg_color = Color(0.85, 0.22, 0.22, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_speed"]
+bg_color = Color(0.2, 0.65, 0.85, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_cannons"]
+bg_color = Color(0.88, 0.58, 0.15, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_btn"]
+bg_color = Color(0.72, 0.13, 0.18, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.95, 0.78, 0.28, 1)
 corner_radius_top_left = 14
 corner_radius_top_right = 14
 corner_radius_bottom_right = 14
 corner_radius_bottom_left = 14
-shadow_color = Color(0, 0, 0, 0.4)
-shadow_size = 4
-shadow_offset = Vector2(0, 2)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_active"]
-bg_color = Color(0.85, 0.58, 0.22, 1)
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
-border_color = Color(1, 0.85, 0.38, 1)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-shadow_color = Color(1, 0.82, 0.25, 0.35)
-shadow_size = 8
-shadow_offset = Vector2(0, 2)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_locked"]
-bg_color = Color(0.24, 0.18, 0.14, 0.95)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.16, 0.11, 0.08, 1)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-shadow_color = Color(0, 0, 0, 0.3)
-shadow_size = 4
-shadow_offset = Vector2(0, 2)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_drawer"]
-bg_color = Color(0.93, 0.88, 0.78, 1)
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
-border_color = Color(0.24, 0.15, 0.09, 1)
-corner_radius_top_left = 20
-corner_radius_top_right = 20
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-shadow_color = Color(0, 0, 0, 0.6)
-shadow_size = 14
-shadow_offset = Vector2(0, -4)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_bg"]
-bg_color = Color(0.22, 0.15, 0.1, 0.8)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_hp"]
-bg_color = Color(0.8, 0.16, 0.16, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(1, 0.4, 0.4, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_speed"]
-bg_color = Color(0.92, 0.68, 0.12, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(1, 0.86, 0.45, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_cannons"]
-bg_color = Color(0.88, 0.52, 0.14, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(1, 0.74, 0.42, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_btn"]
-bg_color = Color(0.72, 0.13, 0.18, 1)
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
-border_color = Color(0.95, 0.78, 0.28, 1)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
-shadow_color = Color(0, 0, 0, 0.45)
-shadow_size = 6
-shadow_offset = Vector2(0, 4)
+shadow_color = Color(0, 0, 0, 0.5)
+shadow_size = 5
+shadow_offset = Vector2(0, 3)
 
 [node name="ShipyardUI" type="CanvasLayer"]
 layer = 20
@@ -142,44 +136,63 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 14
-theme_override_constants/margin_top = 18
-theme_override_constants/margin_right = 14
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 14
 
 [node name="MainVBox" type="VBoxContainer" parent="RootMargin"]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_constants/separation = 10
 
-[node name="HeaderBar" type="HBoxContainer" parent="RootMargin/MainVBox"]
-custom_minimum_size = Vector2(0, 68)
+[node name="HeaderBar" type="Control" parent="RootMargin/MainVBox"]
+custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
-theme_override_constants/separation = 8
-alignment = 1
+size_flags_horizontal = 3
 
 [node name="BackButton" type="Button" parent="RootMargin/MainVBox/HeaderBar"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(110, 54)
-layout_mode = 2
-size_flags_vertical = 4
+custom_minimum_size = Vector2(96, 48)
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -24.0
+offset_right = 96.0
+offset_bottom = 24.0
+grow_vertical = 2
 focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 0.96, 0.88, 1)
 theme_override_colors/font_outline_color = Color(0.16, 0.09, 0.04, 1)
 theme_override_constants/outline_size = 4
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.6)
+theme_override_constants/shadow_offset_y = 2
 theme_override_fonts/font = ExtResource("2_font_lilita")
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 24
 theme_override_styles/normal = SubResource("StyleBoxFlat_back_btn")
-text = "BACK"
+text = "✕ BACK"
 
 [node name="TitleCenterBox" type="HBoxContainer" parent="RootMargin/MainVBox/HeaderBar"]
-layout_mode = 2
-size_flags_horizontal = 3
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -210.0
+offset_top = -30.0
+offset_right = 210.0
+offset_bottom = 30.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_constants/separation = 8
 alignment = 1
 
 [node name="AnchorIcon" type="TextureRect" parent="RootMargin/MainVBox/HeaderBar/TitleCenterBox"]
-custom_minimum_size = Vector2(40, 40)
+custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 size_flags_vertical = 4
 texture = ExtResource("4_anchor_icon")
@@ -191,19 +204,31 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.96, 0.8, 0.38, 1)
 theme_override_colors/font_outline_color = Color(0.16, 0.08, 0.03, 1)
-theme_override_constants/outline_size = 8
+theme_override_constants/outline_size = 7
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.7)
+theme_override_constants/shadow_offset_y = 3
 theme_override_fonts/font = ExtResource("2_font_lilita")
 theme_override_font_sizes/font_size = 52
 text = "THE SHIPYARD"
 vertical_alignment = 1
 
 [node name="PurseHBox" type="HBoxContainer" parent="RootMargin/MainVBox/HeaderBar"]
-layout_mode = 2
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -190.0
+offset_top = -22.0
+offset_bottom = 22.0
+grow_horizontal = 0
+grow_vertical = 2
 theme_override_constants/separation = 6
 alignment = 2
 
 [node name="PurseIcon" type="TextureRect" parent="RootMargin/MainVBox/HeaderBar/PurseHBox"]
-custom_minimum_size = Vector2(44, 44)
+custom_minimum_size = Vector2(34, 34)
 layout_mode = 2
 size_flags_vertical = 4
 texture = ExtResource("3_coin_sack")
@@ -213,105 +238,126 @@ stretch_mode = 5
 [node name="PurseLabel" type="Label" parent="RootMargin/MainVBox/HeaderBar/PurseHBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_color = Color(1, 0.95, 0.7, 1)
 theme_override_colors/font_outline_color = Color(0.14, 0.08, 0.03, 1)
-theme_override_constants/outline_size = 6
+theme_override_constants/outline_size = 5
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.6)
+theme_override_constants/shadow_offset_y = 2
 theme_override_fonts/font = ExtResource("2_font_lilita")
-theme_override_font_sizes/font_size = 36
-text = "0"
+theme_override_font_sizes/font_size = 24
+text = "🪙 0 COINS"
 vertical_alignment = 1
 
 [node name="TabsHBox" type="HBoxContainer" parent="RootMargin/MainVBox"]
-custom_minimum_size = Vector2(0, 56)
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 8
 alignment = 1
 
 [node name="TabVessels" type="Button" parent="RootMargin/MainVBox/TabsHBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(210, 54)
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
+size_flags_horizontal = 3
 focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.2, 0.12, 0.05, 1)
-theme_override_constants/outline_size = 5
+theme_override_constants/outline_size = 4
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.5)
+theme_override_constants/shadow_offset_y = 2
 theme_override_fonts/font = ExtResource("2_font_lilita")
-theme_override_font_sizes/font_size = 30
+theme_override_font_sizes/font_size = 24
 theme_override_styles/normal = SubResource("StyleBoxFlat_tab_active")
 text = "VESSELS"
 
 [node name="TabCrew" type="PanelContainer" parent="RootMargin/MainVBox/TabsHBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(200, 54)
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
+size_flags_horizontal = 3
 mouse_filter = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_tab_locked")
 
 [node name="Margin" type="MarginContainer" parent="RootMargin/MainVBox/TabsHBox/TabCrew"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_right = 12
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
 
 [node name="HBox" type="HBoxContainer" parent="RootMargin/MainVBox/TabsHBox/TabCrew/Margin"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 6
 alignment = 1
 
 [node name="CrewLabel" type="Label" parent="RootMargin/MainVBox/TabsHBox/TabCrew/Margin/HBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.72, 0.64, 0.56, 1)
 theme_override_fonts/font = ExtResource("2_font_lilita")
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 22
 text = "CREW"
 vertical_alignment = 1
 
-[node name="LockIcon" type="TextureRect" parent="RootMargin/MainVBox/TabsHBox/TabCrew/Margin/HBox"]
-custom_minimum_size = Vector2(22, 22)
+[node name="SoonBadge" type="PanelContainer" parent="RootMargin/MainVBox/TabsHBox/TabCrew/Margin/HBox"]
+custom_minimum_size = Vector2(46, 22)
 layout_mode = 2
 size_flags_vertical = 4
 mouse_filter = 2
-texture = ExtResource("5_padlock_icon")
-expand_mode = 1
-stretch_mode = 5
+theme_override_styles/panel = SubResource("StyleBoxFlat_soon_badge")
 
-[node name="TabAmmo" type="PanelContainer" parent="RootMargin/MainVBox/TabsHBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(200, 54)
+[node name="SoonLabel" type="Label" parent="RootMargin/MainVBox/TabsHBox/TabCrew/Margin/HBox/SoonBadge"]
 layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 13
+text = "SOON"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TabWeapons" type="PanelContainer" parent="RootMargin/MainVBox/TabsHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_horizontal = 3
 mouse_filter = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_tab_locked")
 
-[node name="Margin" type="MarginContainer" parent="RootMargin/MainVBox/TabsHBox/TabAmmo"]
+[node name="Margin" type="MarginContainer" parent="RootMargin/MainVBox/TabsHBox/TabWeapons"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_right = 12
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
 
-[node name="HBox" type="HBoxContainer" parent="RootMargin/MainVBox/TabsHBox/TabAmmo/Margin"]
+[node name="HBox" type="HBoxContainer" parent="RootMargin/MainVBox/TabsHBox/TabWeapons/Margin"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 6
 alignment = 1
 
-[node name="AmmoLabel" type="Label" parent="RootMargin/MainVBox/TabsHBox/TabAmmo/Margin/HBox"]
+[node name="WeaponsLabel" type="Label" parent="RootMargin/MainVBox/TabsHBox/TabWeapons/Margin/HBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.72, 0.64, 0.56, 1)
 theme_override_fonts/font = ExtResource("2_font_lilita")
-theme_override_font_sizes/font_size = 28
-text = "AMMO"
+theme_override_font_sizes/font_size = 20
+text = "WEAPONS"
 vertical_alignment = 1
 
-[node name="LockIcon" type="TextureRect" parent="RootMargin/MainVBox/TabsHBox/TabAmmo/Margin/HBox"]
-custom_minimum_size = Vector2(22, 22)
+[node name="SoonBadge" type="PanelContainer" parent="RootMargin/MainVBox/TabsHBox/TabWeapons/Margin/HBox"]
+custom_minimum_size = Vector2(46, 22)
 layout_mode = 2
 size_flags_vertical = 4
 mouse_filter = 2
-texture = ExtResource("5_padlock_icon")
-expand_mode = 1
-stretch_mode = 5
+theme_override_styles/panel = SubResource("StyleBoxFlat_soon_badge")
+
+[node name="SoonLabel" type="Label" parent="RootMargin/MainVBox/TabsHBox/TabWeapons/Margin/HBox/SoonBadge"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 13
+text = "SOON"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="GridScroll" type="ScrollContainer" parent="RootMargin/MainVBox"]
 layout_mode = 2
@@ -322,18 +368,18 @@ horizontal_scroll_mode = 0
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/margin_left = 4
-theme_override_constants/margin_top = 4
-theme_override_constants/margin_right = 4
-theme_override_constants/margin_bottom = 8
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 2
+theme_override_constants/margin_bottom = 4
 
 [node name="GridContainer" type="GridContainer" parent="RootMargin/MainVBox/GridScroll/GridMargin"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/h_separation = 12
-theme_override_constants/v_separation = 14
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
 columns = 2
 
 [node name="DrawerPanel" type="PanelContainer" parent="RootMargin/MainVBox"]
@@ -344,10 +390,10 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_drawer")
 
 [node name="DrawerMargin" type="MarginContainer" parent="RootMargin/MainVBox/DrawerPanel"]
 layout_mode = 2
-theme_override_constants/margin_left = 18
-theme_override_constants/margin_top = 14
-theme_override_constants/margin_right = 18
-theme_override_constants/margin_bottom = 16
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
 
 [node name="DrawerVBox" type="VBoxContainer" parent="RootMargin/MainVBox/DrawerPanel/DrawerMargin"]
 layout_mode = 2
@@ -358,10 +404,12 @@ theme_override_constants/separation = 8
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.18, 0.1, 0.05, 1)
+theme_override_colors/font_color = Color(0.2, 0.12, 0.06, 1)
+theme_override_colors/font_outline_color = Color(1, 0.95, 0.85, 1)
+theme_override_constants/outline_size = 4
 theme_override_fonts/font = ExtResource("2_font_lilita")
-theme_override_font_sizes/font_size = 38
-text = "THE DINGHY (TIER 2)"
+theme_override_font_sizes/font_size = 32
+text = "THE DINGHY - AGILITY SKIFF (TIER 1)"
 horizontal_alignment = 1
 clip_text = true
 text_overrun_behavior = 3
@@ -369,48 +417,56 @@ text_overrun_behavior = 3
 [node name="StatsHBox" type="HBoxContainer" parent="RootMargin/MainVBox/DrawerPanel/DrawerMargin/DrawerVBox"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 12
+theme_override_constants/separation = 10
 alignment = 1
 
 [node name="HpBox" type="VBoxContainer" parent="RootMargin/MainVBox/DrawerPanel/DrawerMargin/DrawerVBox/StatsHBox"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 2
+theme_override_constants/separation = 3
 
 [node name="StatHpLabel" type="Label" parent="RootMargin/MainVBox/DrawerPanel/DrawerMargin/DrawerVBox/StatsHBox/HpBox"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.2, 0.12, 0.06, 1)
+theme_override_colors/font_color = Color(0.18, 0.1, 0.05, 1)
+theme_override_colors/font_outline_color = Color(0.96, 0.92, 0.85, 1)
+theme_override_constants/outline_size = 4
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.25)
+theme_override_constants/shadow_offset_y = 2
 theme_override_fonts/font = ExtResource("2_font_lilita")
-theme_override_font_sizes/font_size = 32
-text = "Hull: 1 HP"
+theme_override_font_sizes/font_size = 28
+text = "Hull: 3 HP"
 horizontal_alignment = 1
 clip_text = true
 text_overrun_behavior = 3
 
 [node name="StatHpBar" type="ProgressBar" parent="RootMargin/MainVBox/DrawerPanel/DrawerMargin/DrawerVBox/StatsHBox/HpBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 14)
+custom_minimum_size = Vector2(0, 12)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
 theme_override_styles/fill = SubResource("StyleBoxFlat_bar_hp")
-value = 15.0
+value = 35.0
 show_percentage = false
 
 [node name="SpeedBox" type="VBoxContainer" parent="RootMargin/MainVBox/DrawerPanel/DrawerMargin/DrawerVBox/StatsHBox"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 2
+theme_override_constants/separation = 3
 
 [node name="StatSpeedLabel" type="Label" parent="RootMargin/MainVBox/DrawerPanel/DrawerMargin/DrawerVBox/StatsHBox/SpeedBox"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.2, 0.12, 0.06, 1)
+theme_override_colors/font_color = Color(0.18, 0.1, 0.05, 1)
+theme_override_colors/font_outline_color = Color(0.96, 0.92, 0.85, 1)
+theme_override_constants/outline_size = 4
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.25)
+theme_override_constants/shadow_offset_y = 2
 theme_override_fonts/font = ExtResource("2_font_lilita")
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 28
 text = "Speed: 12 m/s"
 horizontal_alignment = 1
 clip_text = true
@@ -418,7 +474,7 @@ text_overrun_behavior = 3
 
 [node name="StatSpeedBar" type="ProgressBar" parent="RootMargin/MainVBox/DrawerPanel/DrawerMargin/DrawerVBox/StatsHBox/SpeedBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 14)
+custom_minimum_size = Vector2(0, 12)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
@@ -426,52 +482,75 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_bar_speed")
 value = 85.0
 show_percentage = false
 
-[node name="CannonsBox" type="VBoxContainer" parent="RootMargin/MainVBox/DrawerPanel/DrawerMargin/DrawerVBox/StatsHBox"]
+[node name="SocketsBox" type="VBoxContainer" parent="RootMargin/MainVBox/DrawerPanel/DrawerMargin/DrawerVBox/StatsHBox"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 2
+theme_override_constants/separation = 3
 
-[node name="StatCannonsLabel" type="Label" parent="RootMargin/MainVBox/DrawerPanel/DrawerMargin/DrawerVBox/StatsHBox/CannonsBox"]
+[node name="StatSocketsLabel" type="Label" parent="RootMargin/MainVBox/DrawerPanel/DrawerMargin/DrawerVBox/StatsHBox/SocketsBox"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.2, 0.12, 0.06, 1)
+theme_override_colors/font_color = Color(0.18, 0.1, 0.05, 1)
+theme_override_colors/font_outline_color = Color(0.96, 0.92, 0.85, 1)
+theme_override_constants/outline_size = 4
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.25)
+theme_override_constants/shadow_offset_y = 2
 theme_override_fonts/font = ExtResource("2_font_lilita")
-theme_override_font_sizes/font_size = 32
-text = "Cannons: 1 Bow"
+theme_override_font_sizes/font_size = 28
+text = "Sockets: 1"
 horizontal_alignment = 1
 clip_text = true
 text_overrun_behavior = 3
 
-[node name="StatCannonsBar" type="ProgressBar" parent="RootMargin/MainVBox/DrawerPanel/DrawerMargin/DrawerVBox/StatsHBox/CannonsBox"]
+[node name="StatSocketsBar" type="ProgressBar" parent="RootMargin/MainVBox/DrawerPanel/DrawerMargin/DrawerVBox/StatsHBox/SocketsBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 14)
+custom_minimum_size = Vector2(0, 12)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
 theme_override_styles/fill = SubResource("StyleBoxFlat_bar_cannons")
-value = 25.0
+value = 20.0
 show_percentage = false
+
+[node name="CurrentTierDescLabel" type="Label" parent="RootMargin/MainVBox/DrawerPanel/DrawerMargin/DrawerVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.24, 0.16, 0.1, 1)
+theme_override_colors/font_outline_color = Color(1, 0.96, 0.9, 1)
+theme_override_constants/outline_size = 3
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.2)
+theme_override_constants/shadow_offset_y = 2
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 24
+text = "Current: Base Bow Chaser"
+horizontal_alignment = 1
+autowrap_mode = 2
 
 [node name="NextUpgradeLabel" type="Label" parent="RootMargin/MainVBox/DrawerPanel/DrawerMargin/DrawerVBox"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.18, 0.1, 0.05, 1)
+theme_override_colors/font_color = Color(0.15, 0.1, 0.05, 1)
+theme_override_colors/font_outline_color = Color(1, 0.96, 0.9, 1)
+theme_override_constants/outline_size = 3
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.2)
+theme_override_constants/shadow_offset_y = 2
 theme_override_fonts/font = ExtResource("2_font_lilita")
-theme_override_font_sizes/font_size = 32
-text = "Next: Unlocks Aft Skeleton Tosser Crew"
+theme_override_font_sizes/font_size = 24
+text = "Next: + Monkey Bomber Crew"
 horizontal_alignment = 1
 autowrap_mode = 2
 
 [node name="ActionButtonsHBox" type="HBoxContainer" parent="RootMargin/MainVBox/DrawerPanel/DrawerMargin/DrawerVBox"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 12
+theme_override_constants/separation = 10
 
 [node name="EquipButton" type="Button" parent="RootMargin/MainVBox/DrawerPanel/DrawerMargin/DrawerVBox/ActionButtonsHBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 78)
+custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
 size_flags_horizontal = 3
 focus_mode = 0
@@ -479,14 +558,16 @@ mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.08, 0.25, 0.05, 1)
 theme_override_constants/outline_size = 5
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.6)
+theme_override_constants/shadow_offset_y = 3
 theme_override_fonts/font = ExtResource("2_font_lilita")
-theme_override_font_sizes/font_size = 38
-text = "EQUIP VESSEL"
+theme_override_font_sizes/font_size = 32
+text = "EQUIPPED ✓"
 clip_text = true
 
 [node name="ActionButton" type="Button" parent="RootMargin/MainVBox/DrawerPanel/DrawerMargin/DrawerVBox/ActionButtonsHBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 78)
+custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
 size_flags_horizontal = 3
 focus_mode = 0
@@ -494,9 +575,10 @@ mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.16, 0.04, 0.04, 1)
 theme_override_constants/outline_size = 5
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.6)
+theme_override_constants/shadow_offset_y = 3
 theme_override_fonts/font = ExtResource("2_font_lilita")
-theme_override_font_sizes/font_size = 38
+theme_override_font_sizes/font_size = 32
 theme_override_styles/normal = SubResource("StyleBoxFlat_action_btn")
-text = "UPGRADE TO TIER 3 (350)"
+text = "UPGRADE TO TIER 2: 350 COINS"
 clip_text = true
-
