@@ -93,8 +93,8 @@ func _generate() -> void:
 	for child in get_children():
 		child.queue_free()
 
-	# Always lay the structural bank spine first, then scatter props on top.
-	_spawn_bank_spine()
+	# Prepare BankScenerySlots hook point along the shore edge for modular .glb cliff/rock meshes
+	_setup_bank_scenery_slots()
 
 	match biome:
 		"black_tide_bayou":
@@ -121,56 +121,35 @@ func _rand_x_inner() -> float:
 		return randf_range(-8.5, -6.5)
 	return randf_range(6.5, 8.5)
 
-## X position for the bank spine edge – just beyond the navigable corridor.
+## X position for the bank scenery slots edge – just beyond the navigable corridor.
 func _spine_x() -> float:
 	return -7.5 if side == "left" else 7.5
 
-# ── Bank Spine ────────────────────────────────────────────────────────────────
+# ── Bank Scenery Slots Hook Point ─────────────────────────────────────────────
 
-## Tiles BANK_SEGMENT_PATH along the full chunk_length at the inner shore edge.
-## Creates a continuous dock-plank silhouette that replaces the "square canal" look.
-## Each tile uses a shared optimised StandardMaterial3D (CULL_BACK, roughness=1.0).
-func _spawn_bank_spine() -> void:
-	var tile_res := load(BANK_SEGMENT_PATH)
-	if not tile_res:
-		return
+## Creates BankScenerySlots containing a MultiMeshInstance3D and Marker3D slot array
+## along the shore edges where modular .glb cliff/rock meshes can be placed or spawned.
+func _setup_bank_scenery_slots() -> void:
+	var slots_container := Node3D.new()
+	slots_container.name = "BankScenerySlots"
+	add_child(slots_container)
 
-	# Determine tile length from the mesh AABB after instantiation.
-	var probe := tile_res.instantiate() as Node3D
-	if not probe:
-		return
+	# MultiMeshInstance3D hook point for modular cliff/rock meshes
+	var multimesh_inst := MultiMeshInstance3D.new()
+	multimesh_inst.name = "BankSceneryMultiMesh"
+	slots_container.add_child(multimesh_inst)
 
-	# Measure Z extents of the probe to auto-tile correctly.
-	var probe_mi := _first_mesh_instance(probe)
-	var tile_z := 4.0  # safe fallback if no mesh found
-	if probe_mi and probe_mi.mesh:
-		tile_z = probe_mi.mesh.get_aabb().size.z
-		tile_z = maxf(tile_z, 0.5)  # guard against degenerate meshes
-	probe.queue_free()
-
-	var tile_count := ceili(chunk_length / tile_z) + 1  # +1 to cover rounding gap
-	var spine_x := _spine_x()
+	# Marker3D slot array along the shore edge
+	var step := 10.0
+	var slot_count := ceili(chunk_length / step)
+	var shore_x := _spine_x()
 	var start_z := -chunk_length * 0.5
 
-	for i in range(tile_count):
-		var tile := tile_res.instantiate() as Node3D
-		if not tile:
-			continue
-		add_child(tile)
-		tile.position = Vector3(
-			spine_x,
-			-0.3,
-			start_z + i * tile_z
-		)
-		# Slight per-tile Y-axis rotation jitter so adjacent tiles don't look stamped.
-		tile.rotation.y = randf_range(-0.08, 0.08)
-		# Uniform scale with subtle variation (0.9–1.05) to avoid perfect repetition.
-		var s := randf_range(0.9, 1.05)
-		tile.scale = Vector3(s, s, s)
-		# Orient dock planks to face the river (outward face visible from centre lane).
-		if side == "right":
-			tile.rotation.y += PI
-		_apply_bank_material(tile)
+	for i in range(slot_count):
+		var marker := Marker3D.new()
+		marker.name = "Slot_%d" % i
+		marker.position = Vector3(shore_x, 0.0, start_z + (i + 0.5) * step)
+		slots_container.add_child(marker)
 
 # ── Biome: Tropical / Smuggler's Run ──────────────────────────────────────────
 

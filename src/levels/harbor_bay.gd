@@ -33,6 +33,11 @@ func on_expedition_changed(level_num: int) -> void:
 	_apply_biome_theme(level_num)
 
 func transition_out(duration: float = 0.8) -> void:
+	var harbor_cam = find_child("*Camera*", true, false)
+	if harbor_cam and harbor_cam is Camera3D:
+		harbor_cam.current = false
+	hide()
+	
 	var tween = create_tween().set_parallel(true)
 	# Smoothly slide harbor props slightly backward and fade them
 	tween.tween_property(self, "position:z", position.z + 10.0, duration).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
@@ -41,6 +46,5 @@ func transition_out(duration: float = 0.8) -> void:
 			tween.tween_property(child, "transparency", 1.0, duration * 0.8).set_trans(Tween.TRANS_SINE)
 			
 	tween.chain().tween_callback(func():
-		visible = false
 		queue_free()
 	)

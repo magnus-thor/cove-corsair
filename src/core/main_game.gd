@@ -80,16 +80,15 @@ func _setup_start_screen() -> void:
 func _on_game_started() -> void:
 	GameState.is_game_active = true
 	
-	# Transition camera to gameplay
-	var camera = get_tree().get_first_node_in_group("game_camera")
-	if camera and camera.has_method("transition_to_gameplay"):
-		camera.transition_to_gameplay(0.85)
-		
-	# Transition harbor bay out
+	# 1. Disable harbor backdrop camera & hide 3D parent node BEFORE chunk instantiation
 	if harbor_bay and is_instance_valid(harbor_bay):
+		var harbor_cam = harbor_bay.find_child("*Camera*", true, false)
+		if harbor_cam and harbor_cam is Camera3D:
+			harbor_cam.current = false
+		harbor_bay.hide()
 		harbor_bay.transition_out(0.8)
 		
-	# Make runner track and level obstacles visible
+	# 2. Make runner track and level obstacles visible & instantiated/ready
 	var track_mgr = get_tree().get_first_node_in_group("track_manager")
 	if track_mgr:
 		track_mgr.visible = true
@@ -97,6 +96,13 @@ func _on_game_started() -> void:
 	var level_ctrl = get_tree().get_first_node_in_group("level_controller")
 	if level_ctrl:
 		level_ctrl.visible = true
+
+	# 3. Transition gameplay camera once runner chunk is ready to render
+	var camera = get_tree().get_first_node_in_group("game_camera") as Camera3D
+	if camera:
+		camera.make_current()
+		if camera.has_method("transition_to_gameplay"):
+			camera.transition_to_gameplay(0.85)
 		
 	var player = get_tree().get_first_node_in_group("player")
 	if player:

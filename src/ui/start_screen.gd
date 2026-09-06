@@ -222,6 +222,9 @@ func _on_start_button_pressed() -> void:
 	if AudioManager and AudioManager.has_method("play_sfx"):
 		AudioManager.play_sfx("gate_passes")
 	
+	# Hide start screen root node immediately
+	visible = false
+	
 	game_started.emit()
 	
 	var fade_tween = create_tween().set_parallel(true)

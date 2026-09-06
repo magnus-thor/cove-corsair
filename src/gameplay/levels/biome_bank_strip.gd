@@ -14,6 +14,8 @@ func generate_scenery() -> void:
 	for child in get_children():
 		child.queue_free()
 		
+	_setup_bank_scenery_slots()
+		
 	match biome:
 		"black_tide_bayou":
 			_generate_bayou_scenery()
@@ -21,6 +23,26 @@ func generate_scenery() -> void:
 			_generate_bastion_scenery()
 		_:
 			_generate_tropical_scenery()
+
+func _setup_bank_scenery_slots() -> void:
+	var slots_container := Node3D.new()
+	slots_container.name = "BankScenerySlots"
+	add_child(slots_container)
+
+	var multimesh_inst := MultiMeshInstance3D.new()
+	multimesh_inst.name = "BankSceneryMultiMesh"
+	slots_container.add_child(multimesh_inst)
+
+	var step := 10.0
+	var slot_count := ceili(strip_length / step)
+	var shore_x := -7.5 if side == "left" else 7.5
+	var start_z := -strip_length * 0.5
+
+	for i in range(slot_count):
+		var marker := Marker3D.new()
+		marker.name = "Slot_%d" % i
+		marker.position = Vector3(shore_x, 0.0, start_z + (i + 0.5) * step)
+		slots_container.add_child(marker)
 
 func _generate_tropical_scenery() -> void:
 	var sand_island_path = "res://assets/models/patch-sand.glb"
