@@ -17,11 +17,14 @@ signal doubloons_changed(new_doubloons: int)
 @export var dinghy_ship_data: ShipData = preload("res://src/data/resources/user_vessels/dinghy_ship.tres")
 @export var sloop_ship_data: ShipData = preload("res://src/data/resources/user_vessels/sloop_ship.tres")
 @export var ironclad_ship_data: ShipData = preload("res://src/data/resources/user_vessels/ironclad_ship.tres")
+@export var bombard_skiff_ship_data: ShipData = preload("res://src/data/resources/user_vessels/bombard_skiff_ship.tres")
 
 const DEFAULT_SOCKET_WEAPONS: Dictionary = {
 	"BowMount": "res://src/data/resources/user_crew/weapon_bow_chaser.tres",
+	"BowMortarMount": "res://src/data/resources/user_crew/weapon_bow_mortar.tres",
 	"MidDeckCrew": "res://src/data/resources/user_crew/crew_monkey_bomber.tres",
 	"MonkeyCrew": "res://src/data/resources/user_crew/crew_monkey_bomber.tres",
+	"QuarterdeckCrew": "res://src/data/resources/user_crew/crew_monkey_bomber.tres",
 	"AftDeckCrew": "res://src/data/resources/user_crew/crew_skeleton_tosser.tres",
 	"SkeletonCrew": "res://src/data/resources/user_crew/crew_skeleton_tosser.tres",
 	"PortSwivelMount": "res://src/data/resources/user_crew/weapon_port_swivel.tres",
@@ -29,7 +32,9 @@ const DEFAULT_SOCKET_WEAPONS: Dictionary = {
 	"PortSwivelMount1": "res://src/data/resources/user_crew/weapon_port_swivel.tres",
 	"PortSwivelMount2": "res://src/data/resources/user_crew/weapon_port_swivel.tres",
 	"StarboardSwivelMount1": "res://src/data/resources/user_crew/weapon_port_swivel.tres",
-	"StarboardSwivelMount2": "res://src/data/resources/user_crew/weapon_port_swivel.tres"
+	"StarboardSwivelMount2": "res://src/data/resources/user_crew/weapon_port_swivel.tres",
+	"PortRailMount": "res://src/data/resources/user_crew/weapon_scattershot.tres",
+	"StarboardRailMount": "res://src/data/resources/user_crew/weapon_scattershot.tres"
 }
 
 ## Width of the river channel boundaries. The boat can move within [-river_width/2, river_width/2]

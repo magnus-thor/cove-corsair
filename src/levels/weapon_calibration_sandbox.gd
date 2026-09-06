@@ -8,6 +8,7 @@ extends Node3D
 var dinghy_ship: ShipData = preload("res://src/data/resources/user_vessels/dinghy_ship.tres")
 var sloop_ship: ShipData = preload("res://src/data/resources/user_vessels/sloop_ship.tres")
 var ironclad_ship: ShipData = preload("res://src/data/resources/user_vessels/ironclad_ship.tres")
+var bombard_skiff_ship: ShipData = preload("res://src/data/resources/user_vessels/bombard_skiff_ship.tres")
 
 # Dynamic Weapon, Crew, and Ammunition options populated per active vessel
 var available_assets: Array[Dictionary] = []
@@ -101,11 +102,14 @@ func _setup_ui() -> void:
 		ship_option.add_item("The Dinghy")
 		ship_option.add_item("The Sloop")
 		ship_option.add_item("The Ironclad")
+		ship_option.add_item("The Bombard Skiff")
 		if target_ship:
 			if target_ship.ship_id == "sloop":
 				ship_option.selected = 1
 			elif target_ship.ship_id == "ironclad":
 				ship_option.selected = 2
+			elif target_ship.ship_id == "bombard_skiff":
+				ship_option.selected = 3
 			else:
 				ship_option.selected = 0
 		ship_option.item_selected.connect(_on_ship_selected)
@@ -213,10 +217,11 @@ func _refresh_ship_sockets_and_tiers() -> void:
 			var sl = s.to_lower()
 			if "bow" in sl: return 0
 			if "mid" in sl or "monkey" in sl: return 1
-			if "aft" in sl or "skeleton" in sl: return 2
-			if "port" in sl: return 3
-			if "starboard" in sl: return 4
-			return 5
+			if "quarter" in sl: return 2
+			if "aft" in sl or "skeleton" in sl: return 3
+			if "port" in sl: return 4
+			if "starboard" in sl: return 5
+			return 6
 		raw_sockets.sort_custom(func(a, b): return order_rank.call(a) < order_rank.call(b))
 		sockets = raw_sockets
 	else:
@@ -278,6 +283,10 @@ func _refresh_vessel_assets_and_ammo() -> void:
 						display_name += " (Crew)"
 					elif "swivel" in w_data.weapon_type.to_lower():
 						display_name += " (Swivel)"
+					elif "scatter" in w_data.weapon_type.to_lower():
+						display_name += " (Carronade)"
+					elif "mortar" in w_data.weapon_type.to_lower():
+						display_name += " (Mortar)"
 					else:
 						display_name += " (Cannon)"
 					available_assets.append({"name": display_name, "data": w_data, "path": res_path})
@@ -289,6 +298,23 @@ func _refresh_vessel_assets_and_ammo() -> void:
 							if stb_data:
 								seen_asset_paths[stb_path] = true
 								available_assets.append({"name": stb_data.weapon_name + " (Swivel)", "data": stb_data, "path": stb_path})
+
+	# Always ensure Scattershot Carronade and Bow Mortar are available in the sandbox dropdown
+	var extra_weapons = [
+		"res://src/data/resources/user_crew/weapon_scattershot.tres",
+		"res://src/data/resources/user_crew/weapon_bow_mortar.tres"
+	]
+	for ew_path in extra_weapons:
+		if not seen_asset_paths.has(ew_path) and ResourceLoader.exists(ew_path):
+			var ew_data = load(ew_path) as WeaponData
+			if ew_data:
+				seen_asset_paths[ew_path] = true
+				var d_name = ew_data.weapon_name
+				if "scatter" in ew_data.weapon_type.to_lower():
+					d_name += " (Carronade)"
+				elif "mortar" in ew_data.weapon_type.to_lower():
+					d_name += " (Mortar)"
+				available_assets.append({"name": d_name, "data": ew_data, "path": ew_path})
 
 	if asset_option:
 		asset_option.clear()
@@ -387,6 +413,7 @@ func _on_ship_selected(idx: int) -> void:
 		0: target_ship = dinghy_ship
 		1: target_ship = sloop_ship
 		2: target_ship = ironclad_ship
+		3: target_ship = bombard_skiff_ship
 	if player_boat and target_ship:
 		player_boat.apply_ship_data(target_ship)
 		_refresh_vessel_options()

@@ -25,7 +25,8 @@ var owned_vessels: Array[String] = ["dinghy"]
 var vessel_tiers: Dictionary = {
 	"dinghy": 1,
 	"sloop": 1,
-	"ironclad": 1
+	"ironclad": 1,
+	"bombard_skiff": 1
 }
 var active_vessel: String = "dinghy"
 # Persistent Progression & Level Map State
@@ -114,6 +115,23 @@ const VESSEL_CATALOG: Dictionary = {
 		"base_speed": 7.5,
 		"fire_rate": 0.15,
 		"preview_texture": "res://assets/sprites/user_vessels/The Ironclad.png"
+	},
+	"bombard_skiff": {
+		"id": "bombard_skiff",
+		"name": "The Bombard Skiff",
+		"archetype": "Artillery Mortar",
+		"resource_path": "res://src/data/resources/user_vessels/bombard_skiff_ship.tres",
+		"purchase_price": 800,
+		"tier_prices": { 2: 500, 3: 1000 },
+		"tier_descriptions": {
+			1: "Heavy Siege Mortar (AoE)",
+			2: "Heavy Mortar + Quarterdeck Crew Support",
+			3: "Heavy Mortar + Crew + Dual Side Scattershot Carronades"
+		},
+		"base_hp": 3,
+		"base_speed": 9.0,
+		"fire_rate": 1.3,
+		"preview_texture": "res://assets/sprites/user_vessels/The Bombard Skiff.png"
 	}
 }
 
@@ -378,7 +396,7 @@ func save_game() -> void:
 func load_game() -> void:
 	# Sensible default fallback state
 	owned_vessels = ["dinghy"]
-	vessel_tiers = {"dinghy": 1, "sloop": 1, "ironclad": 1}
+	vessel_tiers = {"dinghy": 1, "sloop": 1, "ironclad": 1, "bombard_skiff": 1}
 	active_vessel = "dinghy"
 	highest_unlocked_level = 1
 	current_selected_level = 1

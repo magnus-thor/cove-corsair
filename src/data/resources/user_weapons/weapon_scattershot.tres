@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://src/data/weapon_data.gd" id="1_script"]
+[ext_resource type="Resource" path="res://src/data/resources/user_ammo/ammo_scatter_pellet.tres" id="2_ammo"]
+[ext_resource type="PackedScene" path="res://assets/models/weapons/scattershot_carronade.glb" id="3_mesh"]
+
+[resource]
+script = ExtResource("1_script")
+weapon_name = "Scattershot Carronade"
+weapon_type = "scattershot"
+model_scene = ExtResource("3_mesh")
+model_scale = Vector3(0.28, 0.28, 0.28)
+model_rotation_degrees = Vector3(0, 90, 0)
+model_offset = Vector3(0, 0.08, 0)
+fire_rate = 0.45
+spread_angle_deg = 0.0
+max_range = 13.0
+projectile_speed_mult = 1.0
+arc_height = 0.0
+default_ammo = ExtResource("2_ammo")
+compatible_ammo = Array[Resource]([ExtResource("2_ammo")])
+is_scatter = true
+pellet_count = 5
+scatter_spread_deg = 30.0
+projectile_lifetime = 0.5

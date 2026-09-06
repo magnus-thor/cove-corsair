@@ -96,6 +96,7 @@ var gate_items: Array[Dictionary] = [
 var ammo_items: Array[Dictionary] = [
 	{"name": "Standard Ball", "ammo_res": "res://src/data/resources/user_ammo/ammo_standard_ball.tres"},
 	{"name": "Grape Shot", "ammo_res": "res://src/data/resources/user_ammo/ammo_grape_shot.tres"},
+	{"name": "Scatter Pellet", "ammo_res": "res://src/data/resources/user_ammo/ammo_scatter_pellet.tres"},
 	{"name": "Heavy Shot", "ammo_res": "res://src/data/resources/user_ammo/ammo_heavy_shot.tres"},
 	{"name": "Fire Bomb", "ammo_res": "res://src/data/resources/user_ammo/ammo_fire_bomb.tres"},
 	{"name": "Coconut Bomb", "ammo_res": "res://src/data/resources/user_ammo/ammo_coconut_bomb.tres"},
@@ -106,7 +107,8 @@ var ammo_items: Array[Dictionary] = [
 var ship_items: Array[Dictionary] = [
 	{"name": "The Dinghy", "res": "res://src/data/resources/user_vessels/dinghy_ship.tres"},
 	{"name": "The Sloop", "res": "res://src/data/resources/user_vessels/sloop_ship.tres"},
-	{"name": "The Ironclad", "res": "res://src/data/resources/user_vessels/ironclad_ship.tres"}
+	{"name": "The Ironclad", "res": "res://src/data/resources/user_vessels/ironclad_ship.tres"},
+	{"name": "The Bombard Skiff", "res": "res://src/data/resources/user_vessels/bombard_skiff_ship.tres"}
 ]
 
 var current_object_node: Node3D = null

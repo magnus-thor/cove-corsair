@@ -43,3 +43,15 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.02, 0.12, -0.15)
 [node name="AftDeckCrew" type="Node3D" parent="Hardpoints" unique_id=784073938]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05, 0.12, 0.55)
 
+[node name="BowMortarMount" type="Marker3D" parent="Hardpoints" unique_id=784073939]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, -1.35)
+
+[node name="QuarterdeckCrew" type="Marker3D" parent="Hardpoints" unique_id=784073940]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, 0.85)
+
+[node name="PortRailMount" type="Marker3D" parent="Hardpoints" unique_id=784073941]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.48, 0.68, 0)
+
+[node name="StarboardRailMount" type="Marker3D" parent="Hardpoints" unique_id=784073942]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.48, 0.68, 0)
+

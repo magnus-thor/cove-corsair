@@ -14,4 +14,4 @@ alpha_cut = 1
 [node name="ModelContainer" type="Node3D" parent="."]
 
 [node name="MuzzlePoint" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, 0.35)

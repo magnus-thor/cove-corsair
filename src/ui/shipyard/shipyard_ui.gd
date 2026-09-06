@@ -34,7 +34,7 @@ signal shipyard_closed
 const CARD_SCENE: PackedScene = preload("res://src/ui/shipyard/vessel_card.tscn")
 const VesselCardScript = preload("res://src/ui/shipyard/vessel_card.gd")
 
-var vessel_ids: Array[String] = ["dinghy", "sloop", "ironclad"]
+var vessel_ids: Array[String] = ["dinghy", "sloop", "ironclad", "bombard_skiff"]
 var card_instances: Dictionary = {} # vessel_id -> VesselCard
 var selected_vessel_id: String = "dinghy"
 

@@ -146,6 +146,10 @@ func _apply_weapon_data() -> void:
 			scale = Vector3(0.5, 0.5, 0.5)
 		"cannon":
 			scale = Vector3(0.7, 0.7, 0.7)
+		"scattershot":
+			scale = Vector3(0.7, 0.7, 0.7)
+		"deck_mortar":
+			scale = Vector3(0.8, 0.8, 0.8)
 		_:
 			scale = Vector3(0.6, 0.6, 0.6)
 	
@@ -363,38 +367,73 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 		
 	AudioManager.play_sfx("cannon_shots")
 	
-	var ball = proj_scene.instantiate() as Area3D
-	if ball:
-		var spawn_pos = muzzle_point.global_position
-		spawn_pos.y = max(0.48, spawn_pos.y)
-		
-		var socket_name = get_parent().name.to_lower() if get_parent() else ""
-		if "bow" in socket_name:
-			ball.set_meta("from_bow", true)
-		
-		var proj_dir: Vector3
-		if is_crew:
-			proj_dir = aim_direction if aim_direction != Vector3.ZERO else Vector3(0, 0, -1)
+	var spawn_pos = muzzle_point.global_position
+	spawn_pos.y = max(0.48, spawn_pos.y)
+	
+	var socket_name = get_parent().name.to_lower() if get_parent() else ""
+	var from_bow = ("bow" in socket_name)
+	
+	var proj_dir: Vector3
+	if is_crew:
+		proj_dir = aim_direction if aim_direction != Vector3.ZERO else Vector3(0, 0, -1)
+	else:
+		var mount_fwd = global_transform.basis.z
+		mount_fwd.y = 0.0
+		if mount_fwd.length_squared() > 0.001:
+			proj_dir = mount_fwd.normalized()
+		elif weapon_data.has_method("get_firing_direction"):
+			proj_dir = weapon_data.get_firing_direction(Vector3(0, 0, -1))
 		else:
-			if weapon_data.has_method("get_firing_direction"):
-				proj_dir = weapon_data.get_firing_direction(Vector3(0, 0, -1))
-			else:
-				var spread = deg_to_rad(weapon_data.spread_angle_deg)
-				proj_dir = Vector3(0, 0, -1).rotated(Vector3.UP, spread).normalized()
-		
-		world_container.add_child(ball)
-		ball.top_level = true
-		ball.global_position = spawn_pos
-		
-		if ball.has_method("set_spawn_pos"):
-			ball.set_spawn_pos(spawn_pos)
-		
-		if ball.has_method("setup"):
-			ball.setup(proj_dir, weapon_data.default_ammo, weapon_data)
+			var spread = deg_to_rad(weapon_data.spread_angle_deg)
+			proj_dir = Vector3(0, 0, -1).rotated(Vector3.UP, spread).normalized()
+
+	var player = get_tree().get_first_node_in_group("player")
+	var is_scatter_weapon: bool = (weapon_data.get("is_scatter") == true or weapon_data.weapon_type == "scattershot" or "scatter" in weapon_data.weapon_name.to_lower())
+
+	if is_scatter_weapon:
+		var num_pellets: int = weapon_data.get("pellet_count") if ("pellet_count" in weapon_data and weapon_data.pellet_count > 0) else 5
+		var total_fan_deg: float = weapon_data.get("scatter_spread_deg") if ("scatter_spread_deg" in weapon_data and weapon_data.scatter_spread_deg > 0.0) else 30.0
+		var half_fan: float = total_fan_deg * 0.5
+
+		for i in range(num_pellets):
+			var t = float(i) / float(num_pellets - 1) if num_pellets > 1 else 0.5
+			var fan_angle_deg = lerp(-half_fan, half_fan, t) # -15° to +15°
+			var pellet_dir = proj_dir.rotated(Vector3.UP, deg_to_rad(fan_angle_deg)).normalized()
+
+			var pellet = proj_scene.instantiate() as Area3D
+			if pellet:
+				if from_bow:
+					pellet.set_meta("from_bow", true)
+				world_container.add_child(pellet)
+				pellet.top_level = true
+				pellet.global_position = spawn_pos
+				if pellet.has_method("set_spawn_pos"):
+					pellet.set_spawn_pos(spawn_pos)
+				if pellet.has_method("setup"):
+					pellet.setup(pellet_dir, weapon_data.default_ammo, weapon_data)
+				if "projectile_lifetime" in weapon_data and weapon_data.projectile_lifetime > 0.0:
+					pellet.lifetime = weapon_data.projectile_lifetime
+				elif pellet.speed > 0.0:
+					pellet.lifetime = min(pellet.lifetime, (pellet.max_range / pellet.speed) + 0.05)
+				if player and "base_damage_bonus" in player and "damage" in pellet:
+					pellet.damage += player.base_damage_bonus
+	else:
+		var ball = proj_scene.instantiate() as Area3D
+		if ball:
+			if from_bow:
+				ball.set_meta("from_bow", true)
+			world_container.add_child(ball)
+			ball.top_level = true
+			ball.global_position = spawn_pos
 			
-		var player = get_tree().get_first_node_in_group("player")
-		if player and "base_damage_bonus" in player and "damage" in ball:
-			ball.damage += player.base_damage_bonus
+			if ball.has_method("set_spawn_pos"):
+				ball.set_spawn_pos(spawn_pos)
+			
+			if ball.has_method("setup"):
+				ball.setup(proj_dir, weapon_data.default_ammo, weapon_data)
+				
+			if player and "base_damage_bonus" in player and "damage" in ball:
+				ball.damage += player.base_damage_bonus
 
 func _trigger_throw_anim() -> void:
 	if model_container and model_container.visible:

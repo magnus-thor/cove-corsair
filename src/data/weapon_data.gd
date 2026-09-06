@@ -20,6 +20,10 @@ extends Resource
 @export var arc_height: float = 0.0 # Height of ballistic arc in meters (0.0 = flat naval trajectory)
 @export var default_ammo: AmmoData
 @export var compatible_ammo: Array[Resource] = []
+@export var is_scatter: bool = false
+@export var pellet_count: int = 5
+@export var scatter_spread_deg: float = 30.0 # Horizontal cone spread angle (-15° to +15°)
+@export var projectile_lifetime: float = 0.0 # If > 0, overrides projectile lifetime
 
 func can_use_ammo(ammo: Resource) -> bool:
 	if not ammo:
