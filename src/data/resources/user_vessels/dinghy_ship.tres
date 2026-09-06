@@ -32,13 +32,7 @@ hardpoint_scales = {
 "BowMount": Vector3(1, 1, 1),
 "MidDeckCrew": Vector3(1.25, 1.25, 1.25)
 }
-tier_upgrades = Array[Dictionary]([{
-"BowMount": "res://src/data/resources/user_crew/weapon_bow_chaser.tres"
-}, {
-"BowMount": "res://src/data/resources/user_crew/weapon_bow_chaser.tres",
-"MidDeckCrew": "res://src/data/resources/user_crew/crew_monkey_bomber.tres"
-}, {
-"BowMount": "res://src/data/resources/user_crew/weapon_bow_chaser.tres",
-"MidDeckCrew": "res://src/data/resources/user_crew/crew_monkey_bomber.tres",
-"AftDeckCrew": "res://src/data/resources/user_crew/crew_skeleton_tosser.tres"
-}])
+current_tier = 1
+upgrade_costs = Array[int]([0, 350, 750])
+tier_descriptions = Array[String](["Base Bow Chaser", "+ Monkey Bomber Crew", "+ Skeleton Tosser Crew"])
+tier_sockets = Array[Array]([["BowMount"], ["BowMount", "MidDeckCrew"], ["BowMount", "MidDeckCrew", "AftDeckCrew"]])

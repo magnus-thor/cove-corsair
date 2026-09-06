@@ -46,18 +46,7 @@ hardpoint_scales = {
 "StarboardSwivelMount1": Vector3(3.2, 3.2, 3.2),
 "StarboardSwivelMount2": Vector3(3.2, 3.2, 3.2)
 }
-tier_upgrades = Array[Dictionary]([{
-"BowMount": "res://src/data/resources/user_crew/weapon_bow_chaser.tres"
-}, {
-"BowMount": "res://src/data/resources/user_crew/weapon_bow_chaser.tres",
-"MonkeyCrew": "res://src/data/resources/user_crew/crew_monkey_bomber.tres",
-"SkeletonCrew": "res://src/data/resources/user_crew/crew_skeleton_tosser.tres"
-}, {
-"BowMount": "res://src/data/resources/user_crew/weapon_bow_chaser.tres",
-"MonkeyCrew": "res://src/data/resources/user_crew/crew_monkey_bomber.tres",
-"PortSwivelMount1": "res://src/data/resources/user_crew/weapon_port_swivel.tres",
-"PortSwivelMount2": "res://src/data/resources/user_crew/weapon_port_swivel.tres",
-"SkeletonCrew": "res://src/data/resources/user_crew/crew_skeleton_tosser.tres",
-"StarboardSwivelMount1": "res://src/data/resources/user_crew/weapon_port_swivel.tres",
-"StarboardSwivelMount2": "res://src/data/resources/user_crew/weapon_port_swivel.tres"
-}])
+current_tier = 1
+upgrade_costs = Array[int]([0, 1500, 2000])
+tier_descriptions = Array[String](["Heavy Bow Battery", "+ Reinforced Deck Crew", "+ Quad Swivel Battery"])
+tier_sockets = Array[Array]([["BowMount"], ["BowMount", "MonkeyCrew", "SkeletonCrew"], ["BowMount", "MonkeyCrew", "SkeletonCrew", "PortSwivelMount1", "PortSwivelMount2", "StarboardSwivelMount1", "StarboardSwivelMount2"]])

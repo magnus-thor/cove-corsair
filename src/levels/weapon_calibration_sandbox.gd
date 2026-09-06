@@ -236,7 +236,7 @@ func _refresh_ship_sockets_and_tiers() -> void:
 	else:
 		active_socket = ""
 
-	var num_tiers = target_ship.tier_upgrades.size() if target_ship and target_ship.tier_upgrades else 2
+	var num_tiers = target_ship.tier_sockets.size() if target_ship and "tier_sockets" in target_ship and target_ship.tier_sockets else 2
 	if tier_option:
 		tier_option.clear()
 		for i in range(num_tiers):
@@ -257,13 +257,10 @@ func _refresh_vessel_assets_and_ammo() -> void:
 	available_assets.append({"name": "[ Default Ship Tier ]", "data": null, "path": ""})
 	
 	var seen_asset_paths: Dictionary = {}
-	if target_ship and "tier_upgrades" in target_ship and target_ship.tier_upgrades:
-		for tier_dict in target_ship.tier_upgrades:
-			var weapons_map = tier_dict.get("weapons", tier_dict)
-			for socket_name in weapons_map.keys():
-				if socket_name == "tier":
-					continue
-				var val = weapons_map[socket_name]
+	if target_ship and "tier_sockets" in target_ship and target_ship.tier_sockets:
+		for socket_list in target_ship.tier_sockets:
+			for socket_name in socket_list:
+				var val = target_ship.socket_weapons.get(socket_name, PlayerSwerve.DEFAULT_SOCKET_WEAPONS.get(socket_name, null)) if "socket_weapons" in target_ship else PlayerSwerve.DEFAULT_SOCKET_WEAPONS.get(socket_name, null)
 				var res_path: String = ""
 				var w_data: WeaponData = null
 				if val is String:

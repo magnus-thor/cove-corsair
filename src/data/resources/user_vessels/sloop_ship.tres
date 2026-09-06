@@ -40,16 +40,7 @@ hardpoint_scales = {
 "PortSwivelMount": Vector3(3.1, 3.1, 3.1),
 "StarboardSwivelMount": Vector3(3.1, 3.1, 3.1)
 }
-tier_upgrades = Array[Dictionary]([{
-"BowMount": "res://src/data/resources/user_crew/weapon_bow_chaser.tres"
-}, {
-"BowMount": "res://src/data/resources/user_crew/weapon_bow_chaser.tres",
-"MidDeckCrew": "res://src/data/resources/user_crew/crew_monkey_bomber.tres",
-"AftDeckCrew": "res://src/data/resources/user_crew/crew_skeleton_tosser.tres",
-}, {
-"BowMount": "res://src/data/resources/user_crew/weapon_bow_chaser.tres",
-"MidDeckCrew": "res://src/data/resources/user_crew/crew_monkey_bomber.tres",
-"AftDeckCrew": "res://src/data/resources/user_crew/crew_skeleton_tosser.tres",
-"PortSwivelMount": "res://src/data/resources/user_crew/weapon_port_swivel.tres",
-"StarboardSwivelMount": "res://src/data/resources/user_crew/weapon_port_swivel.tres"
-}])
+current_tier = 1
+upgrade_costs = Array[int]([0, 600, 900])
+tier_descriptions = Array[String](["Dual Bow Chasers", "+ Deck Crew Duo", "+ Port & Starboard Swivels"])
+tier_sockets = Array[Array]([["BowMount"], ["BowMount", "MidDeckCrew", "AftDeckCrew"], ["BowMount", "MidDeckCrew", "AftDeckCrew", "PortSwivelMount", "StarboardSwivelMount"]])

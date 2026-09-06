@@ -52,12 +52,9 @@ Weapon and crew resources are assigned to flagship hardpoint dictionaries (`hard
 
 ```gdscript
 # Hardpoint assignment example from The Sloop (Tier 2 Upgrade)
-tier_upgrades = [
-    { "BowMount": "res://src/data/resources/user_crew/weapon_bow_chaser.tres" },
-    {
-        "BowMount": "res://src/data/resources/user_crew/weapon_bow_chaser.tres",
-        "MidDeckCrew": "res://src/data/resources/user_crew/crew_monkey_bomber.tres",
-        "AftDeckCrew": "res://src/data/resources/user_crew/crew_skeleton_tosser.tres"
-    }
+tier_sockets = [
+    ["BowMount"],
+    ["BowMount", "MidDeckCrew", "AftDeckCrew"],
+    ["BowMount", "MidDeckCrew", "AftDeckCrew", "PortSwivelMount", "StarboardSwivelMount"]
 ]
 ```

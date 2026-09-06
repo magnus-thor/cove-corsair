@@ -18,6 +18,20 @@ signal doubloons_changed(new_doubloons: int)
 @export var sloop_ship_data: ShipData = preload("res://src/data/resources/user_vessels/sloop_ship.tres")
 @export var ironclad_ship_data: ShipData = preload("res://src/data/resources/user_vessels/ironclad_ship.tres")
 
+const DEFAULT_SOCKET_WEAPONS: Dictionary = {
+	"BowMount": "res://src/data/resources/user_crew/weapon_bow_chaser.tres",
+	"MidDeckCrew": "res://src/data/resources/user_crew/crew_monkey_bomber.tres",
+	"MonkeyCrew": "res://src/data/resources/user_crew/crew_monkey_bomber.tres",
+	"AftDeckCrew": "res://src/data/resources/user_crew/crew_skeleton_tosser.tres",
+	"SkeletonCrew": "res://src/data/resources/user_crew/crew_skeleton_tosser.tres",
+	"PortSwivelMount": "res://src/data/resources/user_crew/weapon_port_swivel.tres",
+	"StarboardSwivelMount": "res://src/data/resources/user_crew/weapon_port_swivel.tres",
+	"PortSwivelMount1": "res://src/data/resources/user_crew/weapon_port_swivel.tres",
+	"PortSwivelMount2": "res://src/data/resources/user_crew/weapon_port_swivel.tres",
+	"StarboardSwivelMount1": "res://src/data/resources/user_crew/weapon_port_swivel.tres",
+	"StarboardSwivelMount2": "res://src/data/resources/user_crew/weapon_port_swivel.tres"
+}
+
 ## Width of the river channel boundaries. The boat can move within [-river_width/2, river_width/2]
 @export var river_width: float = 12.0
 
@@ -283,15 +297,23 @@ func apply_ship_data(data: ShipData) -> void:
 	health_changed.emit(current_health, max_health)
 
 func apply_tier(tier_level: int) -> void:
-	if not ship_data:
+	if not ship_data or ship_data.tier_sockets.is_empty():
 		return
 	current_tier = tier_level
-	if ship_data.tier_upgrades.is_empty():
-		return
-	var index = clamp(tier_level - 1, 0, ship_data.tier_upgrades.size() - 1)
-	var tier_dict: Dictionary = ship_data.tier_upgrades[index]
-	
-	var weapons_map: Dictionary = tier_dict.get("weapons", tier_dict)
+	var active_sockets: Array = ship_data.tier_sockets[clampi(tier_level - 1, 0, ship_data.tier_sockets.size() - 1)]
+
+	var weapons_map: Dictionary = DEFAULT_SOCKET_WEAPONS.duplicate()
+	if "socket_weapons" in ship_data and not ship_data.socket_weapons.is_empty():
+		weapons_map.merge(ship_data.socket_weapons, true)
+
+	# Filter weapons_map directly against active_sockets
+	var filtered_map: Dictionary = {}
+	for s in active_sockets:
+		if weapons_map.has(s):
+			filtered_map[s] = weapons_map[s]
+	weapons_map = filtered_map
+
+	# Remove any currently equipped weapons whose sockets are no longer in this tier
 	var sockets_to_remove: Array[String] = []
 	for s in equipped_weapons.keys():
 		if not weapons_map.has(s):
@@ -300,10 +322,8 @@ func apply_tier(tier_level: int) -> void:
 		if is_instance_valid(equipped_weapons[s]):
 			equipped_weapons[s].queue_free()
 		equipped_weapons.erase(s)
-		
+
 	for socket_name in weapons_map:
-		if socket_name == "tier":
-			continue
 		var val = weapons_map[socket_name]
 		var w_data: WeaponData = null
 		if val is String:
