@@ -188,7 +188,9 @@ func spawn_gates() -> void:
 		gates_container.remove_child(child)
 		child.queue_free()
 
-## Spawns landscape scenery pieces along the segment shores
+## Spawns landscape scenery pieces along the segment shores.
+## Each zone may spawn a sand/rock shoal base (with optional palm), plus a dock
+## ruin accent prop (30 % chance) to create an organic, jagged shoreline.
 func spawn_scenery() -> void:
 	var scenery_container = get_node_or_null("Scenery")
 	if not scenery_container:
@@ -197,13 +199,19 @@ func spawn_scenery() -> void:
 	for child in scenery_container.get_children():
 		scenery_container.remove_child(child)
 		child.queue_free()
-		
-	var sand_island_path = "res://assets/models/patch-sand.glb"
-	var rock_island_path = "res://assets/models/rocks-sand-a.glb"
-	var palm_straight_path = "res://assets/models/palm-detailed-straight.glb"
-	var palm_bend_path = "res://assets/models/palm-detailed-bend.glb"
-	
-	var zones = [
+
+	# ── Asset paths ───────────────────────────────────────────────────────────
+	# Swap these to res://assets/models/environment/*.glb for the art-pass.
+	var sand_island_path   := "res://assets/models/patch-sand.glb"
+	var rock_island_path   := "res://assets/models/rocks-sand-a.glb"
+	var palm_straight_path := "res://assets/models/palm-detailed-straight.glb"
+	var palm_bend_path     := "res://assets/models/palm-detailed-bend.glb"
+	var dock_ruin_paths: Array[String] = [
+		"res://assets/models/structure-platform-dock-small.glb",
+		"res://assets/models/structure.glb",
+	]
+
+	var zones := [
 		Vector2(-40.0, -32.5),
 		Vector2(-32.5, -25.0),
 		Vector2(-25.0, -17.5),
@@ -211,11 +219,11 @@ func spawn_scenery() -> void:
 	]
 	
 	for zone in zones:
-		var shore = randi() % 3
+		var shore := randi() % 3
 		if shore == 0:
 			continue
 			
-		var rand_x = 0.0
+		var rand_x := 0.0
 		var is_left: bool = (shore == 1)
 		if is_left:
 			# Left bank: roots strictly at X <= -6.5 (ranging outward from -6.5 to -10.5)
@@ -224,27 +232,47 @@ func spawn_scenery() -> void:
 			# Right bank: roots strictly at X >= +6.5 (ranging outward from +6.5 to +10.5)
 			rand_x = randf_range(6.5, 10.5)
 			
-		var rand_z = randf_range(zone.x, zone.y)
+		var rand_z := randf_range(zone.x, zone.y)
 		
-		var base_path = sand_island_path if randf() < 0.5 else rock_island_path
-		var base_scene = load(base_path)
+		# ── Shoal base (sand island or rock cluster) ──────────────────────────
+		var base_path := sand_island_path if randf() < 0.5 else rock_island_path
+		var base_scene := load(base_path)
 		if base_scene:
-			var base_inst = base_scene.instantiate() as Node3D
+			var base_inst := base_scene.instantiate() as Node3D
 			scenery_container.add_child(base_inst)
 			base_inst.position = Vector3(rand_x, 0.0, rand_z)
 			base_inst.scale = Vector3(randf_range(1.0, 1.3), randf_range(0.7, 1.0), randf_range(1.0, 1.3))
+			base_inst.rotation.y = randf_range(0.0, TAU)
 			_clean_shadow_nodes(base_inst)
 			
+			# Palm on shoal (60 % chance)
 			if randf() < 0.6:
-				var palm_path = palm_straight_path if randf() < 0.5 else palm_bend_path
-				var palm_scene = load(palm_path)
+				var palm_path := palm_straight_path if randf() < 0.5 else palm_bend_path
+				var palm_scene := load(palm_path)
 				if palm_scene:
-					var palm_inst = palm_scene.instantiate() as Node3D
+					var palm_inst := palm_scene.instantiate() as Node3D
 					base_inst.add_child(palm_inst)
+					palm_inst.position = Vector3(randf_range(-0.2, 0.2), 0.0, randf_range(-0.2, 0.2))
+					palm_inst.scale    = Vector3.ONE * randf_range(0.8, 1.2)
 					palm_inst.rotation.y = randf_range(0.0, TAU)
 					_clean_shadow_nodes(palm_inst)
 
+			# buffer=0.0 — allow rocks to kiss ±6.0 for an organic jagged silhouette.
 			_enforce_navigable_clearance(base_inst, is_left)
+
+		# ── Dock ruins accent prop (30 % chance) ──────────────────────────────
+		if randf() < 0.30:
+			var ruin_path: String = dock_ruin_paths[randi() % dock_ruin_paths.size()]
+			var ruin_scene := load(ruin_path)
+			if ruin_scene:
+				var ruin_inst := ruin_scene.instantiate() as Node3D
+				scenery_container.add_child(ruin_inst)
+				var ruin_x := randf_range(-8.5, -6.5) if is_left else randf_range(6.5, 8.5)
+				ruin_inst.position   = Vector3(ruin_x, 0.0, rand_z + randf_range(-2.0, 2.0))
+				ruin_inst.scale      = Vector3.ONE * randf_range(0.8, 1.2)
+				ruin_inst.rotation.y = randf_range(0.0, TAU)
+				_clean_shadow_nodes(ruin_inst)
+				_enforce_navigable_clearance(ruin_inst, is_left)
 
 func _clean_shadow_nodes(node: Node) -> void:
 	if not node:
@@ -281,7 +309,8 @@ func _get_relative_transform(node: Node3D, root: Node3D) -> Transform3D:
 		curr = curr.get_parent()
 	return xform
 
-func _enforce_navigable_clearance(prop: Node3D, is_left: bool, buffer: float = 0.05) -> void:
+## buffer=0.0 allows props to touch the ±6.0 corridor edge for organic silhouette.
+func _enforce_navigable_clearance(prop: Node3D, is_left: bool, buffer: float = 0.0) -> void:
 	if not prop:
 		return
 	

@@ -3,17 +3,72 @@ extends Node3D
 # ──────────────────────────────────────────────────────────────────────────────
 # RIVERBANK PROPS  –  Layer 2 of the 3-Layer Parallax Environment System
 #
-# One recycled chunk (left or right side).  Spawns 3–4 rock / cliff / foliage
-# props strictly outside the playable corridor:
+# One recycled chunk (left or right side).  Spawns a dock-plank bank spine plus
+# 3–4 rock / cliff / foliage / dock-ruin props strictly outside the playable
+# corridor:
 #   Left  side: outer centres X ≈ –11.5, inner centres X ≈ –10.2
 #   Right side: outer centres X ≈ +11.5, inner centres X ≈ +10.2
 #
-# X bounds are kept far enough from ±7.5 lane edge that even the largest scaled
-# mesh geometry cannot reach the playable corridor.
+# X bounds keep visual geometry far enough from ±7.5 lane edge so even the
+# largest scaled mesh cannot reach the playable corridor.
+#
+# ── Modular Asset Slots ───────────────────────────────────────────────────────
+# Paths below are the CURRENT fallbacks using existing assets.
+# Drop a replacement GLB into res://assets/models/environment/ and update the
+# constant to swap the whole system with no further code changes.
+#
+# | Slot              | Current asset                              |
+# |-------------------|--------------------------------------------|
+# | BANK_SEGMENT      | structure-platform-dock.glb                |
+# | PROP_ROCK_CLUSTER | rocks-a/b/c.glb                            |
+# | PROP_PALMS        | palm-detailed-straight/bend.glb            |
+# | PROP_DOCK_RUINS   | structure-platform-dock-small.glb,         |
+# |                   | structure.glb                              |
 #
 # Material strategy:
-#   - Tropical biome → _kill_shadows() only; GLB textures/colours preserved.
-#   - Biome-tinted props → _apply_tint() replaces material with flat colour.
+#   - Tropical biome props → _kill_shadows() only; GLB textures preserved.
+#   - Biome-tinted props   → _apply_tint() replaces material with flat colour.
+#   - Bank spine tiles     → _apply_bank_material() (CULL_BACK, roughness 1.0).
+# ──────────────────────────────────────────────────────────────────────────────
+
+# ── Modular asset path constants ──────────────────────────────────────────────
+
+## Shore-edge spine tile – continuous dock plank strip along the bank.
+## Swap to res://assets/models/environment/bank_segment.glb when available.
+const BANK_SEGMENT_PATH := "res://assets/models/structure-platform-dock.glb"
+
+## Outer cliff / boulder mass clusters.
+## Swap to res://assets/models/environment/prop_rock_cluster.glb when available.
+const PROP_ROCK_CLUSTER_PATHS := [
+	"res://assets/models/rocks-a.glb",
+	"res://assets/models/rocks-b.glb",
+	"res://assets/models/rocks-c.glb",
+]
+
+## Shoal sand / rock-sand bases (inner band).
+const PROP_SHOAL_PATHS := [
+	"res://assets/models/patch-sand.glb",
+	"res://assets/models/rocks-sand-a.glb",
+	"res://assets/models/rocks-sand-c.glb",
+]
+
+## Tropical palm foliage.
+## Swap to res://assets/models/environment/prop_palms.glb when available.
+const PROP_PALMS_PATHS := [
+	"res://assets/models/palm-detailed-straight.glb",
+	"res://assets/models/palm-detailed-bend.glb",
+]
+
+## Ruined dock / structure accent props.
+## Swap to res://assets/models/environment/prop_dock_ruins.glb when available.
+const PROP_DOCK_RUINS_PATHS := [
+	"res://assets/models/structure-platform-dock-small.glb",
+	"res://assets/models/structure.glb",
+]
+
+# Shared bank material cache – one instance created on first use, reused across all tiles.
+static var _shared_bank_mat: StandardMaterial3D = null
+
 # ──────────────────────────────────────────────────────────────────────────────
 
 var side         : String = "left"
@@ -37,6 +92,9 @@ func _generate() -> void:
 	# Clear previous props (called on recycle)
 	for child in get_children():
 		child.queue_free()
+
+	# Always lay the structural bank spine first, then scatter props on top.
+	_spawn_bank_spine()
 
 	match biome:
 		"black_tide_bayou":
@@ -63,32 +121,68 @@ func _rand_x_inner() -> float:
 		return randf_range(-8.5, -6.5)
 	return randf_range(6.5, 8.5)
 
+## X position for the bank spine edge – just beyond the navigable corridor.
+func _spine_x() -> float:
+	return -7.5 if side == "left" else 7.5
+
+# ── Bank Spine ────────────────────────────────────────────────────────────────
+
+## Tiles BANK_SEGMENT_PATH along the full chunk_length at the inner shore edge.
+## Creates a continuous dock-plank silhouette that replaces the "square canal" look.
+## Each tile uses a shared optimised StandardMaterial3D (CULL_BACK, roughness=1.0).
+func _spawn_bank_spine() -> void:
+	var tile_res := load(BANK_SEGMENT_PATH)
+	if not tile_res:
+		return
+
+	# Determine tile length from the mesh AABB after instantiation.
+	var probe := tile_res.instantiate() as Node3D
+	if not probe:
+		return
+
+	# Measure Z extents of the probe to auto-tile correctly.
+	var probe_mi := _first_mesh_instance(probe)
+	var tile_z := 4.0  # safe fallback if no mesh found
+	if probe_mi and probe_mi.mesh:
+		tile_z = probe_mi.mesh.get_aabb().size.z
+		tile_z = maxf(tile_z, 0.5)  # guard against degenerate meshes
+	probe.queue_free()
+
+	var tile_count := ceili(chunk_length / tile_z) + 1  # +1 to cover rounding gap
+	var spine_x := _spine_x()
+	var start_z := -chunk_length * 0.5
+
+	for i in range(tile_count):
+		var tile := tile_res.instantiate() as Node3D
+		if not tile:
+			continue
+		add_child(tile)
+		tile.position = Vector3(
+			spine_x,
+			-0.3,
+			start_z + i * tile_z
+		)
+		# Slight per-tile Y-axis rotation jitter so adjacent tiles don't look stamped.
+		tile.rotation.y = randf_range(-0.08, 0.08)
+		# Uniform scale with subtle variation (0.9–1.05) to avoid perfect repetition.
+		var s := randf_range(0.9, 1.05)
+		tile.scale = Vector3(s, s, s)
+		# Orient dock planks to face the river (outward face visible from centre lane).
+		if side == "right":
+			tile.rotation.y += PI
+		_apply_bank_material(tile)
+
 # ── Biome: Tropical / Smuggler's Run ──────────────────────────────────────────
 
 func _spawn_tropical() -> void:
-	var rock_paths   := [
-		"res://assets/models/rocks-a.glb",
-		"res://assets/models/rocks-b.glb",
-		"res://assets/models/rocks-c.glb",
-	]
-	var shoal_paths  := [
-		"res://assets/models/patch-sand.glb",
-		"res://assets/models/rocks-sand-a.glb",
-		"res://assets/models/rocks-sand-c.glb",
-	]
-	var palm_paths   := [
-		"res://assets/models/palm-detailed-straight.glb",
-		"res://assets/models/palm-detailed-bend.glb",
-	]
-
 	var prop_count := randi_range(3, 5)
 	var step       := chunk_length / float(prop_count)
 
 	for i in range(prop_count):
 		var z_pos := -chunk_length * 0.5 + i * step + randf_range(-1.5, 1.5)
 
-		# Natural Tropical Coastal Boulders (no vertical stretching)
-		var rock_res := load(rock_paths[randi() % rock_paths.size()])
+		# ── Outer band: Natural Coastal Boulders ──────────────────────────────
+		var rock_res := load(PROP_ROCK_CLUSTER_PATHS[randi() % PROP_ROCK_CLUSTER_PATHS.size()])
 		if rock_res:
 			var rock := rock_res.instantiate() as Node3D
 			add_child(rock)
@@ -101,11 +195,12 @@ func _spawn_tropical() -> void:
 			)
 			rock.rotation.y = randf_range(0.0, TAU)
 			_kill_shadows(rock)
-			_enforce_navigable_clearance(rock)
+			# Buffer 0.0 — rocks may kiss the ±6.0 line for a jagged organic silhouette.
+			_enforce_navigable_clearance(rock, 0.0)
 
-		# Sandy Shoals & Palm Clusters – inner band
+		# ── Inner band: Sandy Shoals & Palm Clusters ──────────────────────────
 		if randf() < 0.85:
-			var shoal_res := load(shoal_paths[randi() % shoal_paths.size()])
+			var shoal_res := load(PROP_SHOAL_PATHS[randi() % PROP_SHOAL_PATHS.size()])
 			if shoal_res:
 				var shoal := shoal_res.instantiate() as Node3D
 				add_child(shoal)
@@ -124,7 +219,7 @@ func _spawn_tropical() -> void:
 
 				# Palm Tree Cluster on Shoal
 				if randf() < 0.85:
-					var palm_res := load(palm_paths[randi() % palm_paths.size()])
+					var palm_res := load(PROP_PALMS_PATHS[randi() % PROP_PALMS_PATHS.size()])
 					if palm_res:
 						var palm := palm_res.instantiate() as Node3D
 						shoal.add_child(palm)
@@ -132,23 +227,38 @@ func _spawn_tropical() -> void:
 							randf_range(-0.2, 0.2), 0.0, randf_range(-0.2, 0.2)
 						)
 						palm.scale       = Vector3.ONE * randf_range(0.8, 1.2)
-						# Orient palm lean away from the river corridor
-						var palm_lean_rot: float = randf_range(0.0, TAU)
-						palm.rotation.y  = palm_lean_rot
+						palm.rotation.y  = randf_range(0.0, TAU)
 						_kill_shadows(palm)
 
-				_enforce_navigable_clearance(shoal)
+				_enforce_navigable_clearance(shoal, 0.0)
+
+		# ── Inner band: Dock Ruins (30 % chance) ─────────────────────────────
+		if randf() < 0.30:
+			var ruin_res := load(PROP_DOCK_RUINS_PATHS[randi() % PROP_DOCK_RUINS_PATHS.size()])
+			if ruin_res:
+				var ruin := ruin_res.instantiate() as Node3D
+				add_child(ruin)
+				ruin.position = Vector3(
+					_rand_x_inner(),
+					0.0,
+					z_pos + randf_range(-2.0, 2.0)
+				)
+				ruin.scale    = Vector3.ONE * randf_range(0.8, 1.2)
+				ruin.rotation.y = randf_range(0.0, TAU)
+				_kill_shadows(ruin)
+				_enforce_navigable_clearance(ruin, 0.0)
 
 # ── Biome: Black Tide Bayou ────────────────────────────────────────────────────
 
 func _spawn_bayou() -> void:
-	var rock_paths   := [
+	var bayou_rocks   := [
 		"res://assets/models/rocks-a.glb",
 		"res://assets/models/rocks-c.glb",
 	]
 	var shoal_path   := "res://assets/models/rocks-sand-b.glb"
 	var tint_cliff   := Color(0.28, 0.42, 0.32)
 	var tint_shoal   := Color(0.22, 0.35, 0.28)
+	var tint_ruin    := Color(0.25, 0.38, 0.30)
 
 	var prop_count := randi_range(3, 4)
 	var step       := chunk_length / float(prop_count)
@@ -157,7 +267,7 @@ func _spawn_bayou() -> void:
 		var z_pos := -chunk_length * 0.5 + i * step + randf_range(-1.5, 1.5)
 
 		# Dark mossy cliff mass
-		var rock_res := load(rock_paths[randi() % rock_paths.size()])
+		var rock_res := load(bayou_rocks[randi() % bayou_rocks.size()])
 		if rock_res:
 			var rock := rock_res.instantiate() as Node3D
 			add_child(rock)
@@ -169,7 +279,7 @@ func _spawn_bayou() -> void:
 			)
 			rock.rotation.y  = randf_range(0.0, TAU)
 			_apply_tint(rock, tint_cliff)
-			_enforce_navigable_clearance(rock)
+			_enforce_navigable_clearance(rock, 0.0)
 
 		# Mangrove shoal with optional bioluminescent lantern
 		if randf() < 0.75:
@@ -191,7 +301,23 @@ func _spawn_bayou() -> void:
 				if randf() < 0.6:
 					_spawn_lantern(shoal)
 
-				_enforce_navigable_clearance(shoal)
+				_enforce_navigable_clearance(shoal, 0.0)
+
+		# Dock Ruins – bayou-tinted (30 % chance)
+		if randf() < 0.30:
+			var ruin_res := load(PROP_DOCK_RUINS_PATHS[randi() % PROP_DOCK_RUINS_PATHS.size()])
+			if ruin_res:
+				var ruin := ruin_res.instantiate() as Node3D
+				add_child(ruin)
+				ruin.position = Vector3(
+					_rand_x_inner(),
+					0.0,
+					z_pos + randf_range(-2.0, 2.0)
+				)
+				ruin.scale    = Vector3.ONE * randf_range(0.8, 1.2)
+				ruin.rotation.y = randf_range(0.0, TAU)
+				_apply_tint(ruin, tint_ruin)
+				_enforce_navigable_clearance(ruin, 0.0)
 
 func _spawn_lantern(parent: Node3D) -> void:
 	var post      := MeshInstance3D.new()
@@ -226,7 +352,7 @@ func _spawn_lantern(parent: Node3D) -> void:
 # ── Biome: Brimstone Bastion ───────────────────────────────────────────────────
 
 func _spawn_bastion() -> void:
-	var rock_paths := [
+	var bastion_rocks := [
 		"res://assets/models/rocks-a.glb",
 		"res://assets/models/rocks-b.glb",
 	]
@@ -234,6 +360,7 @@ func _spawn_bastion() -> void:
 	var tower_path := "res://assets/models/tower-top.glb"
 	var tint_rock  := Color(0.15, 0.15, 0.18)
 	var tint_wall  := Color(0.28, 0.22, 0.22)
+	var tint_ruin  := Color(0.22, 0.18, 0.18)
 
 	var prop_count := randi_range(3, 4)
 	var step       := chunk_length / float(prop_count)
@@ -242,7 +369,7 @@ func _spawn_bastion() -> void:
 		var z_pos := -chunk_length * 0.5 + i * step + randf_range(-1.5, 1.5)
 
 		# Basalt column outer band
-		var rock_res := load(rock_paths[randi() % rock_paths.size()])
+		var rock_res := load(bastion_rocks[randi() % bastion_rocks.size()])
 		if rock_res:
 			var rock := rock_res.instantiate() as Node3D
 			add_child(rock)
@@ -254,7 +381,7 @@ func _spawn_bastion() -> void:
 			)
 			rock.rotation.y  = randf_range(0.0, TAU)
 			_apply_tint(rock, tint_rock)
-			_enforce_navigable_clearance(rock)
+			_enforce_navigable_clearance(rock, 0.0)
 
 		# Fortress piece inner band
 		if randf() < 0.75:
@@ -273,7 +400,23 @@ func _spawn_bastion() -> void:
 				if is_tower or randf() < 0.5:
 					_spawn_brazier(piece)
 
-				_enforce_navigable_clearance(piece)
+				_enforce_navigable_clearance(piece, 0.0)
+
+		# Dock Ruins – battle-damaged bastion platforms (30 % chance)
+		if randf() < 0.30:
+			var ruin_res := load(PROP_DOCK_RUINS_PATHS[randi() % PROP_DOCK_RUINS_PATHS.size()])
+			if ruin_res:
+				var ruin := ruin_res.instantiate() as Node3D
+				add_child(ruin)
+				ruin.position = Vector3(
+					_rand_x_inner(),
+					0.0,
+					z_pos + randf_range(-2.0, 2.0)
+				)
+				ruin.scale    = Vector3.ONE * randf_range(0.8, 1.2)
+				ruin.rotation.y = randf_range(0.0, TAU)
+				_apply_tint(ruin, tint_ruin)
+				_enforce_navigable_clearance(ruin, 0.0)
 
 func _spawn_brazier(parent: Node3D) -> void:
 	var bowl     := MeshInstance3D.new()
@@ -305,7 +448,25 @@ func _spawn_brazier(parent: Node3D) -> void:
 	bowl.add_child(fire)
 	fire.position = Vector3(0.0, 0.2, 0.0)
 
-# ── Material / shadow helpers ──────────────────────────────────────────────────
+# ── Material helpers ───────────────────────────────────────────────────────────
+
+## Applies the shared optimised bank material to every MeshInstance3D in the hierarchy.
+## StandardMaterial3D: CULL_BACK, roughness=1.0, metallic_specular=0.0, shadows OFF.
+## A single static instance is shared across all tiles to minimise draw-call overhead.
+func _apply_bank_material(node: Node) -> void:
+	if _shared_bank_mat == null:
+		_shared_bank_mat = StandardMaterial3D.new()
+		_shared_bank_mat.cull_mode         = BaseMaterial3D.CULL_BACK
+		_shared_bank_mat.roughness         = 1.0
+		_shared_bank_mat.metallic_specular = 0.0
+		_shared_bank_mat.shading_mode      = BaseMaterial3D.SHADING_MODE_PER_PIXEL
+		_shared_bank_mat.albedo_color      = Color(0.72, 0.58, 0.40)  # warm plank tone
+	if node is MeshInstance3D:
+		(node as MeshInstance3D).material_override = _shared_bank_mat
+	if node is GeometryInstance3D:
+		(node as GeometryInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	for child in node.get_children():
+		_apply_bank_material(child)
 
 ## Recursively disables shadows WITHOUT touching any material.
 ## Use this for tropical biome props so their original GLB textures show through.
@@ -340,6 +501,16 @@ func _collect_mesh_instances(node: Node, result: Array[MeshInstance3D]) -> void:
 	for child in node.get_children():
 		_collect_mesh_instances(child, result)
 
+## Returns the first MeshInstance3D found in the hierarchy (used for probe measurement).
+func _first_mesh_instance(node: Node) -> MeshInstance3D:
+	if node is MeshInstance3D:
+		return node as MeshInstance3D
+	for child in node.get_children():
+		var found := _first_mesh_instance(child)
+		if found:
+			return found
+	return null
+
 ## Computes the local transform of node relative to root by walking parent transforms.
 func _get_relative_transform(node: Node3D, root: Node3D) -> Transform3D:
 	var xform := Transform3D.IDENTITY
@@ -349,9 +520,11 @@ func _get_relative_transform(node: Node3D, root: Node3D) -> Transform3D:
 		curr = curr.get_parent()
 	return xform
 
-## Enforces that no visual geometry in the prop hierarchy crosses the +/- 6.0 navigable lane boundary.
-## If any geometry overshoots the channel limit, the prop is shifted outward.
-func _enforce_navigable_clearance(prop: Node3D, buffer: float = 0.05) -> void:
+## Enforces that no visual geometry in the prop hierarchy crosses the +/- 6.0 navigable
+## lane boundary. If any geometry overshoots, the prop is shifted outward.
+## buffer = 0.0  → rocks may kiss the ±6.0 line (organic jagged silhouette).
+## buffer = 0.05 → old conservative value; retained as default for spine tiles via caller.
+func _enforce_navigable_clearance(prop: Node3D, buffer: float = 0.0) -> void:
 	if not prop:
 		return
 	
@@ -374,18 +547,18 @@ func _enforce_navigable_clearance(prop: Node3D, buffer: float = 0.05) -> void:
 			var pt := rel_xform * corner
 			min_x = minf(min_x, pt.x)
 			max_x = maxf(max_x, pt.x)
-			
+		
 	if min_x == INF or max_x == -INF:
 		return
 		
 	var lane_limit: float = 6.0 + buffer
 	if side == "left":
-		# Left bank: navigable water is X >= -6.0. Visual geometry must be strictly <= -lane_limit (-6.05).
+		# Left bank: navigable water is X >= -6.0. Visual geometry must be <= -lane_limit.
 		if max_x > -lane_limit:
 			var overshoot: float = max_x - (-lane_limit)
 			prop.position.x -= overshoot
 	else:
-		# Right bank: navigable water is X <= +6.0. Visual geometry must be strictly >= +lane_limit (+6.05).
+		# Right bank: navigable water is X <= +6.0. Visual geometry must be >= +lane_limit.
 		if min_x < lane_limit:
 			var undershoot: float = lane_limit - min_x
 			prop.position.x += undershoot
