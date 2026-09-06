@@ -42,7 +42,10 @@ f:\projects\cove-corsair\
 │       ├── README.md                           # Level overview index
 │       ├── level_01_smugglers_run.md           # Level 1 setup specification
 │       ├── level_02_black_tide_bayou.md        # Level 2 setup specification
-│       └── level_03_brimstone_bastion.md       # Level 3 setup specification
+│       ├── level_03_brimstone_bastion.md       # Level 3 setup specification
+│       ├── level_04_smugglers_nightmare.md     # Level 4 setup specification
+│       ├── level_05_black_tide_abyss.md        # Level 5 setup specification
+│       └── level_06_brimstone_inferno.md       # Level 6 setup specification
 └── src/                                        # Core game source code
     ├── core/                                   # Global singletons, game state, camera, audio
     │   ├── game_state.gd                       # Global state autoload (score, level, progress)
@@ -156,6 +159,9 @@ flowchart TD
 | **Level 1** | Smuggler's Run | `smugglers_run` | $250\text{m}$ | $10.0\text{ m/s}$ | The Dinghy | War-Barge ($220\text{ HP}$) | [Level 1 Setup Spec](file:///f:/projects/cove-corsair/documents/levels/level_01_smugglers_run.md) |
 | **Level 2** | Black Tide Bayou | `black_tide_bayou` | $280\text{m}$ | $10.0\text{ m/s}$ | The Sloop | Phantom Dredge ($450\text{ HP}$) | [Level 2 Setup Spec](file:///f:/projects/cove-corsair/documents/levels/level_02_black_tide_bayou.md) |
 | **Level 3** | Brimstone Bastion | `brimstone_bastion` | $320\text{m}$ | $10.0\text{ m/s}$ | The Ironclad | Siege Fortress ($800\text{ HP}$) | [Level 3 Setup Spec](file:///f:/projects/cove-corsair/documents/levels/level_03_brimstone_bastion.md) |
+| **Level 4** | Smuggler's Nightmare | `smugglers_run` | $250\text{m}$ | $10.5\text{ m/s}$ | The Dinghy | Nightmare Flagship ($300\text{ HP}$) | [Level 4 Setup Spec](file:///f:/projects/cove-corsair/documents/levels/level_04_smugglers_nightmare.md) |
+| **Level 5** | Black Tide Abyss | `black_tide_bayou` | $280\text{m}$ | $11.0\text{ m/s}$ | The Sloop | Phantom Dredge ($550\text{ HP}$) | [Level 5 Setup Spec](file:///f:/projects/cove-corsair/documents/levels/level_05_black_tide_abyss.md) |
+| **Level 6** | Brimstone Inferno | `brimstone_bastion` | $320\text{m}$ | $11.0\text{ m/s}$ | The Ironclad | Siege Fortress ($1000\text{ HP}$) | [Level 6 Setup Spec](file:///f:/projects/cove-corsair/documents/levels/level_06_brimstone_inferno.md) |
 
 ---
 
@@ -192,4 +198,7 @@ godot --headless --export-release "Android" coveCorsair.apk
   * 📜 **Level 1 Setup Specification:** [`documents/levels/level_01_smugglers_run.md`](file:///f:/projects/cove-corsair/documents/levels/level_01_smugglers_run.md)
   * 📜 **Level 2 Setup Specification:** [`documents/levels/level_02_black_tide_bayou.md`](file:///f:/projects/cove-corsair/documents/levels/level_02_black_tide_bayou.md)
   * 📜 **Level 3 Setup Specification:** [`documents/levels/level_03_brimstone_bastion.md`](file:///f:/projects/cove-corsair/documents/levels/level_03_brimstone_bastion.md)
+  * 📜 **Level 4 Setup Specification:** [`documents/levels/level_04_smugglers_nightmare.md`](file:///f:/projects/cove-corsair/documents/levels/level_04_smugglers_nightmare.md)
+  * 📜 **Level 5 Setup Specification:** [`documents/levels/level_05_black_tide_abyss.md`](file:///f:/projects/cove-corsair/documents/levels/level_05_black_tide_abyss.md)
+  * 📜 **Level 6 Setup Specification:** [`documents/levels/level_06_brimstone_inferno.md`](file:///f:/projects/cove-corsair/documents/levels/level_06_brimstone_inferno.md)
 

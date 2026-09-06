@@ -11,6 +11,9 @@ This directory contains technical specifications for all campaign levels in **Co
 | **Level 1** | [Smuggler's Run](file:///f:/projects/cove-corsair/documents/levels/level_01_smugglers_run.md) | `smugglers_run` (Coastal Island) | $250\text{m}$ | $10.0\text{ m/s}$ | The Dinghy (1 HP) | **Captain Ironjaw's War-Barge** ($220\text{ HP}$) | Reef Outcrops, Spiked Mines, Barricades |
 | **Level 2** | [Black Tide Bayou](file:///f:/projects/cove-corsair/documents/levels/level_02_black_tide_bayou.md) | `black_tide_bayou` (Murky Swamp) | $280\text{m}$ | $10.0\text{ m/s}$ | The Sloop (5 HP) | **The Phantom Dredge** ($450\text{ HP}$) | Biogas Pods, Grave Skiffs, Tide Cutters |
 | **Level 3** | [Brimstone Bastion](file:///f:/projects/cove-corsair/documents/levels/level_03_brimstone_bastion.md) | `brimstone_bastion` (Volcanic Fortress) | $320\text{m}$ | $10.0\text{ m/s}$ | The Ironclad (8 HP) | **Brimstone Siege Fortress** ($800\text{ HP}$) | Thermal Geysers, Iron Gunners, Bombarders |
+| **Level 4** | [Smuggler's Nightmare](file:///f:/projects/cove-corsair/documents/levels/level_04_smugglers_nightmare.md) | `smugglers_run` (Night Archipelago) | $250\text{m}$ | $10.5\text{ m/s}$ | The Dinghy (1 HP) | **Nightmare Flagship** ($300\text{ HP}$) | Barricade Walls, Sea Mines, Reef Outcrops |
+| **Level 5** | [Black Tide Abyss](file:///f:/projects/cove-corsair/documents/levels/level_05_black_tide_abyss.md) | `black_tide_bayou` (Abyssal Bayou) | $280\text{m}$ | $11.0\text{ m/s}$ | The Sloop (5 HP) | **Phantom Dredge (Abyssal)** ($550\text{ HP}$) | Biogas Pods, Dense Tide Cutters, Harvester |
+| **Level 6** | [Brimstone Inferno](file:///f:/projects/cove-corsair/documents/levels/level_06_brimstone_inferno.md) | `brimstone_bastion` (Infernal Caldera) | $320\text{m}$ | $11.0\text{ m/s}$ | The Ironclad (8 HP) | **Infernal Siege Fortress** ($1000\text{ HP}$) | Erupting Geysers, Brimstone Rafts, Bombard |
 
 ---
 
@@ -25,3 +28,7 @@ Levels in **Cove Corsair** use a **strictly deterministic timeline engine**.
 1. [Level 1: Smuggler's Run Setup Specification](file:///f:/projects/cove-corsair/documents/levels/level_01_smugglers_run.md)
 2. [Level 2: Black Tide Bayou Setup Specification](file:///f:/projects/cove-corsair/documents/levels/level_02_black_tide_bayou.md)
 3. [Level 3: Brimstone Bastion Setup Specification](file:///f:/projects/cove-corsair/documents/levels/level_03_brimstone_bastion.md)
+4. [Level 4: Smuggler's Nightmare Setup Specification](file:///f:/projects/cove-corsair/documents/levels/level_04_smugglers_nightmare.md)
+5. [Level 5: Black Tide Abyss Setup Specification](file:///f:/projects/cove-corsair/documents/levels/level_05_black_tide_abyss.md)
+6. [Level 6: Brimstone Inferno Setup Specification](file:///f:/projects/cove-corsair/documents/levels/level_06_brimstone_inferno.md)
+
