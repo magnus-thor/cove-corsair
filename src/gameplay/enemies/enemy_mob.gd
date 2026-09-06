@@ -139,6 +139,7 @@ func _physics_process(delta: float) -> void:
 		
 	# Clean up and leak threat if passed behind the player boat
 	if global_position.z > (player_z + 3.0):
+		GameState.record_mob_leaked()
 		if player and player.has_method("leak_threat"):
 			player.leak_threat(self)
 		queue_free()

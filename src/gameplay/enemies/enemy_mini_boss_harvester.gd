@@ -49,6 +49,7 @@ func _physics_process(delta: float) -> void:
 	var player = get_tree().get_first_node_in_group("player")
 	var player_z = player.global_position.z if player else 0.0
 	if global_position.z > (player_z + 4.5):
+		GameState.record_mob_leaked()
 		if player and player.has_method("leak_threat"):
 			player.leak_threat(self)
 		queue_free()

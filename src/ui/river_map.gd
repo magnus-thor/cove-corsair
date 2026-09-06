@@ -605,10 +605,14 @@ func _show_level_popup(lvl: int) -> void:
 		
 	if popup_score:
 		var best = GameState.level_high_scores.get(lvl, 0)
+		var stars = GameState.level_stars.get(lvl, 0)
+		var stars_str = ""
+		for i in range(3):
+			stars_str += "★" if i < stars else "☆"
 		if best > 0:
-			popup_score.text = "HIGH SCORE: %s DOUBLOONS" % _format_number(best)
+			popup_score.text = "%s  •  HIGH SCORE: %s DOUBLOONS" % [stars_str, _format_number(best)]
 		else:
-			popup_score.text = "HIGH SCORE: UNCHARTED"
+			popup_score.text = "%s  •  HIGH SCORE: UNCHARTED" % stars_str
 			
 	if popup_boss_tag:
 		if data["is_boss"]:

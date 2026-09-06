@@ -38,6 +38,7 @@ func _on_hit(target: Node) -> void:
 	var is_follower = target.is_in_group("follower") or (target.get_parent() and target.get_parent().is_in_group("follower"))
 	
 	if is_player or is_follower:
+		GameState.record_hit()
 		var player = get_tree().get_first_node_in_group("player")
 		if player:
 			if is_follower:

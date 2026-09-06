@@ -455,6 +455,8 @@ func spawn_floating_text_at_position(text_val: String, color_val: Color) -> void
 
 
 func take_hit(amount: int = 1, source_info: String = "") -> void:
+	if source_info != "leak_threat":
+		GameState.record_hit()
 	current_health = max(0, current_health - amount)
 	if GameState.boss_spawned:
 		print("[PLAYER HIT] User vessel took %d dmg from %s | HP: %d/%d | Fleet: %d" % [amount, source_info, current_health, max_health, follower_boats.size() + 1])
@@ -661,6 +663,7 @@ func leak_threat(_threat_node: Node3D) -> void:
 		take_hit(1, "leak_threat")
 
 func damage_fleet(_amount: int = 1) -> void:
+	GameState.record_hit()
 	leak_threat(null)
 
 func add_follower_ships(amount: int) -> void:

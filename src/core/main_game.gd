@@ -135,5 +135,6 @@ func _setup_victory_screen() -> void:
 
 func _on_level_completed(doubloons: int, targets: int) -> void:
 	GameState.set_performance_mode(false)
+	var stars: int = GameState.calculate_stars()
 	if victory_screen:
-		victory_screen.show_victory(doubloons, targets, 3)
+		victory_screen.show_victory(doubloons, targets, stars)

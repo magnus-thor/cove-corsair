@@ -36,6 +36,9 @@ var last_cleared_level: int = 1
 var level_high_scores: Dictionary = {
 	1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0
 }
+var level_stars: Dictionary = {
+	1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0
+}
 var unlocked_levels: int = 1 # Backwards compatibility alias for highest_unlocked_level
 
 # Persistent Audio Preferences
@@ -49,6 +52,8 @@ var sfx_muted: bool = false
 # In-Run Transient State
 var run_doubloons: int = 0
 var targets_destroyed: int = 0
+var hits_taken: int = 0
+var mobs_leaked: int = 0
 var active_multiplier: float = 1.0
 var multiplier_mode: String = "x" # "x" for multiply, "+" for add
 var current_level: int = 1 # Backwards compatibility alias for current_selected_level
@@ -271,12 +276,34 @@ func record_level_score(level_num: int, score: int) -> void:
 		level_high_scores[level_num] = score
 		save_game()
 
+func record_level_stars(level_num: int, stars: int) -> void:
+	var cur_stars: int = int(level_stars.get(level_num, 0))
+	if stars > cur_stars:
+		level_stars[level_num] = clamp(stars, 0, 3)
+		save_game()
+
+func record_hit() -> void:
+	hits_taken += 1
+
+func record_mob_leaked() -> void:
+	mobs_leaked += 1
+
+func calculate_stars() -> int:
+	var stars: int = 1 # Star 1: Cove Cleared / Boss Defeated
+	if mobs_leaked == 0:
+		stars += 1 # Star 2: Zero Leaks (No enemy mobs breached past the player)
+	if hits_taken == 0:
+		stars += 1 # Star 3: Untouched Hull (Zero hits taken from hazards, attacks, or collisions)
+	return stars
+
 func is_campaign_complete() -> bool:
 	return current_level >= 6
 
 func reset_level() -> void:
 	run_doubloons = 0
 	targets_destroyed = 0
+	hits_taken = 0
+	mobs_leaked = 0
 	distance_traveled = 0.0
 	is_game_active = false
 	boss_spawned = false
@@ -302,6 +329,7 @@ func reset_save_data() -> void:
 	just_cleared_level = false
 	last_cleared_level = 1
 	level_high_scores = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
+	level_stars = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
 	reset_level()
 	if FileAccess.file_exists(SAVE_PATH):
 		DirAccess.remove_absolute(SAVE_PATH)
@@ -320,6 +348,7 @@ func save_game() -> void:
 		"just_cleared_level": just_cleared_level,
 		"last_cleared_level": last_cleared_level,
 		"level_high_scores": level_high_scores,
+		"level_stars": level_stars,
 		"unlocked_levels": highest_unlocked_level,
 		"master_volume": master_volume,
 		"music_volume": music_volume,
@@ -346,6 +375,7 @@ func load_game() -> void:
 	just_cleared_level = false
 	last_cleared_level = 1
 	level_high_scores = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
+	level_stars = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
 	master_volume = 1.0
 	music_volume = 1.0
 	sfx_volume = 1.0
@@ -415,6 +445,12 @@ func load_game() -> void:
 				var lvl_key = int(k)
 				if lvl_key in level_high_scores:
 					level_high_scores[lvl_key] = max(0, int(data["level_high_scores"][k]))
+
+		if data.has("level_stars") and data["level_stars"] is Dictionary:
+			for k in data["level_stars"]:
+				var lvl_key = int(k)
+				if lvl_key in level_stars:
+					level_stars[lvl_key] = clamp(int(data["level_stars"][k]), 0, 3)
 
 		if data.has("master_volume"): master_volume = clamp(float(data["master_volume"]), 0.0, 1.0)
 		if data.has("music_volume"): music_volume = clamp(float(data["music_volume"]), 0.0, 1.0)

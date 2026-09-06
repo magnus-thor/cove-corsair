@@ -10,8 +10,11 @@ extends CanvasLayer
 @onready var star_1: Label = %Star1
 @onready var star_2: Label = %Star2
 @onready var star_3: Label = %Star3
+@onready var star_summary_label: Label = %StarSummaryLabel
 @onready var doubloons_label: Label = %DoubloonsLabel
 @onready var targets_label: Label = %TargetsLabel
+@onready var mobs_label: Label = %MobsLabel
+@onready var hits_label: Label = %HitsLabel
 @onready var boss_label: Label = %BossLabel
 @onready var retry_button: Button = %RetryButton
 @onready var next_level_button: Button = %NextLevelButton
@@ -33,8 +36,9 @@ func show_victory(doubloons_earned: int, targets_hit: int, stars_earned: int = 3
 	get_tree().paused = true
 	GameState.set_performance_mode(false)
 	
-	# Record high score and advance progression
+	# Record high score, star mastery, and advance progression
 	GameState.record_level_score(GameState.current_level, doubloons_earned)
+	GameState.record_level_stars(GameState.current_level, stars_earned)
 	GameState.unlock_next_level()
 	
 	match GameState.last_cleared_level:
@@ -73,6 +77,34 @@ func show_victory(doubloons_earned: int, targets_hit: int, stars_earned: int = 3
 		doubloons_label.text = "0"
 	if targets_label:
 		targets_label.text = "0"
+
+	if star_summary_label:
+		match stars_earned:
+			3:
+				star_summary_label.text = "★★★ 3 STARS - PERFECT FLAWLESS RUN!"
+				star_summary_label.add_theme_color_override("font_color", Color(1.0, 0.84, 0.0, 1.0))
+			2:
+				star_summary_label.text = "★★☆ 2 STARS - EXCELLENT VOYAGE!"
+				star_summary_label.add_theme_color_override("font_color", Color(0.9, 0.72, 0.25, 1.0))
+			_:
+				star_summary_label.text = "★☆☆ 1 STAR - EXPEDITION CLEARED"
+				star_summary_label.add_theme_color_override("font_color", Color(0.75, 0.65, 0.5, 1.0))
+
+	if mobs_label:
+		if GameState.mobs_leaked == 0:
+			mobs_label.text = "0 ★ (FLAWLESS)"
+			mobs_label.add_theme_color_override("font_color", Color(0.2, 0.65, 0.3, 1.0))
+		else:
+			mobs_label.text = "%d ESCAPED" % GameState.mobs_leaked
+			mobs_label.add_theme_color_override("font_color", Color(0.85, 0.25, 0.15, 1.0))
+
+	if hits_label:
+		if GameState.hits_taken == 0:
+			hits_label.text = "0 ★ (UNTOUCHED)"
+			hits_label.add_theme_color_override("font_color", Color(0.2, 0.65, 0.3, 1.0))
+		else:
+			hits_label.text = "%d HITS TAKEN" % GameState.hits_taken
+			hits_label.add_theme_color_override("font_color", Color(0.85, 0.25, 0.15, 1.0))
 	
 	# Reset stars to inactive state
 	var stars: Array[Label] = [star_1, star_2, star_3]
@@ -116,7 +148,7 @@ func _animate_tally(doubloons_earned: int, targets_hit: int) -> void:
 
 func _animate_stars(stars_earned: int) -> void:
 	var stars: Array[Label] = [star_1, star_2, star_3]
-	var count = clamp(stars_earned, 1, 3)
+	var count = clamp(stars_earned, 0, 3)
 	
 	for i in range(count):
 		var star = stars[i]
