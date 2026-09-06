@@ -13,3 +13,4 @@ sprite_texture = ExtResource("2_tex")
 scale_multiplier = 1.25
 pixel_size = 0.0007
 y_offset = 1.16
+spins_in_flight = true

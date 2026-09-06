@@ -10,4 +10,7 @@ weapon_name = "Deckhand Sniper"
 weapon_type = "crew_musket"
 sprite_texture = ExtResource("3_55s0a")
 fire_rate = 0.75
+max_range = 38.0
+projectile_speed_mult = 1.4
+arc_height = 0.0
 default_ammo = ExtResource("2_ammo")

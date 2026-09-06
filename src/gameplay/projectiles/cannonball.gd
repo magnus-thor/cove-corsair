@@ -2,13 +2,20 @@ class_name Cannonball
 extends Area3D
 
 ## Speed of the cannonball moving forward
-@export var speed: float = 50.0
+@export var speed: float = 25.0
 
 ## Total time the cannonball remains active before self-destruction
 @export var lifetime: float = 5.0
 
 ## Maximum travel distance from spawn position before self-destructing
-@export var max_range: float = 35.0
+@export var max_range: float = 38.0
+
+## Height of parabolic ballistic arc (0.0 = flat naval trajectory)
+@export var arc_height: float = 0.0
+
+## Whether this projectile tumbles/spins in flight (e.g. Throwing Axe)
+@export var spins_in_flight: bool = false
+@export var spin_speed: float = 16.0
 
 ## Base damage dealt to obstacles
 @export var damage: int = 1
@@ -26,23 +33,70 @@ var ammo_data: AmmoData:
 		if is_node_ready():
 			_apply_ammo_data()
 
+var weapon_data: WeaponData = null
+
 var _is_destroyed: bool = false
 var direction: Vector3 = Vector3.ZERO
 var _spawn_pos: Vector3 = Vector3.ZERO
 var _spawn_pos_initialized: bool = false
+var _distance_traveled: float = 0.0
+var _base_spawn_y: float = 0.48
 
 func set_spawn_pos(pos: Vector3) -> void:
 	_spawn_pos = pos
+	_base_spawn_y = pos.y
 	_spawn_pos_initialized = true
 
-func setup(p_direction: Vector3, p_ammo_data: AmmoData) -> void:
+func setup(p_direction: Vector3, p_ammo_data: AmmoData, p_weapon_data: WeaponData = null) -> void:
 	direction = p_direction.normalized()
+	weapon_data = p_weapon_data
 	ammo_data = p_ammo_data
-	if ammo_data:
-		speed = ammo_data.projectile_speed
-		damage = ammo_data.damage
-		if ammo_data.scale_multiplier != 1.0:
-			scale = Vector3.ONE * ammo_data.scale_multiplier
+	
+	# Determine speed
+	var base_spd = ammo_data.projectile_speed if ammo_data else 24.0
+	var spd_mult = weapon_data.projectile_speed_mult if (weapon_data and "projectile_speed_mult" in weapon_data) else 1.0
+	speed = base_spd * spd_mult
+	
+	# Determine damage
+	damage = ammo_data.damage if ammo_data else 1
+	
+	# Determine scale
+	if ammo_data and ammo_data.scale_multiplier != 1.0:
+		scale = Vector3.ONE * ammo_data.scale_multiplier
+		
+	# Determine max_range
+	if ammo_data and "max_range_override" in ammo_data and ammo_data.max_range_override > 0.0:
+		max_range = ammo_data.max_range_override
+	elif weapon_data:
+		if weapon_data.has_method("get_effective_max_range"):
+			max_range = weapon_data.get_effective_max_range()
+		elif "max_range" in weapon_data and weapon_data.max_range > 0.0:
+			max_range = weapon_data.max_range
+		elif "max_throw_range" in weapon_data and weapon_data.max_throw_range > 0.0:
+			max_range = weapon_data.max_throw_range
+		else:
+			max_range = 38.0
+	else:
+		max_range = 38.0
+		
+	# Determine arc_height
+	var base_arc = 0.0
+	if weapon_data:
+		if weapon_data.has_method("get_effective_arc_height"):
+			base_arc = weapon_data.get_effective_arc_height()
+		elif "arc_height" in weapon_data:
+			base_arc = weapon_data.arc_height
+	if ammo_data and "arc_height_bonus" in ammo_data:
+		base_arc += ammo_data.arc_height_bonus
+	arc_height = base_arc
+	
+	# Determine spinning
+	if ammo_data and "spins_in_flight" in ammo_data and ammo_data.spins_in_flight:
+		spins_in_flight = true
+	elif ammo_data and ammo_data.ammo_name == "Throwing Axe":
+		spins_in_flight = true
+	else:
+		spins_in_flight = false
 
 func _ready() -> void:
 	top_level = true
@@ -100,7 +154,9 @@ func _apply_ammo_data() -> void:
 	damage = ammo_data.damage if ammo_data else 1
 	if not ammo_data:
 		return
-	speed = max(24.0, ammo_data.projectile_speed)
+	var base_spd = ammo_data.projectile_speed if ammo_data else 24.0
+	var spd_mult = weapon_data.projectile_speed_mult if (weapon_data and "projectile_speed_mult" in weapon_data) else 1.0
+	speed = base_spd * spd_mult
 	
 	if ammo_data.splash_radius > 0.0:
 		splash_radius_multiplier = ammo_data.splash_radius / 2.5
@@ -197,16 +253,36 @@ func _physics_process(delta: float) -> void:
 		return
 	if not _spawn_pos_initialized:
 		_spawn_pos = global_position
+		_base_spawn_y = _spawn_pos.y
 		_spawn_pos_initialized = true
 
-	# Move forward along the direction if set, otherwise along the local negative Z-axis
-	if direction != Vector3.ZERO:
-		global_position += direction * speed * delta
-	else:
-		global_position += -global_transform.basis.z * speed * delta
+	var step = speed * delta
+	_distance_traveled += step
+
+	# Move horizontal direction
+	var forward_dir = direction if direction != Vector3.ZERO else -global_transform.basis.z
+	global_position.x += forward_dir.x * step
+	global_position.z += forward_dir.z * step
 	
-	# Travel distance clamp (primary check: 3D Euclidean distance from spawn position)
-	if global_position.distance_to(_spawn_pos) >= max_range:
+	# Parabolic Ballistic Arc Calculation
+	if arc_height > 0.0 and max_range > 0.0:
+		var t = clampf(_distance_traveled / max_range, 0.0, 1.0)
+		var arc_y = 4.0 * arc_height * t * (1.0 - t)
+		global_position.y = lerp(_base_spawn_y, 0.08, t) + arc_y
+	else:
+		global_position.y += forward_dir.y * step
+		
+	# Flight spin for throwing axes / tumbling projectiles
+	if spins_in_flight:
+		var sprite_node = get_node_or_null("Sprite3D") as Sprite3D
+		if sprite_node:
+			sprite_node.rotation.z += spin_speed * delta
+		var model = get_node_or_null("CannonBallModel")
+		if model and model.visible:
+			model.rotate_x(spin_speed * delta)
+
+	# Travel distance clamp (primary check: total travel progress vs max_range)
+	if _distance_traveled >= max_range or global_position.distance_to(_spawn_pos) >= max_range:
 		_is_destroyed = true
 		set_deferred("monitoring", false)
 		set_deferred("monitorable", false)

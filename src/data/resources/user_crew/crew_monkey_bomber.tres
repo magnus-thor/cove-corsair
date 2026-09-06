@@ -19,4 +19,6 @@ crew_role = "bomber"
 targeting_priority = "nearest"
 detection_range = 20.0
 max_throw_range = 20.0
-throw_arc_height = 0.5
+throw_arc_height = 1.2
+max_range = 20.0
+arc_height = 1.2

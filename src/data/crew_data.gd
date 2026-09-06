@@ -14,3 +14,13 @@ extends WeaponData
 
 func is_crew_member() -> bool:
 	return true
+
+func get_effective_max_range() -> float:
+	if max_throw_range > 0.0:
+		return max_throw_range
+	return max_range
+
+func get_effective_arc_height() -> float:
+	if throw_arc_height > 0.0:
+		return throw_arc_height
+	return arc_height

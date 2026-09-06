@@ -9,3 +9,6 @@ extends Resource
 @export var scale_multiplier: float = 1.0
 @export var pixel_size: float = 0.005
 @export var y_offset: float = 0.0
+@export var max_range_override: float = 0.0 # If > 0.0, overrides weapon's max range
+@export var arc_height_bonus: float = 0.0 # Additional arc height in meters
+@export var spins_in_flight: bool = false # Rotates end-over-end in flight (e.g. Throwing Axe)

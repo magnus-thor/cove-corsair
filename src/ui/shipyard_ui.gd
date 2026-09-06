@@ -23,6 +23,7 @@ signal shipyard_closed
 @onready var stat_cannons_bar: ProgressBar = %StatCannonsBar
 @onready var next_upgrade_label: Label = %NextUpgradeLabel
 @onready var action_button: Button = %ActionButton
+@onready var equip_button: Button = %EquipButton
 
 # Category Tabs
 @onready var tab_vessels: Button = %TabVessels
@@ -56,6 +57,8 @@ func _ready() -> void:
 		back_button.pressed.connect(_on_back_pressed)
 	if action_button:
 		action_button.pressed.connect(_on_action_pressed)
+	if equip_button:
+		equip_button.pressed.connect(_on_equip_pressed)
 
 	if tab_crew:
 		tab_crew.gui_input.connect(_on_locked_tab_clicked)
@@ -182,6 +185,13 @@ func _on_card_clicked(v_id: String) -> void:
 		AudioManager.play_sfx("gate_passes", 1.0, 1.1)
 		_refresh_card_selections()
 		_update_inspection_drawer()
+	elif GameState.is_vessel_owned(v_id) and GameState.active_vessel != v_id:
+		# Clicking an already selected owned vessel immediately equips it!
+		if GameState.equip_vessel(v_id):
+			AudioManager.play_sfx("coin_pickups", 1.0, 1.2)
+			AudioManager.play_sfx("gate_passes")
+			_refresh_card_selections()
+			_update_inspection_drawer()
 
 func _update_purse_display() -> void:
 	if purse_label:
@@ -261,11 +271,14 @@ func _update_inspection_drawer() -> void:
 		else:
 			next_upgrade_label.text = "Flagship Fully Mastered (Tier 3 Maximum)"
 
-	# 4. Action Button Configuration
+	# 4. Action & Equip Button Configuration
 	if not action_button:
 		return
 
 	if not is_owned:
+		if equip_button:
+			equip_button.visible = false
+		action_button.visible = true
 		current_action_state = ActionState.BUY
 		var price = v_info["purchase_price"]
 		var can_buy = GameState.can_afford(price)
@@ -275,35 +288,53 @@ func _update_inspection_drawer() -> void:
 		action_button.add_theme_stylebox_override("pressed", style_btn_buy)
 		action_button.disabled = not can_buy
 		action_button.modulate = Color(1, 1, 1, 1) if can_buy else Color(0.7, 0.7, 0.7, 0.8)
-	elif cur_tier < 3:
-		# Owned and upgrade available
-		current_action_state = ActionState.UPGRADE
-		var next_tier = cur_tier + 1
-		var cost = GameState.get_upgrade_cost(selected_vessel_id, next_tier)
-		var can_upgrade = GameState.can_afford(cost)
-		action_button.text = "UPGRADE TO TIER %d (%s)" % [next_tier, _format_number(cost)]
-		action_button.add_theme_stylebox_override("normal", style_btn_upgrade)
-		action_button.add_theme_stylebox_override("hover", style_btn_upgrade)
-		action_button.add_theme_stylebox_override("pressed", style_btn_upgrade)
-		action_button.disabled = not can_upgrade
-		action_button.modulate = Color(1, 1, 1, 1) if can_upgrade else Color(0.7, 0.7, 0.7, 0.8)
-	elif not is_active:
-		# Owned, Tier 3, but not equipped
-		current_action_state = ActionState.EQUIP
-		action_button.text = "EQUIP VESSEL"
-		action_button.add_theme_stylebox_override("normal", style_btn_equip)
-		action_button.add_theme_stylebox_override("hover", style_btn_equip)
-		action_button.add_theme_stylebox_override("pressed", style_btn_equip)
-		action_button.disabled = false
-		action_button.modulate = Color.WHITE
 	else:
-		# Equipped
-		current_action_state = ActionState.EQUIPPED
-		action_button.text = "EQUIPPED ✓"
-		action_button.add_theme_stylebox_override("normal", style_btn_equip)
-		action_button.add_theme_stylebox_override("disabled", style_btn_disabled)
-		action_button.disabled = true
-		action_button.modulate = Color(0.8, 1.0, 0.8, 0.9)
+		if equip_button:
+			equip_button.visible = true
+			if is_active:
+				equip_button.text = "EQUIPPED ✓"
+				equip_button.disabled = true
+				equip_button.add_theme_stylebox_override("normal", style_btn_disabled)
+				equip_button.add_theme_stylebox_override("disabled", style_btn_disabled)
+				equip_button.modulate = Color(0.85, 1.0, 0.85, 0.95)
+			else:
+				equip_button.text = "EQUIP VESSEL"
+				equip_button.disabled = false
+				equip_button.add_theme_stylebox_override("normal", style_btn_equip)
+				equip_button.add_theme_stylebox_override("hover", style_btn_equip)
+				equip_button.add_theme_stylebox_override("pressed", style_btn_equip)
+				equip_button.modulate = Color.WHITE
+
+		if cur_tier < 3:
+			# Owned and upgrade available
+			action_button.visible = true
+			current_action_state = ActionState.UPGRADE
+			var next_tier = cur_tier + 1
+			var cost = GameState.get_upgrade_cost(selected_vessel_id, next_tier)
+			var can_upgrade = GameState.can_afford(cost)
+			action_button.text = "UPGRADE T%d (%s)" % [next_tier, _format_number(cost)]
+			action_button.add_theme_stylebox_override("normal", style_btn_upgrade)
+			action_button.add_theme_stylebox_override("hover", style_btn_upgrade)
+			action_button.add_theme_stylebox_override("pressed", style_btn_upgrade)
+			action_button.disabled = not can_upgrade
+			action_button.modulate = Color(1, 1, 1, 1) if can_upgrade else Color(0.7, 0.7, 0.7, 0.8)
+		else:
+			# Max tier reached
+			action_button.visible = false
+			current_action_state = ActionState.EQUIPPED
+
+func _on_equip_pressed() -> void:
+	if not GameState.VESSEL_CATALOG.has(selected_vessel_id):
+		return
+	if not GameState.is_vessel_owned(selected_vessel_id):
+		return
+	if GameState.active_vessel == selected_vessel_id:
+		return
+	if GameState.equip_vessel(selected_vessel_id):
+		AudioManager.play_sfx("coin_pickups", 1.0, 1.2)
+		AudioManager.play_sfx("gate_passes")
+		_refresh_card_selections()
+		_update_inspection_drawer()
 
 func _on_action_pressed() -> void:
 	if not GameState.VESSEL_CATALOG.has(selected_vessel_id):
@@ -325,6 +356,7 @@ func _on_action_pressed() -> void:
 		ActionState.EQUIP:
 			if GameState.equip_vessel(selected_vessel_id):
 				AudioManager.play_sfx("coin_pickups", 1.0, 1.2)
+				AudioManager.play_sfx("gate_passes")
 				_refresh_card_selections()
 				_update_inspection_drawer()
 		_:

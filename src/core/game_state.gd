@@ -57,7 +57,7 @@ const VESSEL_CATALOG: Dictionary = {
 		"archetype": "Agility Skiff",
 		"resource_path": "res://src/data/resources/user_vessels/dinghy_ship.tres",
 		"purchase_price": 0,
-		"tier_prices": { 2: 160, 3: 350 },
+		"tier_prices": { 2: 75, 3: 200 },
 		"tier_descriptions": {
 			1: "Bow Chaser Cannon",
 			2: "Bow Chaser + Monkey Bomber",
@@ -185,8 +185,10 @@ func buy_vessel(vessel_id: String) -> bool:
 	doubloons -= cost
 	owned_vessels.append(vessel_id)
 	vessel_tiers[vessel_id] = 1
+	active_vessel = vessel_id
 	save_game()
 	doubloons_changed.emit(doubloons)
+	active_vessel_changed.emit(active_vessel)
 	return true
 
 func upgrade_vessel_tier(vessel_id: String) -> bool:

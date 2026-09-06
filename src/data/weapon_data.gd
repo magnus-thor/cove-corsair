@@ -15,6 +15,9 @@ extends Resource
 @export var pixel_size: float = 0.005
 @export var fire_rate: float = 0.2 # Cooldown in seconds
 @export var spread_angle_deg: float = 0.0 # Forward cone offset angle in degrees
+@export var max_range: float = 38.0 # Maximum effective range in meters
+@export var projectile_speed_mult: float = 1.0 # Multiplier applied to ammo projectile speed
+@export var arc_height: float = 0.0 # Height of ballistic arc in meters (0.0 = flat naval trajectory)
 @export var default_ammo: AmmoData
 @export var compatible_ammo: Array[Resource] = []
 

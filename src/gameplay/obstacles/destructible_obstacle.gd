@@ -6,7 +6,7 @@ extends Area3D
 enum ObstacleType { WOODEN_BARREL, FUSE_BARREL, RUNE_BARREL, SEA_MINE, CORAL_REEF }
 
 ## Visual obstacle HP
-@export var hp: int = 3
+@export var hp: int = 1
 @export var obstacle_type: ObstacleType = ObstacleType.WOODEN_BARREL:
 	set(val):
 		obstacle_type = val

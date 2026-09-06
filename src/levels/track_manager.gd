@@ -67,6 +67,11 @@ func _ready() -> void:
 				for child in segment.get_node("Gates").get_children():
 					child.queue_free()
 
+func clear_all_segment_obstacles() -> void:
+	for segment in active_segments:
+		if is_instance_valid(segment) and segment.has_method("clear_obstacles"):
+			segment.clear_obstacles()
+
 func _on_distance_target_reached() -> void:
 	# LevelController is the authoritative boss spawner across all levels
 	return

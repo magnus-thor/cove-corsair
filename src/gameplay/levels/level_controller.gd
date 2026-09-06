@@ -96,6 +96,8 @@ func load_level_resource(res: LevelData) -> void:
 		track_mgr.scroll_speed = base_scroll_speed
 		if "current_level_data" in track_mgr:
 			track_mgr.current_level_data["is_scripted"] = true
+		if track_mgr.has_method("clear_all_segment_obstacles"):
+			track_mgr.clear_all_segment_obstacles()
 			
 	var hud = get_tree().get_first_node_in_group("top_hud")
 	if hud and "level_title" in hud:
@@ -235,7 +237,8 @@ func normalized_to_world_x(norm_x: float) -> float:
 	return norm_x * (river_width_world / 2.0)
 
 func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> void:
-	var z_spawn = spawn_z_ahead if z_pos_override == 0.0 else z_pos_override
+	var target_z = spawn_z_ahead if z_pos_override == 0.0 else z_pos_override
+	var z_spawn = minf(target_z, -45.0) # Ensure at least 45m distance from player vessel
 	var is_brimstone: bool = level_data != null and (level_data.biome_type == "brimstone_bastion" or level_data.level_id == 3)
 	
 	match event.entity_type:
@@ -368,7 +371,8 @@ func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> vo
 # EVENT SPAWNER – purely data-driven, no randomness
 # ──────────────────────────────────────────────────────────────────────────────
 func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
-	var z_spawn = spawn_z_ahead if z_pos_override == 0.0 else z_pos_override
+	var target_z = spawn_z_ahead if z_pos_override == 0.0 else z_pos_override
+	var z_spawn = minf(target_z, -45.0) # Ensure at least 45m distance from player vessel
 	var event_type: String = event.get("type", "")
 
 	match event_type:
@@ -392,7 +396,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 		# ── Barrel row ────────────────────────────────────────────────────────
 		"obstacles":
 			var x_positions: Array = event.get("x_positions", [])
-			var hp           = int(event.get("hp", 4))
+			var hp           = int(event.get("hp", 1))
 			var obs_type_str: String = event.get("obstacle_type", "wooden")
 			for x_norm in x_positions:
 				var x_world = clampf(normalized_to_world_x(float(x_norm)), -5.2, 5.2)
@@ -412,7 +416,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 		# ── Single barrel / obstacle ──────────────────────────────────────────
 		"obstacle":
 			var x_norm  = float(event.get("x", 0.0))
-			var hp      = int(event.get("hp", 4))
+			var hp      = int(event.get("hp", 1))
 			var x_world = clampf(normalized_to_world_x(x_norm), -5.2, 5.2)
 			if barrel_scene:
 				var barrel = barrel_scene.instantiate() as Area3D
@@ -557,7 +561,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 		# ── Skeleton Rowers (Level 1) ─────────────────────────────────────────
 		"skeleton_rowers":
 			var x_positions: Array = event.get("x_positions", [])
-			var hp = int(event.get("hp", 6))
+			var hp = int(event.get("hp", 2))
 			var mob_speed = float(event.get("speed", 2.0))
 			for x_norm in x_positions:
 				var x_world = clampf(normalized_to_world_x(float(x_norm)), -4.6, 4.6)
@@ -575,7 +579,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 		# ── Raider Skiffs (Level 1) ───────────────────────────────────────────
 		"raider_skiffs":
 			var x_positions: Array = event.get("x_positions", [])
-			var hp = int(event.get("hp", 10))
+			var hp = int(event.get("hp", 4))
 			var skiff_speed = float(event.get("speed", 3.0))
 			for x_norm in x_positions:
 				var x_world = clampf(normalized_to_world_x(float(x_norm)), -4.2, 4.2)
@@ -593,7 +597,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 		# ── Kamikaze Rafts (Level 1) ──────────────────────────────────────────
 		"kamikaze_rafts":
 			var x_positions: Array = event.get("x_positions", [-0.6, 0.6])
-			var hp = int(event.get("hp", 14))
+			var hp = int(event.get("hp", 5))
 			var raft_speed = float(event.get("speed", 7.0))
 			for x_norm in x_positions:
 				var x_world = clampf(normalized_to_world_x(float(x_norm)), -4.2, 4.2)
@@ -636,7 +640,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 		# ── Armored Turtle Rafts ───────────────────────────────────────────────
 		"turtle_rafts":
 			var x_positions: Array = event.get("x_positions", [0.0])
-			var hp         = int(event.get("hp", 8))
+			var hp         = int(event.get("hp", 6))
 			var raft_speed = float(event.get("speed", 1.8))
 			for x_norm in x_positions:
 				var x_world = clampf(normalized_to_world_x(float(x_norm)), -4.4, 4.4)

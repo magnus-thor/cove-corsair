@@ -464,7 +464,27 @@ text = "Next: Unlocks Aft Skeleton Tosser Crew"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="ActionButton" type="Button" parent="RootMargin/MainVBox/DrawerPanel/DrawerMargin/DrawerVBox"]
+[node name="ActionButtonsHBox" type="HBoxContainer" parent="RootMargin/MainVBox/DrawerPanel/DrawerMargin/DrawerVBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="EquipButton" type="Button" parent="RootMargin/MainVBox/DrawerPanel/DrawerMargin/DrawerVBox/ActionButtonsHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 78)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.08, 0.25, 0.05, 1)
+theme_override_constants/outline_size = 5
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 38
+text = "EQUIP VESSEL"
+clip_text = true
+
+[node name="ActionButton" type="Button" parent="RootMargin/MainVBox/DrawerPanel/DrawerMargin/DrawerVBox/ActionButtonsHBox"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 78)
 layout_mode = 2
@@ -475,7 +495,8 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.16, 0.04, 0.04, 1)
 theme_override_constants/outline_size = 5
 theme_override_fonts/font = ExtResource("2_font_lilita")
-theme_override_font_sizes/font_size = 44
+theme_override_font_sizes/font_size = 38
 theme_override_styles/normal = SubResource("StyleBoxFlat_action_btn")
 text = "UPGRADE TO TIER 3 (350)"
 clip_text = true
+

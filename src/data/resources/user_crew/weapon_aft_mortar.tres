@@ -9,4 +9,7 @@ weapon_name = "Aft Mortar"
 weapon_type = "deck_mortar"
 fire_rate = 0.8
 spread_angle_deg = 180.0
+max_range = 28.0
+projectile_speed_mult = 0.9
+arc_height = 2.4
 default_ammo = ExtResource("2_ammo")

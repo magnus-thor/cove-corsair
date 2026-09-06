@@ -52,22 +52,30 @@ func recycle_segment() -> void:
 	spawn_gates()
 	spawn_scenery()
 
+## Clean up all obstacle and enemy nodes from this segment
+func clear_obstacles() -> void:
+	if obstacles_container:
+		for child in obstacles_container.get_children():
+			obstacles_container.remove_child(child)
+			child.queue_free()
+
 ## Helper to clean up existing obstacles and spawn new barrels dynamically using level config
 func spawn_obstacles() -> void:
 	if not obstacles_container or not barrel_prefab:
 		return
 		
-	# Clean up any existing obstacles and enemies from previous cycles
-	for child in obstacles_container.get_children():
-		obstacles_container.remove_child(child)
-		child.queue_free()
+	clear_obstacles()
 		
-	if GameState.current_level == 1 or level_config_data.get("is_scripted", false):
+	# Cove Corsair campaign levels (1-6) are strictly deterministic and scripted by LevelController
+	if GameState.current_level in [1, 2, 3, 4, 5, 6] or level_config_data.get("is_scripted", false) or GameState.get_current_level_resource() != null:
 		return
 		
 	var player = get_tree().get_first_node_in_group("player")
 	if player and "is_calibration_mode" in player and player.is_calibration_mode:
 		return
+		
+	var player_z = player.global_position.z if player else 0.0
+	var min_safe_z = player_z - 45.0 # Never spawn within 45m ahead of the player vessel
 		
 	var level_idx = int(level_config_data.get("level_index", 1))
 	var rarities: Array = level_config_data.get("obstacle_rarities_allowed", ["common"])
@@ -82,6 +90,11 @@ func spawn_obstacles() -> void:
 	var base_max_hp = 3 + level_idx
 	
 	for i in range(count):
+		var rand_z = -randf_range(5.0, segment_length - 5.0)
+		var world_z = global_position.z + rand_z
+		if world_z > min_safe_z:
+			continue # Enforce minimum safe distance from player vessel
+			
 		var barrel = barrel_prefab.instantiate() as Area3D
 		if not barrel:
 			continue
@@ -120,7 +133,6 @@ func spawn_obstacles() -> void:
 				barrel.obstacle_type = DestructibleObstacle.ObstacleType.WOODEN_BARREL
 				
 		var lane_x = randf_range(-4.5, 4.5)
-		var rand_z = -randf_range(5.0, segment_length - 5.0)
 		barrel.position = Vector3(lane_x, 0.0, rand_z)
 
 	# Dynamic enemy mob spawning based on level difficulty
@@ -144,6 +156,11 @@ func spawn_obstacles() -> void:
 	}
 		
 	for e in range(enemy_mob_count):
+		var rand_z = -randf_range(8.0, segment_length - 8.0)
+		var world_z = global_position.z + rand_z
+		if world_z > min_safe_z:
+			continue # Enforce minimum safe distance from player vessel
+			
 		if enemy_mob_prefab:
 			var enemy = enemy_mob_prefab.instantiate() as Area3D
 			if enemy:
@@ -157,7 +174,6 @@ func spawn_obstacles() -> void:
 					enemy.mob_type = chosen_type
 				
 				var lane_x = randf_range(-3.8, 3.8)
-				var rand_z = -randf_range(8.0, segment_length - 8.0)
 				enemy.position = Vector3(lane_x, 0.0, rand_z)
 
 ## Spawns Multiplier Gates on this segment according to level config frequency

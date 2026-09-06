@@ -386,22 +386,11 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 		ball.top_level = true
 		ball.global_position = spawn_pos
 		
-		if "max_range" in ball:
-			if is_crew:
-				var crew_max: float = 20.0
-				if "max_throw_range" in weapon_data and weapon_data.max_throw_range > 0.0:
-					crew_max = weapon_data.max_throw_range
-				elif "detection_range" in weapon_data and weapon_data.detection_range > 0.0:
-					crew_max = min(20.0, weapon_data.detection_range)
-				ball.max_range = min(ball.max_range, crew_max)
-			else:
-				ball.max_range = 35.0
-				
 		if ball.has_method("set_spawn_pos"):
 			ball.set_spawn_pos(spawn_pos)
 		
 		if ball.has_method("setup"):
-			ball.setup(proj_dir, weapon_data.default_ammo)
+			ball.setup(proj_dir, weapon_data.default_ammo, weapon_data)
 			
 		var player = get_tree().get_first_node_in_group("player")
 		if player and "base_damage_bonus" in player and "damage" in ball:
