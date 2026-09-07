@@ -1,10 +1,9 @@
 [gd_scene format=3 uid="uid://d3y8calib83a1"]
 
-[ext_resource type="Script" path="res://src/levels/weapon_calibration_sandbox.gd" id="1_script"]
-[ext_resource type="Shader" path="res://src/shaders/water_stylized.gdshader" id="2_water_shader"]
-[ext_resource type="PackedScene" path="res://src/gameplay/player/player_boat.tscn" id="3_player_boat"]
-[ext_resource type="Resource" path="res://src/data/resources/user_vessels/dinghy_ship.tres" id="4_target_ship"]
-[ext_resource type="Texture2D" path="res://assets/sprites/enemy_vessels/Skeleton Rower.png" id="5_target_tex"]
+[ext_resource type="Script" uid="uid://yl42oim3ljox" path="res://src/levels/weapon_calibration_sandbox.gd" id="1_script"]
+[ext_resource type="Shader" uid="uid://d3pqmhtscn7vf" path="res://src/shaders/water_stylized.gdshader" id="2_water_shader"]
+[ext_resource type="PackedScene" uid="uid://dcehj56vbh1l2" path="res://src/gameplay/player/player_boat.tscn" id="3_player_boat"]
+[ext_resource type="Texture2D" uid="uid://cwm3nw1dpaix5" path="res://assets/sprites/enemy_vessels/Skeleton Rower.png" id="5_target_tex"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 sky_top_color = Color(0.53, 0.81, 0.98, 1)
@@ -26,65 +25,63 @@ noise_type = 2
 frequency = 0.04
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_water"]
+noise = SubResource("FastNoiseLite_noise")
 seamless = true
 as_normal_map = true
-noise = SubResource("FastNoiseLite_noise")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_water"]
 render_priority = 0
 shader = ExtResource("2_water_shader")
 shader_parameter/albedo = Color(0.08, 0.58, 0.82, 0.88)
 shader_parameter/roughness = 0.05
+shader_parameter/texture_normal = SubResource("NoiseTexture2D_water")
+shader_parameter/texture_refraction = SubResource("NoiseTexture2D_water")
 shader_parameter/refraction_strength = 0.04
 shader_parameter/uv1_scale = Vector3(0.15, 0.15, 0.15)
 shader_parameter/flow_speed = Vector2(0, -0.6)
-shader_parameter/texture_normal = SubResource("NoiseTexture2D_water")
-shader_parameter/texture_refraction = SubResource("NoiseTexture2D_water")
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_water"]
 material = SubResource("ShaderMaterial_water")
 size = Vector2(30, 30)
 
-[sub_resource type="LabelSettings" id="LabelSettings_title"]
-font_size = 16
-
 [sub_resource type="BoxShape3D" id="BoxShape3D_target"]
 size = Vector3(1.5, 1.5, 1.5)
 
-[node name="WeaponCalibrationSandbox" type="Node3D"]
-script = ExtResource("1_script")
-target_ship = ExtResource("4_target_ship")
+[sub_resource type="LabelSettings" id="LabelSettings_title"]
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+[node name="WeaponCalibrationSandbox" type="Node3D" unique_id=1939430234]
+script = ExtResource("1_script")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1352035459]
 transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
 shadow_enabled = true
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1988552257]
 environment = SubResource("Environment_main")
 
-[node name="Camera3D" type="Camera3D" parent="."]
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1463643930]
 transform = Transform3D(1, 0, 0, 0, 0.5, 0.866025, 0, -0.866025, 0.5, 0, 10, 2)
 
-[node name="WaterPlane" type="MeshInstance3D" parent="."]
+[node name="WaterPlane" type="MeshInstance3D" parent="." unique_id=951340426]
 mesh = SubResource("PlaneMesh_water")
 
-[node name="PlayerBoat" parent="." instance=ExtResource("3_player_boat")]
+[node name="PlayerBoat" parent="." unique_id=1988263359 instance=ExtResource("3_player_boat")]
 
-[node name="TargetDummy" type="Area3D" parent="." groups=["enemies"]]
+[node name="TargetDummy" type="Area3D" parent="." unique_id=1244983420 groups=["enemies"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -6)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="TargetDummy"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TargetDummy" unique_id=1356274571]
 shape = SubResource("BoxShape3D_target")
 
-[node name="Sprite3D" type="Sprite3D" parent="TargetDummy"]
+[node name="Sprite3D" type="Sprite3D" parent="TargetDummy" unique_id=652673271]
 pixel_size = 0.0025
 billboard = 2
 texture = ExtResource("5_target_tex")
 
-[node name="DebugUI" type="CanvasLayer" parent="."]
+[node name="DebugUI" type="CanvasLayer" parent="." unique_id=830254879]
 layer = 10
 
-[node name="Control" type="Control" parent="DebugUI"]
+[node name="Control" type="Control" parent="DebugUI" unique_id=126164701]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -92,7 +89,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="btn_toggle_ui" type="Button" parent="DebugUI/Control"]
+[node name="btn_toggle_ui" type="Button" parent="DebugUI/Control" unique_id=1769470130]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 1
@@ -105,7 +102,7 @@ offset_bottom = 55.0
 grow_horizontal = 0
 text = "Hide UI (H)"
 
-[node name="PanelContainer" type="PanelContainer" parent="DebugUI/Control"]
+[node name="PanelContainer" type="PanelContainer" parent="DebugUI/Control" unique_id=1935930832]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 12
@@ -119,124 +116,124 @@ offset_bottom = -20.0
 grow_horizontal = 2
 grow_vertical = 0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="DebugUI/Control/PanelContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="DebugUI/Control/PanelContainer" unique_id=1261844987]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="LeftCol" type="VBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer"]
+[node name="LeftCol" type="VBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer" unique_id=1907285544]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 6
 
-[node name="TitleLabel" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol"]
+[node name="TitleLabel" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol" unique_id=1736172781]
 layout_mode = 2
 text = "WEAPON CALIBRATION SANDBOX"
 label_settings = SubResource("LabelSettings_title")
 
-[node name="HSeparator1" type="HSeparator" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol"]
+[node name="HSeparator1" type="HSeparator" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol" unique_id=681005158]
 layout_mode = 2
 
-[node name="ShipRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol"]
+[node name="ShipRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol" unique_id=348678468]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ShipRow"]
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ShipRow" unique_id=1051074855]
 custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 text = "Vessel:"
 
-[node name="ship_option" type="OptionButton" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ShipRow"]
+[node name="ship_option" type="OptionButton" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ShipRow" unique_id=960739286]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="TierRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol"]
+[node name="TierRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol" unique_id=1511447166]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/TierRow"]
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/TierRow" unique_id=1257310772]
 custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 text = "Tier:"
 
-[node name="tier_option" type="OptionButton" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/TierRow"]
+[node name="tier_option" type="OptionButton" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/TierRow" unique_id=686715345]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="AssetRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol"]
+[node name="AssetRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol" unique_id=267381225]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/AssetRow"]
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/AssetRow" unique_id=1282874539]
 custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 text = "Asset:"
 
-[node name="asset_option" type="OptionButton" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/AssetRow"]
+[node name="asset_option" type="OptionButton" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/AssetRow" unique_id=1991525043]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="AmmoRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol"]
+[node name="AmmoRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol" unique_id=1636833792]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/AmmoRow"]
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/AmmoRow" unique_id=624498608]
 custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 text = "Ammo:"
 
-[node name="ammo_option" type="OptionButton" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/AmmoRow"]
+[node name="ammo_option" type="OptionButton" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/AmmoRow" unique_id=830043540]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="HSeparatorCam" type="HSeparator" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol"]
+[node name="HSeparatorCam" type="HSeparator" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol" unique_id=1720834749]
 layout_mode = 2
 
-[node name="CameraViewRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol"]
+[node name="CameraViewRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol" unique_id=275323523]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/CameraViewRow"]
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/CameraViewRow" unique_id=111314575]
 custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 text = "Camera:"
 
-[node name="btn_cam_rear" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/CameraViewRow"]
+[node name="btn_cam_rear" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/CameraViewRow" unique_id=2147458420]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Behind"
 
-[node name="btn_cam_top" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/CameraViewRow"]
+[node name="btn_cam_top" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/CameraViewRow" unique_id=892275606]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Top"
 
-[node name="btn_cam_lane" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/CameraViewRow"]
+[node name="btn_cam_lane" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/CameraViewRow" unique_id=1498529898]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Lane"
 
-[node name="btn_cam_side" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/CameraViewRow"]
+[node name="btn_cam_side" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/CameraViewRow" unique_id=101161786]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Side"
 
-[node name="ZoomRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol"]
+[node name="ZoomRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol" unique_id=72353574]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ZoomRow"]
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ZoomRow" unique_id=1918906991]
 custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 text = "Zoom:"
 
-[node name="btn_zoom_out" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ZoomRow"]
+[node name="btn_zoom_out" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ZoomRow" unique_id=1553888768]
 unique_name_in_owner = true
 layout_mode = 2
 text = " - "
 
-[node name="slider_zoom" type="HSlider" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ZoomRow"]
+[node name="slider_zoom" type="HSlider" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ZoomRow" unique_id=889555567]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -246,72 +243,72 @@ max_value = 2.5
 step = 0.05
 value = 1.0
 
-[node name="btn_zoom_in" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ZoomRow"]
+[node name="btn_zoom_in" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ZoomRow" unique_id=207011774]
 unique_name_in_owner = true
 layout_mode = 2
 text = " + "
 
-[node name="btn_zoom_reset" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ZoomRow"]
+[node name="btn_zoom_reset" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ZoomRow" unique_id=221875455]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Reset"
 
-[node name="ActionRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol"]
+[node name="ActionRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol" unique_id=1723170755]
 layout_mode = 2
 
-[node name="btn_fire_toggle" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ActionRow"]
+[node name="btn_fire_toggle" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ActionRow" unique_id=33145989]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Auto-Fire: OFF"
 
-[node name="btn_clear_all" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ActionRow"]
+[node name="btn_clear_all" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ActionRow" unique_id=1846806891]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Clear"
 
-[node name="btn_print_dict" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ActionRow"]
+[node name="btn_print_dict" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/LeftCol/ActionRow" unique_id=2090959821]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Print Dict"
 
-[node name="VSeparator" type="VSeparator" parent="DebugUI/Control/PanelContainer/HBoxContainer"]
+[node name="VSeparator" type="VSeparator" parent="DebugUI/Control/PanelContainer/HBoxContainer" unique_id=1690356461]
 layout_mode = 2
 
-[node name="RightCol" type="VBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer"]
+[node name="RightCol" type="VBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer" unique_id=2142497701]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 6
 
-[node name="SocketRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol"]
+[node name="SocketRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol" unique_id=684889106]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/SocketRow"]
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/SocketRow" unique_id=1182357634]
 custom_minimum_size = Vector2(75, 0)
 layout_mode = 2
 text = "Cal Socket:"
 
-[node name="socket_option" type="OptionButton" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/SocketRow"]
+[node name="socket_option" type="OptionButton" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/SocketRow" unique_id=831073576]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="PosXRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol"]
+[node name="PosXRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol" unique_id=1981837347]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosXRow"]
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosXRow" unique_id=1844021725]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 text = "Pos X:"
 
-[node name="btn_pos_x_dec" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosXRow"]
+[node name="btn_pos_x_dec" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosXRow" unique_id=1764086467]
 unique_name_in_owner = true
 layout_mode = 2
 text = " - "
 
-[node name="slider_pos_x" type="HSlider" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosXRow"]
+[node name="slider_pos_x" type="HSlider" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosXRow" unique_id=133584104]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -320,31 +317,31 @@ min_value = -6.0
 max_value = 6.0
 step = 0.01
 
-[node name="btn_pos_x_inc" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosXRow"]
+[node name="btn_pos_x_inc" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosXRow" unique_id=1870148632]
 unique_name_in_owner = true
 layout_mode = 2
 text = " + "
 
-[node name="input_pos_x" type="LineEdit" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosXRow"]
+[node name="input_pos_x" type="LineEdit" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosXRow" unique_id=1594450974]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(45, 0)
 layout_mode = 2
 text = "0.00"
 
-[node name="PosYRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol"]
+[node name="PosYRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol" unique_id=374552039]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosYRow"]
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosYRow" unique_id=1892511240]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 text = "Pos Y:"
 
-[node name="btn_pos_y_dec" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosYRow"]
+[node name="btn_pos_y_dec" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosYRow" unique_id=168290294]
 unique_name_in_owner = true
 layout_mode = 2
 text = " - "
 
-[node name="slider_pos_y" type="HSlider" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosYRow"]
+[node name="slider_pos_y" type="HSlider" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosYRow" unique_id=316010286]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -353,31 +350,31 @@ min_value = -6.0
 max_value = 6.0
 step = 0.01
 
-[node name="btn_pos_y_inc" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosYRow"]
+[node name="btn_pos_y_inc" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosYRow" unique_id=1911441272]
 unique_name_in_owner = true
 layout_mode = 2
 text = " + "
 
-[node name="input_pos_y" type="LineEdit" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosYRow"]
+[node name="input_pos_y" type="LineEdit" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosYRow" unique_id=505507840]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(45, 0)
 layout_mode = 2
 text = "0.00"
 
-[node name="PosZRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol"]
+[node name="PosZRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol" unique_id=841079145]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosZRow"]
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosZRow" unique_id=251425774]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 text = "Pos Z:"
 
-[node name="btn_pos_z_dec" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosZRow"]
+[node name="btn_pos_z_dec" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosZRow" unique_id=1843215349]
 unique_name_in_owner = true
 layout_mode = 2
 text = " - "
 
-[node name="slider_pos_z" type="HSlider" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosZRow"]
+[node name="slider_pos_z" type="HSlider" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosZRow" unique_id=1953208558]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -386,64 +383,63 @@ min_value = -6.0
 max_value = 6.0
 step = 0.01
 
-[node name="btn_pos_z_inc" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosZRow"]
+[node name="btn_pos_z_inc" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosZRow" unique_id=1926715577]
 unique_name_in_owner = true
 layout_mode = 2
 text = " + "
 
-[node name="input_pos_z" type="LineEdit" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosZRow"]
+[node name="input_pos_z" type="LineEdit" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/PosZRow" unique_id=174081253]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(45, 0)
 layout_mode = 2
 text = "0.00"
 
-[node name="RotYRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol"]
+[node name="RotYRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol" unique_id=602201721]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/RotYRow"]
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/RotYRow" unique_id=1495018924]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 text = "Rot Y:"
 
-[node name="btn_rot_y_dec" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/RotYRow"]
+[node name="btn_rot_y_dec" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/RotYRow" unique_id=1932678797]
 unique_name_in_owner = true
 layout_mode = 2
 text = " - "
 
-[node name="slider_rot_y" type="HSlider" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/RotYRow"]
+[node name="slider_rot_y" type="HSlider" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/RotYRow" unique_id=72313662]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 min_value = -180.0
 max_value = 180.0
-step = 1.0
 
-[node name="btn_rot_y_inc" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/RotYRow"]
+[node name="btn_rot_y_inc" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/RotYRow" unique_id=1661081541]
 unique_name_in_owner = true
 layout_mode = 2
 text = " + "
 
-[node name="input_rot_y" type="LineEdit" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/RotYRow"]
+[node name="input_rot_y" type="LineEdit" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/RotYRow" unique_id=527382529]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(45, 0)
 layout_mode = 2
 text = "0.0°"
 
-[node name="ScaleRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol"]
+[node name="ScaleRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol" unique_id=914628759]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/ScaleRow"]
+[node name="Label" type="Label" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/ScaleRow" unique_id=247528774]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 text = "Scale:"
 
-[node name="btn_scale_dec" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/ScaleRow"]
+[node name="btn_scale_dec" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/ScaleRow" unique_id=1959297796]
 unique_name_in_owner = true
 layout_mode = 2
 text = " - "
 
-[node name="slider_scale" type="HSlider" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/ScaleRow"]
+[node name="slider_scale" type="HSlider" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/ScaleRow" unique_id=84750871]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -453,48 +449,48 @@ max_value = 12.0
 step = 0.01
 value = 1.0
 
-[node name="btn_scale_inc" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/ScaleRow"]
+[node name="btn_scale_inc" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/ScaleRow" unique_id=1694230253]
 unique_name_in_owner = true
 layout_mode = 2
 text = " + "
 
-[node name="input_scale" type="LineEdit" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/ScaleRow"]
+[node name="input_scale" type="LineEdit" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/ScaleRow" unique_id=894360233]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(45, 0)
 layout_mode = 2
 text = "1.00x"
 
-[node name="TierButtonsRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol"]
+[node name="TierButtonsRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol" unique_id=851002914]
 layout_mode = 2
 
-[node name="btn_tier1" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/TierButtonsRow"]
+[node name="btn_tier1" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/TierButtonsRow" unique_id=1751112754]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Tier 1"
 
-[node name="btn_tier2" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/TierButtonsRow"]
+[node name="btn_tier2" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/TierButtonsRow" unique_id=997635016]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Tier 2"
 
-[node name="btn_tier3" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/TierButtonsRow"]
+[node name="btn_tier3" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/TierButtonsRow" unique_id=915327962]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Tier 3"
 
-[node name="ResetRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol"]
+[node name="ResetRow" type="HBoxContainer" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol" unique_id=1215866137]
 layout_mode = 2
 
-[node name="btn_reset_socket" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/ResetRow"]
+[node name="btn_reset_socket" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/ResetRow" unique_id=2012605949]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Reset Socket"
 
-[node name="btn_reset_all" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/ResetRow"]
+[node name="btn_reset_all" type="Button" parent="DebugUI/Control/PanelContainer/HBoxContainer/RightCol/ResetRow" unique_id=1731652009]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
