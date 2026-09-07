@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="LevelData" format=3]
+
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_warmup.tscn" id="1_3ioxr"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_barricade_siege.tscn" id="2_nja2u"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_mine_gauntlet.tscn" id="3_yq3ah"]
+[ext_resource type="Texture2D" path="res://assets/textures/horizon_smugglers_run.png" id="4_g632r"]
+[ext_resource type="Script" path="res://src/data/resources/level_data.gd" id="5_tly2d"]
+
+[resource]
+script = ExtResource("5_tly2d")
+level_id = 14
+level_title = "Level 14: Siren's Shoals"
+base_scroll_speed = 9.25
+chunk_scenes = Array[PackedScene]([ExtResource("1_3ioxr"), ExtResource("2_nja2u"), ExtResource("3_yq3ah"), ExtResource("2_nja2u"), ExtResource("2_nja2u"), ExtResource("2_nja2u")])
+completion_doubloon_reward = 425
+horizon_texture = ExtResource("4_g632r")

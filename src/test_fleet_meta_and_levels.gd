@@ -268,24 +268,24 @@ func _test_river_map_integration() -> void:
 	var river_map = river_map_scene.instantiate() as RiverMap
 	add_child(river_map)
 
-	# Verify MILESTONES has 12 entries
-	assert_test(RiverMap.MILESTONES.size() == 12, "RiverMap.MILESTONES contains all 12 campaign levels")
-	assert_test(RiverMap.MILESTONES.has(12), "Level 12 is defined in RiverMap.MILESTONES")
-	if RiverMap.MILESTONES.has(12):
-		assert_test(RiverMap.MILESTONES[12]["is_boss"] == true, "Level 12 has is_boss = true")
-		assert_test(RiverMap.MILESTONES[12]["boss_name"] == "Captain Bone-Beard", "Level 12 boss is Captain Bone-Beard")
+	# Verify MILESTONES has 45 entries
+	assert_test(RiverMap.MILESTONES.size() == 45, "RiverMap.MILESTONES contains all 45 campaign levels")
+	assert_test(RiverMap.MILESTONES.has(45), "Level 45 is defined in RiverMap.MILESTONES")
+	if RiverMap.MILESTONES.has(45):
+		assert_test(RiverMap.MILESTONES[45]["is_boss"] == true, "Level 45 has is_boss = true")
+		assert_test(RiverMap.MILESTONES[45]["boss_name"] == "Captain Bone-Beard", "Level 45 boss is Captain Bone-Beard")
 
 	# Verify scroll container height and initial anchoring
 	var scroll = river_map.get_node_or_null("%ScrollContainer") as ScrollContainer
 	var canvas = river_map.get_node_or_null("%MapCanvas") as Control
-	assert_test(canvas != null and canvas.custom_minimum_size.y >= 4200.0, "MapCanvas custom_minimum_size height is >= 4200px (actual: %.1f)" % (canvas.custom_minimum_size.y if canvas else 0.0))
+	assert_test(canvas != null and canvas.custom_minimum_size.y >= 15000.0, "MapCanvas custom_minimum_size height is >= 15,000px (actual: %.1f)" % (canvas.custom_minimum_size.y if canvas else 0.0))
 
 	# Test scroll anchoring: when current selected level is Level 1, scroll_vertical is anchored to Level 1
 	river_map._focus_on_level(1, false)
-	assert_test(scroll != null and scroll.scroll_vertical > 2000, "Scroll position automatically anchors near bottom for Level 1 (scroll_vertical: %d)" % (scroll.scroll_vertical if scroll else 0))
+	assert_test(scroll != null and scroll.scroll_vertical > 10000, "Scroll position automatically anchors near bottom for Level 1 (scroll_vertical: %d)" % (scroll.scroll_vertical if scroll else 0))
 
-	# Test scroll anchoring when selecting Level 12: anchors near top
-	river_map._focus_on_level(12, false)
-	assert_test(scroll != null and scroll.scroll_vertical < 1000, "Scroll position anchors near top for Level 12 (scroll_vertical: %d)" % (scroll.scroll_vertical if scroll else 0))
+	# Test scroll anchoring when selecting Level 45: anchors near top
+	river_map._focus_on_level(45, false)
+	assert_test(scroll != null and scroll.scroll_vertical < 1000, "Scroll position anchors near top for Level 45 (scroll_vertical: %d)" % (scroll.scroll_vertical if scroll else 0))
 
 	river_map.queue_free()

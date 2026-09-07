@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="LevelData" format=3]
+
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_warmup.tscn" id="1_m73v4"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_barricade_siege.tscn" id="2_0s4oq"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_mine_gauntlet.tscn" id="3_s8vcc"]
+[ext_resource type="Texture2D" path="res://assets/textures/horizon_smugglers_run.png" id="4_da4u5"]
+[ext_resource type="Script" path="res://src/data/resources/level_data.gd" id="5_f5tde"]
+
+[resource]
+script = ExtResource("5_f5tde")
+level_id = 22
+level_title = "Level 22: Gloom Mire"
+biome_name = "bayou"
+base_scroll_speed = 10.350000000000001
+chunk_scenes = Array[PackedScene]([ExtResource("1_m73v4"), ExtResource("2_0s4oq"), ExtResource("3_s8vcc"), ExtResource("2_0s4oq"), ExtResource("2_0s4oq"), ExtResource("3_s8vcc"), ExtResource("2_0s4oq"), ExtResource("2_0s4oq")])
+completion_doubloon_reward = 600
+horizon_texture = ExtResource("4_da4u5")
+water_albedo = Color(0.12, 0.25, 0.18, 0.92)
+fog_color = Color(0.22, 0.35, 0.28, 1)
+fog_density = 0.015

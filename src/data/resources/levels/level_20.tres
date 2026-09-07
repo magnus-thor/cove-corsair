@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="LevelData" format=3]
+
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_warmup.tscn" id="1_0nmmt"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_barricade_siege.tscn" id="2_uv2ht"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_mine_gauntlet.tscn" id="3_jukpe"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_boss_siege_fortress.tscn" id="4_eipws"]
+[ext_resource type="Texture2D" path="res://assets/textures/horizon_smugglers_run.png" id="5_i6htk"]
+[ext_resource type="Script" path="res://src/data/resources/level_data.gd" id="6_q54hw"]
+
+[resource]
+script = ExtResource("6_q54hw")
+level_id = 20
+level_title = "Level 20: Citadel of Iron"
+biome_name = "bayou"
+base_scroll_speed = 10.05
+chunk_scenes = Array[PackedScene]([ExtResource("1_0nmmt"), ExtResource("2_uv2ht"), ExtResource("3_jukpe"), ExtResource("2_uv2ht"), ExtResource("2_uv2ht"), ExtResource("3_jukpe"), ExtResource("2_uv2ht"), ExtResource("4_eipws")])
+completion_doubloon_reward = 575
+horizon_texture = ExtResource("5_i6htk")
+water_albedo = Color(0.12, 0.25, 0.18, 0.92)
+fog_color = Color(0.22, 0.35, 0.28, 1)
+fog_density = 0.015

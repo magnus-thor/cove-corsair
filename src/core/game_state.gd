@@ -73,7 +73,7 @@ const VESSEL_CATALOG: Dictionary = {
 		"archetype": "Agility Skiff",
 		"resource_path": "res://src/data/resources/user_vessels/dinghy_ship.tres",
 		"purchase_price": 0,
-		"tier_prices": { 2: 350, 3: 750 },
+		"tier_prices": { 2: 300, 3: 750 },
 		"tier_descriptions": {
 			1: "Bow Chaser Cannon",
 			2: "Bow Chaser + Monkey Bomber",
@@ -89,8 +89,8 @@ const VESSEL_CATALOG: Dictionary = {
 		"name": "The Sloop",
 		"archetype": "Balanced Standard",
 		"resource_path": "res://src/data/resources/user_vessels/sloop_ship.tres",
-		"purchase_price": 450,
-		"tier_prices": { 2: 600, 3: 900 },
+		"purchase_price": 600,
+		"tier_prices": { 2: 800, 3: 1500 },
 		"tier_descriptions": {
 			1: "Bow Chaser Cannon",
 			2: "Bow Chaser + Monkey Bomber + Skeleton Tosser",
@@ -106,8 +106,8 @@ const VESSEL_CATALOG: Dictionary = {
 		"name": "The Ironclad",
 		"archetype": "Armored Brawler",
 		"resource_path": "res://src/data/resources/user_vessels/ironclad_ship.tres",
-		"purchase_price": 1200,
-		"tier_prices": { 2: 1500, 3: 2000 },
+		"purchase_price": 1400,
+		"tier_prices": { 2: 1800, 3: 3000 },
 		"tier_descriptions": {
 			1: "Heavy Frontal Cannon Battery",
 			2: "Heavy Battery + Monkey Bomber + Skeleton Tosser",
@@ -123,8 +123,8 @@ const VESSEL_CATALOG: Dictionary = {
 		"name": "The Bombard Skiff",
 		"archetype": "Artillery Mortar",
 		"resource_path": "res://src/data/resources/user_vessels/bombard_skiff_ship.tres",
-		"purchase_price": 800,
-		"tier_prices": { 2: 500, 3: 1000 },
+		"purchase_price": 1000,
+		"tier_prices": { 2: 1200, 3: 2200 },
 		"tier_descriptions": {
 			1: "Heavy Siege Mortar (AoE)",
 			2: "Heavy Mortar + Quarterdeck Crew Support",
@@ -149,7 +149,40 @@ const LEVEL_RESOURCES: Dictionary = {
 	9: "res://src/data/resources/levels/level_09.tres",
 	10: "res://src/data/resources/levels/level_10.tres",
 	11: "res://src/data/resources/levels/level_11.tres",
-	12: "res://src/data/resources/levels/level_12.tres"
+	12: "res://src/data/resources/levels/level_12.tres",
+	13: "res://src/data/resources/levels/level_13.tres",
+	14: "res://src/data/resources/levels/level_14.tres",
+	15: "res://src/data/resources/levels/level_15.tres",
+	16: "res://src/data/resources/levels/level_16.tres",
+	17: "res://src/data/resources/levels/level_17.tres",
+	18: "res://src/data/resources/levels/level_18.tres",
+	19: "res://src/data/resources/levels/level_19.tres",
+	20: "res://src/data/resources/levels/level_20.tres",
+	21: "res://src/data/resources/levels/level_21.tres",
+	22: "res://src/data/resources/levels/level_22.tres",
+	23: "res://src/data/resources/levels/level_23.tres",
+	24: "res://src/data/resources/levels/level_24.tres",
+	25: "res://src/data/resources/levels/level_25.tres",
+	26: "res://src/data/resources/levels/level_26.tres",
+	27: "res://src/data/resources/levels/level_27.tres",
+	28: "res://src/data/resources/levels/level_28.tres",
+	29: "res://src/data/resources/levels/level_29.tres",
+	30: "res://src/data/resources/levels/level_30.tres",
+	31: "res://src/data/resources/levels/level_31.tres",
+	32: "res://src/data/resources/levels/level_32.tres",
+	33: "res://src/data/resources/levels/level_33.tres",
+	34: "res://src/data/resources/levels/level_34.tres",
+	35: "res://src/data/resources/levels/level_35.tres",
+	36: "res://src/data/resources/levels/level_36.tres",
+	37: "res://src/data/resources/levels/level_37.tres",
+	38: "res://src/data/resources/levels/level_38.tres",
+	39: "res://src/data/resources/levels/level_39.tres",
+	40: "res://src/data/resources/levels/level_40.tres",
+	41: "res://src/data/resources/levels/level_41.tres",
+	42: "res://src/data/resources/levels/level_42.tres",
+	43: "res://src/data/resources/levels/level_43.tres",
+	44: "res://src/data/resources/levels/level_44.tres",
+	45: "res://src/data/resources/levels/level_45.tres"
 }
 
 const LEVEL_SHIPS: Dictionary = {
@@ -164,7 +197,43 @@ const LEVEL_SHIPS: Dictionary = {
 	9: "res://src/data/resources/user_vessels/ironclad_ship.tres",
 	10: "res://src/data/resources/user_vessels/dinghy_ship.tres",
 	11: "res://src/data/resources/user_vessels/sloop_ship.tres",
-	12: "res://src/data/resources/user_vessels/ironclad_ship.tres"
+	12: "res://src/data/resources/user_vessels/ironclad_ship.tres",
+	# Cove 1 Continuation (L13-L15)
+	13: "res://src/data/resources/user_vessels/dinghy_ship.tres",
+	14: "res://src/data/resources/user_vessels/bombard_skiff_ship.tres",
+	15: "res://src/data/resources/user_vessels/ironclad_ship.tres",
+	# Cove 2 (L16-L30) Tactical Pairings
+	16: "res://src/data/resources/user_vessels/ironclad_ship.tres", # The Iron Wall (Barricade Cluster)
+	17: "res://src/data/resources/user_vessels/sloop_ship.tres",
+	18: "res://src/data/resources/user_vessels/dinghy_ship.tres",
+	19: "res://src/data/resources/user_vessels/dinghy_ship.tres", # Devil's Slalom (Dense Mines)
+	20: "res://src/data/resources/user_vessels/bombard_skiff_ship.tres", # Siege Fortress Boss
+	21: "res://src/data/resources/user_vessels/ironclad_ship.tres",
+	22: "res://src/data/resources/user_vessels/dinghy_ship.tres",
+	23: "res://src/data/resources/user_vessels/sloop_ship.tres",
+	24: "res://src/data/resources/user_vessels/bombard_skiff_ship.tres",
+	25: "res://src/data/resources/user_vessels/sloop_ship.tres", # Phantom Dredge Boss
+	26: "res://src/data/resources/user_vessels/ironclad_ship.tres",
+	27: "res://src/data/resources/user_vessels/dinghy_ship.tres",
+	28: "res://src/data/resources/user_vessels/bombard_skiff_ship.tres",
+	29: "res://src/data/resources/user_vessels/dinghy_ship.tres",
+	30: "res://src/data/resources/user_vessels/ironclad_ship.tres", # Bone-Beard Armada
+	# Cove 3 (L31-L45) Brimstone Tactical Pairings
+	31: "res://src/data/resources/user_vessels/sloop_ship.tres",
+	32: "res://src/data/resources/user_vessels/ironclad_ship.tres",
+	33: "res://src/data/resources/user_vessels/dinghy_ship.tres",
+	34: "res://src/data/resources/user_vessels/bombard_skiff_ship.tres",
+	35: "res://src/data/resources/user_vessels/ironclad_ship.tres", # Ironjaw Boss
+	36: "res://src/data/resources/user_vessels/dinghy_ship.tres",
+	37: "res://src/data/resources/user_vessels/bombard_skiff_ship.tres",
+	38: "res://src/data/resources/user_vessels/sloop_ship.tres",
+	39: "res://src/data/resources/user_vessels/dinghy_ship.tres",
+	40: "res://src/data/resources/user_vessels/bombard_skiff_ship.tres", # Siege Fortress Boss
+	41: "res://src/data/resources/user_vessels/ironclad_ship.tres",
+	42: "res://src/data/resources/user_vessels/dinghy_ship.tres",
+	43: "res://src/data/resources/user_vessels/bombard_skiff_ship.tres",
+	44: "res://src/data/resources/user_vessels/dinghy_ship.tres",
+	45: "res://src/data/resources/user_vessels/ironclad_ship.tres" # Bone-Beard Final Throne
 }
 
 func _ready() -> void:
@@ -324,14 +393,14 @@ func update_distance(delta_distance: float) -> void:
 	progress_changed.emit(distance_traveled, level_distance_target)
 
 func select_level(lvl: int) -> void:
-	current_selected_level = clamp(lvl, 1, 6)
+	current_selected_level = clamp(lvl, 1, 45)
 	current_level = current_selected_level
 	save_game()
 
 func unlock_next_level() -> void:
 	last_cleared_level = current_level
 	if current_level >= highest_unlocked_level:
-		highest_unlocked_level = min(6, current_level + 1)
+		highest_unlocked_level = min(45, current_level + 1)
 		just_cleared_level = true
 		current_selected_level = highest_unlocked_level
 	unlocked_levels = highest_unlocked_level
@@ -365,7 +434,7 @@ func calculate_stars() -> int:
 	return stars
 
 func is_campaign_complete() -> bool:
-	return current_level >= 6
+	return current_level >= 45
 
 func reset_level() -> void:
 	run_doubloons = 0
@@ -398,8 +467,8 @@ func reset_save_data() -> void:
 	current_level = 1
 	just_cleared_level = false
 	last_cleared_level = 1
-	level_high_scores = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
-	level_stars = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
+	level_high_scores = {}
+	level_stars = {}
 	reset_level()
 	if FileAccess.file_exists(SAVE_PATH):
 		DirAccess.remove_absolute(SAVE_PATH)
@@ -444,8 +513,8 @@ func load_game() -> void:
 	current_level = 1
 	just_cleared_level = false
 	last_cleared_level = 1
-	level_high_scores = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
-	level_stars = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
+	level_high_scores = {}
+	level_stars = {}
 	master_volume = 1.0
 	music_volume = 1.0
 	sfx_volume = 1.0
@@ -495,13 +564,13 @@ func load_game() -> void:
 			active_vessel = "dinghy"
 
 		if data.has("highest_unlocked_level"):
-			highest_unlocked_level = clamp(int(data["highest_unlocked_level"]), 1, 6)
+			highest_unlocked_level = clamp(int(data["highest_unlocked_level"]), 1, 45)
 		elif data.has("unlocked_levels"):
-			highest_unlocked_level = clamp(int(data["unlocked_levels"]), 1, 6)
+			highest_unlocked_level = clamp(int(data["unlocked_levels"]), 1, 45)
 		unlocked_levels = highest_unlocked_level
 
 		if data.has("current_selected_level"):
-			current_selected_level = clamp(int(data["current_selected_level"]), 1, 6)
+			current_selected_level = clamp(int(data["current_selected_level"]), 1, 45)
 		else:
 			current_selected_level = highest_unlocked_level
 		current_level = current_selected_level
@@ -509,17 +578,17 @@ func load_game() -> void:
 		if data.has("just_cleared_level"):
 			just_cleared_level = bool(data["just_cleared_level"])
 		if data.has("last_cleared_level"):
-			last_cleared_level = clamp(int(data["last_cleared_level"]), 1, 6)
+			last_cleared_level = clamp(int(data["last_cleared_level"]), 1, 45)
 		if data.has("level_high_scores") and data["level_high_scores"] is Dictionary:
 			for k in data["level_high_scores"]:
 				var lvl_key = int(k)
-				if lvl_key in level_high_scores:
+				if lvl_key >= 1 and lvl_key <= 45:
 					level_high_scores[lvl_key] = max(0, int(data["level_high_scores"][k]))
 
 		if data.has("level_stars") and data["level_stars"] is Dictionary:
 			for k in data["level_stars"]:
 				var lvl_key = int(k)
-				if lvl_key in level_stars:
+				if lvl_key >= 1 and lvl_key <= 45:
 					level_stars[lvl_key] = clamp(int(data["level_stars"][k]), 0, 3)
 
 		if data.has("master_volume"): master_volume = clamp(float(data["master_volume"]), 0.0, 1.0)

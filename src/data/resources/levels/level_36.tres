@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="LevelData" format=3]
+
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_warmup.tscn" id="1_p6a3b"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_barricade_siege.tscn" id="2_ung83"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_mine_gauntlet.tscn" id="3_hpcpm"]
+[ext_resource type="Texture2D" path="res://assets/textures/horizon_smugglers_run.png" id="4_l488b"]
+[ext_resource type="Script" path="res://src/data/resources/level_data.gd" id="5_wiapy"]
+
+[resource]
+script = ExtResource("5_wiapy")
+level_id = 36
+level_title = "Level 36: Pyroclast Pass"
+biome_name = "brimstone"
+base_scroll_speed = 12.05
+chunk_scenes = Array[PackedScene]([ExtResource("1_p6a3b"), ExtResource("2_ung83"), ExtResource("3_hpcpm"), ExtResource("2_ung83"), ExtResource("2_ung83"), ExtResource("3_hpcpm"), ExtResource("2_ung83"), ExtResource("2_ung83"), ExtResource("3_hpcpm"), ExtResource("2_ung83")])
+completion_doubloon_reward = 950
+horizon_texture = ExtResource("4_l488b")
+water_albedo = Color(0.35, 0.1, 0.08, 0.95)
+fog_color = Color(0.45, 0.18, 0.12, 1)
+fog_density = 0.02

@@ -34,6 +34,6 @@ hardpoint_scales = {
 "MidDeckCrew": Vector3(1.25, 1.25, 1.25)
 }
 current_tier = 1
-upgrade_costs = Array[int]([0, 350, 750])
+upgrade_costs = Array[int]([0, 300, 750])
 tier_descriptions = Array[String](["Base Bow Chaser", "+ Monkey Bomber Crew", "+ Skeleton Tosser Crew"])
 tier_sockets = Array[Array]([["BowMount"], ["BowMount", "MidDeckCrew"], ["BowMount", "MidDeckCrew", "AftDeckCrew"]])

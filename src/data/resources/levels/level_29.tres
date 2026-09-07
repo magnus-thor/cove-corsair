@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="LevelData" format=3]
+
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_warmup.tscn" id="1_k80iy"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_mine_gauntlet.tscn" id="2_vlr50"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_barricade_siege.tscn" id="3_pmxv1"]
+[ext_resource type="Texture2D" path="res://assets/textures/horizon_smugglers_run.png" id="4_2vwk7"]
+[ext_resource type="Script" path="res://src/data/resources/level_data.gd" id="5_42k0o"]
+
+[resource]
+script = ExtResource("5_42k0o")
+level_id = 29
+level_title = "Level 29: Voodoo Crossing"
+biome_name = "bayou"
+base_scroll_speed = 11.350000000000001
+chunk_scenes = Array[PackedScene]([ExtResource("1_k80iy"), ExtResource("2_vlr50"), ExtResource("3_pmxv1"), ExtResource("2_vlr50"), ExtResource("2_vlr50"), ExtResource("3_pmxv1"), ExtResource("2_vlr50"), ExtResource("2_vlr50"), ExtResource("3_pmxv1")])
+completion_doubloon_reward = 725
+horizon_texture = ExtResource("4_2vwk7")
+water_albedo = Color(0.12, 0.25, 0.18, 0.92)
+fog_color = Color(0.22, 0.35, 0.28, 1)
+fog_density = 0.015

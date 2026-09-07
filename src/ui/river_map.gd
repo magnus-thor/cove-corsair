@@ -37,104 +37,7 @@ const ICON_SKULL: Texture2D = preload("res://assets/sprites/ui/hud_skull_icon.sv
 const ICON_COIN: Texture2D = preload("res://assets/sprites/ui/coin_icon.svg")
 const ICON_BOAT_FALLBACK: Texture2D = preload("res://assets/sprites/ui/hud_boat_icon.svg")
 
-const MILESTONES: Dictionary = {
-	1: {
-		"name": "SMUGGLER'S RUN",
-		"biome": "Tropical Reef",
-		"target_dist": 200,
-		"pos": Vector2(360, 3800),
-		"is_boss": true,
-		"boss_name": "Captain Ironjaw"
-	},
-	2: {
-		"name": "BLACK TIDE BAYOU",
-		"biome": "Murky Bayou",
-		"target_dist": 200,
-		"pos": Vector2(520, 3500),
-		"is_boss": true,
-		"boss_name": "The Phantom Dredge"
-	},
-	3: {
-		"name": "BRIMSTONE BASTION",
-		"biome": "Volcanic Bastion",
-		"target_dist": 200,
-		"pos": Vector2(200, 3200),
-		"is_boss": true,
-		"boss_name": "The Siege Fortress"
-	},
-	4: {
-		"name": "SMUGGLER'S NIGHTMARE",
-		"biome": "Stormy Coast",
-		"target_dist": 300,
-		"pos": Vector2(520, 2900),
-		"is_boss": true,
-		"boss_name": "Captain Ironjaw (Enraged)"
-	},
-	5: {
-		"name": "BLACK TIDE ABYSS",
-		"biome": "Abyssal Mire",
-		"target_dist": 300,
-		"pos": Vector2(200, 2600),
-		"is_boss": true,
-		"boss_name": "The Phantom Dredge"
-	},
-	6: {
-		"name": "BRIMSTONE INFERNO",
-		"biome": "Lava Caldera",
-		"target_dist": 300,
-		"pos": Vector2(360, 2300),
-		"is_boss": true,
-		"boss_name": "The Siege Fortress"
-	},
-	7: {
-		"name": "CORAL CATACLYSM",
-		"biome": "Tropical Atoll",
-		"target_dist": 350,
-		"pos": Vector2(520, 2000),
-		"is_boss": false,
-		"boss_name": ""
-	},
-	8: {
-		"name": "SERPENT'S MIRE",
-		"biome": "Deep Bayou",
-		"target_dist": 350,
-		"pos": Vector2(200, 1700),
-		"is_boss": false,
-		"boss_name": ""
-	},
-	9: {
-		"name": "ASHEN STRAITS",
-		"biome": "Volcanic Straits",
-		"target_dist": 350,
-		"pos": Vector2(520, 1400),
-		"is_boss": false,
-		"boss_name": ""
-	},
-	10: {
-		"name": "SKULL REEF PASS",
-		"biome": "Outer Reefs",
-		"target_dist": 400,
-		"pos": Vector2(200, 1100),
-		"is_boss": false,
-		"boss_name": ""
-	},
-	11: {
-		"name": "DREADWATER GORGE",
-		"biome": "Dread Bayou",
-		"target_dist": 400,
-		"pos": Vector2(520, 800),
-		"is_boss": false,
-		"boss_name": ""
-	},
-	12: {
-		"name": "BONEBEARD'S LAIR",
-		"biome": "Infernal Caldera",
-		"target_dist": 400,
-		"pos": Vector2(360, 500),
-		"is_boss": true,
-		"boss_name": "Captain Bone-Beard"
-	}
-}
+static var MILESTONES: Dictionary = _build_milestones()
 
 var river_curve: Curve2D = Curve2D.new()
 var node_controls: Dictionary = {}
@@ -143,6 +46,7 @@ var is_animating_travel: bool = false
 var popup_selected_level: int = 1
 
 func _ready() -> void:
+	_init_milestones_data()
 	_setup_river_spline()
 	_setup_terrain_draw()
 	_setup_river_path_draw()
@@ -150,42 +54,95 @@ func _ready() -> void:
 	_setup_mini_vessel()
 	_setup_popup()
 	
-	# Automatically anchor scroll position to current active level node on launch
-	var start_lvl = clamp(GameState.current_selected_level, 1, 12)
-	_focus_on_level(start_lvl, false)
-	
+	# ScrollContainer Frame-0 Guard: defer initial presentation so 15,000px height is measured
 	call_deferred("_handle_initial_presentation")
+
+static func _build_milestones() -> Dictionary:
+	var dict: Dictionary = {}
+	for lvl in range(1, 46):
+		var t = float(lvl - 1) / 44.0
+		var node_y = lerpf(14500.0, 500.0, t)
+		var node_x = 360.0
+		if lvl == 1 or lvl == 45:
+			node_x = 360.0
+		else:
+			node_x = 360.0 + sin((lvl - 1) * 0.72) * 170.0
+		
+		var is_boss = (lvl % 5 == 0)
+		var boss_type = ""
+		var boss_name = ""
+		
+		if is_boss:
+			match lvl:
+				5:
+					boss_type = "phantom_dredge"
+					boss_name = "The Phantom Dredge"
+				10:
+					boss_type = "ironjaw"
+					boss_name = "Captain Ironjaw"
+				15:
+					boss_type = "bonebeard"
+					boss_name = "Captain Bone-Beard"
+				20:
+					boss_type = "siege_fortress"
+					boss_name = "The Siege Fortress"
+				25:
+					boss_type = "phantom_dredge"
+					boss_name = "The Phantom Dredge"
+				30:
+					boss_type = "bonebeard"
+					boss_name = "Captain Bone-Beard"
+				35:
+					boss_type = "ironjaw"
+					boss_name = "Captain Ironjaw"
+				40:
+					boss_type = "siege_fortress"
+					boss_name = "The Siege Fortress"
+				45:
+					boss_type = "final_boss"
+					boss_name = "Captain Bone-Beard"
+		
+		var lvl_title = "EXPEDITION %02d" % lvl
+		var biome_desc = "Tropical Reef" if lvl <= 15 else ("Murky Bayou" if lvl <= 30 else "Volcanic Brimstone")
+		var target_dist = 200 + (lvl * 25)
+		
+		dict[lvl] = {
+			"name": lvl_title,
+			"biome": biome_desc,
+			"target_dist": target_dist,
+			"pos": Vector2(node_x, node_y),
+			"is_boss": is_boss,
+			"boss_type": boss_type,
+			"boss_name": boss_name
+		}
+	return dict
+
+func _init_milestones_data() -> void:
+	if MILESTONES.is_empty():
+		MILESTONES = _build_milestones()
+	for lvl in range(1, 46):
+		if GameState.LEVEL_RESOURCES.has(lvl):
+			var res_path = GameState.LEVEL_RESOURCES[lvl]
+			if ResourceLoader.exists(res_path):
+				var res = load(res_path) as LevelData
+				if res:
+					MILESTONES[lvl]["name"] = res.level_title.replace("Level %d: " % lvl, "").to_upper()
+					MILESTONES[lvl]["target_dist"] = (res.chunk_scenes.size() - 1) * 50
+					if res.biome_name == "tropical":
+						MILESTONES[lvl]["biome"] = "Tropical Reef"
+					elif res.biome_name == "bayou":
+						MILESTONES[lvl]["biome"] = "Murky Bayou"
+					elif res.biome_name == "brimstone":
+						MILESTONES[lvl]["biome"] = "Volcanic Brimstone"
 
 func _setup_river_spline() -> void:
 	river_curve.clear_points()
-	# Define serpentine river control points through all 12 milestone nodes from harbor to peak
-	var points: Array[Vector2] = [
-		Vector2(360, 4050), # Harbor start
-		Vector2(360, 3800), # Node 1 (Smuggler's Run)
-		Vector2(460, 3650), # Turn 1
-		Vector2(520, 3500), # Node 2 (Black Tide Bayou)
-		Vector2(380, 3350), # Turn 2
-		Vector2(200, 3200), # Node 3 (Brimstone Bastion)
-		Vector2(380, 3050), # Turn 3
-		Vector2(520, 2900), # Node 4 (Smuggler's Nightmare)
-		Vector2(380, 2750), # Turn 4
-		Vector2(200, 2600), # Node 5 (Black Tide Abyss)
-		Vector2(280, 2450), # Turn 5
-		Vector2(360, 2300), # Node 6 (Brimstone Inferno)
-		Vector2(460, 2150), # Turn 6
-		Vector2(520, 2000), # Node 7 (Coral Cataclysm)
-		Vector2(380, 1850), # Turn 7
-		Vector2(200, 1700), # Node 8 (Serpent's Mire)
-		Vector2(380, 1550), # Turn 8
-		Vector2(520, 1400), # Node 9 (Ashen Straits)
-		Vector2(380, 1250), # Turn 9
-		Vector2(200, 1100), # Node 10 (Skull Reef Pass)
-		Vector2(380, 950),  # Turn 10
-		Vector2(520, 800),  # Node 11 (Dreadwater Gorge)
-		Vector2(440, 650),  # Turn 11
-		Vector2(360, 500),  # Node 12 (Bonebeard's Lair - Final Boss)
-		Vector2(360, 200)   # Final anchorage peak
-	]
+	var points: Array[Vector2] = []
+	points.append(Vector2(360, 14850)) # Harbor start
+	for lvl in range(1, 46):
+		if MILESTONES.has(lvl):
+			points.append(MILESTONES[lvl]["pos"])
+	points.append(Vector2(360, 200)) # Final anchorage peak
 	
 	for i in range(points.size()):
 		var p = points[i]
@@ -215,32 +172,24 @@ func _setup_river_path_draw() -> void:
 		river_path_layer.draw.connect(_on_river_path_draw)
 
 func _on_terrain_draw() -> void:
-	var canvas_rect = Rect2(Vector2.ZERO, Vector2(720, 4200))
+	var canvas_rect = Rect2(Vector2.ZERO, Vector2(720, 15000))
 	# Lush vintage pirate chart background
 	terrain_layer.draw_rect(canvas_rect, Color(0.93, 0.88, 0.77, 1.0), true)
 	
 	# Decorative map grid & nautical borders
 	var line_color = Color(0.82, 0.75, 0.62, 0.45)
-	for y in range(100, 4180, 160):
+	for y in range(100, 14950, 200):
 		terrain_layer.draw_line(Vector2(40, y), Vector2(680, y), line_color, 1.5)
 	for x in range(120, 680, 120):
-		terrain_layer.draw_line(Vector2(x, 60), Vector2(x, 4140), line_color, 1.5)
+		terrain_layer.draw_line(Vector2(x, 60), Vector2(x, 14940), line_color, 1.5)
 		
-	# Biome background tint zones (bottom to top across 4200px)
-	# Bottom (Tropical Reef L1): Cyan parchment wash
-	terrain_layer.draw_rect(Rect2(0, 3600, 720, 600), Color(0.2, 0.65, 0.7, 0.10), true)
-	# Bayou & Bastion (L2-L3): Mossy wash
-	terrain_layer.draw_rect(Rect2(0, 3000, 720, 600), Color(0.3, 0.5, 0.35, 0.08), true)
-	# Stormy Coast & Abyss (L4-L5): Ocean slate wash
-	terrain_layer.draw_rect(Rect2(0, 2400, 720, 600), Color(0.2, 0.3, 0.45, 0.09), true)
-	# Brimstone & Coral (L6-L7): Volcanic ash wash
-	terrain_layer.draw_rect(Rect2(0, 1800, 720, 600), Color(0.7, 0.25, 0.15, 0.12), true)
-	# Serpent Mire & Ashen Straits (L8-L9): Murky brimstone wash
-	terrain_layer.draw_rect(Rect2(0, 1200, 720, 600), Color(0.3, 0.45, 0.3, 0.10), true)
-	# Outer Reef & Dreadwater (L10-L11): Deep slate wash
-	terrain_layer.draw_rect(Rect2(0, 600, 720, 600), Color(0.2, 0.35, 0.5, 0.10), true)
-	# Caldera Peak (L12 Bonebeard): Burning caldera crimson wash
-	terrain_layer.draw_rect(Rect2(0, 0, 720, 600), Color(0.75, 0.2, 0.1, 0.14), true)
+	# Biome background tint zones across 15,000px
+	# Cove 1 (L1-L15, 10000-15000px): Tropical Reef cyan parchment wash
+	terrain_layer.draw_rect(Rect2(0, 10000, 720, 5000), Color(0.2, 0.65, 0.7, 0.10), true)
+	# Cove 2 (L16-L30, 5000-10000px): Murky Bayou mossy wash
+	terrain_layer.draw_rect(Rect2(0, 5000, 720, 5000), Color(0.3, 0.5, 0.35, 0.09), true)
+	# Cove 3 (L31-L45, 0-5000px): Volcanic Brimstone & Caldera crimson wash
+	terrain_layer.draw_rect(Rect2(0, 0, 720, 5000), Color(0.75, 0.2, 0.1, 0.13), true)
 
 func _on_river_path_draw() -> void:
 	var baked = river_curve.get_baked_points()
@@ -342,21 +291,65 @@ func _create_milestone_button(lvl: int, data: Dictionary) -> Control:
 	status_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	container.add_child(status_icon)
 	
-	# Boss Banner Ribbon (for Level 3 & Level 6)
-	if data["is_boss"]:
+	# Boss Banner Ribbon for Milestone Bosses (5, 10, 15, 20, 25, 30, 35, 40, 45)
+	if data.get("is_boss", false):
+		var boss_type = data.get("boss_type", "")
 		var boss_banner = PanelContainer.new()
 		boss_banner.name = "BossBanner"
-		boss_banner.position = Vector2(-20, -18)
-		boss_banner.custom_minimum_size = Vector2(200, 36)
 		boss_banner.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		
+		var banner_w = 220 if boss_type == "final_boss" else 200
+		var banner_h = 38 if boss_type == "final_boss" else 34
+		boss_banner.position = Vector2(80 - (banner_w * 0.5), -20)
+		boss_banner.custom_minimum_size = Vector2(banner_w, banner_h)
+		
 		var banner_style = StyleBoxFlat.new()
-		banner_style.bg_color = Color(0.72, 0.12, 0.12, 0.95)
-		banner_style.set_border_width_all(2)
-		banner_style.border_color = Color(1.0, 0.85, 0.35, 1.0)
-		banner_style.set_corner_radius_all(10)
-		banner_style.shadow_size = 4
+		banner_style.set_corner_radius_all(12)
+		banner_style.shadow_size = 6
 		banner_style.shadow_offset = Vector2(0, 2)
+		
+		var label_text = "BOSS"
+		var skull_mod = Color.WHITE
+		
+		match boss_type:
+			"phantom_dredge":
+				banner_style.bg_color = Color(0.06, 0.28, 0.32, 0.95)
+				banner_style.set_border_width_all(2)
+				banner_style.border_color = Color(0.35, 0.95, 0.85, 1.0)
+				skull_mod = Color(0.4, 1.0, 0.85, 1.0)
+				label_text = "PHANTOM DREDGE"
+			"ironjaw":
+				banner_style.bg_color = Color(0.58, 0.22, 0.08, 0.95)
+				banner_style.set_border_width_all(2)
+				banner_style.border_color = Color(1.0, 0.72, 0.22, 1.0)
+				skull_mod = Color(1.0, 0.8, 0.3, 1.0)
+				label_text = "CAPT. IRONJAW"
+			"siege_fortress":
+				banner_style.bg_color = Color(0.25, 0.18, 0.22, 0.95)
+				banner_style.set_border_width_all(2)
+				banner_style.border_color = Color(0.95, 0.32, 0.28, 1.0)
+				skull_mod = Color(1.0, 0.45, 0.4, 1.0)
+				label_text = "SIEGE FORTRESS"
+			"bonebeard":
+				banner_style.bg_color = Color(0.72, 0.10, 0.10, 0.95)
+				banner_style.set_border_width_all(2)
+				banner_style.border_color = Color(1.0, 0.86, 0.35, 1.0)
+				skull_mod = Color(1.0, 0.92, 0.5, 1.0)
+				label_text = "BONE-BEARD"
+			"final_boss":
+				banner_style.bg_color = Color(0.85, 0.08, 0.08, 0.98)
+				banner_style.set_border_width_all(3)
+				banner_style.border_color = Color(1.0, 0.95, 0.45, 1.0)
+				banner_style.shadow_color = Color(1.0, 0.8, 0.2, 0.6)
+				banner_style.shadow_size = 12
+				skull_mod = Color(1.0, 0.98, 0.6, 1.0)
+				label_text = "★ FINAL BOSS ★"
+			_:
+				banner_style.bg_color = Color(0.72, 0.12, 0.12, 0.95)
+				banner_style.set_border_width_all(2)
+				banner_style.border_color = Color(1.0, 0.85, 0.35, 1.0)
+				label_text = "BOSS"
+				
 		boss_banner.add_theme_stylebox_override("panel", banner_style)
 		
 		var hbox = HBoxContainer.new()
@@ -366,15 +359,16 @@ func _create_milestone_button(lvl: int, data: Dictionary) -> Control:
 		var skull = TextureRect.new()
 		skull.custom_minimum_size = Vector2(22, 22)
 		skull.texture = ICON_SKULL
+		skull.modulate = skull_mod
 		skull.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		skull.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		hbox.add_child(skull)
 		
 		var b_lbl = Label.new()
-		b_lbl.text = "BOSS" if lvl == 3 else "FINAL BOSS"
+		b_lbl.text = label_text
 		b_lbl.add_theme_font_override("font", FONT_LILITA)
-		b_lbl.add_theme_font_size_override("font_size", 20)
-		b_lbl.add_theme_color_override("font_color", Color(1.0, 0.95, 0.7, 1.0))
+		b_lbl.add_theme_font_size_override("font_size", 18 if boss_type == "final_boss" else 15)
+		b_lbl.add_theme_color_override("font_color", Color(1.0, 0.95, 0.75, 1.0))
 		hbox.add_child(b_lbl)
 		
 		boss_banner.add_child(hbox)
@@ -497,18 +491,22 @@ func _start_vessel_idle_bob() -> void:
 	vessel_bob_tween.tween_property(mini_vessel_icon, "position:y", 2.0, 1.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 func _handle_initial_presentation() -> void:
+	# ScrollContainer Frame-0 Guard: wait for 15,000px content height to be fully measured
+	await get_tree().process_frame
+	
+	var active_lvl = clamp(GameState.current_selected_level, 1, 45)
 	if GameState.just_cleared_level:
 		_play_advancement_sequence()
 	else:
-		_focus_on_level(GameState.current_selected_level, false)
-		var target_pos = _get_node_dock_pos(GameState.current_selected_level)
+		_focus_on_level(active_lvl, false)
+		var target_pos = _get_node_dock_pos(active_lvl)
 		mini_vessel.position = target_pos
 
 func _get_node_dock_pos(lvl: int) -> Vector2:
 	if MILESTONES.has(lvl):
 		# Position miniature vessel slightly offset near the milestone node
 		return MILESTONES[lvl]["pos"] + Vector2(75, 45)
-	return Vector2(360, 3800)
+	return Vector2(360, 14500)
 
 func _focus_on_level(lvl: int, animate: bool = true, duration: float = 0.8) -> void:
 	if not scroll_container or not MILESTONES.has(lvl):
@@ -518,7 +516,7 @@ func _focus_on_level(lvl: int, animate: bool = true, duration: float = 0.8) -> v
 	var viewport_h = scroll_container.size.y
 	if viewport_h <= 0:
 		viewport_h = 1000.0
-	var canvas_h = map_canvas.custom_minimum_size.y if map_canvas else 4200.0
+	var canvas_h = map_canvas.custom_minimum_size.y if map_canvas else 15000.0
 	var target_scroll = clamp(int(node_y - viewport_h * 0.5), 0, int(canvas_h - viewport_h))
 	
 	if animate:
@@ -529,8 +527,8 @@ func _focus_on_level(lvl: int, animate: bool = true, duration: float = 0.8) -> v
 
 func _play_advancement_sequence() -> void:
 	is_animating_travel = true
-	var from_lvl = clamp(GameState.last_cleared_level, 1, 12)
-	var to_lvl = clamp(GameState.highest_unlocked_level, 1, 12)
+	var from_lvl = clamp(GameState.last_cleared_level, 1, 45)
+	var to_lvl = clamp(GameState.highest_unlocked_level, 1, 45)
 	
 	if from_lvl == to_lvl and to_lvl > 1:
 		from_lvl = to_lvl - 1

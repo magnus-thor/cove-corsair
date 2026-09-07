@@ -72,14 +72,14 @@ vertical_scroll_mode = 2
 
 [node name="MapCanvas" type="Control" parent="ScrollContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(720, 4200)
+custom_minimum_size = Vector2(720, 15000)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="TerrainLayer" type="Control" parent="ScrollContainer/MapCanvas"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(720, 4200)
+custom_minimum_size = Vector2(720, 15000)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -90,7 +90,7 @@ mouse_filter = 2
 
 [node name="RiverPathLayer" type="Control" parent="ScrollContainer/MapCanvas"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(720, 4200)
+custom_minimum_size = Vector2(720, 15000)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -101,7 +101,7 @@ mouse_filter = 2
 
 [node name="NodesLayer" type="Control" parent="ScrollContainer/MapCanvas"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(720, 4200)
+custom_minimum_size = Vector2(720, 15000)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -112,7 +112,7 @@ grow_vertical = 2
 [node name="MiniVessel" type="Node2D" parent="ScrollContainer/MapCanvas"]
 unique_name_in_owner = true
 z_index = 10
-position = Vector2(360, 3800)
+position = Vector2(360, 14500)
 
 [node name="MiniVesselIcon" type="TextureRect" parent="ScrollContainer/MapCanvas/MiniVessel"]
 unique_name_in_owner = true

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="LevelData" format=3]
+
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_warmup.tscn" id="1_4spua"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_mine_gauntlet.tscn" id="2_t5mqq"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_barricade_siege.tscn" id="3_5lhdh"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_boss_bonebeard.tscn" id="4_dwe2g"]
+[ext_resource type="Texture2D" path="res://assets/textures/horizon_smugglers_run.png" id="5_swoda"]
+[ext_resource type="Script" path="res://src/data/resources/level_data.gd" id="6_e6fql"]
+
+[resource]
+script = ExtResource("6_e6fql")
+level_id = 15
+level_title = "Level 15: Bone-Beard's Outpost"
+base_scroll_speed = 9.5
+chunk_scenes = Array[PackedScene]([ExtResource("1_4spua"), ExtResource("2_t5mqq"), ExtResource("3_5lhdh"), ExtResource("2_t5mqq"), ExtResource("2_t5mqq"), ExtResource("3_5lhdh"), ExtResource("4_dwe2g")])
+completion_doubloon_reward = 450
+horizon_texture = ExtResource("5_swoda")

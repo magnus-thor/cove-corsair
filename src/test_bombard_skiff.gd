@@ -27,7 +27,7 @@ func _ready() -> void:
 	assert_test(ship_res.fire_rate == 1.3, "fire_rate is 1.3 (base_fire_rate)")
 	assert_test(ship_res.collision_size == Vector3(1.8, 1.2, 3.0), "collision_size is Vector3(1.8, 1.2, 3.0)")
 	assert_test(ship_res.model_scene != null, "model_scene is assigned")
-	assert_test(ship_res.upgrade_costs == [800, 500, 1000], "upgrade_costs are [800, 500, 1000]")
+	assert_test(ship_res.upgrade_costs.size() == 3 and ship_res.upgrade_costs[0] == 1000 and ship_res.upgrade_costs[1] == 1200 and ship_res.upgrade_costs[2] == 2200, "upgrade_costs are [1000, 1200, 2200]")
 	assert_test(ship_res.tier_sockets.size() == 3, "tier_sockets has 3 tiers configured")
 
 	var scatter_res: WeaponData = load("res://src/data/resources/user_crew/weapon_scattershot.tres") as WeaponData
@@ -81,9 +81,9 @@ func _ready() -> void:
 	print("\n--- 2. Testing GameState & Shipyard Catalog ---")
 	assert_test(GameState.VESSEL_CATALOG.has("bombard_skiff"), "VESSEL_CATALOG has 'bombard_skiff'")
 	var cat_entry = GameState.VESSEL_CATALOG.get("bombard_skiff", {})
-	assert_test(cat_entry.get("purchase_price") == 800, "purchase_price in catalog is 800")
-	assert_test(cat_entry.get("tier_prices", {}).get(2) == 500, "tier 2 price is 500")
-	assert_test(cat_entry.get("tier_prices", {}).get(3) == 1000, "tier 3 price is 1000")
+	assert_test(cat_entry.get("purchase_price") == 1000, "purchase_price in catalog is 1000")
+	assert_test(cat_entry.get("tier_prices", {}).get(2) == 1200, "tier 2 price is 1200")
+	assert_test(cat_entry.get("tier_prices", {}).get(3) == 2200, "tier 3 price is 2200")
 
 	# Test purchasing and upgrading logic
 	GameState.doubloons = 5000

@@ -47,6 +47,6 @@ hardpoint_scales = {
 "StarboardSwivelMount2": Vector3(3.2, 3.2, 3.2)
 }
 current_tier = 1
-upgrade_costs = Array[int]([0, 1500, 2000])
+upgrade_costs = Array[int]([1400, 1800, 3000])
 tier_descriptions = Array[String](["Heavy Bow Battery", "+ Reinforced Deck Crew", "+ Quad Swivel Battery"])
 tier_sockets = Array[Array]([["BowMount"], ["BowMount", "MonkeyCrew", "SkeletonCrew"], ["BowMount", "MonkeyCrew", "SkeletonCrew", "PortSwivelMount1", "PortSwivelMount2", "StarboardSwivelMount1", "StarboardSwivelMount2"]])

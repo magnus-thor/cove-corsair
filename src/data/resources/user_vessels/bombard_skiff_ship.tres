@@ -44,6 +44,6 @@ socket_weapons = {
 "StarboardRailMount": "res://src/data/resources/user_crew/weapon_scattershot.tres"
 }
 current_tier = 1
-upgrade_costs = Array[int]([800, 500, 1000])
+upgrade_costs = Array[int]([1000, 1200, 2200])
 tier_descriptions = Array[String](["Heavy Siege Mortar (AoE)", "+ Quarterdeck Crew Support", "+ Dual Side Scattershot Carronades"])
 tier_sockets = Array[Array]([["BowMortarMount"], ["BowMortarMount", "QuarterdeckCrew"], ["BowMortarMount", "QuarterdeckCrew", "PortRailMount", "StarboardRailMount"]])

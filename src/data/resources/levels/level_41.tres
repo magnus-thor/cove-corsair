@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="LevelData" format=3]
+
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_warmup.tscn" id="1_dsm6k"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_mine_gauntlet.tscn" id="2_0f2od"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_barricade_siege.tscn" id="3_620es"]
+[ext_resource type="Texture2D" path="res://assets/textures/horizon_smugglers_run.png" id="4_77po6"]
+[ext_resource type="Script" path="res://src/data/resources/level_data.gd" id="5_ljvjt"]
+
+[resource]
+script = ExtResource("5_ljvjt")
+level_id = 41
+level_title = "Level 41: Inferno Gate"
+biome_name = "brimstone"
+base_scroll_speed = 12.55
+chunk_scenes = Array[PackedScene]([ExtResource("1_dsm6k"), ExtResource("2_0f2od"), ExtResource("3_620es"), ExtResource("2_0f2od"), ExtResource("2_0f2od"), ExtResource("3_620es"), ExtResource("2_0f2od"), ExtResource("2_0f2od"), ExtResource("3_620es"), ExtResource("2_0f2od"), ExtResource("3_620es")])
+completion_doubloon_reward = 1100
+horizon_texture = ExtResource("4_77po6")
+water_albedo = Color(0.35, 0.1, 0.08, 0.95)
+fog_color = Color(0.45, 0.18, 0.12, 1)
+fog_density = 0.02

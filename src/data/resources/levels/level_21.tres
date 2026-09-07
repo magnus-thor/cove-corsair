@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="LevelData" format=3]
+
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_warmup.tscn" id="1_5pf1v"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_mine_gauntlet.tscn" id="2_my4v5"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_barricade_siege.tscn" id="3_36erg"]
+[ext_resource type="Texture2D" path="res://assets/textures/horizon_smugglers_run.png" id="4_t1a6p"]
+[ext_resource type="Script" path="res://src/data/resources/level_data.gd" id="5_xd1wh"]
+
+[resource]
+script = ExtResource("5_xd1wh")
+level_id = 21
+level_title = "Level 21: Serpent's Nest"
+biome_name = "bayou"
+base_scroll_speed = 10.200000000000001
+chunk_scenes = Array[PackedScene]([ExtResource("1_5pf1v"), ExtResource("2_my4v5"), ExtResource("3_36erg"), ExtResource("2_my4v5"), ExtResource("2_my4v5"), ExtResource("3_36erg"), ExtResource("2_my4v5"), ExtResource("3_36erg")])
+completion_doubloon_reward = 600
+horizon_texture = ExtResource("4_t1a6p")
+water_albedo = Color(0.12, 0.25, 0.18, 0.92)
+fog_color = Color(0.22, 0.35, 0.28, 1)
+fog_density = 0.015

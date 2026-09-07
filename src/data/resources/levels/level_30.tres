@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="LevelData" format=3]
+
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_warmup.tscn" id="1_n53fa"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_barricade_siege.tscn" id="2_kscrn"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_mine_gauntlet.tscn" id="3_hmhpc"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_boss_bonebeard.tscn" id="4_2e3wm"]
+[ext_resource type="Texture2D" path="res://assets/textures/horizon_smugglers_run.png" id="5_40vuc"]
+[ext_resource type="Script" path="res://src/data/resources/level_data.gd" id="6_uwbwc"]
+
+[resource]
+script = ExtResource("6_uwbwc")
+level_id = 30
+level_title = "Level 30: Bone-Beard's Armada"
+biome_name = "bayou"
+base_scroll_speed = 11.5
+chunk_scenes = Array[PackedScene]([ExtResource("1_n53fa"), ExtResource("2_kscrn"), ExtResource("3_hmhpc"), ExtResource("2_kscrn"), ExtResource("2_kscrn"), ExtResource("3_hmhpc"), ExtResource("2_kscrn"), ExtResource("2_kscrn"), ExtResource("4_2e3wm")])
+completion_doubloon_reward = 750
+horizon_texture = ExtResource("5_40vuc")
+water_albedo = Color(0.12, 0.25, 0.18, 0.92)
+fog_color = Color(0.22, 0.35, 0.28, 1)
+fog_density = 0.015
