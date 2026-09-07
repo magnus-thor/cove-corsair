@@ -245,10 +245,14 @@ func _physics_process(delta: float) -> void:
 		
 	if chunk_assembler and chunk_assembler.is_assembled:
 		# Modular chunk system handles track scrolling, entities, and progress.
-		# Only wrap Layer-2 riverbank framing chunks if present
+		# Modular chunk system handles track scrolling, entities, and progress.
+		# Advance and wrap Layer-2 riverbank framing chunks
+		var scroll_step = chunk_assembler.scroll_speed * delta if not chunk_assembler.is_boss_active else 0.0
 		for chunk in riverbank_chunks:
-			if is_instance_valid(chunk) and chunk.global_position.z > 40.0:
-				chunk.global_position.z -= 160.0
+			if is_instance_valid(chunk):
+				chunk.global_position.z += scroll_step
+				if chunk.global_position.z > 40.0:
+					chunk.global_position.z -= 160.0
 		return
 	# ──────────────────────────────────────────────────────────────────────────
 
