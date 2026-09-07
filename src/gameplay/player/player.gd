@@ -503,6 +503,9 @@ func take_hit(amount: int = 1, source_info: String = "") -> void:
 	if source_info != "leak_threat":
 		GameState.record_hit()
 	current_health = max(0, current_health - amount)
+	var camera = get_tree().get_first_node_in_group("game_camera")
+	if camera and camera.has_method("add_trauma"):
+		camera.add_trauma(0.55)
 	if GameState.boss_spawned:
 		print("[PLAYER HIT] User vessel took %d dmg from %s | HP: %d/%d | Fleet: %d" % [amount, source_info, current_health, max_health, follower_boats.size() + 1])
 	health_changed.emit(current_health, max_health)
@@ -528,7 +531,7 @@ func _on_area_entered(area: Area3D) -> void:
 				return
 			
 			hit_invulnerability_timer = 0.5
-			AudioManager.play_sfx("barrel_hits")
+			AudioManager.play_sfx("sfx_wood_smash")
 			take_hit(3, "Collision with Barricade")
 			if area.has_method("take_damage"):
 				area.take_damage(5)

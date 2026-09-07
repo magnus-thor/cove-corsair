@@ -170,6 +170,7 @@ func load_level_resource(res: LevelData) -> void:
 			
 	if level_data:
 		var biome_name: String = level_data.biome_name if "biome_name" in level_data else "tropical"
+		_update_biome_music(biome_name)
 
 		# ── Layer 1: Horizon Backdrop ────────────────────────────────────────
 		if not _horizon_backdrop:
@@ -890,3 +891,20 @@ func _setup_boundary_walls() -> void:
 	right_col.shape = box_shape_r
 	right_wall.add_child(right_col)
 	add_child(right_wall)
+
+func _update_biome_music(biome_name: String) -> void:
+	if not AudioManager:
+		return
+	var music_track = "music_tropical"
+	match biome_name.to_lower():
+		"bayou":
+			music_track = "music_bayou"
+		"brimstone":
+			music_track = "music_brimstone"
+		_:
+			music_track = "music_tropical"
+			
+	if AudioManager.has_method("crossfade_music"):
+		AudioManager.crossfade_music(music_track, 1.0)
+	elif AudioManager.has_method("play_music"):
+		AudioManager.play_music(music_track)

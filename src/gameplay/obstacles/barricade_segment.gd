@@ -44,3 +44,9 @@ func _update_label_visuals() -> void:
 func take_damage(amount: int) -> void:
 	super.take_damage(amount)
 	_update_label_visuals()
+
+func die() -> void:
+	if _is_destroyed:
+		return
+	AudioManager.play_sfx("sfx_wood_smash")
+	super()

@@ -362,6 +362,13 @@ func _spawn_splash(at_water_level: bool = false) -> void:
 		splash.global_position = splash_pos
 
 func _apply_splash_damage(exclude_target: Node = null) -> void:
+	var is_mortar = has_meta("is_mortar") or (weapon_data and ("mortar" in weapon_data.weapon_name.to_lower() or "mortar" in weapon_data.weapon_type.to_lower())) or (ammo_data and ("mortar" in ammo_data.ammo_name.to_lower() or ammo_data.splash_radius >= 3.0))
+	if is_mortar:
+		AudioManager.play_sfx("sfx_mortar_impact")
+		var camera = get_tree().get_first_node_in_group("game_camera")
+		if camera and camera.has_method("add_trauma"):
+			camera.add_trauma(0.45)
+
 	var base_radius = ammo_data.splash_radius if (ammo_data and ammo_data.splash_radius > 0.0) else 2.5
 	var radius = base_radius * splash_radius_multiplier
 	var splash_dmg = ammo_data.aoe_damage if (ammo_data and "aoe_damage" in ammo_data and ammo_data.aoe_damage > 0) else damage

@@ -12,7 +12,7 @@ func die() -> void:
 	_is_destroyed = true
 	
 	_spawn_explosion()
-	AudioManager.play_sfx("barrel_breaks")
+	AudioManager.play_sfx("sfx_mine_detonate")
 	
 	# Apply knockback and deal 1 fleet damage to the player if close (direct contact)
 	var player = get_tree().get_first_node_in_group("player")

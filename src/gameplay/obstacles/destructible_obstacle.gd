@@ -137,7 +137,10 @@ func die() -> void:
 	_is_destroyed = true
 	
 	GameState.targets_destroyed += 1
-	AudioManager.play_sfx("barrel_breaks")
+	if is_in_group("barricade"):
+		AudioManager.play_sfx("sfx_wood_smash")
+	else:
+		AudioManager.play_sfx("barrel_breaks")
 	_spawn_explosion()
 	_spawn_doubloons()
 	

@@ -365,13 +365,12 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 		recoil_tween.tween_property(model_container, "position:z", 0.08, 0.04).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		recoil_tween.tween_property(model_container, "position:z", 0.0, 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 		
-	AudioManager.play_sfx("cannon_shots")
-	
 	var spawn_pos = muzzle_point.global_position
 	spawn_pos.y = max(0.48, spawn_pos.y)
 	
 	var socket_name = get_parent().name.to_lower() if get_parent() else ""
 	var from_bow = ("bow" in socket_name)
+	var is_mortar = ("mortar" in socket_name) or (weapon_data and ("mortar" in weapon_data.weapon_name.to_lower() or "mortar" in weapon_data.weapon_type.to_lower()))
 	
 	var proj_dir: Vector3
 	if is_crew:
@@ -389,10 +388,37 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 
 	var player = get_tree().get_first_node_in_group("player")
 	var is_scatter_weapon: bool = (weapon_data.get("is_scatter") == true or weapon_data.weapon_type == "scattershot" or "scatter" in weapon_data.weapon_name.to_lower())
+	var camera = get_tree().get_first_node_in_group("game_camera")
 
 	if is_scatter_weapon:
 		fire_scattershot(proj_dir, world_container, proj_scene)
+	elif is_mortar:
+		AudioManager.play_sfx("sfx_mortar_fire")
+		if camera and camera.has_method("add_trauma"):
+			camera.add_trauma(0.25)
+			
+		var ball = proj_scene.instantiate() as Area3D
+		if ball:
+			ball.set_meta("is_mortar", true)
+			if from_bow:
+				ball.set_meta("from_bow", true)
+			world_container.add_child(ball)
+			ball.top_level = true
+			ball.global_position = spawn_pos
+			
+			if ball.has_method("set_spawn_pos"):
+				ball.set_spawn_pos(spawn_pos)
+			
+			if ball.has_method("setup"):
+				ball.setup(proj_dir, weapon_data.default_ammo, weapon_data)
+				
+			if player and "base_damage_bonus" in player and "damage" in ball:
+				ball.damage += player.base_damage_bonus
 	else:
+		AudioManager.play_sfx("cannon_shots")
+		if camera and camera.has_method("add_trauma"):
+			camera.add_trauma(0.08)
+			
 		var ball = proj_scene.instantiate() as Area3D
 		if ball:
 			if from_bow:
@@ -419,6 +445,12 @@ func fire_scattershot(proj_dir: Vector3 = Vector3.ZERO, world_container: Node = 
 	if not world_container or not muzzle_point:
 		return
 
+	# Play sfx_scattershot ONCE per volley and trigger lateral camera jitter trauma
+	AudioManager.play_sfx("sfx_scattershot")
+	var camera = get_tree().get_first_node_in_group("game_camera")
+	if camera and camera.has_method("add_trauma"):
+		camera.add_trauma(0.15)
+
 	var scene_to_use: PackedScene = p_proj_scene
 	if not scene_to_use:
 		if weapon_data and "projectile_scene" in weapon_data and weapon_data.projectile_scene:
@@ -429,7 +461,6 @@ func fire_scattershot(proj_dir: Vector3 = Vector3.ZERO, world_container: Node = 
 	var spawn_pos = muzzle_point.global_position
 	spawn_pos.y = max(0.48, spawn_pos.y)
 
-	# Transform the base forward vector using the world transform of the rail mount
 	var base_dir: Vector3 = proj_dir
 	if base_dir == Vector3.ZERO:
 		var mount_fwd = global_transform.basis.z
@@ -447,7 +478,6 @@ func fire_scattershot(proj_dir: Vector3 = Vector3.ZERO, world_container: Node = 
 	var from_bow = ("bow" in socket_name)
 	var player = get_tree().get_first_node_in_group("player") if get_tree() else null
 
-	# 5 pellets simultaneously spread horizontally across -15°, -7.5°, 0°, +7.5°, and +15°
 	var spread_angles: Array[float] = [-15.0, -7.5, 0.0, 7.5, 15.0]
 	for angle_deg in spread_angles:
 		var pellet_dir = base_dir.rotated(Vector3.UP, deg_to_rad(angle_deg)).normalized()
