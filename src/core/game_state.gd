@@ -136,9 +136,9 @@ const VESSEL_CATALOG: Dictionary = {
 }
 
 const LEVEL_RESOURCES: Dictionary = {
-	1: "res://src/data/resources/levels/level_01_smugglers_run.tres",
-	2: "res://src/data/resources/levels/level_02_black_tide_bayou.tres",
-	3: "res://src/data/resources/levels/level_03_brimstone_bastion.tres",
+	1: "res://src/data/resources/levels/level_01.tres",
+	2: "res://src/data/resources/levels/level_02.tres",
+	3: "res://src/data/resources/levels/level_03.tres",
 	4: "res://src/data/resources/levels/level_04_smugglers_nightmare.tres",
 	5: "res://src/data/resources/levels/level_05_black_tide_abyss.tres",
 	6: "res://src/data/resources/levels/level_06_brimstone_inferno.tres"

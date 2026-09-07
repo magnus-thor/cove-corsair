@@ -1,172 +1,20 @@
-[gd_resource type="Resource" script_class="LevelData" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="LevelData" format=3]
 
-[ext_resource type="Script" path="res://src/data/level_data.gd" id="1_script"]
-[ext_resource type="PackedScene" path="res://src/gameplay/enemies/boss_phantom_dredge.tscn" id="2_boss"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_mine_gauntlet.tscn" id="1_hep5a"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_barricade_siege.tscn" id="2_l3e7r"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_boss_phantom_dredge.tscn" id="3_khw5c"]
+[ext_resource type="Texture2D" path="res://assets/textures/horizon_smugglers_run.png" id="4_o1bwv"]
+[ext_resource type="Script" path="res://src/data/resources/level_data.gd" id="5_c1t0m"]
 
 [resource]
-script = ExtResource("1_script")
+script = ExtResource("5_c1t0m")
 level_id = 5
-level_name = "Level 5: Black Tide Abyss"
-target_distance = 280.0
-base_scroll_speed = 11.0
-river_width_world = 12.0
-biome_type = "black_tide_bayou"
-water_albedo = Color(0.02, 0.18, 0.12, 0.95)
-fog_color = Color(0.1, 0.25, 0.15, 1.0)
-fog_density = 0.015
-boss_scene = ExtResource("2_boss")
-boss_hp = 550
-wave_events = Array[Dictionary]([{
-"distance": 8.0,
-"type": "biogas_pod",
-"x": -0.4
-}, {
-"distance": 8.0,
-"type": "biogas_pod",
-"x": 0.4
-}, {
-"distance": 16.0,
-"hp": 16,
-"speed": 3.4,
-"type": "grave_skiffs",
-"x_positions": [0.0]
-}, {
-"distance": 26.0,
-"type": "biogas_pod",
-"x": -0.55
-}, {
-"distance": 26.0,
-"type": "biogas_pod",
-"x": 0.0
-}, {
-"distance": 26.0,
-"type": "biogas_pod",
-"x": 0.55
-}, {
-"distance": 36.0,
-"hp": 20,
-"speed": 7.2,
-"type": "tide_cutters",
-"x_positions": [-0.35]
-}, {
-"distance": 46.0,
-"text": "+2",
-"type": "fleet_gate",
-"value": 2,
-"x": 0.2
-}, {
-"distance": 56.0,
-"count": 7,
-"type": "coin_arc",
-"x_end": 0.4,
-"x_start": -0.4
-}, {
-"distance": 68.0,
-"hp": 18,
-"speed": 3.6,
-"type": "grave_skiffs",
-"x_positions": [-0.45, 0.45]
-}, {
-"distance": 80.0,
-"type": "biogas_pod",
-"x": -0.6
-}, {
-"distance": 80.0,
-"type": "biogas_pod",
-"x": 0.3
-}, {
-"distance": 92.0,
-"hp": 22,
-"speed": 7.4,
-"type": "tide_cutters",
-"x_positions": [0.45]
-}, {
-"distance": 104.0,
-"hp": 130,
-"speed": 1.4,
-"type": "mini_boss_harvester",
-"x": 0.0
-}, {
-"distance": 120.0,
-"count": 8,
-"type": "coin_arc",
-"x_end": 0.5,
-"x_start": -0.5
-}, {
-"distance": 132.0,
-"text": "+2",
-"type": "fleet_gate",
-"value": 2,
-"x": -0.3
-}, {
-"distance": 144.0,
-"hp": 18,
-"speed": 3.8,
-"type": "grave_skiffs",
-"x_positions": [-0.3, 0.3]
-}, {
-"distance": 156.0,
-"type": "biogas_pod",
-"x": -0.4
-}, {
-"distance": 156.0,
-"type": "biogas_pod",
-"x": 0.4
-}, {
-"distance": 168.0,
-"hp": 24,
-"speed": 7.6,
-"type": "tide_cutters",
-"x_positions": [-0.5, 0.5]
-}, {
-"distance": 182.0,
-"type": "biogas_pod",
-"x": -0.65
-}, {
-"distance": 182.0,
-"type": "biogas_pod",
-"x": 0.0
-}, {
-"distance": 182.0,
-"type": "biogas_pod",
-"x": 0.65
-}, {
-"distance": 196.0,
-"text": "+1",
-"type": "fleet_gate",
-"value": 1,
-"x": 0.0
-}, {
-"distance": 210.0,
-"hp": 20,
-"speed": 3.8,
-"type": "grave_skiffs",
-"x_positions": [-0.5, 0.0, 0.5]
-}, {
-"distance": 226.0,
-"count": 8,
-"type": "coin_arc",
-"x_end": 0.45,
-"x_start": -0.45
-}, {
-"distance": 240.0,
-"hp": 24,
-"speed": 7.8,
-"type": "tide_cutters",
-"x_positions": [0.0]
-}, {
-"distance": 254.0,
-"type": "biogas_pod",
-"x": -0.35
-}, {
-"distance": 254.0,
-"type": "biogas_pod",
-"x": 0.35
-}, {
-"distance": 266.0,
-"message": "THE PHANTOM DREDGE RISES FROM THE ABYSS!",
-"type": "warning"
-}, {
-"distance": 280.0,
-"type": "boss"
-}])
+level_title = "Level 5: Black Tide Abyss"
+biome_name = "bayou"
+base_scroll_speed = 9.0
+chunk_scenes = Array[PackedScene]([ExtResource("1_hep5a"), ExtResource("2_l3e7r"), ExtResource("1_hep5a"), ExtResource("2_l3e7r"), ExtResource("3_khw5c")])
+completion_doubloon_reward = 400
+horizon_texture = ExtResource("4_o1bwv")
+water_albedo = Color(0.06, 0.18, 0.14, 0.95)
+fog_color = Color(0.15, 0.25, 0.2, 1)
+fog_density = 0.02

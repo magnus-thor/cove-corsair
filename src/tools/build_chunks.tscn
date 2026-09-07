@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/tools/build_chunks.gd" id="1_builder"]
+
+[node name="BuildChunks" type="Node"]
+script = ExtResource("1_builder")

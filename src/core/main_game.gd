@@ -51,12 +51,14 @@ func _setup_harbor_mode() -> void:
 func _start_game_immediately() -> void:
 	GameState.is_game_active = true
 	GameState.set_performance_mode(true)
-	var track_mgr = get_tree().get_first_node_in_group("track_manager")
-	if track_mgr:
-		track_mgr.visible = true
 	var level_ctrl = get_tree().get_first_node_in_group("level_controller")
 	if level_ctrl:
 		level_ctrl.visible = true
+	var is_modular = level_ctrl and level_ctrl.chunk_assembler and level_ctrl.chunk_assembler.is_assembled
+	var track_mgr = get_tree().get_first_node_in_group("track_manager")
+	if track_mgr:
+		track_mgr.visible = not is_modular
+		track_mgr.set_physics_process(not is_modular)
 	var camera = get_tree().get_first_node_in_group("game_camera")
 	if camera and camera.has_method("set_harbor_mode"):
 		camera.set_harbor_mode(false)
@@ -92,13 +94,15 @@ func _on_game_started() -> void:
 		harbor_bay.transition_out(0.8)
 		
 	# 2. Make runner track and level obstacles visible & instantiated/ready
-	var track_mgr = get_tree().get_first_node_in_group("track_manager")
-	if track_mgr:
-		track_mgr.visible = true
-		
 	var level_ctrl = get_tree().get_first_node_in_group("level_controller")
 	if level_ctrl:
 		level_ctrl.visible = true
+
+	var is_modular = level_ctrl and level_ctrl.chunk_assembler and level_ctrl.chunk_assembler.is_assembled
+	var track_mgr = get_tree().get_first_node_in_group("track_manager")
+	if track_mgr:
+		track_mgr.visible = not is_modular
+		track_mgr.set_physics_process(not is_modular)
 
 	# 3. Transition gameplay camera once runner chunk is ready to render
 	var camera = get_tree().get_first_node_in_group("game_camera") as Camera3D

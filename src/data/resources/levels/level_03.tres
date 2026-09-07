@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="LevelData" format=3]
+
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_mine_gauntlet.tscn" id="1_t2my1"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_barricade_siege.tscn" id="2_73ytp"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_boss_siege_fortress.tscn" id="3_sjt10"]
+[ext_resource type="Texture2D" path="res://assets/textures/horizon_smugglers_run.png" id="4_frtbh"]
+[ext_resource type="Script" path="res://src/data/resources/level_data.gd" id="5_7sm5q"]
+
+[resource]
+script = ExtResource("5_7sm5q")
+level_id = 3
+level_title = "Level 3: Brimstone Bastion"
+biome_name = "brimstone"
+base_scroll_speed = 8.0
+chunk_scenes = Array[PackedScene]([ExtResource("1_t2my1"), ExtResource("2_73ytp"), ExtResource("1_t2my1"), ExtResource("2_73ytp"), ExtResource("3_sjt10")])
+completion_doubloon_reward = 350
+horizon_texture = ExtResource("4_frtbh")
+water_albedo = Color(0.35, 0.1, 0.08, 0.95)
+fog_color = Color(0.45, 0.18, 0.12, 1)
+fog_density = 0.02

@@ -8,7 +8,7 @@ extends Node3D
 # ──────────────────────────────────────────────────────────────────────────────
 
 @export var debug_level_override: int = 0
-@export var level_data: LevelData = preload("res://src/data/resources/levels/level_01_smugglers_run.tres")
+@export var level_data: LevelData = preload("res://src/data/resources/levels/level_01.tres")
 @export var spawn_z_ahead: float = -70.0
 
 # Prefabs
@@ -41,10 +41,12 @@ var bank_strips: Array[Node3D] = []          # legacy – kept for potential fut
 var riverbank_chunks: Array[Node3D] = []     # Layer 2 framing strips (new system)
 var _horizon_backdrop: Node3D = null         # Layer 1 horizon quad
 var is_boss_spawned: bool = false
+var chunk_assembler: ChunkAssembler = null
 
 func _ready() -> void:
 	add_to_group("level_controller")
 	_setup_boundary_walls()
+	_ensure_chunk_assembler()
 	
 	if debug_level_override > 0:
 		GameState.current_level = debug_level_override
@@ -53,6 +55,26 @@ func _ready() -> void:
 	var active_res = GameState.get_current_level_resource()
 	if active_res:
 		load_level_resource(active_res)
+
+func _ensure_chunk_assembler() -> void:
+	if not chunk_assembler:
+		chunk_assembler = get_node_or_null("ChunkAssembler") as ChunkAssembler
+		if not chunk_assembler:
+			chunk_assembler = ChunkAssembler.new()
+			chunk_assembler.name = "ChunkAssembler"
+			add_child(chunk_assembler)
+		if not chunk_assembler.boss_arena_reached.is_connected(_on_chunk_boss_arena_reached):
+			chunk_assembler.boss_arena_reached.connect(_on_chunk_boss_arena_reached)
+
+func _on_chunk_boss_arena_reached(boss_chunk: BaseTrackChunk) -> void:
+	is_boss_spawned = true
+	var boss = boss_chunk.find_child("*Boss*", true, false)
+	if not boss:
+		boss = get_tree().get_first_node_in_group("boss")
+	var camera = get_tree().get_first_node_in_group("game_camera")
+	if camera and camera.has_method("start_boss_focus") and boss:
+		camera.start_boss_focus(boss)
+	print("[LEVEL CONTROLLER] Locked camera to boss arena")
 
 func setup_active_queue() -> void:
 	active_queue = [] # Guarantee fresh untyped Array
@@ -81,30 +103,41 @@ func load_level_resource(res: LevelData) -> void:
 	is_boss_spawned = false
 	river_width_world = level_data.river_width_world
 	base_scroll_speed = level_data.base_scroll_speed
-	GameState.level_distance_target = level_data.target_distance if level_data.target_distance > 0.0 else level_data.total_distance
 	GameState.distance_traveled = 0.0
 	
-	# Clear only dynamically spawned obstacles/mobs/hazards from previous level previews
-	for child in get_children():
-		if child is Node3D and (child.is_in_group("destructible") or child.is_in_group("hazards") or child.is_in_group("enemies") or child.is_in_group("collectibles") or child.is_in_group("multiplier_gate")):
-			child.queue_free()
-			
-	setup_active_queue()
-	
-	var track_mgr = get_tree().get_first_node_in_group("track_manager")
-	if track_mgr:
-		track_mgr.scroll_speed = base_scroll_speed
-		if "current_level_data" in track_mgr:
-			track_mgr.current_level_data["is_scripted"] = true
-		if track_mgr.has_method("clear_all_segment_obstacles"):
-			track_mgr.clear_all_segment_obstacles()
-			
 	var hud = get_tree().get_first_node_in_group("top_hud")
-	if hud and "level_title" in hud:
-		hud.level_title.text = level_data.level_name
+	if hud and "level_title" in hud and hud.level_title:
+		hud.level_title.text = level_data.level_title
 		
+	# If this level contains chunk_scenes, hand off to ChunkAssembler
+	if not level_data.chunk_scenes.is_empty():
+		var track_mgr = get_tree().get_first_node_in_group("track_manager")
+		if track_mgr:
+			track_mgr.visible = false
+			track_mgr.set_physics_process(false)
+			
+		_ensure_chunk_assembler()
+		chunk_assembler.assemble_level(level_data)
+	else:
+		GameState.level_distance_target = 250.0
+		# Clear only dynamically spawned obstacles/mobs/hazards from previous level previews
+		for child in get_children():
+			if child is Node3D and (child.is_in_group("destructible") or child.is_in_group("hazards") or child.is_in_group("enemies") or child.is_in_group("collectibles") or child.is_in_group("multiplier_gate")):
+				child.queue_free()
+		setup_active_queue()
+		
+		var track_mgr = get_tree().get_first_node_in_group("track_manager")
+		if track_mgr:
+			track_mgr.visible = true
+			track_mgr.set_physics_process(true)
+			track_mgr.scroll_speed = base_scroll_speed
+			if "current_level_data" in track_mgr:
+				track_mgr.current_level_data["is_scripted"] = true
+			if track_mgr.has_method("clear_all_segment_obstacles"):
+				track_mgr.clear_all_segment_obstacles()
+			
 	if level_data:
-		var biome_name: String = level_data.biome_type if "biome_type" in level_data else "smugglers_run"
+		var biome_name: String = level_data.biome_name if "biome_name" in level_data else "tropical"
 
 		# ── Layer 1: Horizon Backdrop ────────────────────────────────────────
 		if not _horizon_backdrop:
@@ -156,6 +189,9 @@ func _apply_biome_visuals() -> void:
 		env.environment.fog_density = level_data.fog_density
 		env.environment.fog_sky_affect = 0.45 if level_data.fog_density > 0.0 else 0.0
 		
+	if chunk_assembler:
+		chunk_assembler.update_water_color(level_data.water_albedo)
+		
 	# Apply water shader color across track segments
 	var track_mgr = get_tree().get_first_node_in_group("track_manager")
 	if track_mgr and "active_segments" in track_mgr:
@@ -175,12 +211,21 @@ func _physics_process(delta: float) -> void:
 	if not GameState.is_game_active:
 		return
 		
+	if chunk_assembler and chunk_assembler.is_assembled:
+		# Modular chunk system handles track scrolling, entities, and progress.
+		# Only wrap Layer-2 riverbank framing chunks if present
+		for chunk in riverbank_chunks:
+			if is_instance_valid(chunk) and chunk.global_position.z > 40.0:
+				chunk.global_position.z -= 160.0
+		return
+	# ──────────────────────────────────────────────────────────────────────────
+
 	var track_mgr = get_tree().get_first_node_in_group("track_manager")
 	var speed = base_scroll_speed
 	if track_mgr and "scroll_speed" in track_mgr:
 		speed = track_mgr.scroll_speed
 
-	var max_dist = level_data.total_distance if level_data else 250.0
+	var max_dist = 250.0
 
 	# ── Boss-Arena Trigger ───────────────────────────────────────────
 	if not is_boss_spawned and current_distance >= max_dist:
@@ -191,7 +236,6 @@ func _physics_process(delta: float) -> void:
 		active_queue.clear()           # Ensure nothing fires after boss spawn
 		_spawn_boss()
 		return
-	# ──────────────────────────────────────────────────────────────────────────
 
 	# Accumulate distance only while pre-boss and not yet halted
 	if not GameState.boss_spawned:
@@ -239,7 +283,7 @@ func normalized_to_world_x(norm_x: float) -> float:
 func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> void:
 	var target_z = spawn_z_ahead if z_pos_override == 0.0 else z_pos_override
 	var z_spawn = minf(target_z, -45.0) # Ensure at least 45m distance from player vessel
-	var is_brimstone: bool = level_data != null and (level_data.biome_type == "brimstone_bastion" or level_data.level_id == 3)
+	var is_brimstone: bool = level_data != null and (level_data.biome_name == "brimstone" or level_data.level_id == 3)
 	
 	match event.entity_type:
 		SpawnEvent.EntityType.BARREL:
@@ -773,7 +817,7 @@ func _spawn_boss() -> void:
 		else:
 			add_child(boss)
 		boss.global_position = Vector3(0.0, 0.0, player_z - 18.0)
-		print("[BOSS] Spawned boss for ", level_data.level_name if level_data else "Level", " with HP: ", str(level_data.boss_hp) if (level_data and "boss_hp" in level_data) else "default")
+		print("[BOSS] Spawned boss for ", level_data.level_title if level_data else "Level", " with HP: ", str(level_data.boss_hp) if (level_data and "boss_hp" in level_data) else "default")
 
 		# Lock camera to boss arena
 		var camera = get_tree().get_first_node_in_group("game_camera")
