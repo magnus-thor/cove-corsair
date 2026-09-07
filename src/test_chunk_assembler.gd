@@ -156,3 +156,4 @@ func test_boss_chunks_wiring() -> void:
 	assert(b3 != null, "Siege Fortress boss must be spawned in chunk")
 	c3.free()
 	print("[PASS] Level 3 Boss (Brimstone Siege Fortress) correctly wired.")
+	get_tree().quit(0)

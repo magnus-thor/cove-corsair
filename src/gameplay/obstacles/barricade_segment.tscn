@@ -16,7 +16,7 @@ radial_segments = 8
 [sub_resource type="BoxShape3D" id="BoxShape3D_log"]
 size = Vector3(2.3, 0.45, 0.45)
 
-[node name="BarricadeSegment" type="Area3D" groups=["destructible"]]
+[node name="BarricadeSegment" type="Area3D" groups=["barricade", "destructible"]]
 script = ExtResource("1_script")
 
 [node name="LogMesh" type="MeshInstance3D" parent="."]

@@ -12,6 +12,7 @@
 [ext_resource type="Script" path="res://src/gameplay/obstacles/destructible_barrel.gd" id="10_mxap3"]
 [ext_resource type="PackedScene" path="res://src/gameplay/obstacles/multiplier_gate.tscn" id="11_h1ubg"]
 [ext_resource type="Script" path="res://src/gameplay/obstacles/multiplier_gate.gd" id="12_p20ko"]
+[ext_resource type="Resource" path="res://src/data/resources/enemy_vessels/turtle_raft.tres" id="13_turtle"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lcaak"]
 resource_name = "colormap"
@@ -131,14 +132,16 @@ mesh = SubResource("ArrayMesh_2bo03")
 [node name="EnemyMob" type="Area3D" parent="Entities" unique_id=12027143 groups=["destructible", "enemies"] instance=ExtResource("5_41l2j")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -12)
 script = ExtResource("6_heufw")
-max_hp = 6
-current_hp = 6
-forward_speed = 1.6
+enemy_data = ExtResource("13_turtle")
+max_hp = 30
+current_hp = 30
+forward_speed = 1.5
 doubloons_drop = 4
 
 [node name="BarricadeWall" type="Node3D" parent="Entities" unique_id=189151967 instance=ExtResource("7_3txa0")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -22)
 script = ExtResource("8_0h1at")
+hp = 20
 
 [node name="DestructibleBarrel" type="Area3D" parent="Entities" unique_id=212223384 groups=["destructible"] instance=ExtResource("9_4kp4g")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, -30)

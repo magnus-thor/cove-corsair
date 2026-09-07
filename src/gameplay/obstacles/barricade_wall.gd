@@ -3,7 +3,7 @@ extends Node3D
 
 @export var segment_prefab: PackedScene = preload("res://src/gameplay/obstacles/barricade_segment.tscn")
 @export var x_points: Array = [-0.8, -0.4, 0.0, 0.4, 0.8]
-@export var hp: int = 2
+@export var hp: int = 20
 @export var hp_values: Array = []
 
 func _ready() -> void:

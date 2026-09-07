@@ -93,6 +93,7 @@ var score: int = 0
 var doubloons: int = 0
 var is_game_over: bool = false
 var float_time: float = 0.0
+var hit_invulnerability_timer: float = 0.0
 
 @export var is_shooting_enabled: bool = false
 @export var end_game_ui_scene: PackedScene = preload("res://src/ui/end_game_ui.tscn")
@@ -355,6 +356,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		target_x = clamp(target_x, -half_width, half_width)
 
 func _physics_process(delta: float) -> void:
+	if hit_invulnerability_timer > 0.0:
+		hit_invulnerability_timer = maxf(0.0, hit_invulnerability_timer - delta)
+
 	if is_game_over:
 		return
 		
@@ -498,6 +502,24 @@ func _on_area_entered(area: Area3D) -> void:
 		return
 		
 	if area.is_in_group("destructible") or area.is_in_group("enemies") or area.is_in_group("boss"):
+		var is_barricade = area is BarricadeSegment or area.is_in_group("barricade") or (area.get_parent() and area.get_parent().is_in_group("barricade"))
+		
+		if is_barricade:
+			if hit_invulnerability_timer > 0.0:
+				# Collision damage already applied this burst; damage barricade segment without re-damaging hull
+				if area.has_method("take_damage"):
+					area.take_damage(5)
+				return
+			
+			hit_invulnerability_timer = 0.5
+			AudioManager.play_sfx("barrel_hits")
+			take_hit(3, "Collision with Barricade")
+			if area.has_method("take_damage"):
+				area.take_damage(5)
+			elif area.has_method("die"):
+				area.die()
+			return
+
 		AudioManager.play_sfx("barrel_hits")
 		take_hit(1, "Collision with %s (%s)" % [area.name, str(area.get_groups())])
 			

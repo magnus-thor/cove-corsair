@@ -139,9 +139,15 @@ const LEVEL_RESOURCES: Dictionary = {
 	1: "res://src/data/resources/levels/level_01.tres",
 	2: "res://src/data/resources/levels/level_02.tres",
 	3: "res://src/data/resources/levels/level_03.tres",
-	4: "res://src/data/resources/levels/level_04_smugglers_nightmare.tres",
-	5: "res://src/data/resources/levels/level_05_black_tide_abyss.tres",
-	6: "res://src/data/resources/levels/level_06_brimstone_inferno.tres"
+	4: "res://src/data/resources/levels/level_04.tres",
+	5: "res://src/data/resources/levels/level_05.tres",
+	6: "res://src/data/resources/levels/level_06.tres",
+	7: "res://src/data/resources/levels/level_07.tres",
+	8: "res://src/data/resources/levels/level_08.tres",
+	9: "res://src/data/resources/levels/level_09.tres",
+	10: "res://src/data/resources/levels/level_10.tres",
+	11: "res://src/data/resources/levels/level_11.tres",
+	12: "res://src/data/resources/levels/level_12.tres"
 }
 
 const LEVEL_SHIPS: Dictionary = {
@@ -150,7 +156,13 @@ const LEVEL_SHIPS: Dictionary = {
 	3: "res://src/data/resources/user_vessels/ironclad_ship.tres",
 	4: "res://src/data/resources/user_vessels/dinghy_ship.tres",
 	5: "res://src/data/resources/user_vessels/sloop_ship.tres",
-	6: "res://src/data/resources/user_vessels/ironclad_ship.tres"
+	6: "res://src/data/resources/user_vessels/ironclad_ship.tres",
+	7: "res://src/data/resources/user_vessels/dinghy_ship.tres",
+	8: "res://src/data/resources/user_vessels/sloop_ship.tres",
+	9: "res://src/data/resources/user_vessels/ironclad_ship.tres",
+	10: "res://src/data/resources/user_vessels/dinghy_ship.tres",
+	11: "res://src/data/resources/user_vessels/sloop_ship.tres",
+	12: "res://src/data/resources/user_vessels/ironclad_ship.tres"
 }
 
 func _ready() -> void:

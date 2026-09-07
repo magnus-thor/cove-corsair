@@ -41,24 +41,24 @@ const MILESTONES: Dictionary = {
 	1: {
 		"name": "SMUGGLER'S RUN",
 		"biome": "Tropical Reef",
-		"target_dist": 250,
-		"pos": Vector2(360, 1920),
-		"is_boss": false,
-		"boss_name": ""
+		"target_dist": 200,
+		"pos": Vector2(360, 3800),
+		"is_boss": true,
+		"boss_name": "Captain Ironjaw"
 	},
 	2: {
 		"name": "BLACK TIDE BAYOU",
 		"biome": "Murky Bayou",
-		"target_dist": 300,
-		"pos": Vector2(520, 1600),
-		"is_boss": false,
-		"boss_name": ""
+		"target_dist": 200,
+		"pos": Vector2(520, 3500),
+		"is_boss": true,
+		"boss_name": "The Phantom Dredge"
 	},
 	3: {
 		"name": "BRIMSTONE BASTION",
 		"biome": "Volcanic Bastion",
-		"target_dist": 350,
-		"pos": Vector2(200, 1280),
+		"target_dist": 200,
+		"pos": Vector2(200, 3200),
 		"is_boss": true,
 		"boss_name": "The Siege Fortress"
 	},
@@ -66,23 +66,71 @@ const MILESTONES: Dictionary = {
 		"name": "SMUGGLER'S NIGHTMARE",
 		"biome": "Stormy Coast",
 		"target_dist": 300,
-		"pos": Vector2(520, 960),
-		"is_boss": false,
-		"boss_name": ""
+		"pos": Vector2(520, 2900),
+		"is_boss": true,
+		"boss_name": "Captain Ironjaw (Enraged)"
 	},
 	5: {
 		"name": "BLACK TIDE ABYSS",
 		"biome": "Abyssal Mire",
-		"target_dist": 350,
-		"pos": Vector2(200, 640),
-		"is_boss": false,
-		"boss_name": ""
+		"target_dist": 300,
+		"pos": Vector2(200, 2600),
+		"is_boss": true,
+		"boss_name": "The Phantom Dredge"
 	},
 	6: {
 		"name": "BRIMSTONE INFERNO",
 		"biome": "Lava Caldera",
+		"target_dist": 300,
+		"pos": Vector2(360, 2300),
+		"is_boss": true,
+		"boss_name": "The Siege Fortress"
+	},
+	7: {
+		"name": "CORAL CATACLYSM",
+		"biome": "Tropical Atoll",
+		"target_dist": 350,
+		"pos": Vector2(520, 2000),
+		"is_boss": false,
+		"boss_name": ""
+	},
+	8: {
+		"name": "SERPENT'S MIRE",
+		"biome": "Deep Bayou",
+		"target_dist": 350,
+		"pos": Vector2(200, 1700),
+		"is_boss": false,
+		"boss_name": ""
+	},
+	9: {
+		"name": "ASHEN STRAITS",
+		"biome": "Volcanic Straits",
+		"target_dist": 350,
+		"pos": Vector2(520, 1400),
+		"is_boss": false,
+		"boss_name": ""
+	},
+	10: {
+		"name": "SKULL REEF PASS",
+		"biome": "Outer Reefs",
 		"target_dist": 400,
-		"pos": Vector2(360, 320),
+		"pos": Vector2(200, 1100),
+		"is_boss": false,
+		"boss_name": ""
+	},
+	11: {
+		"name": "DREADWATER GORGE",
+		"biome": "Dread Bayou",
+		"target_dist": 400,
+		"pos": Vector2(520, 800),
+		"is_boss": false,
+		"boss_name": ""
+	},
+	12: {
+		"name": "BONEBEARD'S LAIR",
+		"biome": "Infernal Caldera",
+		"target_dist": 400,
+		"pos": Vector2(360, 500),
 		"is_boss": true,
 		"boss_name": "Captain Bone-Beard"
 	}
@@ -102,25 +150,41 @@ func _ready() -> void:
 	_setup_mini_vessel()
 	_setup_popup()
 	
+	# Automatically anchor scroll position to current active level node on launch
+	var start_lvl = clamp(GameState.current_selected_level, 1, 12)
+	_focus_on_level(start_lvl, false)
+	
 	call_deferred("_handle_initial_presentation")
 
 func _setup_river_spline() -> void:
 	river_curve.clear_points()
-	# Define serpentine river control points from bottom (harbor) to top (caldera)
+	# Define serpentine river control points through all 12 milestone nodes from harbor to peak
 	var points: Array[Vector2] = [
-		Vector2(360, 2140), # Harbor start
-		Vector2(360, 1920), # Node 1 (Smuggler's Run)
-		Vector2(460, 1760), # Turn 1
-		Vector2(520, 1600), # Node 2 (Black Tide Bayou)
-		Vector2(380, 1440), # Turn 2
-		Vector2(200, 1280), # Node 3 (Brimstone Bastion - Boss)
-		Vector2(380, 1120), # Turn 3
-		Vector2(520, 960),  # Node 4 (Smuggler's Nightmare)
-		Vector2(380, 800),  # Turn 4
-		Vector2(200, 640),  # Node 5 (Black Tide Abyss)
-		Vector2(280, 480),  # Turn 5
-		Vector2(360, 320),  # Node 6 (Brimstone Inferno - Final Boss)
-		Vector2(360, 100)   # Final anchorage peak
+		Vector2(360, 4050), # Harbor start
+		Vector2(360, 3800), # Node 1 (Smuggler's Run)
+		Vector2(460, 3650), # Turn 1
+		Vector2(520, 3500), # Node 2 (Black Tide Bayou)
+		Vector2(380, 3350), # Turn 2
+		Vector2(200, 3200), # Node 3 (Brimstone Bastion)
+		Vector2(380, 3050), # Turn 3
+		Vector2(520, 2900), # Node 4 (Smuggler's Nightmare)
+		Vector2(380, 2750), # Turn 4
+		Vector2(200, 2600), # Node 5 (Black Tide Abyss)
+		Vector2(280, 2450), # Turn 5
+		Vector2(360, 2300), # Node 6 (Brimstone Inferno)
+		Vector2(460, 2150), # Turn 6
+		Vector2(520, 2000), # Node 7 (Coral Cataclysm)
+		Vector2(380, 1850), # Turn 7
+		Vector2(200, 1700), # Node 8 (Serpent's Mire)
+		Vector2(380, 1550), # Turn 8
+		Vector2(520, 1400), # Node 9 (Ashen Straits)
+		Vector2(380, 1250), # Turn 9
+		Vector2(200, 1100), # Node 10 (Skull Reef Pass)
+		Vector2(380, 950),  # Turn 10
+		Vector2(520, 800),  # Node 11 (Dreadwater Gorge)
+		Vector2(440, 650),  # Turn 11
+		Vector2(360, 500),  # Node 12 (Bonebeard's Lair - Final Boss)
+		Vector2(360, 200)   # Final anchorage peak
 	]
 	
 	for i in range(points.size()):
@@ -151,26 +215,32 @@ func _setup_river_path_draw() -> void:
 		river_path_layer.draw.connect(_on_river_path_draw)
 
 func _on_terrain_draw() -> void:
-	var canvas_rect = Rect2(Vector2.ZERO, Vector2(720, 2200))
+	var canvas_rect = Rect2(Vector2.ZERO, Vector2(720, 4200))
 	# Lush vintage pirate chart background
 	terrain_layer.draw_rect(canvas_rect, Color(0.93, 0.88, 0.77, 1.0), true)
 	
 	# Decorative map grid & nautical borders
 	var line_color = Color(0.82, 0.75, 0.62, 0.45)
-	for y in range(100, 2180, 160):
+	for y in range(100, 4180, 160):
 		terrain_layer.draw_line(Vector2(40, y), Vector2(680, y), line_color, 1.5)
 	for x in range(120, 680, 120):
-		terrain_layer.draw_line(Vector2(x, 60), Vector2(x, 2140), line_color, 1.5)
+		terrain_layer.draw_line(Vector2(x, 60), Vector2(x, 4140), line_color, 1.5)
 		
-	# Biome background tint zones
-	# Bottom (Tropical Reef): Cyan parchment wash
-	terrain_layer.draw_rect(Rect2(0, 1650, 720, 550), Color(0.2, 0.65, 0.7, 0.10), true)
-	# Middle-low (Murky Bayou & Bastion): Mossy wash
-	terrain_layer.draw_rect(Rect2(0, 1050, 720, 600), Color(0.3, 0.5, 0.35, 0.08), true)
-	# Middle-high (Stormy Coast & Abyss): Ocean slate wash
-	terrain_layer.draw_rect(Rect2(0, 500, 720, 550), Color(0.2, 0.3, 0.45, 0.09), true)
-	# Top (Volcanic Caldera): Crimson ash wash
-	terrain_layer.draw_rect(Rect2(0, 0, 720, 500), Color(0.7, 0.25, 0.15, 0.12), true)
+	# Biome background tint zones (bottom to top across 4200px)
+	# Bottom (Tropical Reef L1): Cyan parchment wash
+	terrain_layer.draw_rect(Rect2(0, 3600, 720, 600), Color(0.2, 0.65, 0.7, 0.10), true)
+	# Bayou & Bastion (L2-L3): Mossy wash
+	terrain_layer.draw_rect(Rect2(0, 3000, 720, 600), Color(0.3, 0.5, 0.35, 0.08), true)
+	# Stormy Coast & Abyss (L4-L5): Ocean slate wash
+	terrain_layer.draw_rect(Rect2(0, 2400, 720, 600), Color(0.2, 0.3, 0.45, 0.09), true)
+	# Brimstone & Coral (L6-L7): Volcanic ash wash
+	terrain_layer.draw_rect(Rect2(0, 1800, 720, 600), Color(0.7, 0.25, 0.15, 0.12), true)
+	# Serpent Mire & Ashen Straits (L8-L9): Murky brimstone wash
+	terrain_layer.draw_rect(Rect2(0, 1200, 720, 600), Color(0.3, 0.45, 0.3, 0.10), true)
+	# Outer Reef & Dreadwater (L10-L11): Deep slate wash
+	terrain_layer.draw_rect(Rect2(0, 600, 720, 600), Color(0.2, 0.35, 0.5, 0.10), true)
+	# Caldera Peak (L12 Bonebeard): Burning caldera crimson wash
+	terrain_layer.draw_rect(Rect2(0, 0, 720, 600), Color(0.75, 0.2, 0.1, 0.14), true)
 
 func _on_river_path_draw() -> void:
 	var baked = river_curve.get_baked_points()
@@ -438,7 +508,7 @@ func _get_node_dock_pos(lvl: int) -> Vector2:
 	if MILESTONES.has(lvl):
 		# Position miniature vessel slightly offset near the milestone node
 		return MILESTONES[lvl]["pos"] + Vector2(75, 45)
-	return Vector2(360, 1920)
+	return Vector2(360, 3800)
 
 func _focus_on_level(lvl: int, animate: bool = true, duration: float = 0.8) -> void:
 	if not scroll_container or not MILESTONES.has(lvl):
@@ -448,7 +518,8 @@ func _focus_on_level(lvl: int, animate: bool = true, duration: float = 0.8) -> v
 	var viewport_h = scroll_container.size.y
 	if viewport_h <= 0:
 		viewport_h = 1000.0
-	var target_scroll = clamp(int(node_y - viewport_h * 0.5), 0, int(2200 - viewport_h))
+	var canvas_h = map_canvas.custom_minimum_size.y if map_canvas else 4200.0
+	var target_scroll = clamp(int(node_y - viewport_h * 0.5), 0, int(canvas_h - viewport_h))
 	
 	if animate:
 		var st = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
@@ -458,8 +529,8 @@ func _focus_on_level(lvl: int, animate: bool = true, duration: float = 0.8) -> v
 
 func _play_advancement_sequence() -> void:
 	is_animating_travel = true
-	var from_lvl = clamp(GameState.last_cleared_level, 1, 6)
-	var to_lvl = clamp(GameState.highest_unlocked_level, 1, 6)
+	var from_lvl = clamp(GameState.last_cleared_level, 1, 12)
+	var to_lvl = clamp(GameState.highest_unlocked_level, 1, 12)
 	
 	if from_lvl == to_lvl and to_lvl > 1:
 		from_lvl = to_lvl - 1

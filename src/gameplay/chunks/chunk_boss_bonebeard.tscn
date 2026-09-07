@@ -1,0 +1,38 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://src/gameplay/chunks/base_track_chunk.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://src/gameplay/enemies/boss_bone_beard.tscn" id="2_boss"]
+[ext_resource type="PackedScene" path="res://assets/models/rocks-a.glb" id="3_rocks"]
+[ext_resource type="PackedScene" path="res://src/gameplay/obstacles/destructible_barrel.tscn" id="4_barrel"]
+[ext_resource type="Script" path="res://src/gameplay/obstacles/destructible_barrel.gd" id="5_barrel_script"]
+
+[node name="BossBonebeard" type="Node3D"]
+script = ExtResource("1_script")
+chunk_id = "boss_bonebeard"
+is_boss_chunk = true
+boss_scene = ExtResource("2_boss")
+
+[node name="ChunkStart" type="Marker3D" parent="."]
+
+[node name="ChunkEnd" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -50)
+
+[node name="Banks" type="Node3D" parent="."]
+
+[node name="RocksLeft" type="Node3D" parent="Banks" instance=ExtResource("3_rocks")]
+transform = Transform3D(1.732, 0, 1, 0, 1.5, 0, -1, 0, 1.732, -9.5, 0, -12)
+
+[node name="RocksRight" type="Node3D" parent="Banks" instance=ExtResource("3_rocks")]
+transform = Transform3D(1.732, 0, -1, 0, 1.5, 0, 1, 0, 1.732, 9.5, 0, -12)
+
+[node name="Entities" type="Node3D" parent="."]
+
+[node name="DestructibleBarrelLeft" type="Area3D" parent="Entities" groups=["destructible"] instance=ExtResource("4_barrel")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.8, 0.05, -6)
+script = ExtResource("5_barrel_script")
+obstacle_type = 2
+
+[node name="DestructibleBarrelRight" type="Area3D" parent="Entities" groups=["destructible"] instance=ExtResource("4_barrel")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.8, 0.05, -6)
+script = ExtResource("5_barrel_script")
+obstacle_type = 2

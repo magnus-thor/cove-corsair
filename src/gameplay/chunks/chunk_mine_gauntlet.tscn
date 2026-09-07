@@ -128,75 +128,55 @@ mesh = SubResource("ArrayMesh_reysl")
 
 [node name="Entities" type="Node3D" parent="." unique_id=1617667661]
 
-[node name="HazardSeaMine" type="Area3D" parent="Entities" unique_id=1455072694 groups=["destructible"] instance=ExtResource("5_8bbi5")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0, -12)
+[node name="MineGate1_Left" type="Area3D" parent="Entities" unique_id=1455072694 groups=["destructible"] instance=ExtResource("5_8bbi5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.45, 0, -12)
 script = ExtResource("6_scdm7")
 
-[node name="@Area3D@12" type="Area3D" parent="Entities" unique_id=494774630 groups=["destructible"] instance=ExtResource("5_8bbi5")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, -18)
+[node name="MineGate1_Right" type="Area3D" parent="Entities" unique_id=494774630 groups=["destructible"] instance=ExtResource("5_8bbi5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15, 0, -12)
 script = ExtResource("6_scdm7")
 
-[node name="CollectibleDoubloon" type="Area3D" parent="Entities" unique_id=1935115361 groups=["collectibles", "doubloons"] instance=ExtResource("7_v2x2o")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0.13, -12)
+[node name="Doubloon1" type="Area3D" parent="Entities" unique_id=1935115361 groups=["collectibles", "doubloons"] instance=ExtResource("7_v2x2o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 0.13, -12)
 collision_layer = 8
 script = ExtResource("8_ngubn")
 
-[node name="@Area3D@13" type="Area3D" parent="Entities" unique_id=57330670 groups=["collectibles", "doubloons"] instance=ExtResource("7_v2x2o")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.75, 0.13, -14)
-collision_layer = 8
-script = ExtResource("8_ngubn")
-
-[node name="@Area3D@14" type="Area3D" parent="Entities" unique_id=1574374619 groups=["collectibles", "doubloons"] instance=ExtResource("7_v2x2o")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.13, -16)
-collision_layer = 8
-script = ExtResource("8_ngubn")
-
-[node name="@Area3D@15" type="Area3D" parent="Entities" unique_id=1295245498 groups=["collectibles", "doubloons"] instance=ExtResource("7_v2x2o")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, 0.13, -18)
-collision_layer = 8
-script = ExtResource("8_ngubn")
-
-[node name="@Area3D@16" type="Area3D" parent="Entities" unique_id=829208659 groups=["collectibles", "doubloons"] instance=ExtResource("7_v2x2o")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0.13, -20)
-collision_layer = 8
-script = ExtResource("8_ngubn")
-
-[node name="DestructibleBarrel" type="Area3D" parent="Entities" unique_id=1520071954 groups=["destructible"] instance=ExtResource("9_3v6uw")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2, 0.05, -26)
-script = ExtResource("10_i1ga4")
-hp = 2
-obstacle_type = 1
-
-[node name="@Area3D@17" type="Area3D" parent="Entities" unique_id=1157332215 groups=["destructible"] instance=ExtResource("9_3v6uw")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, 0.05, -26)
-script = ExtResource("10_i1ga4")
-hp = 2
-obstacle_type = 1
-
-[node name="EnemyMob" type="Area3D" parent="Entities" unique_id=2100312031 groups=["destructible", "enemies"] instance=ExtResource("11_kcm6y")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -31)
-script = ExtResource("12_0k44h")
-max_hp = 4
-current_hp = 4
-forward_speed = 0.0
-doubloons_drop = 3
-
-[node name="@Area3D@18" type="Area3D" parent="Entities" unique_id=1596979201 groups=["destructible"] instance=ExtResource("5_8bbi5")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -38)
+[node name="MineGate2_Left" type="Area3D" parent="Entities" unique_id=1596979201 groups=["destructible"] instance=ExtResource("5_8bbi5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.65, 0, -24)
 script = ExtResource("6_scdm7")
 
-[node name="@Area3D@19" type="Area3D" parent="Entities" unique_id=1677469573 groups=["collectibles", "doubloons"] instance=ExtResource("7_v2x2o")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0.13, -38)
+[node name="MineGate2_Right" type="Area3D" parent="Entities" unique_id=1596979202 groups=["destructible"] instance=ExtResource("5_8bbi5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.65, 0, -24)
+script = ExtResource("6_scdm7")
+
+[node name="Doubloon2" type="Area3D" parent="Entities" unique_id=57330670 groups=["collectibles", "doubloons"] instance=ExtResource("7_v2x2o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.13, -24)
 collision_layer = 8
 script = ExtResource("8_ngubn")
 
-[node name="@Area3D@20" type="Area3D" parent="Entities" unique_id=1816231775 groups=["collectibles", "doubloons"] instance=ExtResource("7_v2x2o")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.13, -38)
+[node name="MineGate3_Left" type="Area3D" parent="Entities" unique_id=1596979203 groups=["destructible"] instance=ExtResource("5_8bbi5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, 0, -36)
+script = ExtResource("6_scdm7")
+
+[node name="MineGate3_Right" type="Area3D" parent="Entities" unique_id=1596979204 groups=["destructible"] instance=ExtResource("5_8bbi5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.45, 0, -36)
+script = ExtResource("6_scdm7")
+
+[node name="Doubloon3" type="Area3D" parent="Entities" unique_id=1574374619 groups=["collectibles", "doubloons"] instance=ExtResource("7_v2x2o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 0.13, -36)
 collision_layer = 8
 script = ExtResource("8_ngubn")
 
-[node name="@Area3D@21" type="Area3D" parent="Entities" unique_id=1119737104 groups=["destructible"] instance=ExtResource("9_3v6uw")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, -45)
-script = ExtResource("10_i1ga4")
-hp = 2
-obstacle_type = 2
+[node name="MineGate4_Left" type="Area3D" parent="Entities" unique_id=1596979205 groups=["destructible"] instance=ExtResource("5_8bbi5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.65, 0, -46)
+script = ExtResource("6_scdm7")
+
+[node name="MineGate4_Right" type="Area3D" parent="Entities" unique_id=1596979206 groups=["destructible"] instance=ExtResource("5_8bbi5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.65, 0, -46)
+script = ExtResource("6_scdm7")
+
+[node name="Doubloon4" type="Area3D" parent="Entities" unique_id=1295245498 groups=["collectibles", "doubloons"] instance=ExtResource("7_v2x2o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.13, -46)
+collision_layer = 8
+script = ExtResource("8_ngubn")
+

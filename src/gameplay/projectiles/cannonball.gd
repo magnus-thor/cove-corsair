@@ -362,7 +362,8 @@ func _spawn_splash(at_water_level: bool = false) -> void:
 		splash.global_position = splash_pos
 
 func _apply_splash_damage() -> void:
-	var radius = 2.5 * splash_radius_multiplier
+	var base_radius = ammo_data.splash_radius if (ammo_data and ammo_data.splash_radius > 0.0) else 2.5
+	var radius = base_radius * splash_radius_multiplier
 	var targets: Array[Node] = []
 	targets.append_array(get_tree().get_nodes_in_group("destructible"))
 	targets.append_array(get_tree().get_nodes_in_group("enemies"))

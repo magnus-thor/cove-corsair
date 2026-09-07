@@ -6,6 +6,9 @@ var hp_label: Label3D
 func _ready() -> void:
 	doubloons_drop = 1
 	add_to_group("destructible")
+	add_to_group("barricade")
+	if hp <= 1:
+		hp = 20
 	
 	# Hide the default Sprite3D if it exists, as we will use a 3D log mesh
 	var default_sprite = get_node_or_null("ObstacleSprite")
