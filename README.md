@@ -194,6 +194,7 @@ godot --headless --export-release "Android" coveCorsair.apk
 * 🐒 **Deck Crew & Weapon Mounts Specification:** [`documents/crew.md`](file:///f:/projects/cove-corsair/documents/crew.md)
 * 💣 **Ammunition & Projectile Specification:** [`documents/ammo.md`](file:///f:/projects/cove-corsair/documents/ammo.md)
 * 🛢️ **Lane Objects, Hazards & Gates Specification:** [`documents/lane_objects.md`](file:///f:/projects/cove-corsair/documents/lane_objects.md)
+* 🎨 **3D Asset & Environmental Catalog:** [`documents/assets_3d_manifest.md`](file:///f:/projects/cove-corsair/documents/assets_3d_manifest.md)
 * 🗺️ **Level Systems Overview Index:** [`documents/levels/README.md`](file:///f:/projects/cove-corsair/documents/levels/README.md)
   * 📜 **Level 1 Setup Specification:** [`documents/levels/level_01_smugglers_run.md`](file:///f:/projects/cove-corsair/documents/levels/level_01_smugglers_run.md)
   * 📜 **Level 2 Setup Specification:** [`documents/levels/level_02_black_tide_bayou.md`](file:///f:/projects/cove-corsair/documents/levels/level_02_black_tide_bayou.md)
