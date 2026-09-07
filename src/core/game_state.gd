@@ -16,6 +16,7 @@ signal boss_spawned_event(boss_name: String, max_val: int)
 @warning_ignore("unused_signal")
 signal boss_health_changed(current: int, max_val: int)
 signal active_vessel_changed(vessel_id: String)
+signal run_failed(coins_collected: int, distance_reached: float)
 
 const SAVE_PATH: String = "user://cove_corsair_save.json"
 
@@ -52,6 +53,7 @@ var sfx_muted: bool = false
 
 # In-Run Transient State
 var run_doubloons: int = 0
+var run_doubloons_banked: bool = false
 var targets_destroyed: int = 0
 var hits_taken: int = 0
 var mobs_leaked: int = 0
@@ -277,11 +279,35 @@ func equip_vessel(vessel_id: String) -> bool:
 func set_active_vessel(vessel_id: String) -> bool:
 	return equip_vessel(vessel_id)
 
+func can_afford_active_vessel_upgrade() -> bool:
+	var cur_tier = get_vessel_tier(active_vessel)
+	if cur_tier >= 3:
+		return false
+	var next_tier = cur_tier + 1
+	var cost = get_upgrade_cost(active_vessel, next_tier)
+	return cost > 0 and doubloons >= cost
+
 func add_doubloons(amount: int) -> void:
-	doubloons += amount
+	if is_game_active:
+		add_run_doubloons(amount)
+	else:
+		doubloons += amount
+		save_game()
+		doubloons_changed.emit(doubloons)
+
+func add_run_doubloons(amount: int) -> void:
 	run_doubloons += amount
+	doubloons_changed.emit(doubloons + run_doubloons)
+
+func bank_run_doubloons(completion_bonus: int = 0) -> int:
+	if run_doubloons_banked:
+		return 0
+	run_doubloons_banked = true
+	var total_earned: int = run_doubloons + completion_bonus
+	doubloons += total_earned
 	save_game()
 	doubloons_changed.emit(doubloons)
+	return total_earned
 
 func set_multiplier(value: float, mode: String = "x") -> void:
 	multiplier_mode = mode
@@ -343,6 +369,7 @@ func is_campaign_complete() -> bool:
 
 func reset_level() -> void:
 	run_doubloons = 0
+	run_doubloons_banked = false
 	targets_destroyed = 0
 	hits_taken = 0
 	mobs_leaked = 0

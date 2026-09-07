@@ -224,26 +224,31 @@ mesh = SubResource("ArrayMesh_bumw7")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.13, -8)
 collision_layer = 8
 script = ExtResource("8_ejvrq")
+value = 6
 
 [node name="@Area3D@4" type="Area3D" parent="Entities" unique_id=543460772 groups=["collectibles", "doubloons"] instance=ExtResource("7_v8m1i")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.13, -10)
 collision_layer = 8
 script = ExtResource("8_ejvrq")
+value = 6
 
 [node name="@Area3D@5" type="Area3D" parent="Entities" unique_id=1440064413 groups=["collectibles", "doubloons"] instance=ExtResource("7_v8m1i")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.13, -12)
 collision_layer = 8
 script = ExtResource("8_ejvrq")
+value = 6
 
 [node name="@Area3D@6" type="Area3D" parent="Entities" unique_id=1964257099 groups=["collectibles", "doubloons"] instance=ExtResource("7_v8m1i")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.13, -14)
 collision_layer = 8
 script = ExtResource("8_ejvrq")
+value = 6
 
 [node name="@Area3D@7" type="Area3D" parent="Entities" unique_id=1212539336 groups=["collectibles", "doubloons"] instance=ExtResource("7_v8m1i")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.13, -16)
 collision_layer = 8
 script = ExtResource("8_ejvrq")
+value = 6
 
 [node name="DestructibleBarrel" type="Area3D" parent="Entities" unique_id=1172014096 groups=["destructible"] instance=ExtResource("9_lll5g")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, -22)

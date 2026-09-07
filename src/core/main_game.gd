@@ -3,11 +3,13 @@ extends Node3D
 
 @export var start_screen_scene: PackedScene = preload("res://src/ui/start_screen.tscn")
 @export var victory_screen_scene: PackedScene = preload("res://src/ui/victory_screen.tscn")
+@export var settlement_screen_scene: PackedScene = preload("res://src/ui/settlement_screen.tscn")
 
 @export var harbor_bay_scene: PackedScene = preload("res://src/levels/harbor_bay.tscn")
 
 var start_screen: StartScreen
 var victory_screen: VictoryScreen
+var settlement_screen: CanvasLayer
 var harbor_bay: Node3D
 
 func _ready() -> void:
@@ -131,14 +133,26 @@ func _on_game_started() -> void:
 	AudioManager.play_music()
 
 func _setup_victory_screen() -> void:
-	if victory_screen_scene:
+	if settlement_screen_scene:
+		settlement_screen = settlement_screen_scene.instantiate() as CanvasLayer
+		settlement_screen.add_to_group("settlement_screen")
+		add_child(settlement_screen)
+	elif victory_screen_scene:
 		victory_screen = victory_screen_scene.instantiate() as VictoryScreen
 		add_child(victory_screen)
-		if GameState.has_signal("level_completed"):
-			GameState.level_completed.connect(_on_level_completed)
+		
+	if GameState.has_signal("level_completed") and not GameState.level_completed.is_connected(_on_level_completed):
+		GameState.level_completed.connect(_on_level_completed)
 
-func _on_level_completed(doubloons: int, targets: int) -> void:
+func _on_level_completed(_doubloons: int, _targets: int) -> void:
 	GameState.set_performance_mode(false)
 	var stars: int = GameState.calculate_stars()
-	if victory_screen:
-		victory_screen.show_victory(doubloons, targets, stars)
+	var level_res = GameState.get_current_level_resource()
+	var bonus: int = level_res.completion_doubloon_reward if level_res else 150
+	var run_coins = GameState.run_doubloons
+	GameState.bank_run_doubloons(bonus)
+	
+	if settlement_screen:
+		settlement_screen.show_victory(run_coins, bonus, GameState.doubloons, stars)
+	elif victory_screen:
+		victory_screen.show_victory(run_coins + bonus, _targets, stars)

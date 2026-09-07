@@ -4,6 +4,7 @@ extends CharacterBody3D
 signal health_changed(current: int, max_hp: int)
 signal score_changed(new_score: int)
 signal doubloons_changed(new_doubloons: int)
+signal run_failed(coins_collected: int, distance_reached: float)
 
 @export var ship_data: ShipData:
 	set(val):
@@ -538,8 +539,31 @@ func game_over(victory: bool) -> void:
 	if is_game_over:
 		return
 	is_game_over = true
-	get_tree().paused = true
+	is_shooting_enabled = false
 	
+	if not victory:
+		var coins = GameState.run_doubloons
+		var dist = GameState.distance_traveled
+		GameState.bank_run_doubloons(0)
+		run_failed.emit(coins, dist)
+		if GameState.has_signal("run_failed"):
+			GameState.run_failed.emit(coins, dist)
+			
+		var level_ctrl = get_tree().get_first_node_in_group("level_controller")
+		if level_ctrl and level_ctrl.has_method("handle_player_defeat"):
+			level_ctrl.handle_player_defeat(coins, dist)
+			return
+
+		get_tree().paused = true
+		var settlement_scene = preload("res://src/ui/settlement_screen.tscn")
+		if settlement_scene:
+			var ui = settlement_scene.instantiate()
+			get_parent().add_child(ui)
+			if ui.has_method("show_defeat"):
+				ui.show_defeat(coins, dist, GameState.doubloons)
+				return
+				
+	get_tree().paused = true
 	if end_game_ui_scene:
 		var ui = end_game_ui_scene.instantiate()
 		get_parent().add_child(ui)

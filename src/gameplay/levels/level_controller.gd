@@ -7,9 +7,12 @@ extends Node3D
 # Zero procedural generation. Zero random timers. No fallback loops.
 # ──────────────────────────────────────────────────────────────────────────────
 
+signal run_failed(coins_collected: int, distance_reached: float)
+
 @export var debug_level_override: int = 0
 @export var level_data: LevelData = preload("res://src/data/resources/levels/level_01.tres")
 @export var spawn_z_ahead: float = -70.0
+@export var settlement_screen_scene: PackedScene = preload("res://src/ui/settlement_screen.tscn")
 
 # Prefabs
 @export var coin_scene: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
@@ -75,6 +78,35 @@ func _on_chunk_boss_arena_reached(boss_chunk: BaseTrackChunk) -> void:
 	if camera and camera.has_method("start_boss_focus") and boss:
 		camera.start_boss_focus(boss)
 	print("[LEVEL CONTROLLER] Locked camera to boss arena")
+
+func handle_player_defeat(coins_collected: int, distance_reached: float) -> void:
+	# 1. Freeze forward track scrolling smoothly
+	var freeze_tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	freeze_tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	
+	if chunk_assembler and is_instance_valid(chunk_assembler):
+		freeze_tween.tween_property(chunk_assembler, "scroll_speed", 0.0, 0.5)
+		
+	var track_mgr = get_tree().get_first_node_in_group("track_manager")
+	if track_mgr and is_instance_valid(track_mgr) and "scroll_speed" in track_mgr:
+		freeze_tween.tween_property(track_mgr, "scroll_speed", 0.0, 0.5)
+		
+	base_scroll_speed = 0.0
+	run_failed.emit(coins_collected, distance_reached)
+	
+	# 2. Wait for deceleration, then display Defeat Settlement Screen
+	await get_tree().create_timer(0.45, true, false, true).timeout
+	
+	var settlement = get_tree().get_first_node_in_group("settlement_screen")
+	if not settlement:
+		var root = get_tree().current_scene
+		if root and settlement_screen_scene:
+			settlement = settlement_screen_scene.instantiate()
+			settlement.add_to_group("settlement_screen")
+			root.add_child(settlement)
+			
+	if settlement and settlement.has_method("show_defeat"):
+		settlement.show_defeat(coins_collected, distance_reached, GameState.doubloons)
 
 func setup_active_queue() -> void:
 	active_queue = [] # Guarantee fresh untyped Array

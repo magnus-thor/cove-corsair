@@ -1,0 +1,267 @@
+class_name SettlementScreen
+extends CanvasLayer
+
+## Responsive Settlement Screen Overlay Modal for Cove Corsair
+## Handles both Victory and Defeat ("SHIP SUNK!") with gold retention roll-up count,
+## completion bonus breakdown, shipyard upgrade badge/glow alert, and seamless navigation.
+
+signal retry_requested
+signal next_level_requested
+signal map_requested
+
+@onready var backdrop: ColorRect = %Backdrop
+@onready var modal_panel: PanelContainer = %ModalPanel
+@onready var header_label: Label = %HeaderLabel
+@onready var subtitle_label: Label = %SubtitleLabel
+
+@onready var stars_container: HBoxContainer = %StarsContainer
+@onready var star_1: Label = %Star1
+@onready var star_2: Label = %Star2
+@onready var star_3: Label = %Star3
+
+@onready var run_doubloons_label: Label = %RunDoubloonsLabel
+@onready var bonus_row: HBoxContainer = %BonusRow
+@onready var bonus_label: Label = %BonusLabel
+@onready var total_banked_label: Label = %TotalBankedLabel
+
+@onready var primary_button: Button = %PrimaryButton
+@onready var shipyard_button: Button = %ShipyardButton
+@onready var shipyard_badge: PanelContainer = %ShipyardBadge
+@onready var shipyard_badge_label: Label = %ShipyardBadgeLabel
+@onready var map_button: Button = %MapButton
+
+var _is_victory: bool = false
+var _run_doubloons: int = 0
+var _completion_bonus: int = 0
+var _total_banked: int = 0
+var _stars_earned: int = 1
+
+var _tally_tween: Tween = null
+var _glow_tween: Tween = null
+var _badge_tween: Tween = null
+var _modal_tween: Tween = null
+
+const COLOR_VICTORY_HEADER := Color(1.0, 0.84, 0.22, 1.0) # Radiant Gold
+const COLOR_DEFEAT_HEADER := Color(0.92, 0.22, 0.24, 1.0) # Crimson Red
+const COLOR_STAR_ACTIVE := Color(1.0, 0.85, 0.15, 1.0)
+const COLOR_STAR_INACTIVE := Color(0.40, 0.35, 0.30, 1.0)
+
+func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	layer = 25
+	visible = false
+
+	if primary_button:
+		primary_button.pressed.connect(_on_primary_pressed)
+	if shipyard_button:
+		shipyard_button.pressed.connect(_on_shipyard_pressed)
+	if map_button:
+		map_button.pressed.connect(_on_map_pressed)
+
+func show_defeat(coins_collected: int, distance_reached: float, banked_total: int) -> void:
+	_is_victory = false
+	_run_doubloons = coins_collected
+	_completion_bonus = 0
+	_total_banked = banked_total
+	_stars_earned = 0
+	_present_modal()
+
+func show_victory(coins_collected: int, completion_bonus: int, banked_total: int, stars: int = 3) -> void:
+	_is_victory = true
+	_run_doubloons = coins_collected
+	_completion_bonus = completion_bonus
+	_total_banked = banked_total
+	_stars_earned = clamp(stars, 1, 3)
+	
+	# Record high score, star mastery, and unlock next level
+	GameState.record_level_score(GameState.current_level, coins_collected + completion_bonus)
+	GameState.record_level_stars(GameState.current_level, _stars_earned)
+	GameState.unlock_next_level()
+	
+	_present_modal()
+
+func _present_modal() -> void:
+	visible = true
+	get_tree().paused = true
+	GameState.set_performance_mode(false)
+
+	# 1. Setup Header & Subtitle
+	if _is_victory:
+		if header_label:
+			header_label.text = "VICTORY!"
+			header_label.add_theme_color_override("font_color", COLOR_VICTORY_HEADER)
+		if subtitle_label:
+			subtitle_label.text = "COVE CONQUERED - CARGO SECURED!"
+			subtitle_label.add_theme_color_override("font_color", Color(0.85, 0.95, 0.85, 1.0))
+		if stars_container:
+			stars_container.visible = true
+			_update_stars(_stars_earned)
+		if bonus_row:
+			bonus_row.visible = true
+			if bonus_label:
+				bonus_label.text = "+0"
+		if primary_button:
+			if GameState.is_campaign_complete():
+				primary_button.text = "MAP COMPLETE"
+			else:
+				primary_button.text = "NEXT LEVEL"
+	else:
+		if header_label:
+			header_label.text = "SHIP SUNK!"
+			header_label.add_theme_color_override("font_color", COLOR_DEFEAT_HEADER)
+		if subtitle_label:
+			subtitle_label.text = "HULL BREACHED - TREASURE RETAINED"
+			subtitle_label.add_theme_color_override("font_color", Color(0.95, 0.8, 0.8, 1.0))
+		if stars_container:
+			stars_container.visible = false
+		if bonus_row:
+			bonus_row.visible = false
+		if primary_button:
+			primary_button.text = "RETRY"
+
+	# 2. Setup initial counters
+	if run_doubloons_label:
+		run_doubloons_label.text = "0"
+	if total_banked_label:
+		total_banked_label.text = str(_total_banked - (_run_doubloons + _completion_bonus))
+
+	# 3. Check shipyard upgrade affordance
+	_update_shipyard_button()
+
+	# 4. Animate Pop-in
+	_animate_open()
+
+	# 5. Roll-up count animation
+	_animate_breakdown(_run_doubloons, _completion_bonus, _total_banked)
+
+func _animate_open() -> void:
+	if _modal_tween and _modal_tween.is_valid():
+		_modal_tween.kill()
+
+	_modal_tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_modal_tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+
+	if backdrop:
+		backdrop.color.a = 0.0
+		_modal_tween.tween_property(backdrop, "color:a", 0.85, 0.3)
+
+	if modal_panel:
+		modal_panel.pivot_offset = modal_panel.size * 0.5
+		modal_panel.scale = Vector2(0.7, 0.7)
+		modal_panel.modulate.a = 0.0
+		_modal_tween.tween_property(modal_panel, "scale", Vector2.ONE, 0.4)
+		_modal_tween.tween_property(modal_panel, "modulate:a", 1.0, 0.3)
+
+func _animate_breakdown(run_coins: int, bonus: int, final_bank: int) -> void:
+	if _tally_tween and _tally_tween.is_valid():
+		_tally_tween.kill()
+
+	_tally_tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_tally_tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+
+	var last_tick: int = -1
+	var step_chunk = max(1, int(float(run_coins) / 12.0))
+	
+	_tally_tween.tween_method(func(val: float):
+		var cur = int(val)
+		if run_doubloons_label:
+			run_doubloons_label.text = str(cur)
+		if cur != last_tick and (cur % step_chunk == 0 or cur == run_coins):
+			last_tick = cur
+			if AudioManager and AudioManager.has_method("play_sfx") and cur > 0:
+				AudioManager.play_sfx("coin_pickups", 0.95 + float(cur) / max(1.0, float(run_coins)) * 0.35, 1.05 + float(cur) / max(1.0, float(run_coins)) * 0.35, 0.5)
+	, 0.0, float(run_coins), 0.75)
+
+	if _is_victory and bonus > 0:
+		_tally_tween.tween_method(func(val: float):
+			if bonus_label:
+				bonus_label.text = "+%d" % int(val)
+		, 0.0, float(bonus), 0.75)
+
+	var starting_bank = max(0, final_bank - (run_coins + bonus))
+	_tally_tween.tween_method(func(val: float):
+		if total_banked_label:
+			total_banked_label.text = str(int(val))
+	, float(starting_bank), float(final_bank), 0.85)
+
+func _update_stars(count: int) -> void:
+	var stars = [star_1, star_2, star_3]
+	for i in range(stars.size()):
+		var s = stars[i]
+		if not s:
+			continue
+		if i < count:
+			s.add_theme_color_override("font_color", COLOR_STAR_ACTIVE)
+		else:
+			s.add_theme_color_override("font_color", COLOR_STAR_INACTIVE)
+
+func _update_shipyard_button() -> void:
+	if not shipyard_button:
+		return
+
+	var can_afford = GameState.can_afford_active_vessel_upgrade()
+
+	if _glow_tween and _glow_tween.is_valid():
+		_glow_tween.kill()
+	if _badge_tween and _badge_tween.is_valid():
+		_badge_tween.kill()
+
+	if can_afford:
+		if shipyard_badge:
+			shipyard_badge.visible = true
+			shipyard_badge.pivot_offset = shipyard_badge.size * 0.5
+			_badge_tween = create_tween().set_loops().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+			_badge_tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+			_badge_tween.tween_property(shipyard_badge, "scale", Vector2(1.15, 1.15), 0.45)
+			_badge_tween.tween_property(shipyard_badge, "scale", Vector2.ONE, 0.45)
+
+		_glow_tween = create_tween().set_loops().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		_glow_tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+		_glow_tween.tween_property(shipyard_button, "modulate", Color(1.35, 1.25, 0.70, 1.0), 0.5)
+		_glow_tween.tween_property(shipyard_button, "modulate", Color(1.0, 1.0, 1.0, 1.0), 0.5)
+	else:
+		if shipyard_badge:
+			shipyard_badge.visible = false
+		shipyard_button.modulate = Color.WHITE
+
+func _refresh_banked_display() -> void:
+	_total_banked = GameState.doubloons
+	if total_banked_label:
+		total_banked_label.text = str(_total_banked)
+
+func _on_primary_pressed() -> void:
+	if AudioManager and AudioManager.has_method("play_sfx"):
+		AudioManager.play_sfx("gate_passes")
+	get_tree().paused = false
+	if _is_victory:
+		next_level_requested.emit()
+		GameState.should_auto_start = true
+		GameState.reset_level()
+		get_tree().reload_current_scene()
+	else:
+		retry_requested.emit()
+		GameState.should_auto_start = true
+		GameState.reset_level()
+		get_tree().reload_current_scene()
+
+func _on_shipyard_pressed() -> void:
+	if AudioManager and AudioManager.has_method("play_sfx"):
+		AudioManager.play_sfx("gate_passes")
+	var shipyard_scene = preload("res://src/ui/shipyard/shipyard_ui.tscn")
+	if shipyard_scene:
+		var shipyard = shipyard_scene.instantiate() as CanvasLayer
+		get_parent().add_child(shipyard)
+		if shipyard.has_signal("shipyard_closed"):
+			shipyard.shipyard_closed.connect(func():
+				_refresh_banked_display()
+				_update_shipyard_button()
+			)
+
+func _on_map_pressed() -> void:
+	if AudioManager and AudioManager.has_method("play_sfx"):
+		AudioManager.play_sfx("gate_passes")
+	map_requested.emit()
+	get_tree().paused = false
+	GameState.should_auto_start = false
+	GameState.reset_level()
+	get_tree().reload_current_scene()

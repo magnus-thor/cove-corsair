@@ -1,0 +1,351 @@
+[gd_scene load_steps=12 format=3 uid="uid://b1v9c8m57q421"]
+
+[ext_resource type="Script" path="res://src/ui/settlement_screen.gd" id="1_settle_script"]
+[ext_resource type="FontFile" path="res://assets/fonts/LilitaOne-Regular.ttf" id="2_font_lilita"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/coin_icon.svg" id="3_coin_icon"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_modal"]
+content_margin_left = 28.0
+content_margin_top = 26.0
+content_margin_right = 28.0
+content_margin_bottom = 26.0
+bg_color = Color(0.14, 0.11, 0.09, 0.96)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.82, 0.65, 0.32, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0, 0, 0, 0.7)
+shadow_size = 22
+shadow_offset = Vector2(0, 10)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_breakdown"]
+content_margin_left = 18.0
+content_margin_top = 16.0
+content_margin_right = 18.0
+content_margin_bottom = 16.0
+bg_color = Color(0.20, 0.16, 0.12, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.45, 0.35, 0.22, 0.8)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_primary"]
+content_margin_left = 16.0
+content_margin_top = 12.0
+content_margin_right = 16.0
+content_margin_bottom = 12.0
+bg_color = Color(0.85, 0.48, 0.12, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.88, 0.45, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.4)
+shadow_size = 6
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_shipyard"]
+content_margin_left = 16.0
+content_margin_top = 11.0
+content_margin_right = 16.0
+content_margin_bottom = 11.0
+bg_color = Color(0.25, 0.42, 0.62, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.55, 0.78, 1.0, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.35)
+shadow_size = 5
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_badge"]
+content_margin_left = 8.0
+content_margin_top = 3.0
+content_margin_right = 8.0
+content_margin_bottom = 3.0
+bg_color = Color(0.92, 0.65, 0.12, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.95, 0.6, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(0, 0, 0, 0.5)
+shadow_size = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_map"]
+content_margin_left = 16.0
+content_margin_top = 10.0
+content_margin_right = 16.0
+content_margin_bottom = 10.0
+bg_color = Color(0.35, 0.25, 0.18, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.65, 0.52, 0.38, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.3)
+shadow_size = 4
+shadow_offset = Vector2(0, 2)
+
+[node name="SettlementScreen" type="CanvasLayer" unique_id=73910284]
+process_mode = 3
+layer = 25
+visible = false
+script = ExtResource("1_settle_script")
+
+[node name="Backdrop" type="ColorRect" parent="." unique_id=184920471]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.06, 0.04, 0.03, 0.85)
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=147291038]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ModalPanel" type="PanelContainer" parent="CenterContainer" unique_id=98124017]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(380, 480)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_modal")
+
+[node name="MainVBox" type="VBoxContainer" parent="CenterContainer/ModalPanel" unique_id=182947192]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="HeaderBox" type="VBoxContainer" parent="CenterContainer/ModalPanel/MainVBox" unique_id=19384716]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="HeaderLabel" type="Label" parent="CenterContainer/ModalPanel/MainVBox/HeaderBox" unique_id=58192038]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 36
+text = "SHIP SUNK!"
+horizontal_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="CenterContainer/ModalPanel/MainVBox/HeaderBox" unique_id=74910283]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.9, 0.8, 0.7, 1)
+text = "HULL BREACHED - TREASURE RETAINED"
+horizontal_alignment = 1
+
+[node name="StarsContainer" type="HBoxContainer" parent="CenterContainer/ModalPanel/MainVBox" unique_id=10293847]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 12
+
+[node name="Star1" type="Label" parent="CenterContainer/ModalPanel/MainVBox/StarsContainer" unique_id=19283746]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 28
+theme_override_colors/font_color = Color(1, 0.85, 0.15, 1)
+text = "★"
+
+[node name="Star2" type="Label" parent="CenterContainer/ModalPanel/MainVBox/StarsContainer" unique_id=29384756]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 28
+theme_override_colors/font_color = Color(1, 0.85, 0.15, 1)
+text = "★"
+
+[node name="Star3" type="Label" parent="CenterContainer/ModalPanel/MainVBox/StarsContainer" unique_id=39485767]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 28
+theme_override_colors/font_color = Color(1, 0.85, 0.15, 1)
+text = "★"
+
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/ModalPanel/MainVBox" unique_id=48291047]
+layout_mode = 2
+
+[node name="BreakdownPanel" type="PanelContainer" parent="CenterContainer/ModalPanel/MainVBox" unique_id=19284729]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_breakdown")
+
+[node name="BreakdownVBox" type="VBoxContainer" parent="CenterContainer/ModalPanel/MainVBox/BreakdownPanel" unique_id=12847192]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="RunCoinsRow" type="HBoxContainer" parent="CenterContainer/ModalPanel/MainVBox/BreakdownPanel/BreakdownVBox" unique_id=19284730]
+layout_mode = 2
+alignment = 1
+
+[node name="Title" type="Label" parent="CenterContainer/ModalPanel/MainVBox/BreakdownPanel/BreakdownVBox/RunCoinsRow" unique_id=18294018]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 17
+theme_override_colors/font_color = Color(0.9, 0.85, 0.75, 1)
+text = "RUN DOUBLOONS"
+
+[node name="Icon" type="TextureRect" parent="CenterContainer/ModalPanel/MainVBox/BreakdownPanel/BreakdownVBox/RunCoinsRow" unique_id=19284019]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+texture = ExtResource("3_coin_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="RunDoubloonsLabel" type="Label" parent="CenterContainer/ModalPanel/MainVBox/BreakdownPanel/BreakdownVBox/RunCoinsRow" unique_id=19284020]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(1, 0.88, 0.35, 1)
+text = "0"
+
+[node name="BonusRow" type="HBoxContainer" parent="CenterContainer/ModalPanel/MainVBox/BreakdownPanel/BreakdownVBox" unique_id=19284731]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1
+
+[node name="Title" type="Label" parent="CenterContainer/ModalPanel/MainVBox/BreakdownPanel/BreakdownVBox/BonusRow" unique_id=18294021]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 17
+theme_override_colors/font_color = Color(0.4, 0.9, 0.45, 1)
+text = "COMPLETION BONUS"
+
+[node name="BonusLabel" type="Label" parent="CenterContainer/ModalPanel/MainVBox/BreakdownPanel/BreakdownVBox/BonusRow" unique_id=19284022]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.4, 0.9, 0.45, 1)
+text = "+0"
+
+[node name="HSeparator2" type="HSeparator" parent="CenterContainer/ModalPanel/MainVBox/BreakdownPanel/BreakdownVBox" unique_id=19284732]
+layout_mode = 2
+
+[node name="TotalBankedRow" type="HBoxContainer" parent="CenterContainer/ModalPanel/MainVBox/BreakdownPanel/BreakdownVBox" unique_id=19284733]
+layout_mode = 2
+alignment = 1
+
+[node name="Title" type="Label" parent="CenterContainer/ModalPanel/MainVBox/BreakdownPanel/BreakdownVBox/TotalBankedRow" unique_id=18294023]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 19
+theme_override_colors/font_color = Color(1, 0.95, 0.85, 1)
+text = "TOTAL BANKED"
+
+[node name="Icon" type="TextureRect" parent="CenterContainer/ModalPanel/MainVBox/BreakdownPanel/BreakdownVBox/TotalBankedRow" unique_id=19284024]
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+texture = ExtResource("3_coin_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TotalBankedLabel" type="Label" parent="CenterContainer/ModalPanel/MainVBox/BreakdownPanel/BreakdownVBox/TotalBankedRow" unique_id=19284025]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(1, 0.84, 0.22, 1)
+text = "0"
+
+[node name="ButtonSpacer" type="Control" parent="CenterContainer/ModalPanel/MainVBox" unique_id=19284734]
+custom_minimum_size = Vector2(0, 6)
+layout_mode = 2
+
+[node name="PrimaryButton" type="Button" parent="CenterContainer/ModalPanel/MainVBox" unique_id=19284735]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_primary")
+text = "RETRY"
+
+[node name="ShipyardWrapper" type="Control" parent="CenterContainer/ModalPanel/MainVBox" unique_id=19284736]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+
+[node name="ShipyardButton" type="Button" parent="CenterContainer/ModalPanel/MainVBox/ShipyardWrapper" unique_id=19284737]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 19
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_shipyard")
+text = "THE SHIPYARD"
+
+[node name="ShipyardBadge" type="PanelContainer" parent="CenterContainer/ModalPanel/MainVBox/ShipyardWrapper" unique_id=19284738]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -118.0
+offset_top = -10.0
+offset_right = 8.0
+offset_bottom = 16.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_badge")
+
+[node name="ShipyardBadgeLabel" type="Label" parent="CenterContainer/ModalPanel/MainVBox/ShipyardWrapper/ShipyardBadge" unique_id=19284739]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.12, 0.08, 0.02, 1)
+text = "✦ UPGRADE READY!"
+horizontal_alignment = 1
+
+[node name="MapButton" type="Button" parent="CenterContainer/ModalPanel/MainVBox" unique_id=19284740]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 17
+theme_override_colors/font_color = Color(0.9, 0.85, 0.8, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_map")
+text = "RIVER MAP"

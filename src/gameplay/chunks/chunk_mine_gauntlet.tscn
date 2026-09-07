@@ -140,6 +140,7 @@ script = ExtResource("6_scdm7")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 0.13, -12)
 collision_layer = 8
 script = ExtResource("8_ngubn")
+value = 8
 
 [node name="MineGate2_Left" type="Area3D" parent="Entities" unique_id=1596979201 groups=["destructible"] instance=ExtResource("5_8bbi5")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.65, 0, -24)
@@ -153,6 +154,7 @@ script = ExtResource("6_scdm7")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.13, -24)
 collision_layer = 8
 script = ExtResource("8_ngubn")
+value = 8
 
 [node name="MineGate3_Left" type="Area3D" parent="Entities" unique_id=1596979203 groups=["destructible"] instance=ExtResource("5_8bbi5")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, 0, -36)
@@ -166,6 +168,7 @@ script = ExtResource("6_scdm7")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 0.13, -36)
 collision_layer = 8
 script = ExtResource("8_ngubn")
+value = 8
 
 [node name="MineGate4_Left" type="Area3D" parent="Entities" unique_id=1596979205 groups=["destructible"] instance=ExtResource("5_8bbi5")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.65, 0, -46)
@@ -179,4 +182,5 @@ script = ExtResource("6_scdm7")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.13, -46)
 collision_layer = 8
 script = ExtResource("8_ngubn")
+value = 8
 

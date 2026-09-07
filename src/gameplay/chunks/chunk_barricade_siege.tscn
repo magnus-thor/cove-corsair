@@ -136,7 +136,7 @@ enemy_data = ExtResource("13_turtle")
 max_hp = 30
 current_hp = 30
 forward_speed = 1.5
-doubloons_drop = 4
+doubloons_drop = 6
 
 [node name="BarricadeWall" type="Node3D" parent="Entities" unique_id=189151967 instance=ExtResource("7_3txa0")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -22)
@@ -163,6 +163,7 @@ script = ExtResource("6_heufw")
 max_hp = 2
 current_hp = 2
 forward_speed = 1.8
+doubloons_drop = 3
 
 [node name="@Area3D@25" type="Area3D" parent="Entities" unique_id=658476764 groups=["destructible", "enemies"] instance=ExtResource("5_41l2j")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0.1, -45)
@@ -170,3 +171,4 @@ script = ExtResource("6_heufw")
 max_hp = 2
 current_hp = 2
 forward_speed = 1.8
+doubloons_drop = 3
