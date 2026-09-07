@@ -9,4 +9,4 @@ damage = 2
 projectile_speed = 28.0
 splash_radius = 0.0
 scale_multiplier = 0.45
-max_range_override = 13.0
+max_range_override = 12.0

@@ -13,6 +13,8 @@ var settlement_screen: CanvasLayer
 var harbor_bay: Node3D
 
 func _ready() -> void:
+	GameState.active_vessel_changed.connect(_on_active_vessel_changed)
+	_update_active_player_vessel()
 	if GameState.should_auto_start:
 		GameState.should_auto_start = false
 		_start_game_immediately()
@@ -156,3 +158,45 @@ func _on_level_completed(_doubloons: int, _targets: int) -> void:
 		settlement_screen.show_victory(run_coins, bonus, GameState.doubloons, stars)
 	elif victory_screen:
 		victory_screen.show_victory(run_coins + bonus, _targets, stars)
+
+func _on_active_vessel_changed(_vessel_id: String) -> void:
+	_update_active_player_vessel()
+
+func _update_active_player_vessel() -> void:
+	var ship = GameState.get_active_ship_resource()
+	if not ship:
+		return
+	var player = get_tree().get_first_node_in_group("player")
+	if not player:
+		return
+
+	var target_scene: PackedScene = null
+	if "boat_scene" in ship and ship.boat_scene:
+		target_scene = ship.boat_scene
+	elif ship.ship_id == "bombard_skiff":
+		target_scene = preload("res://src/gameplay/player/bombard_skiff_boat.tscn")
+
+	if target_scene and player.scene_file_path != target_scene.resource_path:
+		var parent = player.get_parent()
+		if parent:
+			var old_transform = player.transform
+			var old_shooting = player.is_shooting_enabled if "is_shooting_enabled" in player else false
+			player.remove_from_group("player")
+			parent.remove_child(player)
+			player.queue_free()
+
+			var new_boat = target_scene.instantiate()
+			new_boat.name = "PlayerBoat"
+			new_boat.transform = old_transform
+			parent.add_child(new_boat)
+			if "is_shooting_enabled" in new_boat:
+				new_boat.is_shooting_enabled = old_shooting
+			if not GameState.is_game_active:
+				var hp = new_boat.get_node_or_null("Hardpoints")
+				if hp:
+					hp.visible = false
+			return
+
+	if player.has_method("apply_ship_data"):
+		player.apply_ship_data(ship)
+

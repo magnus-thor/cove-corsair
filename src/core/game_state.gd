@@ -388,7 +388,8 @@ func reset_save_data() -> void:
 	vessel_tiers = {
 		"dinghy": 1,
 		"sloop": 1,
-		"ironclad": 1
+		"ironclad": 1,
+		"bombard_skiff": 1
 	}
 	active_vessel = "dinghy"
 	highest_unlocked_level = 1

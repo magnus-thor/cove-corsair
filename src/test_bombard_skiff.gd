@@ -46,7 +46,36 @@ func _ready() -> void:
 
 	var mortar_res: WeaponData = load("res://src/data/resources/user_crew/weapon_bow_mortar.tres") as WeaponData
 	assert_test(mortar_res != null, "weapon_bow_mortar.tres loads successfully")
-	assert_test(mortar_res.default_ammo != null and mortar_res.default_ammo.splash_radius > 0.0, "mortar ammo has AoE splash radius > 0")
+	assert_test(mortar_res.default_ammo != null and mortar_res.default_ammo.splash_radius >= 3.5, "mortar ammo has AoE splash radius >= 3.5m")
+
+	# Test scattershot_pellet.tscn
+	var pellet_scene = load("res://src/gameplay/projectiles/scattershot_pellet.tscn") as PackedScene
+	assert_test(pellet_scene != null, "scattershot_pellet.tscn loads successfully")
+	if pellet_scene:
+		var p_inst = pellet_scene.instantiate() as Area3D
+		assert_test(p_inst != null, "scattershot_pellet instantiates as Area3D")
+		assert_test(p_inst.damage == 1, "scattershot_pellet base damage is 1")
+		assert_test(p_inst.speed >= 25.0, "scattershot_pellet speed is rapid (>= 25.0 m/s)")
+		assert_test(p_inst.max_range <= 12.1 and p_inst.max_range >= 11.9, "scattershot_pellet despawn distance is 12m")
+		p_inst.free()
+
+	# Test bombard_skiff_boat.tscn prefab
+	var bombard_boat_scene = load("res://src/gameplay/player/bombard_skiff_boat.tscn") as PackedScene
+	assert_test(bombard_boat_scene != null, "bombard_skiff_boat.tscn loads successfully")
+	if bombard_boat_scene:
+		var b_inst = bombard_boat_scene.instantiate()
+		add_child(b_inst)
+		assert_test(b_inst.get_node_or_null("Hardpoints/BowMortarMount") is Marker3D, "bombard_skiff_boat has BowMortarMount Marker3D")
+		assert_test(b_inst.get_node_or_null("Hardpoints/QuarterdeckCrew") is Marker3D, "bombard_skiff_boat has QuarterdeckCrew Marker3D")
+		assert_test(b_inst.get_node_or_null("Hardpoints/PortRailMount") is Marker3D, "bombard_skiff_boat has PortRailMount Marker3D")
+		assert_test(b_inst.get_node_or_null("Hardpoints/StarboardRailMount") is Marker3D, "bombard_skiff_boat has StarboardRailMount Marker3D")
+		var c_shape = b_inst.get_node_or_null("CollisionShape3D") as CollisionShape3D
+		assert_test(c_shape != null and c_shape.shape is BoxShape3D, "bombard_skiff_boat has CollisionShape3D BoxShape3D")
+		if c_shape and c_shape.shape is BoxShape3D:
+			var sz = (c_shape.shape as BoxShape3D).size
+			assert_test(abs(sz.x - 1.8) < 0.05 and abs(sz.y - 1.2) < 0.05 and abs(sz.z - 3.0) < 0.05, "bombard_skiff_boat footprint is 1.8m x 1.2m x 3.0m")
+		assert_test(b_inst.get_node_or_null("BoatWake") != null, "bombard_skiff_boat has BoatWake instance")
+		b_inst.queue_free()
 
 	# --- TEST 2: GameState & Shipyard Registration ---
 	print("\n--- 2. Testing GameState & Shipyard Catalog ---")
@@ -107,9 +136,10 @@ func _ready() -> void:
 	assert_test(mortar_balls.size() == 1, "BowMortarMount fired exactly 1 heavy mortar ball")
 	if mortar_balls.size() > 0:
 		var ball: Cannonball = mortar_balls[0]
-		assert_test(ball.damage == 3, "Heavy mortar deals 3 base damage")
+		assert_test(ball.damage == 5, "Heavy mortar deals 5 direct damage")
+		assert_test(ball.ammo_data != null and ball.ammo_data.aoe_damage == 3, "Heavy mortar deals 3 AoE damage")
 		assert_test(ball.arc_height >= 2.0, "Heavy mortar has high arc trajectory")
-		assert_test(ball.ammo_data != null and ball.ammo_data.splash_radius >= 2.0, "Heavy mortar has 2.0m AoE splash radius")
+		assert_test(ball.ammo_data != null and ball.ammo_data.splash_radius >= 3.5, "Heavy mortar has 3.5m AoE splash radius")
 		print("DEBUG: mortar ball dir = ", ball.direction)
 		assert_test(ball.direction.z < -0.9, "Heavy mortar fires directly forward along Z-axis")
 		ball.queue_free()
@@ -127,20 +157,20 @@ func _ready() -> void:
 	assert_test(port_w != null and port_w.weapon_data == scatter_res, "PortRailMount is equipped with Scattershot Carronade")
 	assert_test(stbd_w != null and stbd_w.weapon_data == scatter_res, "StarboardRailMount is equipped with Scattershot Carronade")
 
-	# Test Port Rail Scattershot firing
+	# Test Port Rail Scattershot firing via fire_scattershot()
 	for child in world_node.get_children():
 		world_node.remove_child(child)
 		child.free()
 
 	port_w.projectile_scene = load("res://src/gameplay/projectiles/cannonball.tscn")
-	port_w._execute_fire(port_w.projectile_scene, world_node)
+	port_w.fire_scattershot(Vector3.ZERO, world_node, port_w.projectile_scene)
 
 	var port_pellets: Array = []
 	for child in world_node.get_children():
 		if child is Cannonball:
 			port_pellets.append(child)
 
-	assert_test(port_pellets.size() == 5, "PortRailMount instantiated exactly 5 pellet projectiles")
+	assert_test(port_pellets.size() == 5, "PortRailMount fire_scattershot() instantiated exactly 5 pellet projectiles")
 	if port_pellets.size() == 5:
 		var all_short_range = true
 		var all_high_dmg = true
@@ -148,7 +178,7 @@ func _ready() -> void:
 		var angles_deg: Array[float] = []
 		
 		for p in port_pellets:
-			if p.max_range > 14.0 or p.max_range < 12.0:
+			if p.max_range > 14.0 or p.max_range < 11.9:
 				all_short_range = false
 			if p.damage < 2:
 				all_high_dmg = false
@@ -164,24 +194,24 @@ func _ready() -> void:
 		angles_deg.sort()
 		var total_spread = angles_deg.back() - angles_deg.front()
 		assert_test(abs(total_spread - 30.0) < 1.0, "Pellets span a 30-degree fan spread (-15 to +15 deg)")
-		assert_test(port_pellets[0].direction.x < 0.0, "Port pellets fire into the adjacent PORT (left) lane")
+		assert_test(port_pellets[0].direction.x < 0.0, "Port pellets fire outward into the adjacent PORT (left) lane")
 
-	# Test Starboard Rail Scattershot firing
+	# Test Starboard Rail Scattershot firing via fire_scattershot()
 	for child in world_node.get_children():
 		world_node.remove_child(child)
 		child.free()
 
 	stbd_w.projectile_scene = load("res://src/gameplay/projectiles/cannonball.tscn")
-	stbd_w._execute_fire(stbd_w.projectile_scene, world_node)
+	stbd_w.fire_scattershot(Vector3.ZERO, world_node, stbd_w.projectile_scene)
 
 	var stbd_pellets: Array = []
 	for child in world_node.get_children():
 		if child is Cannonball:
 			stbd_pellets.append(child)
 
-	assert_test(stbd_pellets.size() == 5, "StarboardRailMount instantiated exactly 5 pellet projectiles")
+	assert_test(stbd_pellets.size() == 5, "StarboardRailMount fire_scattershot() instantiated exactly 5 pellet projectiles")
 	if stbd_pellets.size() == 5:
-		assert_test(stbd_pellets[0].direction.x > 0.0, "Starboard pellets fire into the adjacent STARBOARD (right) lane")
+		assert_test(stbd_pellets[0].direction.x > 0.0, "Starboard pellets fire outward into the adjacent STARBOARD (right) lane")
 
 	# Clean up
 	boat.queue_free()

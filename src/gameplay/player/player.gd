@@ -149,6 +149,10 @@ func _ready() -> void:
 	
 	magnet_area.area_entered.connect(_on_magnet_area_entered)
 	
+	if Engine.has_singleton("GameState") or get_node_or_null("/root/GameState"):
+		if not GameState.active_vessel_changed.is_connected(_on_active_vessel_changed):
+			GameState.active_vessel_changed.connect(_on_active_vessel_changed)
+	
 	var level_ship = GameState.get_current_ship_resource() if GameState.has_method("get_current_ship_resource") else null
 	if level_ship:
 		ship_data = level_ship
@@ -160,6 +164,11 @@ func _ready() -> void:
 	
 	if is_calibration_mode:
 		_setup_calibration_mode()
+
+func _on_active_vessel_changed(v_id: String) -> void:
+	var ship = GameState.get_vessel_resource(v_id)
+	if ship:
+		apply_ship_data(ship)
 
 func apply_ship_data(data: ShipData) -> void:
 	if not data:
@@ -256,6 +265,12 @@ func apply_ship_data(data: ShipData) -> void:
 			area_col.shape = area_box
 		area_box.size = Vector3(data.collision_size.x, data.collision_size.y + 0.2, data.collision_size.z)
 		area_col.position = Vector3(0, (data.collision_size.y + 0.2) * 0.5, 0)
+		
+	# Update boat wake position based on collision_size
+	var wake = get_node_or_null("BoatWake") as Node3D
+	if wake and "collision_size" in data:
+		var wake_z = data.collision_size.z * 0.5 - 0.1
+		wake.position = Vector3(0, 0.02, max(1.2, wake_z))
 		
 	# Position and rotate all children under $Hardpoints according to data.hardpoint_offsets and data.hardpoint_rotations
 	var hardpoints = get_node_or_null("Hardpoints")

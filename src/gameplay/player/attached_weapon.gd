@@ -391,32 +391,7 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 	var is_scatter_weapon: bool = (weapon_data.get("is_scatter") == true or weapon_data.weapon_type == "scattershot" or "scatter" in weapon_data.weapon_name.to_lower())
 
 	if is_scatter_weapon:
-		var num_pellets: int = weapon_data.get("pellet_count") if ("pellet_count" in weapon_data and weapon_data.pellet_count > 0) else 5
-		var total_fan_deg: float = weapon_data.get("scatter_spread_deg") if ("scatter_spread_deg" in weapon_data and weapon_data.scatter_spread_deg > 0.0) else 30.0
-		var half_fan: float = total_fan_deg * 0.5
-
-		for i in range(num_pellets):
-			var t = float(i) / float(num_pellets - 1) if num_pellets > 1 else 0.5
-			var fan_angle_deg = lerp(-half_fan, half_fan, t) # -15° to +15°
-			var pellet_dir = proj_dir.rotated(Vector3.UP, deg_to_rad(fan_angle_deg)).normalized()
-
-			var pellet = proj_scene.instantiate() as Area3D
-			if pellet:
-				if from_bow:
-					pellet.set_meta("from_bow", true)
-				world_container.add_child(pellet)
-				pellet.top_level = true
-				pellet.global_position = spawn_pos
-				if pellet.has_method("set_spawn_pos"):
-					pellet.set_spawn_pos(spawn_pos)
-				if pellet.has_method("setup"):
-					pellet.setup(pellet_dir, weapon_data.default_ammo, weapon_data)
-				if "projectile_lifetime" in weapon_data and weapon_data.projectile_lifetime > 0.0:
-					pellet.lifetime = weapon_data.projectile_lifetime
-				elif pellet.speed > 0.0:
-					pellet.lifetime = min(pellet.lifetime, (pellet.max_range / pellet.speed) + 0.05)
-				if player and "base_damage_bonus" in player and "damage" in pellet:
-					pellet.damage += player.base_damage_bonus
+		fire_scattershot(proj_dir, world_container, proj_scene)
 	else:
 		var ball = proj_scene.instantiate() as Area3D
 		if ball:
@@ -434,6 +409,66 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 				
 			if player and "base_damage_bonus" in player and "damage" in ball:
 				ball.damage += player.base_damage_bonus
+
+func fire_scattershot(proj_dir: Vector3 = Vector3.ZERO, world_container: Node = null, p_proj_scene: PackedScene = null) -> void:
+	if not world_container:
+		var parent = get_tree().current_scene if get_tree() else null
+		if not parent:
+			parent = get_parent()
+		world_container = parent
+	if not world_container or not muzzle_point:
+		return
+
+	var scene_to_use: PackedScene = p_proj_scene
+	if not scene_to_use:
+		if weapon_data and "projectile_scene" in weapon_data and weapon_data.projectile_scene:
+			scene_to_use = weapon_data.projectile_scene
+		else:
+			scene_to_use = preload("res://src/gameplay/projectiles/scattershot_pellet.tscn")
+
+	var spawn_pos = muzzle_point.global_position
+	spawn_pos.y = max(0.48, spawn_pos.y)
+
+	# Transform the base forward vector using the world transform of the rail mount
+	var base_dir: Vector3 = proj_dir
+	if base_dir == Vector3.ZERO:
+		var mount_fwd = global_transform.basis.z
+		mount_fwd.y = 0.0
+		if mount_fwd.length_squared() > 0.001:
+			base_dir = mount_fwd.normalized()
+		elif weapon_data and weapon_data.has_method("get_firing_direction"):
+			base_dir = weapon_data.get_firing_direction(Vector3(0, 0, -1))
+		else:
+			base_dir = Vector3(0, 0, -1)
+	else:
+		base_dir = base_dir.normalized()
+
+	var socket_name = get_parent().name.to_lower() if get_parent() else ""
+	var from_bow = ("bow" in socket_name)
+	var player = get_tree().get_first_node_in_group("player") if get_tree() else null
+
+	# 5 pellets simultaneously spread horizontally across -15°, -7.5°, 0°, +7.5°, and +15°
+	var spread_angles: Array[float] = [-15.0, -7.5, 0.0, 7.5, 15.0]
+	for angle_deg in spread_angles:
+		var pellet_dir = base_dir.rotated(Vector3.UP, deg_to_rad(angle_deg)).normalized()
+
+		var pellet = scene_to_use.instantiate() as Area3D
+		if pellet:
+			if from_bow:
+				pellet.set_meta("from_bow", true)
+			world_container.add_child(pellet)
+			pellet.top_level = true
+			pellet.global_position = spawn_pos
+			if pellet.has_method("set_spawn_pos"):
+				pellet.set_spawn_pos(spawn_pos)
+			if pellet.has_method("setup"):
+				pellet.setup(pellet_dir, weapon_data.default_ammo if weapon_data else null, weapon_data)
+			if weapon_data and "projectile_lifetime" in weapon_data and weapon_data.projectile_lifetime > 0.0:
+				pellet.lifetime = weapon_data.projectile_lifetime
+			elif pellet.speed > 0.0:
+				pellet.lifetime = min(pellet.lifetime, (pellet.max_range / pellet.speed) + 0.05)
+			if player and "base_damage_bonus" in player and "damage" in pellet:
+				pellet.damage += player.base_damage_bonus
 
 func _trigger_throw_anim() -> void:
 	if model_container and model_container.visible:

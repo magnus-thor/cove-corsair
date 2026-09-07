@@ -343,7 +343,7 @@ func _on_hit(target: Node) -> void:
 			
 		# Apply splash AoE to nearby destructibles if ammo has splash_radius
 		if (ammo_data and ammo_data.splash_radius > 0.0) or splash_radius_multiplier > 1.0:
-			_apply_splash_damage()
+			_apply_splash_damage(target)
 				
 		_spawn_splash(false)
 		queue_free()
@@ -361,9 +361,10 @@ func _spawn_splash(at_water_level: bool = false) -> void:
 			splash_pos.y = 0.02
 		splash.global_position = splash_pos
 
-func _apply_splash_damage() -> void:
+func _apply_splash_damage(exclude_target: Node = null) -> void:
 	var base_radius = ammo_data.splash_radius if (ammo_data and ammo_data.splash_radius > 0.0) else 2.5
 	var radius = base_radius * splash_radius_multiplier
+	var splash_dmg = ammo_data.aoe_damage if (ammo_data and "aoe_damage" in ammo_data and ammo_data.aoe_damage > 0) else damage
 	var targets: Array[Node] = []
 	targets.append_array(get_tree().get_nodes_in_group("destructible"))
 	targets.append_array(get_tree().get_nodes_in_group("enemies"))
@@ -372,10 +373,12 @@ func _apply_splash_damage() -> void:
 	for obj in targets:
 		if obj != null and is_instance_valid(obj) and obj != self and not processed.has(obj):
 			processed[obj] = true
+			if obj == exclude_target or (exclude_target and obj == exclude_target.get_parent()):
+				continue
 			if obj is Node3D:
 				var dist = (obj as Node3D).global_position.distance_to(global_position)
 				if dist <= radius and obj.has_method("take_damage"):
-					obj.take_damage(damage)
+					obj.take_damage(splash_dmg)
 
 func apply_gate_glow() -> void:
 	var sprite_node = get_node_or_null("Sprite3D") as Sprite3D

@@ -4,6 +4,7 @@ extends Resource
 @export var ship_id: String = ""
 @export var ship_name: String = ""
 @export var model_scene: PackedScene = null
+@export var boat_scene: PackedScene = null # Complete assembled boat scene (e.g. bombard_skiff_boat.tscn)
 @export var sprite_texture: Texture2D
 @export var pixel_size: float = 0.006
 @export var y_offset: float = 0.485
@@ -29,3 +30,12 @@ extends Resource
 @export var tier_descriptions: Array[String] = []
 ## tier_sockets: array of string arrays — each sub-array lists the active socket names for that tier (index 0 = Tier 1)
 @export var tier_sockets: Array[Array] = []
+
+func get_boat_scene() -> PackedScene:
+	if boat_scene:
+		return boat_scene
+	if ship_id == "bombard_skiff":
+		var p = "res://src/gameplay/player/bombard_skiff_boat.tscn"
+		if ResourceLoader.exists(p):
+			return load(p) as PackedScene
+	return null

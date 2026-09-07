@@ -20,6 +20,7 @@ extends Resource
 @export var arc_height: float = 0.0 # Height of ballistic arc in meters (0.0 = flat naval trajectory)
 @export var default_ammo: AmmoData
 @export var compatible_ammo: Array[Resource] = []
+@export var projectile_scene: PackedScene = null # Custom projectile scene override (e.g. scattershot pellet)
 @export var is_scatter: bool = false
 @export var pellet_count: int = 5
 @export var scatter_spread_deg: float = 30.0 # Horizontal cone spread angle (-15° to +15°)
