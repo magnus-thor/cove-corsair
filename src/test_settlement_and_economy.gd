@@ -78,7 +78,7 @@ func _test_gold_retention_on_hull_destruction() -> void:
 	)
 	
 	var gs_signal = {"fired": false, "coins": 0}
-	GameState.run_failed.connect(func(c, d):
+	GameState.run_failed.connect(func(c, _d):
 		gs_signal["fired"] = true
 		gs_signal["coins"] = c
 	)
@@ -137,7 +137,7 @@ func _test_settlement_screen_ui_victory() -> void:
 	var completion_bonus = 300
 	GameState.run_doubloons = run_coins
 	GameState.run_doubloons_banked = false
-	var total_banked = GameState.bank_run_doubloons(completion_bonus)
+	var _total_banked = GameState.bank_run_doubloons(completion_bonus)
 	
 	assert_test(GameState.doubloons == pre_bank + run_coins + completion_bonus, "Bank increased by run coins (200) + completion bonus (300)")
 	

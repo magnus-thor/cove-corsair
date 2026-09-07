@@ -16,6 +16,7 @@ signal boss_spawned_event(boss_name: String, max_val: int)
 @warning_ignore("unused_signal")
 signal boss_health_changed(current: int, max_val: int)
 signal active_vessel_changed(vessel_id: String)
+@warning_ignore("unused_signal")
 signal run_failed(coins_collected: int, distance_reached: float)
 
 const SAVE_PATH: String = "user://cove_corsair_save.json"

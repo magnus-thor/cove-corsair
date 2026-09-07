@@ -20,7 +20,7 @@ This directory contains technical specifications for all campaign levels in **Co
 ## Core Level Architecture
 
 Levels in **Cove Corsair** use a **strictly deterministic timeline engine**. 
-- Level data is defined via strongly typed `LevelData` resources (`src/data/level_data.gd`).
+- Level data is defined via strongly typed `LevelData` resources (`src/data/resources/level_data.gd`).
 - Spawns are scheduled as `SpawnEvent` instances (`src/data/spawn_event.gd`) triggered at specific distance milestones ($Z$ coordinate progression).
 - The `LevelController` (`src/gameplay/levels/level_controller.gd`) processes the timeline queue, spawning obstacles, enemy mobs, multiplier gates, hazards, and bosses without random generation.
 

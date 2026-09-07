@@ -1,7 +1,7 @@
 class_name LevelData
 extends Resource
 
-## Modular Level Data schema for dynamic recipe-based runner level generation
+## Modular Level Data schema for dynamic recipe-based runner level generation.
 
 @export_group("Level Identity")
 @export var level_id: int = 1

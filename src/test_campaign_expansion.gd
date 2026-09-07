@@ -53,11 +53,11 @@ func test_vessel_economics() -> void:
 	}
 	
 	for v_id in expected_economics:
-		var exp = expected_economics[v_id]
+		var expected_entry = expected_economics[v_id]
 		# 1. Check ShipData resource
-		var ship_res = load(exp["res_path"]) as ShipData
+		var ship_res = load(expected_entry["res_path"]) as ShipData
 		assert(ship_res != null, "ShipData resource must exist for %s" % v_id)
-		var exp_costs: Array = exp["costs"]
+		var exp_costs: Array = expected_entry["costs"]
 		assert(ship_res.upgrade_costs.size() == exp_costs.size(), "%s upgrade_costs size mismatch" % v_id)
 		for c_i in range(exp_costs.size()):
 			assert(ship_res.upgrade_costs[c_i] == exp_costs[c_i], "%s upgrade_cost[%d] mismatch" % [v_id, c_i])
@@ -65,21 +65,21 @@ func test_vessel_economics() -> void:
 		# 2. Check GameState.VESSEL_CATALOG
 		assert(GameState.VESSEL_CATALOG.has(v_id), "Catalog must contain %s" % v_id)
 		var cat = GameState.VESSEL_CATALOG[v_id]
-		assert(cat["purchase_price"] == exp["unlock"], 
-			"%s unlock price mismatch: expected %d, got %d" % [v_id, exp["unlock"], cat["purchase_price"]])
-		for tier in exp["tier_prices"]:
-			assert(cat["tier_prices"].get(tier) == exp["tier_prices"][tier],
+		assert(cat["purchase_price"] == expected_entry["unlock"], 
+			"%s unlock price mismatch: expected %d, got %d" % [v_id, expected_entry["unlock"], cat["purchase_price"]])
+		for tier in expected_entry["tier_prices"]:
+			assert(cat["tier_prices"].get(tier) == expected_entry["tier_prices"][tier],
 				"%s tier %d price mismatch" % [v_id, tier])
 				
 		# 3. Check GameState.get_upgrade_cost helper
 		for t_idx in range(1, 4):
-			var expected_cost = exp["costs"][t_idx - 1]
+			var expected_cost = expected_entry["costs"][t_idx - 1]
 			var actual_cost = GameState.get_upgrade_cost(v_id, t_idx)
 			assert(actual_cost == expected_cost, 
 				"%s get_upgrade_cost(%d) mismatch: expected %d, got %d" % [v_id, t_idx, expected_cost, actual_cost])
 				
 		print("[PASS] %s economics calibrated (Unlock: %d, T2: %d, T3: %d)" % [
-			v_id, exp["unlock"], exp["costs"][1], exp["costs"][2]
+			v_id, expected_entry["unlock"], expected_entry["costs"][1], expected_entry["costs"][2]
 		])
 
 func test_all_45_level_resources() -> void:

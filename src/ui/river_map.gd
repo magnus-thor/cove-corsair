@@ -394,7 +394,7 @@ func _create_milestone_button(lvl: int, data: Dictionary) -> Control:
 
 func _refresh_all_node_states() -> void:
 	var unlocked_max = GameState.highest_unlocked_level
-	var selected = GameState.current_selected_level
+	var _selected = GameState.current_selected_level
 	
 	for lvl in MILESTONES.keys():
 		var container = node_controls.get(lvl)

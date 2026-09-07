@@ -82,9 +82,9 @@ func update_water_color(color: Color) -> void:
 ## Assembles the level dynamically from chunk_scenes in LevelData.
 func assemble_level(data: LevelData = null) -> void:
 	if data == null:
-		var gs = _get_game_state()
-		if gs and gs.has_method("get_current_level_resource"):
-			data = gs.get_current_level_resource()
+		var initial_gs = _get_game_state()
+		if initial_gs and initial_gs.has_method("get_current_level_resource"):
+			data = initial_gs.get_current_level_resource()
 		
 	if not data:
 		push_warning("ChunkAssembler: No LevelData provided to assemble.")

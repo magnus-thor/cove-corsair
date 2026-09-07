@@ -112,7 +112,7 @@ f:\projects\cove-corsair\
 Defined in [`src/core/game_state.gd`](file:///f:/projects/cove-corsair/src/core/game_state.gd), this autoload handles global signals (`doubloons_changed`, `multiplier_changed`, `progress_changed`, `boss_health_changed`), current level selection, unlocked levels, and distance tracking.
 
 ### 2. Scripted Timeline Level Engine (`LevelController`)
-Defined in [`src/gameplay/levels/level_controller.gd`](file:///f:/projects/cove-corsair/src/gameplay/levels/level_controller.gd), the level controller provides **100% deterministic wave execution**. It reads arrays of [`SpawnEvent`](file:///f:/projects/cove-corsair/src/data/spawn_event.gd) objects from the active [`LevelData`](file:///f:/projects/cove-corsair/src/data/level_data.gd) resource and instantiates entities as the player reaches specified distance thresholds ($Z$ coordinates).
+Defined in [`src/gameplay/levels/level_controller.gd`](file:///f:/projects/cove-corsair/src/gameplay/levels/level_controller.gd), the level controller provides **100% deterministic wave execution**. It reads arrays of [`SpawnEvent`](file:///f:/projects/cove-corsair/src/data/spawn_event.gd) objects from the active [`LevelData`](file:///f:/projects/cove-corsair/src/data/resources/level_data.gd) resource and instantiates entities as the player reaches specified distance thresholds ($Z$ coordinates).
 
 ### 3. Player Vessel & Follower Fleet System
 * **Player Boat:** ([`src/gameplay/player/player.gd`](file:///f:/projects/cove-corsair/src/gameplay/player/player.gd)) Controls touch/drag lateral movement within river bounds ($X \in [-6.0, +6.0]$), handles health/hull damage, and manages attached cannon batteries.
@@ -146,7 +146,7 @@ flowchart TD
     LevelController -->|Spawns| Boss["Phase Bosses"]
 ```
 
-* **`LevelData`** ([`src/data/level_data.gd`](file:///f:/projects/cove-corsair/src/data/level_data.gd)): Defines level identity, target distance, starting vessel archetype, environment water/fog colors, scroll speed, and timeline spawn events.
+* **`LevelData`** ([`src/data/resources/level_data.gd`](file:///f:/projects/cove-corsair/src/data/resources/level_data.gd)): Defines level identity, target distance, starting vessel archetype, environment water/fog colors, scroll speed, and timeline spawn events.
 * **`SpawnEvent`** ([`src/data/spawn_event.gd`](file:///f:/projects/cove-corsair/src/data/spawn_event.gd)): Defines distance trigger ($Z$), entity type (barrel, mob, gate, hazard, boss), lane position ($X$), rarity tier, HP override, and gate parameters.
 * **`ShipData`** ([`src/data/ship_data.gd`](file:///f:/projects/cove-corsair/src/data/ship_data.gd)): Defines vessel max health, speed, handling acceleration, and weapon mounting slots.
 

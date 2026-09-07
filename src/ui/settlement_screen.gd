@@ -58,7 +58,7 @@ func _ready() -> void:
 	if map_button:
 		map_button.pressed.connect(_on_map_pressed)
 
-func show_defeat(coins_collected: int, distance_reached: float, banked_total: int) -> void:
+func show_defeat(coins_collected: int, _distance_reached: float, banked_total: int) -> void:
 	_is_victory = false
 	_run_doubloons = coins_collected
 	_completion_bonus = 0
@@ -159,15 +159,15 @@ func _animate_breakdown(run_coins: int, bonus: int, final_bank: int) -> void:
 	_tally_tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	_tally_tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 
-	var last_tick: int = -1
+	var tracker = {"last_tick": -1}
 	var step_chunk = max(1, int(float(run_coins) / 12.0))
 	
 	_tally_tween.tween_method(func(val: float):
 		var cur = int(val)
 		if run_doubloons_label:
 			run_doubloons_label.text = str(cur)
-		if cur != last_tick and (cur % step_chunk == 0 or cur == run_coins):
-			last_tick = cur
+		if cur != tracker["last_tick"] and (cur % step_chunk == 0 or cur == run_coins):
+			tracker["last_tick"] = cur
 			if AudioManager and AudioManager.has_method("play_sfx") and cur > 0:
 				AudioManager.play_sfx("coin_pickups", 0.95 + float(cur) / max(1.0, float(run_coins)) * 0.35, 1.05 + float(cur) / max(1.0, float(run_coins)) * 0.35, 0.5)
 	, 0.0, float(run_coins), 0.75)

@@ -8,6 +8,7 @@ extends Node3D
 const CHUNK_LENGTH: float = 50.0
 
 signal chunk_activated(chunk: BaseTrackChunk)
+@warning_ignore("unused_signal")
 signal chunk_completed(chunk: BaseTrackChunk)
 
 @export var chunk_id: String = ""
