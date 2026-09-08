@@ -108,6 +108,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
 
 [node name="MiniVessel" type="Node2D" parent="ScrollContainer/MapCanvas"]
 unique_name_in_owner = true
@@ -128,6 +129,7 @@ offset_right = 29.0
 offset_bottom = 29.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 pivot_offset = Vector2(29, 29)
 texture = ExtResource("4_boat_icon")
 expand_mode = 1

@@ -29,6 +29,7 @@ func _ready() -> void:
 	test_level_1_properties_and_chunks()
 	test_chunk_barricade_siege_buffer_and_pickups()
 	await test_live_dinghy_cannon_shatter_level_1()
+	await test_river_map_hitbox_interior_clicks()
 	
 	print("==========================================================")
 	print("  TEST RESULTS: %d / %d PASSED" % [passed_count, passed_count + failed_count])
@@ -224,3 +225,102 @@ func test_live_dinghy_cannon_shatter_level_1() -> void:
 	assert_test(GameState.targets_destroyed > initial_destroyed, "targets_destroyed incremented on barricade shatter")
 
 	player.queue_free()
+
+func test_river_map_hitbox_interior_clicks() -> void:
+	print("\n--- TEST 5: River Map Milestone Hitbox & Interior Clicking ---")
+	var river_map_scene = load("res://src/ui/river_map.tscn") as PackedScene
+	assert_test(river_map_scene != null, "river_map.tscn loaded successfully")
+	if not river_map_scene:
+		return
+
+	var river_map = river_map_scene.instantiate() as RiverMap
+	add_child(river_map)
+	await get_tree().process_frame
+
+	# 1. Verify canvas layer hierarchy and mouse filters
+	var terrain_layer = river_map.get_node("%TerrainLayer") as Control
+	var river_path_layer = river_map.get_node("%RiverPathLayer") as Control
+	var nodes_layer = river_map.get_node("%NodesLayer") as Control
+	assert_test(terrain_layer != null and river_path_layer != null and nodes_layer != null, "All canvas layers present")
+
+	assert_test(terrain_layer.mouse_filter == Control.MOUSE_FILTER_IGNORE, "TerrainLayer mouse_filter is MOUSE_FILTER_IGNORE")
+	assert_test(river_path_layer.mouse_filter == Control.MOUSE_FILTER_IGNORE, "RiverPathLayer mouse_filter is MOUSE_FILTER_IGNORE")
+	assert_test(nodes_layer.mouse_filter == Control.MOUSE_FILTER_PASS, "NodesLayer mouse_filter is MOUSE_FILTER_PASS")
+	assert_test(nodes_layer.get_index() > terrain_layer.get_index(), "NodesLayer sits higher in tree than TerrainLayer")
+	assert_test(nodes_layer.get_index() > river_path_layer.get_index(), "NodesLayer sits higher in tree than RiverPathLayer")
+
+	# 2. Inspect Milestone TouchButton styleboxes and mouse filter
+	var test_nodes = [1, 2, 5]
+	for lvl in test_nodes:
+		var node_ctrl = river_map.node_controls.get(lvl) as Control
+		assert_test(node_ctrl != null, "Milestone node %d exists" % lvl)
+		if not node_ctrl:
+			continue
+
+		assert_test(node_ctrl.mouse_filter == Control.MOUSE_FILTER_PASS, "Milestone node %d container mouse_filter is MOUSE_FILTER_PASS" % lvl)
+		var btn = node_ctrl.find_child("TouchButton", true, false) as Button
+		assert_test(btn != null, "TouchButton found in node %d" % lvl)
+		if not btn:
+			continue
+
+		assert_test(not btn.flat, "TouchButton is not flat (uses explicit theme styleboxes)")
+		assert_test(btn.mouse_filter == Control.MOUSE_FILTER_STOP, "TouchButton mouse_filter is MOUSE_FILTER_STOP")
+		assert_test(btn.size == Vector2(96, 96), "TouchButton dimensions are 96x96px")
+
+		var has_flat_styles = true
+		var correct_radius = true
+		var non_zero_alpha = true
+		for state in ["normal", "hover", "pressed", "focus", "disabled"]:
+			var sb = btn.get_theme_stylebox(state)
+			if not (sb is StyleBoxFlat):
+				has_flat_styles = false
+			else:
+				var sbf = sb as StyleBoxFlat
+				if sbf.corner_radius_top_left != 48:
+					correct_radius = false
+				if sbf.bg_color.a <= 0.001:
+					non_zero_alpha = false
+
+		assert_test(has_flat_styles, "TouchButton uses StyleBoxFlat across ALL states (normal, hover, pressed, focus, disabled)")
+		assert_test(correct_radius, "TouchButton corner_radius_all = 48 (half button size for solid circular disc)")
+		assert_test(non_zero_alpha, "TouchButton StyleBoxFlat has solid clickable alpha (> 0.001)")
+
+	# 3. Verify hit detection geometry across circular disc interior (Center, Halfway, Rim)
+	var node1_ctrl = river_map.node_controls.get(1) as Control
+	var btn1 = node1_ctrl.find_child("TouchButton", true, false) as Button
+	
+	var clicked_box = [-1]
+	river_map.level_selected.connect(func(lvl: int):
+		clicked_box[0] = lvl
+	)
+
+	var center = Vector2(48, 48)
+	var rect = Rect2(Vector2.ZERO, btn1.size)
+	var pt_center = Vector2(48, 48)
+	var pt_half = Vector2(72, 48) # 24px from center
+	var pt_rim = Vector2(92, 48)  # 44px from center (inside 48px radius)
+	var pt_outside = Vector2(105, 48) # outside 48px radius
+
+	assert_test(rect.has_point(pt_center) and pt_center.distance_to(center) <= 48.0, "Center point (48, 48) is inside 48px circular hitbox")
+	assert_test(rect.has_point(pt_half) and pt_half.distance_to(center) <= 48.0, "Halfway point (72, 48) is inside 48px circular hitbox")
+	assert_test(rect.has_point(pt_rim) and pt_rim.distance_to(center) <= 48.0, "Rim point (92, 48) is inside 48px circular hitbox")
+	assert_test(not rect.has_point(pt_outside) or pt_outside.distance_to(center) > 48.0, "Outside point (105, 48) is outside 48px circular hitbox")
+
+	# Test node trigger via button press
+	clicked_box[0] = -1
+	GameState.current_selected_level = 0
+	GameState.highest_unlocked_level = 5
+	btn1.emit_signal("pressed")
+	assert_test(clicked_box[0] == 1, "TouchButton pressed signal triggers node 1 selection")
+	assert_test(GameState.current_selected_level == 1, "GameState current_selected_level updated to 1")
+
+	# Test Node 2 selection
+	var node2_ctrl = river_map.node_controls.get(2) as Control
+	var btn2 = node2_ctrl.find_child("TouchButton", true, false) as Button
+	clicked_box[0] = -1
+	btn2.emit_signal("pressed")
+	assert_test(clicked_box[0] == 2, "TouchButton pressed signal triggers node 2 selection")
+	assert_test(GameState.current_selected_level == 2, "GameState current_selected_level updated to 2")
+
+	river_map.queue_free()
+

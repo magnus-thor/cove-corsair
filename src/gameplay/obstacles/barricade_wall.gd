@@ -39,10 +39,16 @@ func _ready() -> void:
 	var cur_level = _get_effective_level()
 	var tier_hp = get_tier_hp(cur_level)
 	
-	# If an explicit hp override is set on an exported scene property, respect it only if specified > 0 and level > 10.
+	# Scale barricade slat HP dynamically based on Campaign Tier:
+	# Levels 1 to 3: Slat HP = 2 (starter Dinghy destroys a slat in 2 direct cannon shots).
+	# Levels 4 to 10: Slat HP = 6 (requires 5-6 shots or upgraded vessel fire).
+	# Levels 11 to 25: Slat HP = 12.
+	# Levels 26+: Slat HP = 20 (late-game fortified siege walls).
 	var default_slat_hp = tier_hp
-	if cur_level > 10 and hp > 0:
+	if cur_level > 10 and hp > 0 and hp != 20:
 		default_slat_hp = hp
+	elif cur_level >= 26:
+		default_slat_hp = 20
 		
 	for i in range(x_points.size()):
 		var x_norm = x_points[i]

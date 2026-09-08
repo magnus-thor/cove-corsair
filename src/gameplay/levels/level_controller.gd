@@ -39,7 +39,7 @@ signal run_failed(coins_collected: int, distance_reached: float)
 var current_distance: float = 0.0
 var active_queue: Array = []
 var river_width_world: float = 12.0
-var base_scroll_speed: float = 10.0
+var base_scroll_speed: float = 6.5
 var bank_strips: Array[Node3D] = []          # legacy – kept for potential future use
 var riverbank_chunks: Array[Node3D] = []     # Layer 2 framing strips (new system)
 var _horizon_backdrop: Node3D = null         # Layer 1 horizon quad
@@ -719,6 +719,9 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 		"turtle_rafts":
 			var x_positions: Array = event.get("x_positions", [0.0])
 			var hp         = int(event.get("hp", 6))
+			var cur_lvl = GameState.current_level if has_node("/root/GameState") else 1
+			if cur_lvl <= 1 and hp > 6:
+				hp = 6
 			var raft_speed = float(event.get("speed", 1.8))
 			for x_norm in x_positions:
 				var x_world = clampf(normalized_to_world_x(float(x_norm)), -4.4, 4.4)

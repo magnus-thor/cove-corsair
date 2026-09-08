@@ -28,6 +28,9 @@ func _ready() -> void:
 	if cur_level <= 10:
 		if hp <= 1 or hp > tier_hp:
 			hp = tier_hp
+	elif cur_level <= 25:
+		if hp <= 1 or hp == 20:
+			hp = tier_hp
 	else:
 		if hp <= 1:
 			hp = tier_hp

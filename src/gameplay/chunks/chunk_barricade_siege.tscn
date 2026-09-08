@@ -13,6 +13,7 @@
 [ext_resource type="PackedScene" path="res://src/gameplay/obstacles/multiplier_gate.tscn" id="11_h1ubg"]
 [ext_resource type="Script" path="res://src/gameplay/obstacles/multiplier_gate.gd" id="12_p20ko"]
 [ext_resource type="Resource" path="res://src/data/resources/enemy_vessels/turtle_raft.tres" id="13_turtle"]
+[ext_resource type="Script" path="res://src/gameplay/chunks/chest_spawn_marker.gd" id="14_marker_script"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lcaak"]
 resource_name = "colormap"
@@ -133,8 +134,8 @@ mesh = SubResource("ArrayMesh_2bo03")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -12)
 script = ExtResource("6_heufw")
 enemy_data = ExtResource("13_turtle")
-max_hp = 30
-current_hp = 30
+max_hp = 6
+current_hp = 6
 forward_speed = 1.5
 doubloons_drop = 6
 
@@ -172,3 +173,9 @@ max_hp = 2
 current_hp = 2
 forward_speed = 1.8
 doubloons_drop = 3
+
+[node name="ChestSpawnMarker_HazardFlank" type="Marker3D" parent="Entities" unique_id=987123453]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.4, 0.05, -25)
+script = ExtResource("14_marker_script")
+chest_value = 50
+min_level = 5

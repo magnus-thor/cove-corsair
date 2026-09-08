@@ -236,6 +236,7 @@ func _create_milestone_button(lvl: int, data: Dictionary) -> Control:
 	container.custom_minimum_size = Vector2(160, 160)
 	container.pivot_offset = Vector2(80, 80)
 	container.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	container.mouse_filter = Control.MOUSE_FILTER_PASS
 	
 	# Pulsing active circular aura (behind button)
 	var aura = Panel.new()
@@ -348,10 +349,12 @@ func _create_milestone_button(lvl: int, data: Dictionary) -> Control:
 		boss_banner.add_theme_stylebox_override("panel", banner_style)
 		
 		var hbox = HBoxContainer.new()
+		hbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		hbox.add_theme_constant_override("separation", 6)
 		hbox.alignment = BoxContainer.ALIGNMENT_CENTER
 		
 		var skull = TextureRect.new()
+		skull.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		skull.custom_minimum_size = Vector2(22, 22)
 		skull.texture = ICON_SKULL
 		skull.modulate = skull_mod
@@ -360,6 +363,7 @@ func _create_milestone_button(lvl: int, data: Dictionary) -> Control:
 		hbox.add_child(skull)
 		
 		var b_lbl = Label.new()
+		b_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		b_lbl.text = label_text
 		b_lbl.add_theme_font_override("font", FONT_LILITA)
 		b_lbl.add_theme_font_size_override("font_size", 18 if boss_type == "final_boss" else 15)
@@ -392,17 +396,33 @@ func _create_milestone_button(lvl: int, data: Dictionary) -> Control:
 	btn.size = Vector2(96, 96)
 	btn.custom_minimum_size = Vector2(96, 96)
 	btn.pivot_offset = Vector2(48, 48)
-	btn.flat = true
+	btn.flat = false
 	btn.mouse_filter = Control.MOUSE_FILTER_STOP
 	btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	btn.focus_mode = Control.FOCUS_NONE
-	var empty_style = StyleBoxEmpty.new()
+
+	var hit_style = StyleBoxFlat.new()
+	hit_style.bg_color = Color(1.0, 1.0, 1.0, 0.005)
+	hit_style.set_corner_radius_all(48)
 	for state in ["normal", "hover", "pressed", "focus", "disabled"]:
-		btn.add_theme_stylebox_override(state, empty_style)
+		btn.add_theme_stylebox_override(state, hit_style)
+
 	btn.pressed.connect(func(): _on_node_pressed(lvl))
 	container.add_child(btn)
 
+	# Safeguard: ensure every non-button child/descendant ignores mouse clicks
+	for child in container.get_children():
+		if child != btn:
+			_set_mouse_filter_recursive(child, Control.MOUSE_FILTER_IGNORE)
+	btn.move_to_front()
+
 	return container
+
+static func _set_mouse_filter_recursive(node: Node, filter_mode: Control.MouseFilter) -> void:
+	if node is Control:
+		node.mouse_filter = filter_mode
+	for child in node.get_children():
+		_set_mouse_filter_recursive(child, filter_mode)
 
 func _refresh_all_node_states() -> void:
 	var unlocked_max = GameState.highest_unlocked_level
@@ -493,6 +513,8 @@ func _setup_mini_vessel() -> void:
 				
 	if not tex_loaded:
 		mini_vessel_icon.texture = ICON_BOAT_FALLBACK
+	
+	mini_vessel_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		
 	_start_vessel_idle_bob()
 

@@ -548,6 +548,18 @@ func _on_area_entered(area: Area3D) -> void:
 				area.die()
 			return
 
+		var is_sea_mine = area is HazardSeaMine or (area is DestructibleObstacle and area.obstacle_type == DestructibleObstacle.ObstacleType.SEA_MINE)
+		if is_sea_mine:
+			var mine_pos = area.global_position
+			take_hit(1, "Collision with Sea Mine")
+			if area.has_method("die"):
+				area.die()
+			else:
+				if VFXManager:
+					VFXManager.spawn_mine_explosion(mine_pos)
+				area.queue_free()
+			return
+
 		AudioManager.play_sfx("barrel_hits")
 		take_hit(1, "Collision with %s (%s)" % [area.name, str(area.get_groups())])
 			

@@ -5,14 +5,23 @@ func _ready() -> void:
 	obstacle_type = ObstacleType.SEA_MINE
 	super._ready()
 	add_to_group("destructible")
+	if not area_entered.is_connected(_on_area_entered):
+		area_entered.connect(_on_area_entered)
+
+func _on_area_entered(area: Area3D) -> void:
+	if _is_destroyed:
+		return
+	if area.is_in_group("player") or area.is_in_group("follower") or area.is_in_group("cannonballs"):
+		die()
 
 func die() -> void:
 	if _is_destroyed:
 		return
+	var explosion_pos = global_position
 	_is_destroyed = true
 	
 	if VFXManager:
-		VFXManager.spawn_mine_explosion(global_position)
+		VFXManager.spawn_mine_explosion(explosion_pos)
 	else:
 		_spawn_explosion()
 	AudioManager.play_sfx("sfx_mine_detonate")
@@ -20,9 +29,9 @@ func die() -> void:
 	# Apply knockback and deal 1 fleet damage to the player if close (direct contact)
 	var player = get_tree().get_first_node_in_group("player")
 	if player and is_instance_valid(player):
-		var dist = global_position.distance_to(player.global_position)
+		var dist = explosion_pos.distance_to(player.global_position)
 		if dist < 2.8:
-			var knockback_dir = sign(player.global_position.x - global_position.x)
+			var knockback_dir = sign(player.global_position.x - explosion_pos.x)
 			if knockback_dir == 0.0:
 				knockback_dir = 1.0 if randf() < 0.5 else -1.0
 			

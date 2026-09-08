@@ -12,6 +12,7 @@
 [ext_resource type="Script" path="res://src/gameplay/obstacles/destructible_barrel.gd" id="10_i1ga4"]
 [ext_resource type="PackedScene" path="res://src/gameplay/enemies/enemy_mob.tscn" id="11_kcm6y"]
 [ext_resource type="Script" path="res://src/gameplay/enemies/enemy_mob.gd" id="12_0k44h"]
+[ext_resource type="Script" path="res://src/gameplay/chunks/chest_spawn_marker.gd" id="13_marker_script"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5xg14"]
 resource_name = "colormap"
@@ -183,4 +184,16 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.13, -46)
 collision_layer = 8
 script = ExtResource("8_ngubn")
 value = 8
+
+[node name="ChestSpawnMarker_HazardLeft" type="Marker3D" parent="Entities" unique_id=987123451]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.4, 0.05, -16)
+script = ExtResource("13_marker_script")
+chest_value = 75
+min_level = 5
+
+[node name="ChestSpawnMarker_HazardRight" type="Marker3D" parent="Entities" unique_id=987123452]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.4, 0.05, -40)
+script = ExtResource("13_marker_script")
+chest_value = 100
+min_level = 5
 

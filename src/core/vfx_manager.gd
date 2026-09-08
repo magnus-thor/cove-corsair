@@ -5,6 +5,7 @@ extends Node
 const SCENE_WOOD_SPLINTER: PackedScene = preload("res://src/vfx/vfx_wood_splinter.tscn")
 const SCENE_MORTAR_GEYSER: PackedScene = preload("res://src/vfx/vfx_mortar_geyser.tscn")
 const SCENE_MINE_EXPLOSION: PackedScene = preload("res://src/vfx/vfx_mine_explosion.tscn")
+const SCENE_COIN_BURST: PackedScene = preload("res://src/vfx/vfx_coin_burst.tscn")
 
 ## Water surface constant
 const WATER_SURFACE_MIN_Y: float = 0.0
@@ -99,3 +100,7 @@ func spawn_mortar_splash(world_pos: Vector3) -> Node3D:
 ## Spawns fiery orange core flash and expanding dark charcoal smoke cloud.
 func spawn_mine_explosion(world_pos: Vector3) -> Node3D:
 	return _spawn_effect(SCENE_MINE_EXPLOSION, world_pos, 0.5)
+
+## Spawns fountain burst of golden coin particles erupting upward upon chest collection.
+func spawn_coin_burst(world_pos: Vector3) -> Node3D:
+	return _spawn_effect(SCENE_COIN_BURST, world_pos, 0.7)
