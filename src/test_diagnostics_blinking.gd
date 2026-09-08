@@ -40,7 +40,7 @@ func _ready() -> void:
 				is_water = true
 		if is_water:
 			water_meshes.append(m)
-			var parent_name = m.get_parent().name if m.get_parent() else "root"
+			var parent_name = String(m.get_parent().name) if m.get_parent() else "root"
 			print("Water mesh: '%s' | parent: '%s' | visible: %s | Y: %.3f | global_pos: %s" % [
 				m.name, parent_name, m.is_visible_in_tree(), m.global_position.y, str(m.global_position)
 			])

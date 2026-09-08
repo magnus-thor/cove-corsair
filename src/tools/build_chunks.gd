@@ -1,6 +1,8 @@
 extends Node
 
 const CHUNK_SCRIPT = preload("res://src/gameplay/chunks/base_track_chunk.gd")
+const BARRICADE_SIEGE_SCRIPT = preload("res://src/gameplay/chunks/chunk_barricade_siege.gd")
+const CHEST_MARKER_SCRIPT = preload("res://src/gameplay/chunks/chest_spawn_marker.gd")
 
 const COIN_SCENE = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
 const BARREL_SCENE = preload("res://src/gameplay/obstacles/destructible_barrel.tscn")
@@ -68,21 +70,17 @@ func create_base_chunk_node(chunk_id: String, is_boss: bool = false) -> BaseTrac
 	
 	return root
 
-func add_model_to_node(parent: Node, root_owner: Node, glb_scene: PackedScene, pos: Vector3, rot_deg: Vector3 = Vector3.ZERO, sc: Vector3 = Vector3.ONE) -> void:
+func add_model_to_node(parent: Node, root_owner: Node, glb_scene: PackedScene, node_name: String, pos: Vector3, rot_deg: Vector3 = Vector3.ZERO, sc: Vector3 = Vector3.ONE) -> Node3D:
 	if not glb_scene:
-		return
+		return null
 	var inst = glb_scene.instantiate()
+	inst.name = node_name
 	parent.add_child(inst)
 	inst.position = pos
 	inst.rotation_degrees = rot_deg
 	inst.scale = sc
 	inst.owner = root_owner
-	_set_all_owners(inst, root_owner)
-
-func _set_all_owners(node: Node, new_owner: Node) -> void:
-	for c in node.get_children():
-		c.owner = new_owner
-		_set_all_owners(c, new_owner)
+	return inst
 
 func save_chunk(root: Node, path: String) -> void:
 	var packed := PackedScene.new()
@@ -104,14 +102,14 @@ func build_warmup_chunk() -> void:
 	var entities := root.get_node("Entities")
 	
 	# Scenery on left bank (X approx -8.5)
-	add_model_to_node(banks, root, DOCK_MODEL, Vector3(-8.0, 0, -12), Vector3(0, 90, 0), Vector3(1.2, 1, 1.5))
-	add_model_to_node(banks, root, PALM_MODEL, Vector3(-9.5, 0, -22), Vector3(0, 30, 0), Vector3(1.5, 1.5, 1.5))
-	add_model_to_node(banks, root, ROCKS_A_MODEL, Vector3(-9.8, 0, -36), Vector3(0, 45, 0), Vector3(1.6, 1.6, 1.6))
+	add_model_to_node(banks, root, DOCK_MODEL, "Dock_Left", Vector3(-8.0, 0, -12), Vector3(0, 90, 0), Vector3(1.2, 1, 1.5))
+	add_model_to_node(banks, root, PALM_MODEL, "Palm_Left", Vector3(-9.5, 0, -22), Vector3(0, 30, 0), Vector3(1.5, 1.5, 1.5))
+	add_model_to_node(banks, root, ROCKS_A_MODEL, "RocksA_Left", Vector3(-9.8, 0, -36), Vector3(0, 45, 0), Vector3(1.6, 1.6, 1.6))
 	
 	# Scenery on right bank (X approx +8.5)
-	add_model_to_node(banks, root, PALM_MODEL, Vector3(9.5, 0, -14), Vector3(0, -40, 0), Vector3(1.5, 1.5, 1.5))
-	add_model_to_node(banks, root, ROCKS_B_MODEL, Vector3(9.8, 0, -28), Vector3(0, -20, 0), Vector3(1.8, 1.8, 1.8))
-	add_model_to_node(banks, root, DOCK_MODEL, Vector3(8.0, 0, -42), Vector3(0, -90, 0), Vector3(1.2, 1, 1.5))
+	add_model_to_node(banks, root, PALM_MODEL, "Palm_Right", Vector3(9.5, 0, -14), Vector3(0, -40, 0), Vector3(1.5, 1.5, 1.5))
+	add_model_to_node(banks, root, ROCKS_B_MODEL, "RocksB_Right", Vector3(9.8, 0, -28), Vector3(0, -20, 0), Vector3(1.8, 1.8, 1.8))
+	add_model_to_node(banks, root, DOCK_MODEL, "Dock_Right", Vector3(8.0, 0, -42), Vector3(0, -90, 0), Vector3(1.2, 1, 1.5))
 	
 	# Coins arc (Z = -8 to -16)
 	for i in range(5):
@@ -119,12 +117,14 @@ func build_warmup_chunk() -> void:
 		var x = lerp(-2.0, 2.0, t)
 		var z = -8.0 - (i * 2.0)
 		var coin = COIN_SCENE.instantiate()
+		coin.name = "Doubloon_%d" % (i + 1)
 		entities.add_child(coin)
 		coin.position = Vector3(x, 0.13, z)
 		coin.owner = root
 		
 	# Center wooden barrel at Z = -22
 	var b1 = BARREL_SCENE.instantiate()
+	b1.name = "Barrel_Center"
 	entities.add_child(b1)
 	b1.position = Vector3(0, 0.05, -22.0)
 	b1.hp = 1
@@ -132,6 +132,7 @@ func build_warmup_chunk() -> void:
 	
 	# Skeleton rower at Z = -28
 	var mob = ENEMY_SCENE.instantiate()
+	mob.name = "EnemyMob_Rower"
 	entities.add_child(mob)
 	mob.position = Vector3(-1.8, 0.1, -28.0)
 	mob.max_hp = 2
@@ -141,12 +142,14 @@ func build_warmup_chunk() -> void:
 	
 	# Flanking wooden barrels at Z = -34
 	var b2 = BARREL_SCENE.instantiate()
+	b2.name = "Barrel_Left"
 	entities.add_child(b2)
 	b2.position = Vector3(-2.8, 0.05, -34.0)
 	b2.hp = 1
 	b2.owner = root
 	
 	var b3 = BARREL_SCENE.instantiate()
+	b3.name = "Barrel_Right"
 	entities.add_child(b3)
 	b3.position = Vector3(2.8, 0.05, -34.0)
 	b3.hp = 1
@@ -154,6 +157,7 @@ func build_warmup_chunk() -> void:
 	
 	# Multiplier gate (+1 Fleet) at Z = -42
 	var gate = GATE_SCENE.instantiate()
+	gate.name = "MultiplierGate"
 	entities.add_child(gate)
 	gate.position = Vector3(0, 0.0, -42.0)
 	gate.operation = 0 # ADD
@@ -164,106 +168,135 @@ func build_warmup_chunk() -> void:
 	
 	save_chunk(root, "res://src/gameplay/chunks/chunk_warmup.tscn")
 
-# 2. Mine Gauntlet Chunk (Vector A)
+# 2. Mine Gauntlet Chunk (Vector A Chokepoints)
 func build_mine_gauntlet_chunk() -> void:
 	var root := create_base_chunk_node("mine_gauntlet")
 	var banks := root.get_node("Banks")
 	var entities := root.get_node("Entities")
 	
 	# Rugged rocky banks
-	add_model_to_node(banks, root, ROCKS_B_MODEL, Vector3(-9.5, 0, -10), Vector3(0, 15, 0), Vector3(2.0, 2.0, 2.0))
-	add_model_to_node(banks, root, ROCKS_A_MODEL, Vector3(-9.2, 0, -32), Vector3(0, 60, 0), Vector3(1.8, 1.8, 1.8))
-	add_model_to_node(banks, root, ROCKS_A_MODEL, Vector3(9.5, 0, -16), Vector3(0, -30, 0), Vector3(1.9, 1.9, 1.9))
-	add_model_to_node(banks, root, ROCKS_B_MODEL, Vector3(9.2, 0, -38), Vector3(0, -75, 0), Vector3(2.1, 2.1, 2.1))
+	add_model_to_node(banks, root, ROCKS_B_MODEL, "RocksB_Left1", Vector3(-9.5, 0, -10), Vector3(0, 15, 0), Vector3(2.0, 2.0, 2.0))
+	add_model_to_node(banks, root, ROCKS_A_MODEL, "RocksA_Left2", Vector3(-9.2, 0, -32), Vector3(0, 60, 0), Vector3(1.8, 1.8, 1.8))
+	add_model_to_node(banks, root, ROCKS_A_MODEL, "RocksA_Right1", Vector3(9.5, 0, -16), Vector3(0, -30, 0), Vector3(1.9, 1.9, 1.9))
+	add_model_to_node(banks, root, ROCKS_B_MODEL, "RocksB_Right2", Vector3(9.2, 0, -38), Vector3(0, -75, 0), Vector3(2.1, 2.1, 2.1))
 	
-	# Slalom mines
-	var m1 = SEA_MINE_SCENE.instantiate()
-	entities.add_child(m1)
-	m1.position = Vector3(-2.5, 0.0, -12.0)
-	m1.owner = root
+	# Gate 1 (Z = -12.0): Left passage (centers -3.45 and -0.15, gap = 2.1m)
+	var m1_l = SEA_MINE_SCENE.instantiate()
+	m1_l.name = "MineGate1_Left"
+	entities.add_child(m1_l)
+	m1_l.position = Vector3(-3.45, 0.0, -12.0)
+	m1_l.owner = root
 	
-	var m2 = SEA_MINE_SCENE.instantiate()
-	entities.add_child(m2)
-	m2.position = Vector3(2.5, 0.0, -18.0)
-	m2.owner = root
+	var m1_r = SEA_MINE_SCENE.instantiate()
+	m1_r.name = "MineGate1_Right"
+	entities.add_child(m1_r)
+	m1_r.position = Vector3(-0.15, 0.0, -12.0)
+	m1_r.owner = root
 	
-	# Diagonal coin trail weaving between mines
-	for i in range(5):
-		var t = float(i) / 4.0
-		var x = lerp(1.5, -1.5, t)
-		var z = -12.0 - (i * 2.0)
-		var coin = COIN_SCENE.instantiate()
-		entities.add_child(coin)
-		coin.position = Vector3(x, 0.13, z)
-		coin.owner = root
-		
-	# Fuse barrels flanking at Z = -26
-	var fb1 = BARREL_SCENE.instantiate()
-	entities.add_child(fb1)
-	fb1.position = Vector3(-3.2, 0.05, -26.0)
-	fb1.obstacle_type = 1 # FUSE_BARREL
-	fb1.hp = 2
-	fb1.owner = root
+	var d1 = COIN_SCENE.instantiate()
+	d1.name = "Doubloon1"
+	entities.add_child(d1)
+	d1.position = Vector3(-1.8, 0.13, -12.0)
+	d1.value = 8
+	d1.owner = root
 	
-	var fb2 = BARREL_SCENE.instantiate()
-	entities.add_child(fb2)
-	fb2.position = Vector3(3.2, 0.05, -26.0)
-	fb2.obstacle_type = 1 # FUSE_BARREL
-	fb2.hp = 2
-	fb2.owner = root
+	# Gate 2 (Z = -24.0): Center passage (centers -1.65 and 1.65, gap = 2.1m)
+	var m2_l = SEA_MINE_SCENE.instantiate()
+	m2_l.name = "MineGate2_Left"
+	entities.add_child(m2_l)
+	m2_l.position = Vector3(-1.65, 0.0, -24.0)
+	m2_l.owner = root
 	
-	# Fast Raider Skiff mob at Z = -31
-	var mob = ENEMY_SCENE.instantiate()
-	entities.add_child(mob)
-	mob.position = Vector3(0.0, 0.1, -31.0)
-	mob.max_hp = 4
-	mob.current_hp = 4
-	mob.forward_speed = 2.8
-	var raider_data = preload("res://src/data/resources/enemy_vessels/raider_skiff.tres")
-	if mob.has_method("apply_enemy_data"):
-		mob.apply_enemy_data(raider_data)
-	mob.owner = root
+	var m2_r = SEA_MINE_SCENE.instantiate()
+	m2_r.name = "MineGate2_Right"
+	entities.add_child(m2_r)
+	m2_r.position = Vector3(1.65, 0.0, -24.0)
+	m2_r.owner = root
 	
-	# Center mine at Z = -38 with side coins
-	var m3 = SEA_MINE_SCENE.instantiate()
-	entities.add_child(m3)
-	m3.position = Vector3(0.0, 0.0, -38.0)
-	m3.owner = root
+	var d2 = COIN_SCENE.instantiate()
+	d2.name = "Doubloon2"
+	entities.add_child(d2)
+	d2.position = Vector3(0.0, 0.13, -24.0)
+	d2.value = 8
+	d2.owner = root
 	
-	var c_left = COIN_SCENE.instantiate()
-	entities.add_child(c_left)
-	c_left.position = Vector3(-3.0, 0.13, -38.0)
-	c_left.owner = root
+	# Gate 3 (Z = -36.0): Right passage (centers 0.15 and 3.45, gap = 2.1m)
+	var m3_l = SEA_MINE_SCENE.instantiate()
+	m3_l.name = "MineGate3_Left"
+	entities.add_child(m3_l)
+	m3_l.position = Vector3(0.15, 0.0, -36.0)
+	m3_l.owner = root
 	
-	var c_right = COIN_SCENE.instantiate()
-	entities.add_child(c_right)
-	c_right.position = Vector3(3.0, 0.13, -38.0)
-	c_right.owner = root
+	var m3_r = SEA_MINE_SCENE.instantiate()
+	m3_r.name = "MineGate3_Right"
+	entities.add_child(m3_r)
+	m3_r.position = Vector3(3.45, 0.0, -36.0)
+	m3_r.owner = root
 	
-	# Rune barrel at Z = -45
-	var rb = BARREL_SCENE.instantiate()
-	entities.add_child(rb)
-	rb.position = Vector3(0.0, 0.05, -45.0)
-	rb.obstacle_type = 2 # RUNE_BARREL
-	rb.hp = 2
-	rb.owner = root
+	var d3 = COIN_SCENE.instantiate()
+	d3.name = "Doubloon3"
+	entities.add_child(d3)
+	d3.position = Vector3(1.8, 0.13, -36.0)
+	d3.value = 8
+	d3.owner = root
+	
+	# Gate 4 (Z = -46.0): Center passage (centers -1.65 and 1.65, gap = 2.1m)
+	var m4_l = SEA_MINE_SCENE.instantiate()
+	m4_l.name = "MineGate4_Left"
+	entities.add_child(m4_l)
+	m4_l.position = Vector3(-1.65, 0.0, -46.0)
+	m4_l.owner = root
+	
+	var m4_r = SEA_MINE_SCENE.instantiate()
+	m4_r.name = "MineGate4_Right"
+	entities.add_child(m4_r)
+	m4_r.position = Vector3(1.65, 0.0, -46.0)
+	m4_r.owner = root
+	
+	var d4 = COIN_SCENE.instantiate()
+	d4.name = "Doubloon4"
+	entities.add_child(d4)
+	d4.position = Vector3(0.0, 0.13, -46.0)
+	d4.value = 8
+	d4.owner = root
+	
+	# Chest spawn markers for hazard pockets
+	var m_left = Marker3D.new()
+	m_left.name = "ChestSpawnMarker_HazardLeft"
+	m_left.set_script(CHEST_MARKER_SCRIPT)
+	m_left.chest_value = 75
+	m_left.min_level = 5
+	m_left.position = Vector3(-3.4, 0.05, -16.0)
+	entities.add_child(m_left)
+	m_left.owner = root
+
+	var m_right = Marker3D.new()
+	m_right.name = "ChestSpawnMarker_HazardRight"
+	m_right.set_script(CHEST_MARKER_SCRIPT)
+	m_right.chest_value = 100
+	m_right.min_level = 5
+	m_right.position = Vector3(3.4, 0.05, -40.0)
+	entities.add_child(m_right)
+	m_right.owner = root
 	
 	save_chunk(root, "res://src/gameplay/chunks/chunk_mine_gauntlet.tscn")
 
 # 3. Barricade Siege Chunk (Vector B)
 func build_barricade_siege_chunk() -> void:
 	var root := create_base_chunk_node("barricade_siege")
+	root.set_script(BARRICADE_SIEGE_SCRIPT)
 	var banks := root.get_node("Banks")
 	var entities := root.get_node("Entities")
 	
 	# Fortified ramparts on banks
-	add_model_to_node(banks, root, FENCE_MODEL, Vector3(-7.5, 0, -18), Vector3(0, 0, 0), Vector3(1.5, 1.5, 2.0))
-	add_model_to_node(banks, root, TOWER_MODEL, Vector3(-9.5, 0, -32), Vector3(0, 45, 0), Vector3(1.2, 1.2, 1.2))
-	add_model_to_node(banks, root, FENCE_MODEL, Vector3(7.5, 0, -18), Vector3(0, 0, 0), Vector3(1.5, 1.5, 2.0))
-	add_model_to_node(banks, root, TOWER_MODEL, Vector3(9.5, 0, -32), Vector3(0, -45, 0), Vector3(1.2, 1.2, 1.2))
+	add_model_to_node(banks, root, FENCE_MODEL, "Fence_Left", Vector3(-7.5, 0, -18), Vector3(0, 0, 0), Vector3(1.5, 1.5, 2.0))
+	add_model_to_node(banks, root, TOWER_MODEL, "Tower_Left", Vector3(-9.5, 0, -32), Vector3(0, 45, 0), Vector3(1.2, 1.2, 1.2))
+	add_model_to_node(banks, root, FENCE_MODEL, "Fence_Right", Vector3(7.5, 0, -18), Vector3(0, 0, 0), Vector3(1.5, 1.5, 2.0))
+	add_model_to_node(banks, root, TOWER_MODEL, "Tower_Right", Vector3(9.5, 0, -32), Vector3(0, -45, 0), Vector3(1.2, 1.2, 1.2))
 	
 	# Turtle raft armored front at Z = -12
 	var turtle = ENEMY_SCENE.instantiate()
+	turtle.name = "EnemyMob_TurtleRaft"
 	entities.add_child(turtle)
 	turtle.position = Vector3(0.0, 0.1, -12.0)
 	var turtle_data = preload("res://src/data/resources/enemy_vessels/turtle_raft.tres")
@@ -276,12 +309,14 @@ func build_barricade_siege_chunk() -> void:
 	
 	# Barricade wall at Z = -22
 	var wall = BARRICADE_SCENE.instantiate()
+	wall.name = "BarricadeWall"
 	entities.add_child(wall)
 	wall.position = Vector3(0.0, 0.0, -22.0)
 	wall.owner = root
 	
 	# Armored chest rune barrel at Z = -30
 	var chest_barrel = BARREL_SCENE.instantiate()
+	chest_barrel.name = "Barrel_RuneChest"
 	entities.add_child(chest_barrel)
 	chest_barrel.position = Vector3(0.0, 0.05, -30.0)
 	chest_barrel.obstacle_type = 2 # RUNE_BARREL
@@ -291,6 +326,7 @@ func build_barricade_siege_chunk() -> void:
 	
 	# Multiplier gate (+2 Fleet) reward at Z = -38
 	var gate = GATE_SCENE.instantiate()
+	gate.name = "MultiplierGate"
 	entities.add_child(gate)
 	gate.position = Vector3(0, 0.0, -38.0)
 	gate.operation = 0 # ADD
@@ -301,6 +337,7 @@ func build_barricade_siege_chunk() -> void:
 	
 	# Dual skeleton rowers at Z = -48 (enforcing >= 25m safe buffer zone behind barricade)
 	var r1 = ENEMY_SCENE.instantiate()
+	r1.name = "EnemyMob_RowerLeft"
 	entities.add_child(r1)
 	r1.position = Vector3(-2.2, 0.1, -48.0)
 	r1.max_hp = 2
@@ -309,12 +346,23 @@ func build_barricade_siege_chunk() -> void:
 	r1.owner = root
 	
 	var r2 = ENEMY_SCENE.instantiate()
+	r2.name = "EnemyMob_RowerRight"
 	entities.add_child(r2)
 	r2.position = Vector3(2.2, 0.1, -48.0)
 	r2.max_hp = 2
 	r2.current_hp = 2
 	r2.forward_speed = 1.8
 	r2.owner = root
+	
+	# Hazard flank chest spawn marker
+	var m_flank = Marker3D.new()
+	m_flank.name = "ChestSpawnMarker_HazardFlank"
+	m_flank.set_script(CHEST_MARKER_SCRIPT)
+	m_flank.chest_value = 50
+	m_flank.min_level = 5
+	m_flank.position = Vector3(3.4, 0.05, -34.0)
+	entities.add_child(m_flank)
+	m_flank.owner = root
 	
 	save_chunk(root, "res://src/gameplay/chunks/chunk_barricade_siege.tscn")
 
@@ -327,21 +375,22 @@ func build_boss_chunk(filename: String, chunk_id: String, boss_prefab: PackedSce
 	
 	# Arena entrance decor
 	if theme == "tropical":
-		add_model_to_node(banks, root, TOWER_MODEL, Vector3(-9.0, 0, -8), Vector3(0, 45, 0), Vector3(1.4, 1.4, 1.4))
-		add_model_to_node(banks, root, TOWER_MODEL, Vector3(9.0, 0, -8), Vector3(0, -45, 0), Vector3(1.4, 1.4, 1.4))
-		add_model_to_node(banks, root, ROCKS_B_MODEL, Vector3(-10.0, 0, -30), Vector3(0, 0, 0), Vector3(2.2, 2.2, 2.2))
-		add_model_to_node(banks, root, ROCKS_B_MODEL, Vector3(10.0, 0, -30), Vector3(0, 0, 0), Vector3(2.2, 2.2, 2.2))
+		add_model_to_node(banks, root, TOWER_MODEL, "Tower_Left", Vector3(-9.0, 0, -8), Vector3(0, 45, 0), Vector3(1.4, 1.4, 1.4))
+		add_model_to_node(banks, root, TOWER_MODEL, "Tower_Right", Vector3(9.0, 0, -8), Vector3(0, -45, 0), Vector3(1.4, 1.4, 1.4))
+		add_model_to_node(banks, root, ROCKS_B_MODEL, "RocksB_Left", Vector3(-10.0, 0, -30), Vector3(0, 0, 0), Vector3(2.2, 2.2, 2.2))
+		add_model_to_node(banks, root, ROCKS_B_MODEL, "RocksB_Right", Vector3(10.0, 0, -30), Vector3(0, 0, 0), Vector3(2.2, 2.2, 2.2))
 	elif theme == "bayou":
-		add_model_to_node(banks, root, ROCKS_A_MODEL, Vector3(-9.5, 0, -12), Vector3(0, 30, 0), Vector3(2.0, 1.5, 2.0))
-		add_model_to_node(banks, root, ROCKS_A_MODEL, Vector3(9.5, 0, -12), Vector3(0, -30, 0), Vector3(2.0, 1.5, 2.0))
+		add_model_to_node(banks, root, ROCKS_A_MODEL, "RocksA_Left", Vector3(-9.5, 0, -12), Vector3(0, 30, 0), Vector3(2.0, 1.5, 2.0))
+		add_model_to_node(banks, root, ROCKS_A_MODEL, "RocksA_Right", Vector3(9.5, 0, -12), Vector3(0, -30, 0), Vector3(2.0, 1.5, 2.0))
 	elif theme == "brimstone":
-		add_model_to_node(banks, root, TOWER_MODEL, Vector3(-9.5, 0, -10), Vector3(0, 20, 0), Vector3(1.8, 1.8, 1.8))
-		add_model_to_node(banks, root, TOWER_MODEL, Vector3(9.5, 0, -10), Vector3(0, -20, 0), Vector3(1.8, 1.8, 1.8))
-		add_model_to_node(banks, root, FENCE_MODEL, Vector3(-7.5, 0, -25), Vector3(0, 0, 0), Vector3(1.5, 1.5, 2.5))
-		add_model_to_node(banks, root, FENCE_MODEL, Vector3(7.5, 0, -25), Vector3(0, 0, 0), Vector3(1.5, 1.5, 2.5))
+		add_model_to_node(banks, root, TOWER_MODEL, "Tower_Left", Vector3(-9.5, 0, -10), Vector3(0, 20, 0), Vector3(1.8, 1.8, 1.8))
+		add_model_to_node(banks, root, TOWER_MODEL, "Tower_Right", Vector3(9.5, 0, -10), Vector3(0, -20, 0), Vector3(1.8, 1.8, 1.8))
+		add_model_to_node(banks, root, FENCE_MODEL, "Fence_Left", Vector3(-7.5, 0, -25), Vector3(0, 0, 0), Vector3(1.5, 1.5, 2.5))
+		add_model_to_node(banks, root, FENCE_MODEL, "Fence_Right", Vector3(7.5, 0, -25), Vector3(0, 0, 0), Vector3(1.5, 1.5, 2.5))
 		
 	# Arena pre-boss skull totems / warning buoys
 	var totem_left = BARREL_SCENE.instantiate()
+	totem_left.name = "Barrel_TotemLeft"
 	entities.add_child(totem_left)
 	totem_left.position = Vector3(-4.8, 0.05, -6.0)
 	totem_left.obstacle_type = 2 # RUNE
@@ -349,6 +398,7 @@ func build_boss_chunk(filename: String, chunk_id: String, boss_prefab: PackedSce
 	totem_left.owner = root
 	
 	var totem_right = BARREL_SCENE.instantiate()
+	totem_right.name = "Barrel_TotemRight"
 	entities.add_child(totem_right)
 	totem_right.position = Vector3(4.8, 0.05, -6.0)
 	totem_right.obstacle_type = 2 # RUNE

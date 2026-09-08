@@ -21,10 +21,10 @@ func _ready() -> void:
 	print("Total Camera3D nodes in tree: %d" % all_cams.size())
 	for c in all_cams:
 		print("  - Camera '%s' (parent: '%s', path: '%s'): current = %s, visible = %s, global_pos = %s" % [
-			c.name, c.get_parent().name if c.get_parent() else "null", c.get_path(), c.current, c.is_visible_in_tree(), str(c.global_position)
+			c.name, String(c.get_parent().name) if c.get_parent() else "null", c.get_path(), c.current, c.is_visible_in_tree(), str(c.global_position)
 		])
 	var active_cam = get_viewport().get_camera_3d()
-	print("Viewport active camera: %s" % (active_cam.get_path() if active_cam else "NULL!"))
+	print("Viewport active camera: %s" % (String(active_cam.get_path()) if active_cam else "NULL!"))
 
 	# Start the game via MainGame._start_game_immediately() or simulating button press
 	print("\n--- TEST 1B: Starting Gameplay & Checking Cameras ---")
@@ -39,7 +39,7 @@ func _ready() -> void:
 			c.name, c.get_path(), c.current, c.is_visible_in_tree(), str(c.global_position)
 		])
 	active_cam = get_viewport().get_camera_3d()
-	print("Viewport active camera during gameplay: %s" % (active_cam.get_path() if active_cam else "NULL!"))
+	print("Viewport active camera during gameplay: %s" % (String(active_cam.get_path()) if active_cam else "NULL!"))
 
 	print("\n--- TEST 1C: Monitoring Active Camera Across 60 Frames ---")
 	var camera_switches = 0

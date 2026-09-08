@@ -140,7 +140,7 @@ func _ready() -> void:
 			var gap = right_z[i+1] - right_z[i]
 			assert(gap > 35.0 and gap < 45.0, "Right chunks must maintain ~40m spacing without overlap! Gap: %.2f" % gap)
 
-	var moved_z = chunks[0].global_position.z - initial_z_chunk0
+	var _moved_z = chunks[0].global_position.z - initial_z_chunk0
 	print("[PASS] Chunk Overlap Guard confirmed: Chunks cycled smoothly maintaining strict 40m spacing with 0 overlap.")
 	
 	print("==================================================")

@@ -28,7 +28,7 @@ func _ready() -> void:
 	test_barricade_tier_hp_scaling()
 	test_level_1_properties_and_chunks()
 	test_chunk_barricade_siege_buffer_and_pickups()
-	await test_live_dinghy_cannon_shatter_level_1()
+	test_live_dinghy_cannon_shatter_level_1()
 	await test_river_map_hitbox_interior_clicks()
 	
 	print("==========================================================")
