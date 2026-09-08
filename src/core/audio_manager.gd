@@ -313,7 +313,7 @@ func crossfade_music(track_key_or_path: String, duration: float = 1.0) -> void:
 	current_music_path = target_path
 
 ## Play background music stream
-func play_music(music_path: String = "res://assets/audio/music/gameplay_theme.mp3", volume_db: float = 0.0) -> void:
+func play_music(music_path: String = "res://assets/audio/music/gameplay_theme.mp3", _volume_db: float = 0.0) -> void:
 	if current_music_player and current_music_player.playing and current_music_path != "":
 		# Biome theme or active music is already running smoothly
 		return

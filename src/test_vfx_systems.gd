@@ -32,10 +32,10 @@ func _ready() -> void:
 
 func _run_all_tests() -> void:
 	_test_vfx_manager_registration()
-	await _test_wood_debris_particles()
-	await _test_mortar_geyser_particles_and_waterline()
-	await _test_mine_explosion_particles()
-	await _test_entity_destruction_hooks()
+	_test_wood_debris_particles()
+	_test_mortar_geyser_particles_and_waterline()
+	_test_mine_explosion_particles()
+	_test_entity_destruction_hooks()
 	await _test_autofree_and_memory_cleanup()
 
 func _test_vfx_manager_registration() -> void:

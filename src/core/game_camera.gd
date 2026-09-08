@@ -69,7 +69,7 @@ func add_trauma(amount: float) -> void:
 	trauma = clamp(trauma + amount, 0.0, 1.0)
 
 ## Legacy adapter for existing shake calls
-func shake(duration: float, intensity: float) -> void:
+func shake(_duration: float, intensity: float) -> void:
 	add_trauma(clamp(intensity * 1.5, 0.1, 0.6))
 
 func _process(delta: float) -> void:
