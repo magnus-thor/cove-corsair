@@ -1,34 +1,55 @@
 # Cove Corsair - Level Systems & Biome Architecture
 
-This directory contains technical specifications for all campaign levels in **Cove Corsair**. Each document details the biome design, pacing curve, entity timeline, hazard mechanics, starting vessel loadout, and boss battle specs.
+This directory contains technical specifications for the **45-level campaign** in **Cove Corsair**, organized across three biomes with calibrated difficulty scaling, dynamic barricade progression, and milestone boss battles every 5 levels.
 
 ---
 
-## Campaign Level Overview
+## 🗺️ Campaign Architecture (45 Levels Across 3 Biomes)
 
-| Level ID | Level Name | Biome Type | Target Distance | Scroll Speed | Starting Vessel | Boss Encounter | Primary Hazards |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Level 1** | [Smuggler's Run](file:///f:/projects/cove-corsair/documents/levels/level_01_smugglers_run.md) | `smugglers_run` (Coastal Island) | $250\text{m}$ | $10.0\text{ m/s}$ | The Dinghy (1 HP) | **Captain Ironjaw's War-Barge** ($220\text{ HP}$) | Reef Outcrops, Spiked Mines, Barricades |
-| **Level 2** | [Black Tide Bayou](file:///f:/projects/cove-corsair/documents/levels/level_02_black_tide_bayou.md) | `black_tide_bayou` (Murky Swamp) | $280\text{m}$ | $10.0\text{ m/s}$ | The Sloop (5 HP) | **The Phantom Dredge** ($450\text{ HP}$) | Biogas Pods, Grave Skiffs, Tide Cutters |
-| **Level 3** | [Brimstone Bastion](file:///f:/projects/cove-corsair/documents/levels/level_03_brimstone_bastion.md) | `brimstone_bastion` (Volcanic Fortress) | $320\text{m}$ | $10.0\text{ m/s}$ | The Ironclad (8 HP) | **Brimstone Siege Fortress** ($800\text{ HP}$) | Thermal Geysers, Iron Gunners, Bombarders |
-| **Level 4** | [Smuggler's Nightmare](file:///f:/projects/cove-corsair/documents/levels/level_04_smugglers_nightmare.md) | `smugglers_run` (Night Archipelago) | $250\text{m}$ | $10.5\text{ m/s}$ | The Dinghy (1 HP) | **Nightmare Flagship** ($300\text{ HP}$) | Barricade Walls, Sea Mines, Reef Outcrops |
-| **Level 5** | [Black Tide Abyss](file:///f:/projects/cove-corsair/documents/levels/level_05_black_tide_abyss.md) | `black_tide_bayou` (Abyssal Bayou) | $280\text{m}$ | $11.0\text{ m/s}$ | The Sloop (5 HP) | **Phantom Dredge (Abyssal)** ($550\text{ HP}$) | Biogas Pods, Dense Tide Cutters, Harvester |
-| **Level 6** | [Brimstone Inferno](file:///f:/projects/cove-corsair/documents/levels/level_06_brimstone_inferno.md) | `brimstone_bastion` (Infernal Caldera) | $320\text{m}$ | $11.0\text{ m/s}$ | The Ironclad (8 HP) | **Infernal Siege Fortress** ($1000\text{ HP}$) | Erupting Geysers, Brimstone Rafts, Bombard |
+```
+[ Levels 1–15: Tropical Reef ] ──► [ Levels 16–30: Murky Bayou ] ──► [ Levels 31–45: Volcanic Brimstone ]
+  Scroll Speed: 8.0 – 9.5 m/s        Scroll Speed: 9.5 – 11.5 m/s       Scroll Speed: 11.5 – 13.0 m/s
+  Doubloons: 100 – 450               Doubloons: 500 – 750               Doubloons: 800 – 1,200
+  Clear sunny waters, sandy shoals   Atmospheric swamp fog (0.015)      Intense heat fog (0.02), crimson glow
+```
 
 ---
 
-## Core Level Architecture
+## 👑 Milestone Boss Rotation (Every 5 Levels)
 
-Levels in **Cove Corsair** use a **strictly deterministic timeline engine**. 
-- Level data is defined via strongly typed `LevelData` resources (`src/data/resources/level_data.gd`).
-- Spawns are scheduled as `SpawnEvent` instances (`src/data/spawn_event.gd`) triggered at specific distance milestones ($Z$ coordinate progression).
-- The `LevelController` (`src/gameplay/levels/level_controller.gd`) processes the timeline queue, spawning obstacles, enemy mobs, multiplier gates, hazards, and bosses without random generation.
+| Milestone | Level Title | Biome | Boss Encounter | Boss Class / Script | Encounter Mechanics |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Level 5** | Black Tide Abyss | Tropical / Bayou | **The Phantom Dredge** ($500\text{ HP}$) | [`boss_phantom_dredge.gd`](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_phantom_dredge.gd) | Spectral paddlewheel shockwaves, submergence phases, and frenzy rush. |
+| **Level 10** | Skull Reef Pass | Tropical | **Captain Ironjaw** ($220\text{ HP}$) | [`boss_war_barge.gd`](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_war_barge.gd) | Armored war-barge with swivel turrets and exposed boiler core. |
+| **Level 15** | Bone-Beard's Outpost | Tropical | **Captain Bone-Beard** ($500\text{ HP}$) | [`boss_bone_beard.gd`](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_bone_beard.gd) | Twin frigate catamaran spawning skeleton rowers and cursed skull fire. |
+| **Level 20** | Citadel of Iron | Bayou | **The Siege Fortress** ($800\text{ HP}$) | [`boss_siege_fortress.gd`](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_siege_fortress.gd) | Massive floating fortress with dual mortar turrets and molten core meltdown. |
+| **Level 25** | Phantom Trench | Bayou | **The Phantom Dredge** ($650\text{ HP}$) | [`boss_phantom_dredge.gd`](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_phantom_dredge.gd) | Elevated spectral speed, rapid ghost submersion, and toxic shockwaves. |
+| **Level 30** | Bone-Beard's Armada | Bayou | **Captain Bone-Beard** ($750\text{ HP}$) | [`boss_bone_beard.gd`](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_bone_beard.gd) | High-speed cursed broadside salvos with dense minion wave defense. |
+| **Level 35** | Ironjaw's Crucible | Brimstone | **Captain Ironjaw** ($400\text{ HP}$) | [`boss_war_barge.gd`](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_war_barge.gd) | Fortified volcanic war barge with rapid-fire swivels and lava wave assistance. |
+| **Level 40** | Molten Bulwark | Brimstone | **The Siege Fortress** ($1,200\text{ HP}$) | [`boss_siege_fortress.gd`](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_siege_fortress.gd) | Multi-turret mortar siege fortress with volcanic geysers and lava river surges. |
+| **Level 45** | Bone-Beard's Throne | Brimstone | **Captain Bone-Beard (Final)** ($1,000\text{ HP}$) | [`boss_bone_beard.gd`](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_bone_beard.gd) | Final campaign throne encounter featuring maximum wave pressure and skull salvos. |
 
-### Detailed Level Specifications
-1. [Level 1: Smuggler's Run Setup Specification](file:///f:/projects/cove-corsair/documents/levels/level_01_smugglers_run.md)
-2. [Level 2: Black Tide Bayou Setup Specification](file:///f:/projects/cove-corsair/documents/levels/level_02_black_tide_bayou.md)
-3. [Level 3: Brimstone Bastion Setup Specification](file:///f:/projects/cove-corsair/documents/levels/level_03_brimstone_bastion.md)
-4. [Level 4: Smuggler's Nightmare Setup Specification](file:///f:/projects/cove-corsair/documents/levels/level_04_smugglers_nightmare.md)
-5. [Level 5: Black Tide Abyss Setup Specification](file:///f:/projects/cove-corsair/documents/levels/level_05_black_tide_abyss.md)
-6. [Level 6: Brimstone Inferno Setup Specification](file:///f:/projects/cove-corsair/documents/levels/level_06_brimstone_inferno.md)
+---
 
+## ⚡ Tactical Bottlenecks & Level Design Highlights
+
+* **Level 16 ("The Iron Wall"):** Introduces heavy sequential barricade walls testing high burst DPS and Ironclad / Bombard Skiff loadouts.
+* **Level 19 ("Devil's Slalom"):** Dense sea mine gauntlet with narrow gaps testing The Dinghy's responsive agility and small collision footprint.
+* **Dynamic Barricades:** All barricade walls scale dynamically ($2\text{ HP}$ in L1–3, $6\text{ HP}$ in L4–10, $12\text{ HP}$ in L11–25, $20\text{ HP}$ in L26+).
+
+---
+
+## ⚙️ Automated Campaign Level Pipeline
+
+All levels from Level 13 to Level 45 are generated deterministically using [`src/tools/generate_campaign_levels.gd`](file:///f:/projects/cove-corsair/src/tools/generate_campaign_levels.gd):
+
+```bash
+# Execute headless campaign level generation
+godot --headless --script src/tools/generate_campaign_levels.gd
+```
+
+To run the automated verification suite confirming all 45 levels load correctly and adhere to chunk constraints:
+
+```bash
+godot --headless --scene src/test_campaign_expansion.tscn
+```

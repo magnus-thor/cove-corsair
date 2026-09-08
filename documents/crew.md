@@ -37,9 +37,11 @@ Naval weapon mounts represent fixed vessel artillery installed on bow, side broa
 
 ### Weapon Mounts Table
 
-| Weapon Mount | Resource Path | Weapon Type | Fire Rate (Cooldown) | Yaw Rotation | Default Ammo | Compatible Ammo |
+| Weapon Mount | Resource Path | Weapon Type | Fire Rate (Cooldown) | Yaw Rotation | Default Ammo / Projectile | Compatible Ammo |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Bow Chaser** | [`weapon_bow_chaser.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_crew/weapon_bow_chaser.tres) | `cannon` | $0.20\text{s}$ | $0^\circ$ (Forward) | Standard Ball | Standard Ball, Heavy Shot |
+| **Bow Mortar** | [`weapon_bow_mortar.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_crew/weapon_bow_mortar.tres) | `mortar` | $1.30\text{s}$ | $0^\circ$ (Forward Arc) | Heavy Shot (AoE) | Heavy Shot |
+| **Scattershot Carronade** | [`weapon_scattershot.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_crew/weapon_scattershot.tres) | `carronade` | $0.80\text{s}$ | $\pm 90^\circ$ (Broadside) | Scattershot Pellet ($5\times$ spread) | Scattershot Pellet |
 | **Port Swivel Gun** | [`weapon_port_swivel.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_crew/weapon_port_swivel.tres) | `swivel_gun` | $0.18\text{s}$ | $+99^\circ \text{ to } +112^\circ$ (Left) | Standard Ball | Standard Ball, Grape Shot |
 | **Starboard Swivel Gun** | [`weapon_starboard_swivel.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_crew/weapon_starboard_swivel.tres) | `swivel_gun` | $0.18\text{s}$ | $+80^\circ \text{ to } +94^\circ$ (Right) | Standard Ball | Standard Ball, Grape Shot |
 | **Aft Mortar** | [`weapon_aft_mortar.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_crew/weapon_aft_mortar.tres) | `deck_mortar` | $0.40\text{s}$ | $180^\circ$ (Rear) | Heavy Shot | Heavy Shot, Fire Bomb |
@@ -50,11 +52,29 @@ Naval weapon mounts represent fixed vessel artillery installed on bow, side broa
 
 Weapon and crew resources are assigned to flagship hardpoint dictionaries (`hardpoint_offsets`, `hardpoint_rotations`, `hardpoint_scales`) defined in [`ShipData`](file:///f:/projects/cove-corsair/src/data/ship_data.gd):
 
+### Sloop Tier Socket Sockets
 ```gdscript
-# Hardpoint assignment example from The Sloop (Tier 2 Upgrade)
 tier_sockets = [
     ["BowMount"],
     ["BowMount", "MidDeckCrew", "AftDeckCrew"],
     ["BowMount", "MidDeckCrew", "AftDeckCrew", "PortSwivelMount", "StarboardSwivelMount"]
+]
+```
+
+### Bombard Skiff Tier Sockets
+```gdscript
+tier_sockets = [
+    ["BowMortarMount"],
+    ["BowMortarMount", "QuarterdeckCrew"],
+    ["BowMortarMount", "QuarterdeckCrew", "PortRailMount", "StarboardRailMount"]
+]
+```
+
+### Ironclad Tier Sockets
+```gdscript
+tier_sockets = [
+    ["BowMount"],
+    ["BowMount", "MonkeyCrew", "SkeletonCrew"],
+    ["BowMount", "MonkeyCrew", "SkeletonCrew", "PortSwivelMount1", "PortSwivelMount2", "StarboardSwivelMount1", "StarboardSwivelMount2"]
 ]
 ```

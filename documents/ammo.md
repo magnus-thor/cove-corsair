@@ -24,11 +24,12 @@ extends Resource
 
 ## 💥 2. Complete Ammunition Roster
 
-| Ammunition Type | Resource Path | Damage Profile | Projectile Speed | Splash Radius (AoE) | Scale Multiplier | Primary Users / Weapon Mounts |
+| Ammunition Type | Resource / Scene Path | Damage Profile | Projectile Speed | Splash Radius (AoE) | Scale Multiplier | Primary Users / Weapon Mounts |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Standard Ball** | [`ammo_standard_ball.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_ammo/ammo_standard_ball.tres) | $1\text{ Damage}$ | $24.0\text{ m/s}$ | $0.0\text{m}$ (Single target) | $1.00\times$ | Bow Chaser, Swivel Guns, Base Cannons |
 | **Grape Shot** | [`ammo_grape_shot.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_ammo/ammo_grape_shot.tres) | $1\text{ Damage}$ | $22.0\text{ m/s}$ | $0.0\text{m}$ (Cone spread) | $0.60\times$ | Port & Starboard Swivel Guns |
-| **Heavy Shot** | [`ammo_heavy_shot.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_ammo/ammo_heavy_shot.tres) | $3\text{ Damage}$ | $14.0\text{ m/s}$ | $2.0\text{m}$ | $1.30\times$ | Bow Chaser, Aft Mortar, Deckhand Sniper |
+| **Heavy Shot** | [`ammo_heavy_shot.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_ammo/ammo_heavy_shot.tres) | $3\text{ Damage}$ | $14.0\text{ m/s}$ | $2.0\text{m}$ | $1.30\times$ | Bow Mortar, Bow Chaser, Deckhand Sniper |
+| **Scattershot Pellet** | [`scattershot_pellet.tscn`](file:///f:/projects/cove-corsair/src/gameplay/projectiles/scattershot_pellet.tscn) | $1\text{ Damage}$ per pellet | $25.0\text{ m/s}$ | High dispersion cone | Multi-pellet | Bombard Skiff Side Scattershot Carronades |
 | **Fire Bomb** | [`ammo_fire_bomb.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_ammo/ammo_fire_bomb.tres) | $4\text{ Damage}$ | $20.0\text{ m/s}$ | $2.0\text{m}$ | $1.15\times$ | Monkey Bomber, Aft Mortar |
 | **Coconut Bomb** | [`ammo_coconut_bomb.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_ammo/ammo_coconut_bomb.tres) | $3\text{ Damage}$ | $18.0\text{ m/s}$ | $2.5\text{m}$ | $1.30\times$ | Monkey Bomber, Skeleton Tosser |
 | **Throwing Axe** | [`ammo_throwing_axe.tres`](file:///f:/projects/cove-corsair/src/data/resources/user_ammo/ammo_throwing_axe.tres) | $3\text{ Damage}$ | $16.0\text{ m/s}$ | $0.0\text{m}$ (Single target) | $1.00\times$ | Skeleton Tosser |
@@ -45,9 +46,7 @@ extends Resource
 ![Heavy Shot](file:///C:/Users/Magnus/.gemini/antigravity-ide/brain/a15dc124-9380-4e4f-82f3-a23d3405db55/ammo_heavy_shot.png)
 ````
 
-
 ---
-
 
 ## ⚡ 3. Multiplier Gate Interactions & AoE Explosion Mechanics
 
@@ -62,3 +61,9 @@ For projectiles with `splash_radius > 0.0` (Heavy Shot, Fire Bomb, Coconut Bomb)
 * On collision with an obstacle or mob, an area query identifies all surrounding targets within `splash_radius`.
 * Full base damage is applied to the primary target, and $50\%$ splash damage is applied to adjacent entities.
 * Can trigger immediate chain reactions when detonating red **Fuse Barrels**.
+
+### Scattershot Volley Ballistics
+Scattershot pellets ([`scattershot_pellet.tscn`](file:///f:/projects/cove-corsair/src/gameplay/projectiles/scattershot_pellet.tscn)):
+* Fired in broadside volleys (5 pellets per shot) from dual rail mounts.
+* Rapid travel velocity ($25.0\text{ m/s}$) with a $12.0\text{m}$ maximum range despawn threshold.
+* Generates lateral camera trauma jitter ($+0.15$) and dedicated `sfx_scattershot` audio trigger.
