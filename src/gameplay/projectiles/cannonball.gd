@@ -365,6 +365,8 @@ func _apply_splash_damage(exclude_target: Node = null) -> void:
 	var is_mortar = has_meta("is_mortar") or (weapon_data and ("mortar" in weapon_data.weapon_name.to_lower() or "mortar" in weapon_data.weapon_type.to_lower())) or (ammo_data and ("mortar" in ammo_data.ammo_name.to_lower() or ammo_data.splash_radius >= 3.0))
 	if is_mortar:
 		AudioManager.play_sfx("sfx_mortar_impact")
+		if VFXManager:
+			VFXManager.spawn_mortar_splash(global_position)
 		var camera = get_tree().get_first_node_in_group("game_camera")
 		if camera and camera.has_method("add_trauma"):
 			camera.add_trauma(0.45)

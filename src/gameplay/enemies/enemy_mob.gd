@@ -234,6 +234,10 @@ func die() -> void:
 		return
 	_is_dead = true
 	
+	if mob_type == "turtle_raft" or (enemy_data and "turtle" in enemy_data.resource_path.to_lower()):
+		if VFXManager:
+			VFXManager.spawn_wood_debris(global_position)
+	
 	GameState.targets_destroyed += 1
 	AudioManager.play_sfx("barrel_breaks")
 	_spawn_explosion()

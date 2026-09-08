@@ -11,7 +11,10 @@ func die() -> void:
 		return
 	_is_destroyed = true
 	
-	_spawn_explosion()
+	if VFXManager:
+		VFXManager.spawn_mine_explosion(global_position)
+	else:
+		_spawn_explosion()
 	AudioManager.play_sfx("sfx_mine_detonate")
 	
 	# Apply knockback and deal 1 fleet damage to the player if close (direct contact)

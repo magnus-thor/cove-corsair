@@ -48,5 +48,7 @@ func take_damage(amount: int) -> void:
 func die() -> void:
 	if _is_destroyed:
 		return
+	if VFXManager:
+		VFXManager.spawn_wood_debris(global_position)
 	AudioManager.play_sfx("sfx_wood_smash")
 	super()
