@@ -237,28 +237,23 @@ func _create_milestone_button(lvl: int, data: Dictionary) -> Control:
 	container.pivot_offset = Vector2(80, 80)
 	container.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	
-	# Main touch button
-	var btn = TextureButton.new()
-	btn.name = "TouchButton"
-	btn.custom_minimum_size = Vector2(110, 110)
-	btn.position = Vector2(25, 25)
-	btn.pivot_offset = Vector2(55, 55)
-	btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	btn.focus_mode = Control.FOCUS_NONE
-	btn.pressed.connect(func(): _on_node_pressed(lvl))
-	container.add_child(btn)
-	
-	# Pulsing active aura (behind button)
-	var aura = ColorRect.new()
+	# Pulsing active circular aura (behind button)
+	var aura = Panel.new()
 	aura.name = "ActiveAura"
-	aura.custom_minimum_size = Vector2(126, 126)
-	aura.position = Vector2(17, 17)
+	aura.custom_minimum_size = Vector2(136, 136)
+	aura.position = Vector2(12, 12)
 	aura.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	aura.color = Color(1.0, 0.82, 0.2, 0.45)
-	aura.pivot_offset = Vector2(63, 63)
+	var aura_style = StyleBoxFlat.new()
+	aura_style.set_corner_radius_all(68)
+	aura_style.bg_color = Color(1.0, 0.82, 0.2, 0.22)
+	aura_style.set_border_width_all(3)
+	aura_style.border_color = Color(1.0, 0.92, 0.45, 0.85)
+	aura_style.shadow_color = Color(1.0, 0.8, 0.2, 0.4)
+	aura_style.shadow_size = 8
+	aura.add_theme_stylebox_override("panel", aura_style)
+	aura.pivot_offset = Vector2(68, 68)
 	aura.visible = false
 	container.add_child(aura)
-	container.move_child(aura, 0)
 	
 	# Node Disc Background Panel
 	var disc_panel = Panel.new()
@@ -389,7 +384,24 @@ func _create_milestone_button(lvl: int, data: Dictionary) -> Control:
 	title_lbl.add_theme_color_override("font_outline_color", Color(0.98, 0.94, 0.88, 1.0))
 	title_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	container.add_child(title_lbl)
-	
+
+	# Clickable Milestone Button covering the entire 96x96 circle interior
+	var btn = Button.new()
+	btn.name = "TouchButton"
+	btn.position = Vector2(32, 32)
+	btn.size = Vector2(96, 96)
+	btn.custom_minimum_size = Vector2(96, 96)
+	btn.pivot_offset = Vector2(48, 48)
+	btn.flat = true
+	btn.mouse_filter = Control.MOUSE_FILTER_STOP
+	btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	btn.focus_mode = Control.FOCUS_NONE
+	var empty_style = StyleBoxEmpty.new()
+	for state in ["normal", "hover", "pressed", "focus", "disabled"]:
+		btn.add_theme_stylebox_override(state, empty_style)
+	btn.pressed.connect(func(): _on_node_pressed(lvl))
+	container.add_child(btn)
+
 	return container
 
 func _refresh_all_node_states() -> void:
@@ -404,7 +416,7 @@ func _refresh_all_node_states() -> void:
 		var disc_panel: Panel = container.get_node("DiscPanel")
 		var num_label: Label = container.get_node("NumLabel")
 		var status_icon: TextureRect = container.get_node("StatusIcon")
-		var active_aura: ColorRect = container.get_node("ActiveAura")
+		var active_aura: Control = container.get_node("ActiveAura")
 		
 		var disc_style = StyleBoxFlat.new()
 		disc_style.set_corner_radius_all(48)
@@ -450,17 +462,19 @@ func _refresh_all_node_states() -> void:
 			
 		disc_panel.add_theme_stylebox_override("panel", disc_style)
 
-func _pulse_active_aura(aura: ColorRect) -> void:
+func _pulse_active_aura(aura: Control) -> void:
 	if aura.has_meta("pulse_tween"):
 		var old_t: Tween = aura.get_meta("pulse_tween")
 		if old_t and old_t.is_valid():
 			old_t.kill()
-			
+
+	aura.scale = Vector2(0.92, 0.92)
+	aura.modulate.a = 0.85
 	var t = create_tween().set_loops()
-	t.tween_property(aura, "scale", Vector2(1.18, 1.18), 0.7).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	t.tween_property(aura, "modulate:a", 0.3, 0.7).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	t.tween_property(aura, "scale", Vector2(0.96, 0.96), 0.7).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	t.tween_property(aura, "modulate:a", 0.7, 0.7).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	t.tween_property(aura, "scale", Vector2(1.28, 1.28), 0.85).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	t.parallel().tween_property(aura, "modulate:a", 0.05, 0.85).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	t.tween_property(aura, "scale", Vector2(0.92, 0.92), 0.01)
+	t.tween_property(aura, "modulate:a", 0.85, 0.01)
 	aura.set_meta("pulse_tween", t)
 
 func _setup_mini_vessel() -> void:

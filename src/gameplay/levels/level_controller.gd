@@ -190,23 +190,7 @@ func load_level_resource(res: LevelData) -> void:
 				_horizon_backdrop.bind_texture(htex)
 
 		# ── Layer 2: Riverbank Framing Strips ────────────────────────────────
-		var valid_chunks = riverbank_chunks.filter(func(c): return is_instance_valid(c))
-		if valid_chunks.is_empty():
-			riverbank_chunks.clear()
-			var props_scene := preload("res://src/gameplay/levels/riverbank_props.tscn")
-			if props_scene:
-				for prop_side in ["left", "right"]:
-					for i in range(4):
-						var chunk := props_scene.instantiate()
-						add_child(chunk)
-						chunk.global_position = Vector3(0.0, 0.0, 20.0 - i * 40.0)
-						if chunk.has_method("setup"):
-							chunk.setup(prop_side, 40.0, biome_name)
-						riverbank_chunks.append(chunk)
-		else:
-			for chunk in valid_chunks:
-				if chunk.has_method("setup"):
-					chunk.setup(chunk.side, chunk.chunk_length, biome_name)
+		_setup_riverbank_chunks(biome_name)
 
 		# Configure Environment Visuals
 		_apply_biome_visuals()
@@ -246,14 +230,9 @@ func _physics_process(delta: float) -> void:
 		
 	if chunk_assembler and chunk_assembler.is_assembled:
 		# Modular chunk system handles track scrolling, entities, and progress.
-		# Modular chunk system handles track scrolling, entities, and progress.
 		# Advance and wrap Layer-2 riverbank framing chunks
 		var scroll_step = chunk_assembler.scroll_speed * delta if not chunk_assembler.is_boss_active else 0.0
-		for chunk in riverbank_chunks:
-			if is_instance_valid(chunk):
-				chunk.global_position.z += scroll_step
-				if chunk.global_position.z > 40.0:
-					chunk.global_position.z -= 160.0
+		_scroll_riverbank_chunks(scroll_step)
 		return
 	# ──────────────────────────────────────────────────────────────────────────
 
@@ -301,7 +280,9 @@ func _physics_process(delta: float) -> void:
 				and not child.is_in_group("boss") \
 				and not child.is_in_group("collectibles") \
 				and not child.is_in_group("doubloons") \
-				and not child.is_in_group("horizon_backdrop"):
+				and not child.is_in_group("horizon_backdrop") \
+				and not child.is_in_group("riverbank_chunk") \
+				and not child.is_in_group("boundary_wall"):
 			child.global_position.z += scroll_movement
 
 	# Wrap bank strips (legacy – array is empty; kept as no-op for safety)
@@ -309,10 +290,8 @@ func _physics_process(delta: float) -> void:
 		if is_instance_valid(strip) and strip.global_position.z > 40.0:
 			strip.global_position.z -= 160.0  # 4 tiles × 40m
 
-	# Recycle Layer-2 riverbank framing chunks (4 tiles × 40m = 160m pool)
-	for chunk in riverbank_chunks:
-		if is_instance_valid(chunk) and chunk.global_position.z > 40.0:
-			chunk.global_position.z -= 160.0
+	# Advance and wrap Layer-2 riverbank framing chunks with overlap guard
+	_scroll_riverbank_chunks(scroll_movement)
 
 func normalized_to_world_x(norm_x: float) -> float:
 	return norm_x * (river_width_world / 2.0)
@@ -908,3 +887,132 @@ func _update_biome_music(biome_name: String) -> void:
 		AudioManager.crossfade_music(music_track, 1.0)
 	elif AudioManager.has_method("play_music"):
 		AudioManager.play_music(music_track)
+
+# ── Riverbank Chunk Overlap Guard & Recycling System ─────────────────────────
+
+func _setup_riverbank_chunks(biome_name: String) -> void:
+	var valid_chunks = riverbank_chunks.filter(func(c): return is_instance_valid(c))
+	var left_chunks: Array[Node3D] = []
+	var right_chunks: Array[Node3D] = []
+	for chunk in valid_chunks:
+		if "side" in chunk and chunk.side == "right":
+			right_chunks.append(chunk)
+		else:
+			left_chunks.append(chunk)
+
+	# If 8 valid chunks already exist (4 left, 4 right), cleanly reset positions and re-seed biome
+	if left_chunks.size() == 4 and right_chunks.size() == 4:
+		print("[RIVERBANK CHUNKS] Reusing pool of 8 chunks (4 left, 4 right). Offsets reset to [20, -20, -60, -100]m for biome %s" % biome_name)
+		for i in range(4):
+			left_chunks[i].global_position = Vector3(0.0, 0.0, 20.0 - i * 40.0)
+			left_chunks[i].setup("left", 40.0, biome_name)
+			right_chunks[i].global_position = Vector3(0.0, 0.0, 20.0 - i * 40.0)
+			right_chunks[i].setup("right", 40.0, biome_name)
+		return
+
+	# Otherwise, clear and eliminate any duplicate or orphaned chunks in tree
+	var purged = 0
+	for child in get_children():
+		if child.is_in_group("riverbank_chunk"):
+			child.queue_free()
+			purged += 1
+	riverbank_chunks.clear()
+	if purged > 0:
+		print("[RIVERBANK CHUNKS] Purged %d duplicate/orphaned riverbank chunks from scene tree" % purged)
+
+	var props_scene := preload("res://src/gameplay/levels/riverbank_props.tscn")
+	if props_scene:
+		for prop_side in ["left", "right"]:
+			for i in range(4):
+				var chunk := props_scene.instantiate()
+				chunk.name = "RiverbankChunk_%s_%d" % [prop_side.capitalize(), i]
+				add_child(chunk)
+				chunk.global_position = Vector3(0.0, 0.0, 20.0 - i * 40.0)
+				if chunk.has_method("setup"):
+					chunk.setup(prop_side, 40.0, biome_name)
+				riverbank_chunks.append(chunk)
+		print("[RIVERBANK CHUNKS] Instantiated fresh pool of 8 chunks (4 left, 4 right) with 0 initial overlaps.")
+
+func _scroll_riverbank_chunks(delta_z: float) -> void:
+	if delta_z <= 0.0 or riverbank_chunks.is_empty():
+		return
+
+	var left_chunks: Array[Node3D] = []
+	var right_chunks: Array[Node3D] = []
+	for chunk in riverbank_chunks:
+		if is_instance_valid(chunk):
+			if "side" in chunk and chunk.side == "right":
+				right_chunks.append(chunk)
+			else:
+				left_chunks.append(chunk)
+
+	_advance_and_wrap_side(left_chunks, delta_z)
+	_advance_and_wrap_side(right_chunks, delta_z)
+
+## Advances chunks and executes a strict Overlap Guard upon wrapping:
+## Wrapped chunks are guaranteed to reposition strictly behind the rearmost chunk,
+## completely eliminating double instances and co-planar Z-offsets.
+func _advance_and_wrap_side(chunks: Array[Node3D], delta_z: float) -> void:
+	for chunk in chunks:
+		chunk.global_position.z += delta_z
+
+	var wrapping: Array[Node3D] = []
+	for chunk in chunks:
+		if chunk.global_position.z > 40.0:
+			wrapping.append(chunk)
+
+	if wrapping.is_empty():
+		return
+
+	# Sort furthest forward first
+	wrapping.sort_custom(func(a, b): return a.global_position.z > b.global_position.z)
+
+	for chunk in wrapping:
+		var c_len: float = chunk.chunk_length if "chunk_length" in chunk else 40.0
+		# Find the rearmost position among active chunks on this side
+		var min_z := INF
+		for other in chunks:
+			if other != chunk and not wrapping.has(other):
+				if other.global_position.z < min_z:
+					min_z = other.global_position.z
+
+		if is_finite(min_z):
+			chunk.global_position.z = min_z - c_len
+		else:
+			chunk.global_position.z -= c_len * float(chunks.size())
+		wrapping.erase(chunk)
+
+# ── Diagnostic In-Game Monitor ───────────────────────────────────────────────
+
+func run_blinking_diagnostic() -> Dictionary:
+	var node_count := get_tree().get_node_count()
+	var positions: Dictionary = {}
+	var dupes: int = 0
+	var meshes: Array[MeshInstance3D] = []
+	for group in ["scenery", "riverbank_chunk"]:
+		for parent in get_tree().get_nodes_in_group(group):
+			if parent is Node:
+				_collect_diagnostic_meshes(parent, meshes)
+				
+	for mesh in meshes:
+		if is_instance_valid(mesh) and mesh.is_inside_tree() and mesh.is_visible_in_tree():
+			if "water" in mesh.name.to_lower() or "backdrop" in mesh.name.to_lower():
+				continue
+			var key = "%0.1f_%0.1f" % [mesh.global_position.x, mesh.global_position.z]
+			if positions.has(key):
+				print("[DUPLICATE DETECTED] Two meshes at same spot: %s - '%s' vs '%s'" % [key, mesh.name, positions[key]])
+				dupes += 1
+			positions[key] = mesh.name
+			
+	print("[DIAGNOSTIC MONITOR] Total Active Nodes: %d | Scenery Meshes: %d | Duplicates: %d" % [node_count, positions.size(), dupes])
+	return {
+		"node_count": node_count,
+		"mesh_count": positions.size(),
+		"duplicate_count": dupes
+	}
+
+func _collect_diagnostic_meshes(n: Node, out: Array[MeshInstance3D]) -> void:
+	if n is MeshInstance3D:
+		out.append(n)
+	for child in n.get_children():
+		_collect_diagnostic_meshes(child, out)

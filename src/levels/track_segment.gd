@@ -240,7 +240,7 @@ func spawn_scenery() -> void:
 		if base_scene:
 			var base_inst := base_scene.instantiate() as Node3D
 			scenery_container.add_child(base_inst)
-			base_inst.position = Vector3(rand_x, 0.0, rand_z)
+			base_inst.position = Vector3(rand_x, 0.06, rand_z)
 			base_inst.scale = Vector3(randf_range(1.0, 1.3), randf_range(0.7, 1.0), randf_range(1.0, 1.3))
 			base_inst.rotation.y = randf_range(0.0, TAU)
 			_clean_shadow_nodes(base_inst)

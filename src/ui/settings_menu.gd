@@ -97,6 +97,52 @@ func _init_styles() -> void:
 	style_reset_confirm.shadow_size = 10
 	style_reset_confirm.shadow_offset = Vector2(0, 3)
 
+	_setup_slider_styles()
+
+func _setup_slider_styles() -> void:
+	var grabber_normal = _create_grabber_texture(false)
+	var grabber_highlight = _create_grabber_texture(true)
+	
+	for s in [master_slider, music_slider, sfx_slider]:
+		if s:
+			s.add_theme_icon_override("grabber", grabber_normal)
+			s.add_theme_icon_override("grabber_highlight", grabber_highlight)
+
+func _create_grabber_texture(highlighted: bool) -> ImageTexture:
+	var img_size = 24
+	var img = Image.create(img_size, img_size, false, Image.FORMAT_RGBA8)
+	var center = Vector2(img_size * 0.5, img_size * 0.5)
+	var r_outer = 10.5
+	var r_border = 9.0
+	var r_rim = 7.5
+	var r_core = 5.5
+
+	var border_color = Color(0.12, 0.07, 0.03, 1.0) # Dark engraved outline (#1A1108)
+	var highlight_rim = Color(1.0, 1.0, 0.92, 1.0) if highlighted else Color(1.0, 0.95, 0.72, 1.0) # Bright glowing rim
+	var gold_high = Color(1.0, 0.92, 0.45, 1.0) if highlighted else Color(0.96, 0.82, 0.38, 1.0) # #F5D061
+	var gold_dark = Color(0.83, 0.64, 0.22, 1.0) # #D4A338
+
+	for y in range(img_size):
+		for x in range(img_size):
+			var d = (Vector2(x + 0.5, y + 0.5) - center).length()
+			if d <= r_outer:
+				if d > r_border:
+					img.set_pixel(x, y, border_color)
+				elif d > r_rim:
+					# High-contrast highlight rim
+					img.set_pixel(x, y, highlight_rim)
+				elif d > r_core:
+					# Secondary brass ring
+					img.set_pixel(x, y, gold_high)
+				else:
+					# Inner embossed brass core
+					var t = float(y) / float(img_size)
+					img.set_pixel(x, y, gold_high.lerp(gold_dark, t))
+			else:
+				img.set_pixel(x, y, Color(0, 0, 0, 0))
+				
+	return ImageTexture.create_from_image(img)
+
 func _load_current_values() -> void:
 	if master_slider:
 		master_slider.value = GameState.master_volume * 100.0

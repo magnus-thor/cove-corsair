@@ -47,7 +47,7 @@ func _setup_persistent_water() -> void:
 	var plane := PlaneMesh.new()
 	plane.size = Vector2(200.0, 320.0)
 	water_mesh.mesh = plane
-	water_mesh.position = Vector3(0.0, -0.01, -100.0)
+	water_mesh.position = Vector3(0.0, 0.0, -100.0)
 	
 	var shader := preload("res://src/shaders/water_stylized.gdshader")
 	if shader:

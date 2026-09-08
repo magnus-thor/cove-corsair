@@ -19,23 +19,46 @@ shadow_size = 18
 shadow_offset = Vector2(0, 8)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slider_bg"]
-bg_color = Color(0.28, 0.18, 0.12, 0.9)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+content_margin_top = 3.0
+content_margin_bottom = 3.0
+bg_color = Color(0.102, 0.067, 0.031, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.239, 0.157, 0.09, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slider_fill"]
-bg_color = Color(0.88, 0.62, 0.18, 1)
+content_margin_top = 3.0
+content_margin_bottom = 3.0
+bg_color = Color(0.961, 0.816, 0.38, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(1, 0.82, 0.35, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+border_color = Color(1, 0.95, 0.65, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slider_fill_highlight"]
+content_margin_top = 3.0
+content_margin_bottom = 3.0
+bg_color = Color(1, 0.88, 0.45, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 0.85, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mute_btn"]
 bg_color = Color(0.22, 0.72, 0.15, 1)
@@ -173,7 +196,7 @@ custom_minimum_size = Vector2(0, 28)
 layout_mode = 2
 theme_override_styles/slider = SubResource("StyleBoxFlat_slider_bg")
 theme_override_styles/grabber_area = SubResource("StyleBoxFlat_slider_fill")
-theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_slider_fill")
+theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_slider_fill_highlight")
 value = 100.0
 
 [node name="MusicBox" type="VBoxContainer" parent="CenterContainer/PanelContainer/Margin/VBox"]
@@ -220,7 +243,7 @@ custom_minimum_size = Vector2(0, 28)
 layout_mode = 2
 theme_override_styles/slider = SubResource("StyleBoxFlat_slider_bg")
 theme_override_styles/grabber_area = SubResource("StyleBoxFlat_slider_fill")
-theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_slider_fill")
+theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_slider_fill_highlight")
 value = 100.0
 
 [node name="SFXBox" type="VBoxContainer" parent="CenterContainer/PanelContainer/Margin/VBox"]
@@ -267,7 +290,7 @@ custom_minimum_size = Vector2(0, 28)
 layout_mode = 2
 theme_override_styles/slider = SubResource("StyleBoxFlat_slider_bg")
 theme_override_styles/grabber_area = SubResource("StyleBoxFlat_slider_fill")
-theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_slider_fill")
+theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_slider_fill_highlight")
 value = 100.0
 
 [node name="HSeparator2" type="HSeparator" parent="CenterContainer/PanelContainer/Margin/VBox"]

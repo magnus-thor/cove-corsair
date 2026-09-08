@@ -27,7 +27,12 @@ var noise: FastNoiseLite
 var time_elapsed: float = 0.0
 
 func _ready() -> void:
+	current = true
+	make_current()
 	add_to_group("game_camera")
+	# Maximize 24-bit Z-buffer precision to eliminate depth fighting on water/shorelines
+	near = 0.1
+	far = 200.0
 	_setup_noise()
 	if not GameState.is_game_active:
 		set_harbor_mode(true)
@@ -37,7 +42,7 @@ func _ready() -> void:
 func _setup_noise() -> void:
 	noise = FastNoiseLite.new()
 	noise.noise_type = FastNoiseLite.TYPE_PERLIN
-	noise.seed = randi()
+	noise.seed = randi() % 100000
 	noise.frequency = 4.0
 	noise.fractal_octaves = 2
 
@@ -95,22 +100,34 @@ func _process(delta: float) -> void:
 			return
 
 		if trauma > 0.0:
-			time_elapsed += delta * 35.0
+			time_elapsed += delta * 25.0
 			var shake_sq = trauma * trauma # Quadratic falloff
 
 			if not noise:
 				_setup_noise()
 
-			var offset_x = max_offset.x * shake_sq * noise.get_noise_2d(noise.seed, time_elapsed)
-			var offset_y = max_offset.y * shake_sq * noise.get_noise_2d(noise.seed + 100, time_elapsed)
-			var offset_z = max_offset.z * shake_sq * noise.get_noise_2d(noise.seed + 200, time_elapsed)
+			var sample_x = noise.get_noise_2d(time_elapsed, 10.0)
+			var sample_y = noise.get_noise_2d(time_elapsed, 25.0)
+			var sample_z = noise.get_noise_2d(time_elapsed, 40.0)
 
-			var rot_x = max_rotation.x * shake_sq * noise.get_noise_2d(noise.seed + 300, time_elapsed)
-			var rot_y = max_rotation.y * shake_sq * noise.get_noise_2d(noise.seed + 400, time_elapsed)
-			var rot_z = max_rotation.z * shake_sq * noise.get_noise_2d(noise.seed + 500, time_elapsed)
+			var sample_rx = noise.get_noise_2d(time_elapsed, 55.0)
+			var sample_ry = noise.get_noise_2d(time_elapsed, 70.0)
+			var sample_rz = noise.get_noise_2d(time_elapsed, 85.0)
 
-			position = base_position + Vector3(offset_x, offset_y, offset_z)
-			rotation_degrees = base_rotation + Vector3(rot_x, rot_y, rot_z)
+			var offset_x = max_offset.x * shake_sq * sample_x
+			var offset_y = max_offset.y * shake_sq * sample_y
+			var offset_z = max_offset.z * shake_sq * sample_z
+
+			var rot_x = max_rotation.x * shake_sq * sample_rx
+			var rot_y = max_rotation.y * shake_sq * sample_ry
+			var rot_z = max_rotation.z * shake_sq * sample_rz
+
+			if is_nan(offset_x) or is_nan(offset_y) or is_nan(offset_z) or is_nan(rot_x) or is_nan(rot_y) or is_nan(rot_z) or is_inf(offset_x) or is_inf(offset_y) or is_inf(offset_z):
+				position = base_position
+				rotation_degrees = base_rotation
+			else:
+				position = base_position + Vector3(offset_x, offset_y, offset_z)
+				rotation_degrees = base_rotation + Vector3(rot_x, rot_y, rot_z)
 		elif shake_timer > 0.0:
 			shake_timer -= delta
 			var offset = Vector3(
