@@ -67,8 +67,16 @@ func _start_game_immediately() -> void:
 	if camera and camera.has_method("set_harbor_mode"):
 		camera.set_harbor_mode(false)
 	var player = get_tree().get_first_node_in_group("player")
-	if player and "is_shooting_enabled" in player:
-		player.is_shooting_enabled = true
+	if player:
+		if "is_shooting_enabled" in player:
+			player.is_shooting_enabled = true
+		var vis = player.get_node_or_null("BoatVisuals")
+		if vis:
+			vis.rotation_degrees.y = 0.0
+		var hardpoints = player.get_node_or_null("Hardpoints")
+		if hardpoints:
+			hardpoints.visible = true
+			hardpoints.rotation_degrees.y = 0.0
 	var hud = get_tree().get_first_node_in_group("top_hud")
 	if hud and hud.has_method("on_game_started"):
 		hud.on_game_started()
@@ -119,14 +127,13 @@ func _on_game_started() -> void:
 	if player:
 		if "is_shooting_enabled" in player:
 			player.is_shooting_enabled = true
-		var tween = create_tween()
 		var vis = player.get_node_or_null("BoatVisuals")
 		if vis:
-			tween.tween_property(vis, "rotation_degrees:y", 0.0, 0.6).set_trans(Tween.TRANS_SINE)
+			vis.rotation_degrees.y = 0.0
 		var hardpoints = player.get_node_or_null("Hardpoints")
 		if hardpoints:
 			hardpoints.visible = true
-			tween.tween_property(hardpoints, "rotation_degrees:y", 0.0, 0.6).set_trans(Tween.TRANS_SINE)
+			hardpoints.rotation_degrees.y = 0.0
 		
 	var hud = get_tree().get_first_node_in_group("top_hud")
 	if hud and hud.has_method("on_game_started"):

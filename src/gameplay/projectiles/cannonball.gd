@@ -20,6 +20,9 @@ extends Area3D
 ## Base damage dealt to obstacles
 @export var damage: int = 1
 
+## Whether this projectile was fired by an enemy/hostile craft
+@export var is_hostile: bool = false
+
 ## Splash radius multiplier applied when cannonballs exceed soft cap
 @export var splash_radius_multiplier: float = 1.0
 
@@ -48,7 +51,22 @@ func set_spawn_pos(pos: Vector3) -> void:
 	_spawn_pos_initialized = true
 
 func setup(p_direction: Vector3, p_ammo_data: AmmoData, p_weapon_data: WeaponData = null) -> void:
-	direction = p_direction.normalized()
+	if p_direction != Vector3.ZERO:
+		direction = p_direction.normalized()
+	else:
+		direction = Vector3(0, 0, 1) if (is_hostile or is_in_group("enemy_projectiles") or has_meta("is_hostile")) else Vector3(0, 0, -1)
+		
+	# Hostile craft projectiles MUST travel downriver in +Z toward the player
+	if (is_hostile or is_in_group("enemy_projectiles") or has_meta("is_hostile")) and direction.z < 0.0:
+		direction.z = abs(direction.z)
+		if direction.length_squared() > 0.001:
+			direction = direction.normalized()
+	elif not (is_hostile or is_in_group("enemy_projectiles") or has_meta("is_hostile")) and direction.z > 0.0:
+		# Player and follower fleet projectiles MUST travel upriver in -Z toward enemies
+		direction.z = -abs(direction.z)
+		if direction.length_squared() > 0.001:
+			direction = direction.normalized()
+			
 	weapon_data = p_weapon_data
 	ammo_data = p_ammo_data
 	
@@ -260,7 +278,16 @@ func _physics_process(delta: float) -> void:
 	_distance_traveled += step
 
 	# Move horizontal direction
-	var forward_dir = direction if direction != Vector3.ZERO else -global_transform.basis.z
+	var forward_dir = direction
+	if forward_dir == Vector3.ZERO:
+		if is_hostile or is_in_group("enemy_projectiles") or has_meta("is_hostile"):
+			forward_dir = Vector3(0, 0, 1)
+		else:
+			forward_dir = -global_transform.basis.z
+	elif (is_hostile or is_in_group("enemy_projectiles") or has_meta("is_hostile")) and forward_dir.z < 0.0:
+		forward_dir.z = abs(forward_dir.z)
+		forward_dir = forward_dir.normalized()
+		
 	global_position.x += forward_dir.x * step
 	global_position.z += forward_dir.z * step
 	
@@ -304,6 +331,38 @@ func _physics_process(delta: float) -> void:
 
 func _on_hit(target: Node) -> void:
 	if _is_destroyed or not target or not is_instance_valid(target):
+		return
+		
+	var hostile = is_hostile or is_in_group("enemy_projectiles") or has_meta("is_hostile")
+	if hostile:
+		var is_player = target.is_in_group("player") or (target.get_parent() and target.get_parent().is_in_group("player"))
+		var is_follower = target.is_in_group("follower") or (target.get_parent() and target.get_parent().is_in_group("follower"))
+		if is_player or is_follower:
+			_is_destroyed = true
+			set_deferred("monitoring", false)
+			set_deferred("monitorable", false)
+			for child in get_children():
+				if child is CollisionShape3D:
+					child.set_deferred("disabled", true)
+			GameState.record_hit()
+			var player = get_tree().get_first_node_in_group("player")
+			if player:
+				if is_follower:
+					var follower = target
+					if not follower.has_method("destroy_follower") and target.get_parent() and target.get_parent().has_method("destroy_follower"):
+						follower = target.get_parent()
+					if player.has_method("leak_threat"):
+						player.leak_threat(follower)
+					elif follower.has_method("destroy_follower"):
+						follower.destroy_follower()
+				else:
+					if player.has_method("leak_threat"):
+						player.leak_threat(player)
+					elif player.has_method("take_hit"):
+						player.take_hit(damage, "enemy_cannonball")
+			AudioManager.play_sfx("barrel_hits")
+			_spawn_splash(false)
+			queue_free()
 		return
 		
 	# Ignore player, followers, other cannonballs, and non-combat items

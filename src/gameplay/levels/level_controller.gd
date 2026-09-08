@@ -530,6 +530,24 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 					skiff.current_hp = hp
 					skiff.forward_speed = speed_val
 
+		# ── Ghost Sloops (Level 2) ────────────────────────────────────────────
+		"ghost_sloops":
+			var x_positions: Array = event.get("x_positions", [0.0])
+			var hp = int(event.get("hp", 8))
+			var speed_val = float(event.get("speed", 2.4))
+			for x_norm in x_positions:
+				var x_world = clampf(normalized_to_world_x(float(x_norm)), -4.6, 4.6)
+				if enemy_mob_scene:
+					var mob = enemy_mob_scene.instantiate() as Area3D
+					add_child(mob)
+					mob.global_position = Vector3(x_world, 0.1, z_spawn)
+					var sloop_data = preload("res://src/data/resources/enemy_vessels/ghost_sloop.tres")
+					if mob.has_method("apply_enemy_data") and sloop_data:
+						mob.apply_enemy_data(sloop_data)
+					mob.max_hp = hp
+					mob.current_hp = hp
+					mob.forward_speed = speed_val
+
 		# ── Tide Cutters (Level 2) ────────────────────────────────────────────
 		"tide_cutters":
 			var x_positions: Array = event.get("x_positions", [0.0])

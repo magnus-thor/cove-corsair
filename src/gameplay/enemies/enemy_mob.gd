@@ -93,6 +93,7 @@ func _apply_mob_type_fallback() -> void:
 		"raider_skiff": "res://src/data/resources/enemy_vessels/raider_skiff.tres",
 		"goblin_skiff": "res://src/data/resources/enemy_vessels/raider_skiff.tres",
 		"turtle_raft": "res://src/data/resources/enemy_vessels/turtle_raft.tres",
+		"ghost_sloop": "res://src/data/resources/enemy_vessels/ghost_sloop.tres",
 		"bone_beard": "res://src/data/resources/enemy_bosses/boss_bone_beard.tres"
 	}
 	if path_map.has(mob_type):
@@ -128,11 +129,17 @@ func _physics_process(delta: float) -> void:
 	elif mob_type:
 		mob_name_lower = mob_type.to_lower()
 		
-	if "raider" in mob_name_lower or "skiff" in mob_name_lower or "elite" in mob_name_lower or "ironclad" in mob_name_lower:
+	var can_fire = ("rower" in mob_name_lower or "skeleton" in mob_name_lower or "sloop" in mob_name_lower or "ghost" in mob_name_lower or "raider" in mob_name_lower or "skiff" in mob_name_lower or "elite" in mob_name_lower or "ironclad" in mob_name_lower)
+	if can_fire:
 		shoot_cooldown_timer += delta
 		var shoot_interval = 1.8
 		if "elite" in mob_name_lower or "ironclad" in mob_name_lower:
 			shoot_interval = 1.5
+		elif "rower" in mob_name_lower or "skeleton" in mob_name_lower:
+			shoot_interval = 2.4
+		elif "sloop" in mob_name_lower or "ghost" in mob_name_lower:
+			shoot_interval = 1.8
+			
 		if shoot_cooldown_timer >= shoot_interval:
 			shoot_cooldown_timer = 0.0
 			_fire_forward_cannonball()
@@ -155,7 +162,7 @@ func _fire_forward_cannonball() -> void:
 	else:
 		get_parent().add_child(ball)
 		
-	# Spawn slightly ahead in positive Z
+	# Spawn slightly ahead in positive Z (downriver facing)
 	ball.global_position = global_position + Vector3(0.0, 0.4, 1.2)
 	
 	var ball_speed = 8.0
@@ -167,11 +174,32 @@ func _fire_forward_cannonball() -> void:
 		
 	if "elite" in mob_name_lower or "ironclad" in mob_name_lower:
 		ball_speed = 10.0
+	elif "sloop" in mob_name_lower or "ghost" in mob_name_lower:
+		ball_speed = 9.5
+	elif "rower" in mob_name_lower or "skeleton" in mob_name_lower:
+		ball_speed = 7.5
 		
+	var player = get_tree().get_first_node_in_group("player")
+	var fire_dir = Vector3(0, 0, 1) # Default downriver facing
+	if player and is_instance_valid(player):
+		var to_player = (player.global_position - ball.global_position)
+		to_player.y = 0.0
+		# If player is downriver, track toward player hull; otherwise fire straight downriver
+		if to_player.z > 0.1:
+			fire_dir = to_player.normalized()
+		else:
+			fire_dir = Vector3(0, 0, 1)
+			
+	if ball.has_method("setup"):
+		ball.setup(fire_dir, null, null)
 	if "direction" in ball:
-		ball.direction = Vector3(0, 0, 1)
+		ball.direction = fire_dir
 	if "speed" in ball:
 		ball.speed = ball_speed
+		
+	if "ghost" in mob_name_lower or "sloop" in mob_name_lower:
+		if ball.has_method("set_color"):
+			ball.set_color(Color(0.2, 1.0, 0.75)) # Spectral ghost cyan/green
 		
 	AudioManager.play_sfx("cannon_shots", 0.9, 1.1, -4.0)
 

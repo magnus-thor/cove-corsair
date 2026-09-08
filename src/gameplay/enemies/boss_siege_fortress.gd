@@ -150,14 +150,17 @@ func _fire_fortress_salvo() -> void:
 		if "speed" in ball:
 			ball.speed = 11.0
 
+		var fire_dir = Vector3(0, 0, 1)
+		var player = get_tree().get_first_node_in_group("player")
+		if player and is_instance_valid(player):
+			var to_player = (player.global_position - ball.global_position)
+			to_player.y = 0.0
+			if to_player.z > 0.1:
+				fire_dir = to_player.normalized()
+		if ball.has_method("setup"):
+			ball.setup(fire_dir, null, null)
 		if "direction" in ball:
-			var player = get_tree().get_first_node_in_group("player")
-			if player:
-				var dir = (player.global_position - ball.global_position).normalized()
-				dir.y = 0.0
-				ball.direction = dir.normalized()
-			else:
-				ball.direction = Vector3(0, 0, 1)
+			ball.direction = fire_dir
 
 func _trigger_geyser_slam() -> void:
 	AudioManager.play_sfx("barrel_breaks", 0.5, 0.7, 4.0)

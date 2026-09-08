@@ -21,6 +21,7 @@ var _submerge_timer: float = 0.0
 var _submerge_duration: float = 3.2
 var _minion_timer: float = 0.0
 var _mortar_timer: float = 0.0
+var _cannon_timer: float = 0.0
 var _is_defeated: bool = false
 var current_state: State = State.APPROACHING
 var _base_y: float = 1.45
@@ -81,6 +82,13 @@ func _process_combat(delta: float) -> void:
 	if visual_container:
 		visual_container.position.y = _base_y + sin(_weave_time * 2.5) * 0.08
 		
+	# Spectral Cannon Volley (Fires downriver toward player)
+	_cannon_timer += delta
+	var cannon_cd = 2.4 if current_phase == 1 else (1.9 if current_phase == 2 else 1.4)
+	if _cannon_timer >= cannon_cd:
+		_cannon_timer = 0.0
+		_fire_spectral_cannon_volley()
+
 	# Poison Mortar
 	_mortar_timer += delta
 	var mortar_cooldown = 3.5 if current_phase == 1 else (2.5 if current_phase == 2 else 1.6)
@@ -103,6 +111,37 @@ func _process_combat(delta: float) -> void:
 	if _minion_timer >= minion_cd:
 		_minion_timer = 0.0
 		_spawn_bayou_adds()
+
+func _fire_spectral_cannon_volley() -> void:
+	if not enemy_cannonball_scene or current_state == State.SUBMERGED or _is_defeated:
+		return
+	AudioManager.play_sfx("cannon_shots", 0.85, 1.15, -2.0)
+	var player = get_tree().get_first_node_in_group("player")
+	var root = get_tree().current_scene
+	var spawn_parent = root if root else get_parent()
+	if not spawn_parent:
+		return
+		
+	for offset_x in [-1.5, 1.5]:
+		var ball = enemy_cannonball_scene.instantiate() as Area3D
+		spawn_parent.add_child(ball)
+		ball.global_position = global_position + Vector3(offset_x, 0.6, 2.0)
+		if ball.has_method("set_color"):
+			ball.set_color(Color(0.2, 1.0, 0.75)) # Spectral ghost cyan/green
+		var fire_dir = Vector3(0, 0, 1) # Default downriver facing
+		if player and is_instance_valid(player):
+			var to_player = (player.global_position - ball.global_position)
+			to_player.y = 0.0
+			if to_player.z > 0.1:
+				fire_dir = to_player.normalized()
+			else:
+				fire_dir = Vector3(0, 0, 1)
+		if ball.has_method("setup"):
+			ball.setup(fire_dir, null, null)
+		if "direction" in ball:
+			ball.direction = fire_dir
+		if "speed" in ball:
+			ball.speed = 10.5
 
 func _fire_poison_mortars() -> void:
 	var player = get_tree().get_first_node_in_group("player")

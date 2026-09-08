@@ -295,8 +295,12 @@ func _fire_enraged_mortar(target_pos: Vector3) -> void:
 	
 	var dir = (target_pos - ball.global_position).normalized()
 	dir.y = 0.0
+	if dir.z <= 0.0:
+		dir.z = 1.0
 	dir = dir.normalized()
 	
+	if ball.has_method("setup"):
+		ball.setup(dir, null, null)
 	if "direction" in ball:
 		ball.direction = dir
 
@@ -345,6 +349,22 @@ func _fire_cannon_volley() -> void:
 			root.add_child(ball)
 		ball.global_position = shoot_node.global_position
 		ball.rotation = rotation
+		
+		var player = get_tree().get_first_node_in_group("player")
+		var fire_dir = Vector3(0, 0, 1) # Default downriver facing toward player
+		if player and is_instance_valid(player):
+			var to_player = (player.global_position - ball.global_position)
+			to_player.y = 0.0
+			if to_player.z > 0.1:
+				fire_dir = to_player.normalized()
+			else:
+				fire_dir = Vector3(0, 0, 1)
+		if ball.has_method("setup"):
+			ball.setup(fire_dir, null, null)
+		if "direction" in ball:
+			ball.direction = fire_dir
+		if "speed" in ball:
+			ball.speed = 11.0
 
 func _drop_keg() -> void:
 	if powder_keg_scene:

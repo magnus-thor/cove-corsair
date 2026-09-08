@@ -56,6 +56,7 @@ func _fire_dual_cannons() -> void:
 		
 	AudioManager.play_sfx("cannon_shots", 0.9, 1.1, 0.0)
 	
+	var player = get_tree().get_first_node_in_group("player")
 	for offset_x in [-0.6, 0.6]:
 		var ball = enemy_cannonball_scene.instantiate() as Area3D
 		var root = get_tree().current_scene
@@ -66,8 +67,16 @@ func _fire_dual_cannons() -> void:
 		ball.global_position = global_position + Vector3(offset_x, 0.5, 1.2)
 		if "speed" in ball:
 			ball.speed = 10.0
+		var fire_dir = Vector3(0, 0, 1)
+		if player and is_instance_valid(player):
+			var to_player = (player.global_position - ball.global_position)
+			to_player.y = 0.0
+			if to_player.z > 0.1:
+				fire_dir = to_player.normalized()
+		if ball.has_method("setup"):
+			ball.setup(fire_dir, null, null)
 		if "direction" in ball:
-			ball.direction = Vector3(0, 0, 1)
+			ball.direction = fire_dir
 		ball.scale = Vector3(1.2, 1.2, 1.2)
 
 func take_damage(amount: int) -> void:

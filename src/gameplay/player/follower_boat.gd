@@ -13,7 +13,11 @@ func _ready() -> void:
 	area_entered.connect(_on_area_entered)
 	
 	# Match visual sprite and collision shape to player's active vessel
-	var player = get_tree().get_first_node_in_group("player")
+	var player = null
+	for p in get_tree().get_nodes_in_group("player"):
+		if p != self and not p.is_in_group("follower"):
+			player = p
+			break
 	var sf: float = 1.0
 	if player and player.has_method("get_fleet_scale_factor"):
 		sf = player.get_fleet_scale_factor(player.follower_boats.size() + 1)
@@ -81,8 +85,11 @@ func _ready() -> void:
 				weapon_instance.setup_weapon(weapon_data)
 			else:
 				weapon_instance.weapon_data = weapon_data
-			$BowMount.add_child(weapon_instance)
-			$BowMount.scale = Vector3.ONE * sf
+			var bow = get_node_or_null("BowMount")
+			if bow:
+				bow.rotation_degrees = Vector3(0, 180, 0)
+				bow.add_child(weapon_instance)
+				bow.scale = Vector3.ONE * sf
 
 func set_target_offset(offset: Vector3) -> void:
 	target_offset = offset
@@ -110,11 +117,15 @@ func tween_scale(target_sf: float, duration: float) -> void:
 		t_bow.tween_property(bow, "scale", Vector3.ONE * target_sf, duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 func _physics_process(delta: float) -> void:
-	var player = get_tree().get_first_node_in_group("player")
+	var player = null
+	for p in get_tree().get_nodes_in_group("player"):
+		if p != self and not p.is_in_group("follower") and ("is_game_over" in p):
+			player = p
+			break
 	if not player or not is_instance_valid(player):
 		return
 		
-	if player.is_game_over:
+	if "is_game_over" in player and player.is_game_over:
 		return
 		
 	# Mirror movement with tight lerp delay
@@ -127,8 +138,10 @@ func _physics_process(delta: float) -> void:
 	global_transform.basis = global_transform.basis.slerp(player.global_transform.basis, rotation_lerp_speed * delta)
 	
 	# Auto-fires in sync with the fleet
-	if player.is_shooting_enabled and is_instance_valid(weapon_instance) and weapon_instance.has_method("try_fire"):
-		weapon_instance.try_fire(delta * player.fire_rate_multiplier)
+	var shooting_enabled = player.is_shooting_enabled if ("is_shooting_enabled" in player) else true
+	var rate_mult = player.fire_rate_multiplier if ("fire_rate_multiplier" in player) else 1.0
+	if shooting_enabled and is_instance_valid(weapon_instance) and weapon_instance.has_method("try_fire"):
+		weapon_instance.try_fire(delta * rate_mult)
 
 func _on_area_entered(area: Area3D) -> void:
 	if area.is_in_group("collectibles") or area.is_in_group("cannonballs") or area.is_in_group("multiplier_gate") or area.is_in_group("player") or area.is_in_group("follower"):

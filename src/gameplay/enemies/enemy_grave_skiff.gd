@@ -74,6 +74,17 @@ func _fire_dart_burst() -> void:
 				fire_mesh.scale = Vector3(0.8, 0.8, 1.6)
 			if "speed" in dart:
 				dart.speed = 12.0
+			var player = get_tree().get_first_node_in_group("player")
+			var fire_dir = Vector3(0, 0, 1)
+			if player and is_instance_valid(player):
+				var to_player = (player.global_position - dart.global_position)
+				to_player.y = 0.0
+				if to_player.z > 0.1:
+					fire_dir = to_player.normalized()
+			if dart.has_method("setup"):
+				dart.setup(fire_dir, null, null)
+			if "direction" in dart:
+				dart.direction = fire_dir
 			if dart.has_method("set_color"):
 				dart.set_color(Color(0.2, 1.0, 0.35)) # Toxic green glow
 			AudioManager.play_sfx("cannon_shots", 1.4, 1.8, -4.0)

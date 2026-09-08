@@ -180,7 +180,7 @@ func _physics_process(delta: float) -> void:
 		return
 		
 	var player = get_tree().get_first_node_in_group("player")
-	if player and player.is_game_over:
+	if player and ("is_game_over" in player and player.is_game_over):
 		return
 		
 	if not weapon_data:
@@ -352,11 +352,21 @@ func try_fire(p_projectile_scene = null, world_container = null) -> void:
 	else:
 		_execute_fire(p_projectile_scene, world_container)
 
+func _is_hostile_vessel() -> bool:
+	var node: Node = self
+	while node:
+		if node.is_in_group("enemies") or node.is_in_group("boss"):
+			return true
+		node = node.get_parent()
+	return false
+
 func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 	if not weapon_data or not proj_scene or not world_container or not muzzle_point:
 		return
 		
 	var is_crew = _is_crew()
+	var is_hostile = _is_hostile_vessel()
+	var default_fwd = Vector3(0, 0, 1) if is_hostile else Vector3(0, 0, -1)
 	
 	if is_crew:
 		_trigger_throw_anim()
@@ -374,17 +384,25 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 	
 	var proj_dir: Vector3
 	if is_crew:
-		proj_dir = aim_direction if aim_direction != Vector3.ZERO else Vector3(0, 0, -1)
+		proj_dir = aim_direction if aim_direction != Vector3.ZERO else default_fwd
 	else:
-		var mount_fwd = global_transform.basis.z
+		var mount_fwd = -global_transform.basis.z if is_hostile else global_transform.basis.z
 		mount_fwd.y = 0.0
 		if mount_fwd.length_squared() > 0.001:
 			proj_dir = mount_fwd.normalized()
 		elif weapon_data.has_method("get_firing_direction"):
-			proj_dir = weapon_data.get_firing_direction(Vector3(0, 0, -1))
+			proj_dir = weapon_data.get_firing_direction(default_fwd)
 		else:
 			var spread = deg_to_rad(weapon_data.spread_angle_deg)
-			proj_dir = Vector3(0, 0, -1).rotated(Vector3.UP, spread).normalized()
+			proj_dir = default_fwd.rotated(Vector3.UP, spread).normalized()
+
+	if is_hostile and proj_dir.z < 0.0:
+		proj_dir.z = abs(proj_dir.z)
+		proj_dir = proj_dir.normalized()
+	elif not is_hostile and proj_dir.z > 0.0:
+		# Player flagship and follower fleet vessels must NEVER fire backward downriver (+Z)
+		proj_dir.z = -abs(proj_dir.z)
+		proj_dir = proj_dir.normalized()
 
 	var player = get_tree().get_first_node_in_group("player")
 	var is_scatter_weapon: bool = (weapon_data.get("is_scatter") == true or weapon_data.weapon_type == "scattershot" or "scatter" in weapon_data.weapon_name.to_lower())
@@ -402,6 +420,11 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 			ball.set_meta("is_mortar", true)
 			if from_bow:
 				ball.set_meta("from_bow", true)
+			if is_hostile:
+				ball.add_to_group("enemy_projectiles")
+				ball.set_meta("is_hostile", true)
+				if "is_hostile" in ball:
+					ball.is_hostile = true
 			world_container.add_child(ball)
 			ball.top_level = true
 			ball.global_position = spawn_pos
@@ -412,7 +435,7 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 			if ball.has_method("setup"):
 				ball.setup(proj_dir, weapon_data.default_ammo, weapon_data)
 				
-			if player and "base_damage_bonus" in player and "damage" in ball:
+			if player and "base_damage_bonus" in player and "damage" in ball and not is_hostile:
 				ball.damage += player.base_damage_bonus
 	else:
 		AudioManager.play_sfx("cannon_shots")
@@ -423,6 +446,11 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 		if ball:
 			if from_bow:
 				ball.set_meta("from_bow", true)
+			if is_hostile:
+				ball.add_to_group("enemy_projectiles")
+				ball.set_meta("is_hostile", true)
+				if "is_hostile" in ball:
+					ball.is_hostile = true
 			world_container.add_child(ball)
 			ball.top_level = true
 			ball.global_position = spawn_pos
@@ -433,7 +461,7 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 			if ball.has_method("setup"):
 				ball.setup(proj_dir, weapon_data.default_ammo, weapon_data)
 				
-			if player and "base_damage_bonus" in player and "damage" in ball:
+			if player and "base_damage_bonus" in player and "damage" in ball and not is_hostile:
 				ball.damage += player.base_damage_bonus
 
 func fire_scattershot(proj_dir: Vector3 = Vector3.ZERO, world_container: Node = null, p_proj_scene: PackedScene = null) -> void:
@@ -458,20 +486,27 @@ func fire_scattershot(proj_dir: Vector3 = Vector3.ZERO, world_container: Node = 
 		else:
 			scene_to_use = preload("res://src/gameplay/projectiles/scattershot_pellet.tscn")
 
+	var is_hostile = _is_hostile_vessel()
+	var default_fwd = Vector3(0, 0, 1) if is_hostile else Vector3(0, 0, -1)
+
 	var spawn_pos = muzzle_point.global_position
 	spawn_pos.y = max(0.48, spawn_pos.y)
 
 	var base_dir: Vector3 = proj_dir
 	if base_dir == Vector3.ZERO:
-		var mount_fwd = global_transform.basis.z
+		var mount_fwd = -global_transform.basis.z if is_hostile else global_transform.basis.z
 		mount_fwd.y = 0.0
 		if mount_fwd.length_squared() > 0.001:
 			base_dir = mount_fwd.normalized()
 		elif weapon_data and weapon_data.has_method("get_firing_direction"):
-			base_dir = weapon_data.get_firing_direction(Vector3(0, 0, -1))
+			base_dir = weapon_data.get_firing_direction(default_fwd)
 		else:
-			base_dir = Vector3(0, 0, -1)
+			base_dir = default_fwd
 	else:
+		base_dir = base_dir.normalized()
+
+	if is_hostile and base_dir.z < 0.0:
+		base_dir.z = abs(base_dir.z)
 		base_dir = base_dir.normalized()
 
 	var socket_name = get_parent().name.to_lower() if get_parent() else ""
@@ -486,6 +521,11 @@ func fire_scattershot(proj_dir: Vector3 = Vector3.ZERO, world_container: Node = 
 		if pellet:
 			if from_bow:
 				pellet.set_meta("from_bow", true)
+			if is_hostile:
+				pellet.add_to_group("enemy_projectiles")
+				pellet.set_meta("is_hostile", true)
+				if "is_hostile" in pellet:
+					pellet.is_hostile = true
 			world_container.add_child(pellet)
 			pellet.top_level = true
 			pellet.global_position = spawn_pos
@@ -497,7 +537,7 @@ func fire_scattershot(proj_dir: Vector3 = Vector3.ZERO, world_container: Node = 
 				pellet.lifetime = weapon_data.projectile_lifetime
 			elif pellet.speed > 0.0:
 				pellet.lifetime = min(pellet.lifetime, (pellet.max_range / pellet.speed) + 0.05)
-			if player and "base_damage_bonus" in player and "damage" in pellet:
+			if player and "base_damage_bonus" in player and "damage" in pellet and not is_hostile:
 				pellet.damage += player.base_damage_bonus
 
 func _trigger_throw_anim() -> void:

@@ -5,6 +5,17 @@ extends Area3D
 @export var lifetime: float = 4.5
 var direction: Vector3 = Vector3(0, 0, 1)
 
+func setup(p_direction: Vector3 = Vector3.ZERO, _p_ammo_data = null, _p_weapon_data = null) -> void:
+	if p_direction != Vector3.ZERO:
+		direction = p_direction.normalized()
+	else:
+		direction = Vector3(0, 0, 1)
+	# Safeguard: Enemy projectiles must travel downriver (+Z) toward player
+	if direction.z < 0.0:
+		direction.z = abs(direction.z)
+	if direction.length_squared() > 0.001:
+		direction = direction.normalized()
+
 func _ready() -> void:
 	add_to_group("enemy_projectiles")
 	area_entered.connect(_on_hit)
@@ -28,7 +39,10 @@ func set_color(color: Color) -> void:
 
 
 func _physics_process(delta: float) -> void:
-	global_position += direction * speed * delta
+	var fwd = direction if direction != Vector3.ZERO else Vector3(0, 0, 1)
+	if fwd.z < 0.0:
+		fwd.z = abs(fwd.z)
+	global_position += fwd * speed * delta
 	lifetime -= delta
 	if lifetime <= 0.0:
 		queue_free()

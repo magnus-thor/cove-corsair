@@ -110,6 +110,11 @@ func _ready() -> void:
 	add_to_group("player")
 	target_x = global_position.x
 	half_width = river_width / 2.0
+	if visuals:
+		visuals.rotation_degrees.y = 0.0
+	var init_hp = get_node_or_null("Hardpoints")
+	if init_hp:
+		init_hp.rotation_degrees.y = 0.0
 	
 	# Dynamically construct collision area to detect overlapping Area3D obstacles
 	var detection_area = Area3D.new()
@@ -406,13 +411,13 @@ func _physics_process(delta: float) -> void:
 	# Do NOT call GameState.update_distance() here — it causes double-counting.
 		
 	if not GameState.is_game_active:
-		# Floating / Bobbing on water in calm harbor (3/4 front view facing camera)
+		# Floating / Bobbing on water in calm harbor (facing forward upriver towards the horizon)
 		float_time += delta * bob_frequency
 		var idle_hover_height = lerp(min_hover_height, max_hover_height, (sin(float_time) + 1.0) * 0.5)
 		if visuals:
 			visuals.position.y = idle_hover_height
 			visuals.rotation_degrees.x = sin(float_time * 1.5) * 2.0
-			visuals.rotation_degrees.y = 158.0 + sin(float_time * 0.7) * 2.0
+			visuals.rotation_degrees.y = sin(float_time * 0.7) * 2.0
 			visuals.rotation_degrees.z = sin(float_time * 1.1) * 1.5
 			
 			var hardpoints = get_node_or_null("Hardpoints")
@@ -453,6 +458,8 @@ func _physics_process(delta: float) -> void:
 	if visuals:
 		visuals.position.y = hover_height
 		visuals.rotation_degrees.x = sin(float_time * 1.5) * 2.0
+		visuals.rotation_degrees.y = 0.0
+		visuals.rotation_degrees.z = 0.0
 		
 		var hardpoints = get_node_or_null("Hardpoints")
 		if hardpoints:
@@ -461,6 +468,8 @@ func _physics_process(delta: float) -> void:
 			hardpoints.position.z = visuals.position.z
 			hardpoints.position.y = visuals.position.y
 			hardpoints.rotation_degrees.x = visuals.rotation_degrees.x
+			hardpoints.rotation_degrees.y = 0.0
+			hardpoints.rotation_degrees.z = 0.0
 		
 	# 6. Automatic periodic cannon shooting
 	if is_shooting_enabled:
@@ -682,6 +691,7 @@ func add_follower_boat() -> void:
 	if parent:
 		parent.add_child(follower)
 		follower.global_position = global_position
+		follower.global_transform.basis = global_transform.basis
 		follower_boats.append(follower)
 		_update_follower_positions()
 
