@@ -299,10 +299,10 @@ func build_barricade_siege_chunk() -> void:
 	gate.gate_action = "add_fleet_2"
 	gate.owner = root
 	
-	# Dual skeleton rowers at Z = -45
+	# Dual skeleton rowers at Z = -48 (enforcing >= 25m safe buffer zone behind barricade)
 	var r1 = ENEMY_SCENE.instantiate()
 	entities.add_child(r1)
-	r1.position = Vector3(-2.2, 0.1, -45.0)
+	r1.position = Vector3(-2.2, 0.1, -48.0)
 	r1.max_hp = 2
 	r1.current_hp = 2
 	r1.forward_speed = 1.8
@@ -310,7 +310,7 @@ func build_barricade_siege_chunk() -> void:
 	
 	var r2 = ENEMY_SCENE.instantiate()
 	entities.add_child(r2)
-	r2.position = Vector3(2.2, 0.1, -45.0)
+	r2.position = Vector3(2.2, 0.1, -48.0)
 	r2.max_hp = 2
 	r2.current_hp = 2
 	r2.forward_speed = 1.8
@@ -372,7 +372,7 @@ func build_level_resources() -> void:
 	l1.level_id = 1
 	l1.level_title = "Level 1: Smuggler's Run"
 	l1.biome_name = "tropical"
-	l1.base_scroll_speed = 7.0
+	l1.base_scroll_speed = 6.5
 	l1.completion_doubloon_reward = 150
 	l1.horizon_texture = horizon_smugglers
 	l1.water_albedo = Color(0.08, 0.58, 0.82, 0.88)

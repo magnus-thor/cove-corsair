@@ -3,12 +3,35 @@ extends DestructibleObstacle
 
 var hp_label: Label3D
 
+static func get_tier_hp(level: int) -> int:
+	if level <= 3:
+		return 2
+	elif level <= 10:
+		return 6
+	elif level <= 25:
+		return 12
+	else:
+		return 20
+
 func _ready() -> void:
 	doubloons_drop = 1
 	add_to_group("destructible")
 	add_to_group("barricade")
-	if hp <= 1:
-		hp = 20
+	
+	var cur_level: int = 1
+	if has_node("/root/GameState"):
+		var gs = get_node("/root/GameState")
+		if "current_level" in gs:
+			cur_level = int(gs.current_level)
+			
+	var tier_hp = get_tier_hp(cur_level)
+	if cur_level <= 10:
+		if hp <= 1 or hp > tier_hp:
+			hp = tier_hp
+	else:
+		if hp <= 1:
+			hp = tier_hp
+
 	
 	# Hide the default Sprite3D if it exists, as we will use a 3D log mesh
 	var default_sprite = get_node_or_null("ObstacleSprite")

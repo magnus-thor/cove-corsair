@@ -23,7 +23,7 @@ func test_level_data_resources() -> void:
 	assert(l1.level_title == "Level 1: Smuggler's Run", "Level 1 title mismatch")
 	assert(l1.biome_name == "tropical", "Level 1 biome must be tropical")
 	assert(l1.chunk_scenes.size() == 5, "Level 1 must have 5 chunk scenes")
-	assert(l1.base_scroll_speed == 7.0, "Level 1 base_scroll_speed must be 7.0")
+	assert(l1.base_scroll_speed == 6.5, "Level 1 base_scroll_speed must be 6.5")
 	assert(l1.completion_doubloon_reward == 150, "Level 1 reward must be 150")
 	print("[PASS] Level 1 schema verified.")
 	

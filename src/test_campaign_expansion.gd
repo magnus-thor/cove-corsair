@@ -96,7 +96,7 @@ func test_all_45_level_resources() -> void:
 		assert(lvl_res != null, "Level %d must load as LevelData" % lvl)
 		assert(lvl_res.level_id == lvl, "Level %d level_id mismatch (got %d)" % [lvl, lvl_res.level_id])
 		assert(lvl_res.chunk_scenes.size() >= 5, "Level %d must have at least 5 chunks" % lvl)
-		assert(lvl_res.base_scroll_speed >= 7.0, "Level %d speed must be >= 7.0" % lvl)
+		assert(lvl_res.base_scroll_speed >= (6.5 if lvl == 1 else 7.0), "Level %d speed must be >= 6.5" % lvl)
 		assert(lvl_res.completion_doubloon_reward >= 150, "Level %d doubloon reward must be >= 150" % lvl)
 		assert(lvl_res.water_albedo != Color.BLACK, "Level %d water_albedo must be configured" % lvl)
 		assert(lvl_res.biome_name in ["tropical", "bayou", "brimstone"], "Level %d invalid biome: %s" % [lvl, lvl_res.biome_name])

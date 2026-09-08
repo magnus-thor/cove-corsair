@@ -166,12 +166,12 @@ func _test_shipyard_upgrade_with_retained_gold() -> void:
 	# Purchase Tier 2 upgrade in Shipyard with retained gold
 	var initial_gold = GameState.doubloons
 	var tier_cost = GameState.get_upgrade_cost("dinghy", 2)
-	assert_test(tier_cost == 350, "Dinghy Tier 2 cost is 350 doubloons")
+	assert_test(tier_cost == 300, "Dinghy Tier 2 cost is 300 doubloons")
 	
 	var success = GameState.upgrade_vessel_tier("dinghy")
 	assert_test(success == true, "Dinghy Tier 2 upgrade purchased successfully using retained gold")
 	assert_test(GameState.get_vessel_tier("dinghy") == 2, "Dinghy is now upgraded to Tier 2")
-	assert_test(GameState.doubloons == initial_gold - 350, "Gold accurately deducted after upgrade purchase")
+	assert_test(GameState.doubloons == initial_gold - 300, "Gold accurately deducted after upgrade purchase")
 	
 	# Refresh screen after purchase
 	screen._refresh_banked_display()

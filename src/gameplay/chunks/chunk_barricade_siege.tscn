@@ -1,6 +1,6 @@
 [gd_scene format=4]
 
-[ext_resource type="Script" path="res://src/gameplay/chunks/base_track_chunk.gd" id="1_afkhi"]
+[ext_resource type="Script" path="res://src/gameplay/chunks/chunk_barricade_siege.gd" id="1_afkhi"]
 [ext_resource type="PackedScene" path="res://assets/models/structure-fence.glb" id="2_ej7gm"]
 [ext_resource type="Texture2D" path="res://assets/models/Textures/colormap.png" id="3_w7ipv"]
 [ext_resource type="PackedScene" path="res://assets/models/tower-complete-small.glb" id="4_qdvtt"]
@@ -158,7 +158,7 @@ custom_text = "+2"
 gate_action = "add_fleet_2"
 
 [node name="@Area3D@24" type="Area3D" parent="Entities" unique_id=766446530 groups=["destructible", "enemies"] instance=ExtResource("5_41l2j")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2, 0.1, -45)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2, 0.1, -48)
 script = ExtResource("6_heufw")
 max_hp = 2
 current_hp = 2
@@ -166,7 +166,7 @@ forward_speed = 1.8
 doubloons_drop = 3
 
 [node name="@Area3D@25" type="Area3D" parent="Entities" unique_id=658476764 groups=["destructible", "enemies"] instance=ExtResource("5_41l2j")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0.1, -45)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0.1, -48)
 script = ExtResource("6_heufw")
 max_hp = 2
 current_hp = 2
