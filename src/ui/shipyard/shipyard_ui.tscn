@@ -119,7 +119,7 @@ shadow_size = 5
 shadow_offset = Vector2(0, 3)
 
 [node name="ShipyardUI" type="CanvasLayer"]
-layer = 20
+layer = 35
 script = ExtResource("1_shipyard_script")
 
 [node name="BackdropOverlay" type="ColorRect" parent="."]

@@ -14,11 +14,19 @@ func _on_area_entered(area: Area3D) -> void:
 	if area.is_in_group("player") or area.is_in_group("follower") or area.is_in_group("cannonballs"):
 		die()
 
+## Override base take_damage so cannonball hits route through HazardSeaMine.die() only.
+## The base class die() calls _apply_explosion_damage() which incorrectly spawns VFX
+## and damage checks near the player rather than at the mine's position.
+func take_damage(_amount: int) -> void:
+	die()
+
 func die() -> void:
 	if _is_destroyed:
 		return
 	var explosion_pos = global_position
 	_is_destroyed = true
+	set_deferred("monitoring", false)
+	set_deferred("monitorable", false)
 	
 	if VFXManager:
 		VFXManager.spawn_mine_explosion(explosion_pos)

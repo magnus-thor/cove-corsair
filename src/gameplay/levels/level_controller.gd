@@ -829,7 +829,7 @@ func _spawn_boss() -> void:
 	# Clean up track obstacles in the arena so the boss channel is completely clear
 	for grp in ["obstacles", "destructible_obstacles", "multiplier_gate"]:
 		for obs in get_tree().get_nodes_in_group(grp):
-			if is_instance_valid(obs) and not obs.is_in_group("boss") and not (obs is BossWarBarge) and not (obs is BossComponentDelegate):
+			if is_instance_valid(obs) and not obs.is_in_group("boss") and not (obs is BossWarBarge) and not (obs is BossComponentDelegate) and not (obs is BossBoneBeard):
 				obs.queue_free()
 
 	var spawn_prefab = boss_scene

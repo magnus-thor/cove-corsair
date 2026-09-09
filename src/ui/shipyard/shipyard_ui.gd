@@ -51,7 +51,7 @@ var style_btn_disabled: StyleBoxFlat
 func _ready() -> void:
 	GameState.set_performance_mode(false)
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	layer = 20
+	layer = 35
 
 	_init_button_styles()
 

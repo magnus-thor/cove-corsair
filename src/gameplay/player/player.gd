@@ -509,14 +509,22 @@ func spawn_floating_text_at_position(text_val: String, color_val: Color) -> void
 
 
 func take_hit(amount: int = 1, source_info: String = "") -> void:
+	# I-frame guard: prevent stacked damage from overlapping contacts in the same frame
+	# (barricade handles its own i-frame; leak_threat is throttled by follower loss)
+	if source_info != "leak_threat" and source_info != "Collision with Barricade":
+		if hit_invulnerability_timer > 0.0:
+			return
+		hit_invulnerability_timer = 0.8
+	
 	if source_info != "leak_threat":
 		GameState.record_hit()
 	current_health = max(0, current_health - amount)
 	var camera = get_tree().get_first_node_in_group("game_camera")
 	if camera and camera.has_method("add_trauma"):
 		camera.add_trauma(0.55)
-	if GameState.boss_spawned:
-		print("[PLAYER HIT] User vessel took %d dmg from %s | HP: %d/%d | Fleet: %d" % [amount, source_info, current_health, max_health, follower_boats.size() + 1])
+	print("[PLAYER HIT] Vessel took %d dmg from '%s' | HP: %d/%d | Fleet: %d" % [amount, source_info, current_health, max_health, follower_boats.size() + 1])
+	if current_health <= 0:
+		print("[FATAL DAMAGE] Killed by: %s | Damage: %d | Remaining HP: %d" % [source_info, amount, current_health])
 	health_changed.emit(current_health, max_health)
 	if current_health <= 0:
 		game_over(false)
@@ -550,14 +558,16 @@ func _on_area_entered(area: Area3D) -> void:
 
 		var is_sea_mine = area is HazardSeaMine or (area is DestructibleObstacle and area.obstacle_type == DestructibleObstacle.ObstacleType.SEA_MINE)
 		if is_sea_mine:
-			var mine_pos = area.global_position
-			take_hit(1, "Collision with Sea Mine")
+			# Let mine.die() handle its own explosion VFX at the mine's position.
+			# take_hit() will check i-frames internally.
 			if area.has_method("die"):
 				area.die()
 			else:
+				var mine_pos = area.global_position
 				if VFXManager:
 					VFXManager.spawn_mine_explosion(mine_pos)
 				area.queue_free()
+			take_hit(1, "Collision with Sea Mine")
 			return
 
 		AudioManager.play_sfx("barrel_hits")

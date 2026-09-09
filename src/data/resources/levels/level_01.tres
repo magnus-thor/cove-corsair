@@ -1,11 +1,11 @@
-[gd_resource type="Resource" script_class="LevelData" format=3]
+[gd_resource type="Resource" script_class="LevelData" format=3 uid="uid://2jsdrlt0tnvf"]
 
 [ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_warmup.tscn" id="1_06fpa"]
 [ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_mine_gauntlet.tscn" id="2_vkr4m"]
 [ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_barricade_siege.tscn" id="3_lyxhh"]
 [ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_boss_ironjaw.tscn" id="4_sauan"]
-[ext_resource type="Texture2D" path="res://assets/textures/horizon_smugglers_run.png" id="5_c7wcs"]
-[ext_resource type="Script" path="res://src/data/resources/level_data.gd" id="6_n1mq7"]
+[ext_resource type="Texture2D" uid="uid://c0tbeunp2nalb" path="res://assets/textures/horizon_smugglers_run.png" id="5_c7wcs"]
+[ext_resource type="Script" uid="uid://cpqsm6o6bnsf2" path="res://src/data/resources/level_data.gd" id="6_n1mq7"]
 
 [resource]
 script = ExtResource("6_n1mq7")

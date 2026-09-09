@@ -29,6 +29,7 @@ var _current_base_y: float = 2.15
 func _ready() -> void:
 	_clean_shadow_nodes(self)
 	add_to_group("enemies")
+	add_to_group("boss")
 	add_to_group("destructible")
 	current_hp = max_hp
 	if boss_sprite:
@@ -37,6 +38,12 @@ func _ready() -> void:
 		boss_sprite.rotation_degrees = Vector3.ZERO
 	_update_health_bar()
 	area_entered.connect(_on_area_entered)
+	
+	GameState.boss_spawned = true
+	if GameState.has_signal("boss_spawned_event"):
+		GameState.boss_spawned_event.emit("Captain Bone-Beard", max_hp)
+	if GameState.has_signal("boss_health_changed"):
+		GameState.boss_health_changed.emit(current_hp, max_hp)
 	
 	var player = get_tree().get_first_node_in_group("player")
 	var player_z = player.global_position.z if player else 0.0
@@ -95,6 +102,8 @@ func take_damage(amount: int) -> void:
 	_update_health_bar()
 	_flash_red()
 	AudioManager.play_sfx("barrel_hits")
+	if GameState.has_signal("boss_health_changed"):
+		GameState.boss_health_changed.emit(current_hp, max_hp)
 
 	if current_hp <= 0:
 		boss_defeat()
@@ -186,12 +195,8 @@ func _on_area_entered(area: Area3D) -> void:
 		return
 	if area.is_in_group("player") or (area.get_parent() and area.get_parent().is_in_group("player")):
 		var player = get_tree().get_first_node_in_group("player")
-		if player and "current_health" in player:
-			player.current_health -= 1
-			if player.has_signal("health_changed"):
-				player.health_changed.emit(player.current_health, player.max_health)
-			if player.current_health <= 0 and player.has_method("game_over"):
-				player.game_over(false)
+		if player and player.has_method("take_hit"):
+			player.take_hit(1, "BossBoneBeard hull contact")
 
 func _clean_shadow_nodes(node: Node) -> void:
 	if not node:

@@ -447,8 +447,8 @@ func _process_ram_charge(delta: float) -> void:
 			charge_direction = -1 # Retreat
 			AudioManager.play_sfx("barrel_breaks")
 			if player and abs(player.global_position.x - global_position.x) < 2.5:
-				if player.has_method("take_hit"):
-					player.take_hit(1)
+				if player.has_method("leak_threat"):
+					player.leak_threat(self)
 	else:
 		# Retreat back to combat offset
 		global_position.z = move_toward(global_position.z, _target_z, 10.0 * delta)

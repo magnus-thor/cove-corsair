@@ -141,7 +141,15 @@ func die() -> void:
 		AudioManager.play_sfx("sfx_wood_smash")
 	else:
 		AudioManager.play_sfx("barrel_breaks")
-	_spawn_explosion()
+	var explosion_pos = global_position
+	if obstacle_type == ObstacleType.SEA_MINE:
+		AudioManager.play_sfx("sfx_mine_detonate")
+		if VFXManager:
+			VFXManager.spawn_mine_explosion(explosion_pos)
+		else:
+			_spawn_explosion()
+	else:
+		_spawn_explosion()
 	_spawn_doubloons()
 	
 	# Trigger camera shake on death!
@@ -220,7 +228,14 @@ func _spawn_explosion() -> void:
 		vfx.global_position = global_position
 
 func _spawn_doubloons() -> void:
-	if not doubloon_scene or doubloons_drop <= 0:
+	if not doubloon_scene:
+		return
+		
+	var drop_count = doubloons_drop
+	if drop_count <= 0 and (obstacle_type == ObstacleType.WOODEN_BARREL or obstacle_type == ObstacleType.FUSE_BARREL or obstacle_type == ObstacleType.RUNE_BARREL):
+		drop_count = randi_range(1, 3)
+		
+	if drop_count <= 0:
 		return
 		
 	var spawn_parent = get_tree().current_scene
@@ -229,7 +244,7 @@ func _spawn_doubloons() -> void:
 		if spawn_parent == self or spawn_parent is DestructibleObstacle:
 			return
 		
-	for i in range(doubloons_drop):
+	for i in range(drop_count):
 		var doubloon = doubloon_scene.instantiate() as Area3D
 		if doubloon:
 			spawn_parent.add_child(doubloon)
