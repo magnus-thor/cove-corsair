@@ -144,10 +144,7 @@ func die() -> void:
 	var explosion_pos = global_position
 	if obstacle_type == ObstacleType.SEA_MINE:
 		AudioManager.play_sfx("sfx_mine_detonate")
-		if VFXManager:
-			VFXManager.spawn_mine_explosion(explosion_pos)
-		else:
-			_spawn_explosion()
+		# Sea mine explosion VFX/smoke completely removed per user request
 	else:
 		_spawn_explosion()
 	_spawn_doubloons()

@@ -97,9 +97,9 @@ func spawn_mortar_splash(world_pos: Vector3) -> Node3D:
 	water_aligned_pos.y = clampf(world_pos.y, WATER_SURFACE_MIN_Y, WATER_SURFACE_MAX_Y)
 	return _spawn_effect(SCENE_MORTAR_GEYSER, water_aligned_pos, 0.6)
 
-## Spawns fiery orange core flash and expanding dark charcoal smoke cloud.
-func spawn_mine_explosion(world_pos: Vector3) -> Node3D:
-	return _spawn_effect(SCENE_MINE_EXPLOSION, world_pos, 0.5)
+## Sea mine explosion / smoke VFX completely disabled per user request (will be re-added later).
+func spawn_mine_explosion(_world_pos: Vector3) -> Node3D:
+	return null
 
 ## Spawns fountain burst of golden coin particles erupting upward upon chest collection.
 func spawn_coin_burst(world_pos: Vector3) -> Node3D:

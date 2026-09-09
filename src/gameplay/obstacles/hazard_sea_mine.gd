@@ -28,10 +28,7 @@ func die() -> void:
 	set_deferred("monitoring", false)
 	set_deferred("monitorable", false)
 	
-	if VFXManager:
-		VFXManager.spawn_mine_explosion(explosion_pos)
-	else:
-		_spawn_explosion()
+	# Sea mine explosion VFX/smoke completely removed per user request
 	AudioManager.play_sfx("sfx_mine_detonate")
 	
 	# Apply knockback and deal 1 fleet damage to the player if close (direct contact)

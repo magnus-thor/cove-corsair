@@ -38,8 +38,10 @@ const DEFAULT_SOCKET_WEAPONS: Dictionary = {
 	"StarboardRailMount": "res://src/data/resources/user_crew/weapon_scattershot.tres"
 }
 
-## Width of the river channel boundaries. The boat can move within [-river_width/2, river_width/2]
+## Width of the river channel boundaries.
 @export var river_width: float = 12.0
+## Half-width of the playable lane. Strictly bounds swerve to prevent steering into sand banks.
+@export var playable_half_width: float = 4.8
 
 ## Touch/drag input sensitivity scaling factor.
 @export var sensitivity: float = 0.015
@@ -109,7 +111,7 @@ func _ready() -> void:
 	_clean_shadow_nodes(self)
 	add_to_group("player")
 	target_x = global_position.x
-	half_width = river_width / 2.0
+	half_width = playable_half_width if playable_half_width > 0.0 else (river_width / 2.0)
 	if visuals:
 		visuals.rotation_degrees.y = 0.0
 	var init_hp = get_node_or_null("Hardpoints")

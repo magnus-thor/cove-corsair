@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://src/vfx/vfx_mine_explosion.gd" id="1_explosion_script"]
 
@@ -15,24 +15,6 @@ vertex_color_use_as_albedo = true
 material = SubResource("StandardMaterial3D_flash")
 radius = 0.22
 height = 0.44
-
-[sub_resource type="Gradient" id="Gradient_smoke"]
-offsets = PackedFloat32Array(0, 0.2, 0.7, 1)
-colors = PackedColorArray(0.25, 0.25, 0.25, 0.9, 0.18, 0.18, 0.18, 0.85, 0.12, 0.12, 0.12, 0.4, 0.08, 0.08, 0.08, 0)
-
-[sub_resource type="Curve" id="Curve_smoke_scale"]
-_data = [Vector2(0, 0.5), 0.0, 2.0, 0, 0, Vector2(0.5, 1.2), 0.5, 0.5, 0, 0, Vector2(1, 1.6), 0.0, 0.0, 0, 0]
-point_count = 3
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_smoke"]
-transparency = 1
-shading_mode = 0
-vertex_color_use_as_albedo = true
-
-[sub_resource type="SphereMesh" id="SphereMesh_smoke"]
-material = SubResource("StandardMaterial3D_smoke")
-radius = 0.26
-height = 0.52
 
 [node name="VFXMineExplosion" type="Node3D"]
 script = ExtResource("1_explosion_script")
@@ -52,20 +34,3 @@ gravity = Vector3(0, -3.0, 0)
 initial_velocity_min = 3.0
 initial_velocity_max = 5.0
 color_ramp = SubResource("Gradient_flash")
-
-[node name="SmokeCloud" type="CPUParticles3D" parent="."]
-emitting = false
-amount = 14
-lifetime = 0.5
-one_shot = true
-explosiveness = 0.95
-mesh = SubResource("SphereMesh_smoke")
-emission_shape = 1
-emission_sphere_radius = 0.35
-direction = Vector3(0, 1, 0)
-spread = 60.0
-gravity = Vector3(0, -1.5, 0)
-initial_velocity_min = 2.0
-initial_velocity_max = 4.0
-scale_amount_curve = SubResource("Curve_smoke_scale")
-color_ramp = SubResource("Gradient_smoke")

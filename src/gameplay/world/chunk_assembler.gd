@@ -21,6 +21,9 @@ var distance_traveled: float = 0.0
 var is_boss_active: bool = false
 var is_assembled: bool = false
 var _persistent_water: MeshInstance3D = null
+var _persistent_bank_left: MeshInstance3D = null
+var _persistent_bank_right: MeshInstance3D = null
+var _bank_mat: StandardMaterial3D = null
 
 func _get_game_state() -> Node:
 	return get_node_or_null("/root/GameState")
@@ -32,52 +35,104 @@ func _ready() -> void:
 	if active_level_data:
 		assemble_level(active_level_data)
 
-## Sets up a single persistent water surface plane beneath the camera to prevent
-## seam tearing and redundant GPU overdraw across individual chunks.
+## Sets up a persistent river water surface plane beneath the camera constrained strictly
+## to the river corridor (width 12.0m: X in [-6.0m, +6.0m]), along with solid bank
+## ground planes extending outward to eliminate water outside the lane.
 func _setup_persistent_water() -> void:
 	var existing = get_tree().get_first_node_in_group("persistent_water")
 	if existing and existing is MeshInstance3D:
 		_persistent_water = existing
-		return
+		if _persistent_water.mesh is PlaneMesh:
+			(_persistent_water.mesh as PlaneMesh).size = Vector2(13.2, 320.0)
+	else:
+		var water_mesh := MeshInstance3D.new()
+		water_mesh.name = "PersistentWaterPlane"
+		water_mesh.add_to_group("persistent_water")
 		
-	var water_mesh := MeshInstance3D.new()
-	water_mesh.name = "PersistentWaterPlane"
-	water_mesh.add_to_group("persistent_water")
+		# River lane water: 13.2m width covers wide channel from -6.6m to +6.6m
+		var plane := PlaneMesh.new()
+		plane.size = Vector2(13.2, 320.0)
+		water_mesh.mesh = plane
+		water_mesh.position = Vector3(0.0, 0.0, -100.0)
+		
+		var shader := preload("res://src/shaders/water_stylized.gdshader")
+		if shader:
+			var mat := ShaderMaterial.new()
+			mat.shader = shader
+			mat.set_shader_parameter("albedo", Color(0.08, 0.58, 0.82, 0.88))
+			mat.set_shader_parameter("roughness", 0.05)
+			mat.set_shader_parameter("refraction_strength", 0.04)
+			mat.set_shader_parameter("flow_speed", Vector2(0.0, -0.6))
+			
+			var noise := FastNoiseLite.new()
+			noise.noise_type = FastNoiseLite.TYPE_CELLULAR
+			noise.frequency = 0.04
+			var noise_tex := NoiseTexture2D.new()
+			noise_tex.seamless = true
+			noise_tex.as_normal_map = true
+			noise_tex.noise = noise
+			
+			mat.set_shader_parameter("texture_normal", noise_tex)
+			mat.set_shader_parameter("texture_refraction", noise_tex)
+			water_mesh.material_override = mat
+			
+		add_child(water_mesh)
+		_persistent_water = water_mesh
+
+	# Setup persistent bank ground underlays outside the wide river corridor
+	# Solid untextured sand/earth material at Y = 0.02m starting at |X| = 6.0m
+	_bank_mat = StandardMaterial3D.new()
+	_bank_mat.shading_mode = BaseMaterial3D.SHADING_MODE_PER_PIXEL
+	_bank_mat.roughness = 0.95
+	_bank_mat.albedo_color = Color(0.85, 0.72, 0.48) # Warm sand/shoreline tone
+	_bank_mat.cull_mode = BaseMaterial3D.CULL_BACK
 	
-	var plane := PlaneMesh.new()
-	plane.size = Vector2(200.0, 320.0)
-	water_mesh.mesh = plane
-	water_mesh.position = Vector3(0.0, 0.0, -100.0)
-	
-	var shader := preload("res://src/shaders/water_stylized.gdshader")
-	if shader:
-		var mat := ShaderMaterial.new()
-		mat.shader = shader
-		mat.set_shader_parameter("albedo", Color(0.08, 0.58, 0.82, 0.88))
-		mat.set_shader_parameter("roughness", 0.05)
-		mat.set_shader_parameter("refraction_strength", 0.04)
-		mat.set_shader_parameter("flow_speed", Vector2(0.0, -0.6))
-		
-		var noise := FastNoiseLite.new()
-		noise.noise_type = FastNoiseLite.TYPE_CELLULAR
-		noise.frequency = 0.04
-		var noise_tex := NoiseTexture2D.new()
-		noise_tex.seamless = true
-		noise_tex.as_normal_map = true
-		noise_tex.noise = noise
-		
-		mat.set_shader_parameter("texture_normal", noise_tex)
-		mat.set_shader_parameter("texture_refraction", noise_tex)
-		water_mesh.material_override = mat
-		
-	add_child(water_mesh)
-	_persistent_water = water_mesh
+	for b_side in [-1.0, 1.0]:
+		var bank_name := "PersistentBank_%s" % ("Left" if b_side < 0 else "Right")
+		var existing_bank = get_tree().get_first_node_in_group("persistent_bank_%s" % ("left" if b_side < 0 else "right"))
+		var bank_mesh: MeshInstance3D = null
+		if existing_bank and existing_bank is MeshInstance3D:
+			bank_mesh = existing_bank
+		else:
+			bank_mesh = MeshInstance3D.new()
+			bank_mesh.name = bank_name
+			bank_mesh.add_to_group("persistent_bank")
+			bank_mesh.add_to_group("persistent_bank_%s" % ("left" if b_side < 0 else "right"))
+			add_child(bank_mesh)
+			
+		var bank_plane := PlaneMesh.new()
+		# 94m wide plane spanning from |X| = 6.0m to 100.0m
+		bank_plane.size = Vector2(94.0, 320.0)
+		bank_mesh.mesh = bank_plane
+		# Elevated to Y = 0.02m (above water Y = 0.0m) to seal shorelines and hide any water under mountains
+		bank_mesh.position = Vector3(b_side * 53.0, 0.02, -100.0)
+		bank_mesh.material_override = _bank_mat
+		if b_side < 0:
+			_persistent_bank_left = bank_mesh
+		else:
+			_persistent_bank_right = bank_mesh
 
 func update_water_color(color: Color) -> void:
 	if _persistent_water and _persistent_water.material_override:
 		var mat = _persistent_water.material_override as ShaderMaterial
 		if mat:
 			mat.set_shader_parameter("albedo", color)
+
+	if _bank_mat:
+		var b_name := "tropical"
+		if active_level_data:
+			if "biome_name" in active_level_data and active_level_data.biome_name != "":
+				b_name = active_level_data.biome_name
+			elif "biome" in active_level_data and active_level_data.biome != "":
+				b_name = active_level_data.biome
+				
+		match b_name.to_lower():
+			"bayou", "black_tide_bayou":
+				_bank_mat.albedo_color = Color(0.28, 0.35, 0.25) # Mossy swamp bank
+			"brimstone", "brimstone_bastion":
+				_bank_mat.albedo_color = Color(0.22, 0.20, 0.22) # Volcanic basalt bank
+			_:
+				_bank_mat.albedo_color = Color(0.85, 0.72, 0.48) # Tropical sand bank
 
 ## Assembles the level dynamically from chunk_scenes in LevelData.
 func assemble_level(data: LevelData = null) -> void:

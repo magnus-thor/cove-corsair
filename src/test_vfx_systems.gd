@@ -96,23 +96,10 @@ func _test_mortar_geyser_particles_and_waterline() -> void:
 		assert_test(is_equal_approx(ring.position.y, 0.05), "ShockwaveRing aligned flat at water surface (Y = 0.05)")
 
 func _test_mine_explosion_particles() -> void:
-	print("\n--- 4. Sea Mine Explosion Particles ---")
+	print("\n--- 4. Sea Mine Explosion Particles (Disabled / Smoke Removed) ---")
 	var mine_pos = Vector3(0.0, 0.2, -8.0)
 	var effect = VFXManager.spawn_mine_explosion(mine_pos)
-	assert_test(effect != null, "spawn_mine_explosion returned instance")
-	assert_test(effect.is_inside_tree(), "Mine explosion inside tree")
-	
-	var flash: CPUParticles3D = effect.get_node_or_null("CoreFlash")
-	assert_test(flash != null, "Found fiery CoreFlash particle system")
-	if flash:
-		assert_test(flash.one_shot == true, "CoreFlash one_shot is true")
-		assert_test(flash.lifetime <= 0.4, "CoreFlash is short explosive flash (lifetime: %.2fs)" % flash.lifetime)
-		
-	var smoke: CPUParticles3D = effect.get_node_or_null("SmokeCloud")
-	assert_test(smoke != null, "Found expanding dark charcoal SmokeCloud particle system")
-	if smoke:
-		assert_test(smoke.one_shot == true, "SmokeCloud one_shot is true")
-		assert_test(is_equal_approx(smoke.lifetime, 0.5), "SmokeCloud lifetime is 0.5s")
+	assert_test(effect == null, "spawn_mine_explosion returns null while smoke is removed from code")
 
 func _test_entity_destruction_hooks() -> void:
 	print("\n--- 5. Entity Destruction Hooks ---")
@@ -151,7 +138,7 @@ func _test_entity_destruction_hooks() -> void:
 	count_before = vfx_container.get_child_count() if vfx_container else 0
 	mine.die()
 	count_after = vfx_container.get_child_count() if vfx_container else 0
-	assert_test(count_after > count_before, "HazardSeaMine.die() triggered mine explosion spawn")
+	assert_test(count_after == count_before, "HazardSeaMine.die() does not spawn mine explosion while smoke removed")
 	
 	# D. Mortar Cannonball splash damage -> spawn_mortar_splash
 	var ball = Cannonball.new()
