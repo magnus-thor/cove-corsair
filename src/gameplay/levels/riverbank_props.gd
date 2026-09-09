@@ -158,7 +158,7 @@ func _generate_3tier_shoreline() -> void:
 	var base_chunk_x: float = position.x
 
 	# ──────────────────────────────────────────────────────────────────────────
-	# TIER 1: The Jagged Shoreline (Center at |X| = 5.5m to 6.2m)
+	# TIER 1: The Jagged Shoreline (Center at |X| = 4.6m to 6.2m)
 	# ──────────────────────────────────────────────────────────────────────────
 
 	# 1. Low-poly sand patches / shoals (Dry beach at Y = 0.08m above water plane)
@@ -169,7 +169,7 @@ func _generate_3tier_shoreline() -> void:
 		var sand_path := SHOAL_SAND_PATHS[randi() % SHOAL_SAND_PATHS.size()]
 		var sand_node := _instantiate_prop(sand_path, active_mat)
 		if sand_node:
-			var x_pos := (sign_x * randf_range(5.5, 5.9)) - base_chunk_x
+			var x_pos := (sign_x * randf_range(4.6, 6.2)) - base_chunk_x
 			sand_node.position = Vector3(x_pos, 0.08, z_pos)
 			var s_xz := randf_range(0.18, 0.22)
 			sand_node.scale = Vector3(s_xz, randf_range(0.6, 0.8), s_xz)
@@ -196,7 +196,7 @@ func _generate_3tier_shoreline() -> void:
 			rock_node.rotation.z = randf_range(-0.04, 0.04)
 
 	# ──────────────────────────────────────────────────────────────────────────
-	# TIER 2: Canopy & Overhangs (Center at |X| = 6.8m to 7.5m)
+	# TIER 2: Canopy & Overhangs (Center at |X| = 6.5m to 7.8m)
 	# ──────────────────────────────────────────────────────────────────────────
 	var palm_count := randi_range(3, 5)
 	var palm_step := chunk_length / float(palm_count)
@@ -206,10 +206,10 @@ func _generate_3tier_shoreline() -> void:
 		var palm_path := PALM_BEND_PATHS[randi() % PALM_BEND_PATHS.size()] if is_bent else PALM_STRAIGHT_PATH
 		var palm_node := _instantiate_prop(palm_path, active_mat)
 		if palm_node:
-			var x_pos := (sign_x * randf_range(6.8, 7.5)) - base_chunk_x
-			# Base elevated on the bank (Y ≈ 0.25m to 0.40m) ensuring high vertical
+			var x_pos := (sign_x * randf_range(6.5, 7.8)) - base_chunk_x
+			# Base grounded on the bank (Y ≈ 0.10m to 0.15m) ensuring high vertical
 			# canopy clearance (>4.5m above water plane) for tall vessels like Ironclad.
-			var y_pos := randf_range(0.25, 0.40)
+			var y_pos := randf_range(0.10, 0.15)
 			palm_node.position = Vector3(x_pos, y_pos, z_pos)
 			palm_node.scale = Vector3.ONE * randf_range(1.0, 1.10)
 
@@ -250,8 +250,8 @@ func _generate_3tier_shoreline() -> void:
 		var cliff_path := CLIFF_ROCK_PATHS[randi() % CLIFF_ROCK_PATHS.size()]
 		var cliff_node := _instantiate_prop(cliff_path, active_mat)
 		if cliff_node:
-			var x_pos := (sign_x * randf_range(8.8, 10.5)) - base_chunk_x
-			cliff_node.position = Vector3(x_pos, randf_range(0.0, 0.35), z_pos)
+			var x_pos := (sign_x * randf_range(8.2, 10.5)) - base_chunk_x
+			cliff_node.position = Vector3(x_pos, randf_range(0.05, 0.15), z_pos)
 			var base_scale := randf_range(1.1, 1.25)
 			cliff_node.scale = Vector3(
 				base_scale,

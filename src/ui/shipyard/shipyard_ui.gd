@@ -47,6 +47,7 @@ var style_btn_buy: StyleBoxFlat
 var style_btn_upgrade: StyleBoxFlat
 var style_btn_equip: StyleBoxFlat
 var style_btn_disabled: StyleBoxFlat
+var style_btn_upgrade_disabled: StyleBoxFlat
 
 func _ready() -> void:
 	GameState.set_performance_mode(false)
@@ -141,6 +142,19 @@ func _init_button_styles() -> void:
 	style_btn_disabled.corner_radius_top_right = 16
 	style_btn_disabled.corner_radius_bottom_right = 16
 	style_btn_disabled.corner_radius_bottom_left = 16
+
+	# Disabled Upgrade style (Muted Crimson with dark bronze trim for unaffordable upgrade)
+	style_btn_upgrade_disabled = StyleBoxFlat.new()
+	style_btn_upgrade_disabled.bg_color = Color(0.42, 0.18, 0.20, 0.85)
+	style_btn_upgrade_disabled.border_width_left = 3
+	style_btn_upgrade_disabled.border_width_top = 3
+	style_btn_upgrade_disabled.border_width_right = 3
+	style_btn_upgrade_disabled.border_width_bottom = 3
+	style_btn_upgrade_disabled.border_color = Color(0.55, 0.40, 0.25, 0.9)
+	style_btn_upgrade_disabled.corner_radius_top_left = 16
+	style_btn_upgrade_disabled.corner_radius_top_right = 16
+	style_btn_upgrade_disabled.corner_radius_bottom_right = 16
+	style_btn_upgrade_disabled.corner_radius_bottom_left = 16
 
 func _build_grid_cards() -> void:
 	if not grid_container:
@@ -237,10 +251,13 @@ func _update_inspection_drawer() -> void:
 		if not is_owned:
 			next_upgrade_label.text = "Acquire vessel to commission for voyages and tier outfitting."
 		elif cur_tier < 3:
+			var next_tier = cur_tier + 1
+			var cost = GameState.get_upgrade_cost(selected_vessel_id, next_tier)
+			var cost_str = "%s 🪙" % _format_number(cost)
 			if ship_data and ship_data.tier_descriptions.size() > cur_tier:
-				next_upgrade_label.text = "Next: %s" % ship_data.tier_descriptions[cur_tier]
+				next_upgrade_label.text = "Next (Tier %d - %s): %s" % [next_tier, cost_str, ship_data.tier_descriptions[cur_tier]]
 			else:
-				next_upgrade_label.text = "Next: Advanced Naval Sockets"
+				next_upgrade_label.text = "Next (Tier %d - %s): Advanced Naval Sockets" % [next_tier, cost_str]
 		else:
 			next_upgrade_label.text = "Flagship Mastered (Tier 3 Maximum)"
 
@@ -285,16 +302,25 @@ func _update_inspection_drawer() -> void:
 			var next_tier = cur_tier + 1
 			var cost = GameState.get_upgrade_cost(selected_vessel_id, next_tier)
 			var can_upgrade = GameState.can_afford(cost)
-			action_button.text = "UPGRADE TO TIER %d: %s COINS" % [next_tier, _format_number(cost)]
+			action_button.text = "UPGRADE TO TIER %d: %s 🪙" % [next_tier, _format_number(cost)]
 			action_button.add_theme_stylebox_override("normal", style_btn_upgrade)
 			action_button.add_theme_stylebox_override("hover", style_btn_upgrade)
 			action_button.add_theme_stylebox_override("pressed", style_btn_upgrade)
+			action_button.add_theme_stylebox_override("disabled", style_btn_upgrade_disabled)
+			action_button.add_theme_color_override("font_color", Color(1, 1, 1, 1))
+			action_button.add_theme_color_override("font_disabled_color", Color(0.95, 0.85, 0.70, 0.9))
 			action_button.disabled = not can_upgrade
-			action_button.modulate = Color(1, 1, 1, 1) if can_upgrade else Color(0.7, 0.7, 0.7, 0.75)
+			action_button.modulate = Color(1, 1, 1, 1) if can_upgrade else Color(0.85, 0.85, 0.85, 0.9)
 		else:
-			# Max tier reached: action button hidden or disabled
-			action_button.visible = false
+			# Max tier reached: show disabled MAX TIER button with gold text
+			action_button.visible = true
 			current_action_state = ActionState.EQUIPPED
+			action_button.disabled = true
+			action_button.text = "⚓ MAX TIER"
+			action_button.add_theme_stylebox_override("normal", style_btn_disabled)
+			action_button.add_theme_stylebox_override("disabled", style_btn_disabled)
+			action_button.add_theme_color_override("font_disabled_color", Color(0.96, 0.82, 0.38, 1.0)) # #F5D061 Gold
+			action_button.modulate = Color(1.0, 1.0, 1.0, 0.95)
 
 func _on_equip_pressed() -> void:
 	if not GameState.VESSEL_CATALOG.has(selected_vessel_id):

@@ -62,7 +62,7 @@ func _generate_tropical_scenery() -> void:
 		if rock_res:
 			var rock = rock_res.instantiate() as Node3D
 			add_child(rock)
-			rock.position = Vector3(cliff_x, -0.2, z_pos)
+			rock.position = Vector3(cliff_x, 0.05, z_pos)
 			rock.scale = Vector3(randf_range(1.4, 2.0), randf_range(4.0, 6.0), randf_range(1.4, 2.0))
 			rock.rotation.y = randf_range(0.0, TAU)
 			_clean_shadow_nodes(rock)
@@ -74,7 +74,7 @@ func _generate_tropical_scenery() -> void:
 		if shoal_res:
 			var shoal = shoal_res.instantiate() as Node3D
 			add_child(shoal)
-			shoal.position = Vector3(shoal_x, -0.1, z_pos + randf_range(-1.5, 1.5))
+			shoal.position = Vector3(shoal_x, 0.08, z_pos + randf_range(-1.5, 1.5))
 			shoal.scale = Vector3(randf_range(1.1, 1.4), randf_range(0.7, 1.0), randf_range(1.1, 1.4))
 			shoal.rotation.y = randf_range(0.0, TAU)
 			_clean_shadow_nodes(shoal)
@@ -106,7 +106,7 @@ func _generate_bayou_scenery() -> void:
 		if rock_res:
 			var rock = rock_res.instantiate() as Node3D
 			add_child(rock)
-			rock.position = Vector3(cliff_x, -0.3, z_pos)
+			rock.position = Vector3(cliff_x, 0.05, z_pos)
 			rock.scale = Vector3(randf_range(1.4, 2.0), randf_range(3.5, 5.5), randf_range(1.4, 2.0))
 			rock.rotation.y = randf_range(0.0, TAU)
 			_tint_node(rock, Color(0.35, 0.48, 0.38))
@@ -119,7 +119,7 @@ func _generate_bayou_scenery() -> void:
 		if shoal_res:
 			var shoal = shoal_res.instantiate() as Node3D
 			add_child(shoal)
-			shoal.position = Vector3(shoal_x, -0.15, z_pos + randf_range(-1.5, 1.5))
+			shoal.position = Vector3(shoal_x, 0.08, z_pos + randf_range(-1.5, 1.5))
 			shoal.scale = Vector3(randf_range(1.0, 1.3), randf_range(0.6, 0.9), randf_range(1.0, 1.3))
 			shoal.rotation.y = randf_range(0.0, TAU)
 			_tint_node(shoal, Color(0.28, 0.42, 0.32))
@@ -174,7 +174,7 @@ func _generate_bastion_scenery() -> void:
 		if rock_res:
 			var rock = rock_res.instantiate() as Node3D
 			add_child(rock)
-			rock.position = Vector3(cliff_x, -0.3, z_pos)
+			rock.position = Vector3(cliff_x, 0.05, z_pos)
 			rock.scale = Vector3(randf_range(1.4, 2.0), randf_range(4.0, 6.5), randf_range(1.4, 2.0))
 			rock.rotation.y = randf_range(0.0, TAU)
 			_tint_node(rock, Color(0.18, 0.18, 0.22)) # Dark basalt

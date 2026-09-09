@@ -563,9 +563,6 @@ func _on_area_entered(area: Area3D) -> void:
 			if area.has_method("die"):
 				area.die()
 			else:
-				var mine_pos = area.global_position
-				if VFXManager:
-					VFXManager.spawn_mine_explosion(mine_pos)
 				area.queue_free()
 			take_hit(1, "Collision with Sea Mine")
 			return
