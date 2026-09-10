@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://br5hfn5dnrapt"
-path="res://.godot/imported/scattershot_carronade_base_color.jpg-2eb9fbc05c0e365ce387e7ff9efde502.ctex"
+path.s3tc="res://.godot/imported/scattershot_carronade_base_color.jpg-2eb9fbc05c0e365ce387e7ff9efde502.s3tc.ctex"
+path.etc2="res://.godot/imported/scattershot_carronade_base_color.jpg-2eb9fbc05c0e365ce387e7ff9efde502.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "d9ad6a5040732cf4a67752d4bb4d22b5"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/weapons/scattershot_carronade_base_color.jpg"
-dest_files=["res://.godot/imported/scattershot_carronade_base_color.jpg-2eb9fbc05c0e365ce387e7ff9efde502.ctex"]
+dest_files=["res://.godot/imported/scattershot_carronade_base_color.jpg-2eb9fbc05c0e365ce387e7ff9efde502.s3tc.ctex", "res://.godot/imported/scattershot_carronade_base_color.jpg-2eb9fbc05c0e365ce387e7ff9efde502.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
@@ -40,4 +42,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=1
+detect_3d/compress_to=0
