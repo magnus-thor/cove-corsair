@@ -167,7 +167,7 @@ func _test_3d_chest_and_pickup_vfx() -> void:
 		if child is Label3D:
 			found_label = true
 			var l = child as Label3D
-			assert_test(l.text == "+25 🪙", "Floating Label3D text matches '+25 🪙' (actual: %s)" % l.text)
+			assert_test(l.text == "+25 GOLD", "Floating Label3D text matches '+25 GOLD' (actual: %s)" % l.text)
 			assert_test(l.billboard == BaseMaterial3D.BILLBOARD_ENABLED, "Floating Label3D is billboarded to camera")
 			assert_test(l.modulate.to_html(false).to_upper() == "F5D061", "Floating Label3D text color is Radiant Gold (#F5D061)")
 			break

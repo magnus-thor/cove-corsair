@@ -99,7 +99,7 @@ func collect_chest() -> void:
 	if VFXManager and VFXManager.has_method("spawn_coin_burst"):
 		VFXManager.spawn_coin_burst(spawn_pos)
 		
-	# 2. Floating Label3D billboard score text (+XX 🪙)
+	# 2. Floating Label3D billboard score text (+XX GOLD)
 	_spawn_floating_score_label(spawn_pos, chest_value)
 	
 	# 3. Audio SFX (pitch 1.25)
@@ -118,7 +118,10 @@ func collect_chest() -> void:
 
 func _spawn_floating_score_label(pos: Vector3, amount: int) -> void:
 	var label = Label3D.new()
-	label.text = "+%d 🪙" % amount
+	var font_file = load("res://assets/fonts/CarterOne.ttf")
+	if font_file:
+		label.font = font_file
+	label.text = "+%d GOLD" % amount
 	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	label.no_depth_test = true
 	label.font_size = 48
@@ -127,10 +130,6 @@ func _spawn_floating_score_label(pos: Vector3, amount: int) -> void:
 	label.outline_render_priority = 1
 	label.outline_size = 12
 	label.outline_modulate = Color(0.12, 0.08, 0.04, 1.0)
-	
-	var font_file = load("res://assets/fonts/CarterOne.ttf")
-	if font_file:
-		label.font = font_file
 		
 	var root = get_tree().current_scene
 	if not root:

@@ -12,7 +12,7 @@ config_version=5
 
 config/name="Cove Corsair"
 run/main_scene="res://src/core/main_game.tscn"
-config/features=PackedStringArray("4.6", "Forward Plus")
+config/features=PackedStringArray("4.8", "Forward Plus")
 run/max_fps=60
 config/icon="res://icon.svg"
 
