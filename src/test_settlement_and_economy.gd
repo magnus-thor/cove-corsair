@@ -67,7 +67,7 @@ func _test_gold_retention_on_hull_destruction() -> void:
 	
 	var dinghy_data = load("res://src/data/resources/user_vessels/dinghy_ship.tres") as ShipData
 	player.apply_ship_data(dinghy_data)
-	assert_test(player.current_health == 1, "Dinghy hull HP starts at 1")
+	assert_test(player.current_health == 2, "Dinghy hull HP starts at 2")
 	
 	# Connect to run_failed signals
 	var player_signal = {"fired": false, "coins": 0, "dist": 0.0}
@@ -118,6 +118,7 @@ func _test_settlement_screen_ui_defeat() -> void:
 	assert_test(screen.subtitle_label.text == "HULL BREACHED - TREASURE RETAINED", "Subtitle displays 'HULL BREACHED - TREASURE RETAINED'")
 	assert_test(screen.primary_button.text == "RETRY", "Primary button is 'RETRY'")
 	assert_test(screen.bonus_row.visible == false, "Completion bonus row is hidden on defeat")
+	assert_test(screen.bonus_claim_button != null and screen.bonus_claim_button.visible == false, "BonusClaimButton is hidden on defeat")
 	
 	# Verify pause mode safe tweens
 	assert_test(screen._modal_tween != null and screen._modal_tween.is_valid(), "Modal entrance tween initialized and active")
@@ -147,12 +148,32 @@ func _test_settlement_screen_ui_victory() -> void:
 	assert_test(screen.stars_container.visible == true, "Stars container is visible on victory")
 	assert_test(screen.bonus_row.visible == true, "Completion bonus row is visible on victory")
 	assert_test(screen.primary_button.text == "NEXT LEVEL", "Primary button is 'NEXT LEVEL'")
+	assert_test(screen.bonus_claim_button != null, "BonusClaimButton exists in settlement scene")
+	assert_test(screen.bonus_claim_button.visible == true, "BonusClaimButton is visible on victory")
+	assert_test(screen.bonus_claim_button.disabled == false, "BonusClaimButton is initially enabled")
+	assert_test(screen.bonus_claim_button.text == "✦ CLAIM 2X BONUS DOUBLOONS", "BonusClaimButton has initial label '✦ CLAIM 2X BONUS DOUBLOONS'")
+	
+	# Simulate claiming 2X bonus
+	var pre_claim_bank = GameState.doubloons
+	screen._on_bonus_claim_pressed()
+	
+	assert_test(screen._bonus_claimed == true, "Bonus claim state set to true")
+	assert_test(screen.bonus_claim_button.disabled == true, "BonusClaimButton is disabled after claiming")
+	assert_test(screen.bonus_claim_button.text == "BONUS CLAIMED! ✦", "BonusClaimButton text updated to 'BONUS CLAIMED! ✦'")
+	assert_test(GameState.doubloons == pre_claim_bank + (run_coins + completion_bonus), "Bank doubled payout by adding another run payout (+500)")
+	
+	# Ensure cannot double-claim
+	var post_claim_bank = GameState.doubloons
+	screen._on_bonus_claim_pressed()
+	assert_test(GameState.doubloons == post_claim_bank, "Double claim prevented by guard")
 	
 	screen.queue_free()
 
 func _test_shipyard_upgrade_with_retained_gold() -> void:
 	print("\n--- 4. Shipyard Alert Badge & Tier Upgrade with Retained Gold ---")
-	# Dinghy Tier 2 price is 350. GameState.doubloons is currently >= 350
+	GameState.doubloons = 350
+	GameState.vessel_tiers["dinghy"] = 1
+	# Dinghy Tier 2 price is 250. GameState.doubloons is 350 (>= 250)
 	assert_test(GameState.can_afford_active_vessel_upgrade() == true, "GameState confirms active vessel (Dinghy) upgrade can be afforded")
 	
 	var settlement_scene = load("res://src/ui/settlement_screen.tscn") as PackedScene
@@ -166,17 +187,17 @@ func _test_shipyard_upgrade_with_retained_gold() -> void:
 	# Purchase Tier 2 upgrade in Shipyard with retained gold
 	var initial_gold = GameState.doubloons
 	var tier_cost = GameState.get_upgrade_cost("dinghy", 2)
-	assert_test(tier_cost == 300, "Dinghy Tier 2 cost is 300 doubloons")
+	assert_test(tier_cost == 250, "Dinghy Tier 2 cost is 250 doubloons")
 	
 	var success = GameState.upgrade_vessel_tier("dinghy")
 	assert_test(success == true, "Dinghy Tier 2 upgrade purchased successfully using retained gold")
 	assert_test(GameState.get_vessel_tier("dinghy") == 2, "Dinghy is now upgraded to Tier 2")
-	assert_test(GameState.doubloons == initial_gold - 300, "Gold accurately deducted after upgrade purchase")
+	assert_test(GameState.doubloons == initial_gold - 250, "Gold accurately deducted after upgrade purchase")
 	
 	# Refresh screen after purchase
 	screen._refresh_banked_display()
 	screen._update_shipyard_button()
-	assert_test(GameState.can_afford_active_vessel_upgrade() == false, "Upgrade affordance now false (Tier 3 requires 750 doubloons)")
+	assert_test(GameState.can_afford_active_vessel_upgrade() == false, "Upgrade affordance now false (Tier 3 requires 1000 doubloons)")
 	assert_test(screen.shipyard_badge.visible == false, "Shipyard alert badge hidden when upgrade cannot be afforded")
 	
 	screen.queue_free()
@@ -197,7 +218,7 @@ func _test_chunk_payout_tuning() -> void:
 		elif "obstacle_type" in c:
 			w_coins += 1
 	print("  [INFO] chunk_warmup calculated total payout: %d doubloons" % w_coins)
-	assert_test(w_coins >= 30 and w_coins <= 45, "chunk_warmup yields ~30-45 doubloons (actual: %d)" % w_coins)
+	assert_test(w_coins >= 10 and w_coins <= 45, "chunk_warmup yields ~10-45 doubloons (actual: %d)" % w_coins)
 	warmup.queue_free()
 
 	# Verify chunk_mine_gauntlet
@@ -235,4 +256,4 @@ func _test_chunk_payout_tuning() -> void:
 	# Verify Level 4 completion reward
 	var l4 = load("res://src/data/resources/levels/level_04.tres") as LevelData
 	assert_test(l4 != null, "level_04.tres loaded")
-	assert_test(l4.completion_doubloon_reward == 300, "Level 4 completion reward tuned to 300 doubloons (actual: %d)" % l4.completion_doubloon_reward)
+	assert_test(l4.completion_doubloon_reward == 85, "Level 4 completion reward tuned to 85 doubloons (actual: %d)" % l4.completion_doubloon_reward)

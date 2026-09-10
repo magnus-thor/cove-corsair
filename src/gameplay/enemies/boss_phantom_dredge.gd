@@ -179,7 +179,7 @@ func _telegraph_and_strike_mortar(pos: Vector3) -> void:
 	var tween = marker.create_tween()
 	var vfx_scene = explosion_scene
 	var tree = get_tree()
-	tween.tween_property(mat, "albedo_color:a", 0.8, 1.1)
+	tween.tween_property(mat, "albedo_color:a", 0.8, 1.6)
 	tween.tween_callback(Callable(BossPhantomDredge, "execute_poison_mortar_detonation").bind(marker.global_position, vfx_scene, tree))
 	tween.tween_callback(marker.queue_free)
 
@@ -299,6 +299,12 @@ func _resurface() -> void:
 	_fire_poison_mortars()
 
 func _spawn_bayou_adds(lane_x_override: float = NAN, type_choice: int = -1) -> void:
+	var existing_enemies = get_tree().get_nodes_in_group("enemies").filter(
+		func(e): return is_instance_valid(e) and not e.is_in_group("boss") and not e.is_queued_for_deletion()
+	)
+	if existing_enemies.size() >= 2:
+		return
+
 	var parent = get_tree().get_first_node_in_group("level_controller")
 	if not parent: parent = get_parent()
 	if not parent: return

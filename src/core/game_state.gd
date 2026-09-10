@@ -74,13 +74,13 @@ const VESSEL_CATALOG: Dictionary = {
 		"archetype": "Agility Skiff",
 		"resource_path": "res://src/data/resources/user_vessels/dinghy_ship.tres",
 		"purchase_price": 0,
-		"tier_prices": { 2: 300, 3: 750 },
+		"tier_prices": { 2: 250, 3: 1000 },
 		"tier_descriptions": {
 			1: "Bow Chaser Cannon",
 			2: "Bow Chaser + Monkey Bomber",
 			3: "Bow Chaser + Monkey Bomber + Skeleton Tosser"
 		},
-		"base_hp": 1,
+		"base_hp": 2,
 		"base_speed": 12.0,
 		"fire_rate": 0.20,
 		"preview_texture": "res://assets/sprites/user_vessels/The Dinghy.png"
@@ -90,14 +90,14 @@ const VESSEL_CATALOG: Dictionary = {
 		"name": "The Sloop",
 		"archetype": "Balanced Standard",
 		"resource_path": "res://src/data/resources/user_vessels/sloop_ship.tres",
-		"purchase_price": 600,
-		"tier_prices": { 2: 800, 3: 1500 },
+		"purchase_price": 500,
+		"tier_prices": { 2: 700, 3: 1600 },
 		"tier_descriptions": {
 			1: "Bow Chaser Cannon",
 			2: "Bow Chaser + Monkey Bomber + Skeleton Tosser",
 			3: "Bow Chaser + Monkey Bomber + Skeleton Tosser + Port & Starboard Swivel Guns"
 		},
-		"base_hp": 5,
+		"base_hp": 4,
 		"base_speed": 11.0,
 		"fire_rate": 0.16,
 		"preview_texture": "res://assets/sprites/user_vessels/The Sloop.png"

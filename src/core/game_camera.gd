@@ -20,7 +20,7 @@ var harbor_tween: Tween
 
 # Procedural Trauma & Perlin Noise Shake System
 var trauma: float = 0.0
-var trauma_reduction_rate: float = 1.25
+var trauma_reduction_rate: float = 2.8
 var max_offset: Vector3 = Vector3(1.2, 0.8, 0.5)
 var max_rotation: Vector3 = Vector3(3.5, 3.5, 2.5) # degrees (pitch, yaw, roll)
 var noise: FastNoiseLite
@@ -69,9 +69,11 @@ func transition_to_gameplay(duration: float = 0.85) -> void:
 	harbor_tween.tween_property(self, "position", GAMEPLAY_POSITION, duration).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 	harbor_tween.tween_property(self, "rotation_degrees", GAMEPLAY_ROTATION, duration).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 
-## Add trauma (0.0 to 1.0) with quadratic falloff and Perlin noise shake
-func add_trauma(amount: float) -> void:
-	trauma = clamp(trauma + amount, 0.0, 1.0)
+## Add trauma (0.0 to 1.0) with quadratic falloff and Perlin noise shake.
+## Optional max_cap allows continuous weapon fire to cap trauma (e.g. 0.35) without suppressing heavier impact shakes.
+func add_trauma(amount: float, max_cap: float = 1.0) -> void:
+	if trauma < max_cap:
+		trauma = min(trauma + amount, max_cap)
 
 ## Legacy adapter for existing shake calls
 func shake(_duration: float, intensity: float) -> void:

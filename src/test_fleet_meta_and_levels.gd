@@ -78,7 +78,7 @@ func _test_vector_a_chokepoints() -> void:
 	# 1. Verify The Dinghy (1.6m hitbox, lateral_speed = 12.0)
 	var dinghy_ship = load("res://src/data/resources/user_vessels/dinghy_ship.tres") as ShipData
 	assert_test(dinghy_ship != null, "The Dinghy ShipData loaded")
-	assert_test(dinghy_ship.max_health == 1, "The Dinghy has 1 HP (fragile skiff)")
+	assert_test(dinghy_ship.max_health == 2, "The Dinghy has 2 HP (fragile skiff)")
 	assert_test(dinghy_ship.move_speed == 12.0, "The Dinghy has 12.0 move speed")
 	assert_test(is_equal_approx(dinghy_ship.collision_size.x, 1.6), "The Dinghy hitbox width is 1.6m (actual: %.2f)" % dinghy_ship.collision_size.x)
 
@@ -161,7 +161,7 @@ func _test_vector_b_dps_bottlenecks() -> void:
 		add_child(dinghy_player)
 		var dinghy_data = load("res://src/data/resources/user_vessels/dinghy_ship.tres") as ShipData
 		dinghy_player.apply_ship_data(dinghy_data)
-		assert_test(dinghy_player.current_health == 1, "Dinghy player starts with 1 HP")
+		assert_test(dinghy_player.current_health == 2, "Dinghy player starts with 2 HP")
 
 		var slat_mock = Area3D.new()
 		slat_mock.set_script(load("res://src/gameplay/obstacles/barricade_segment.gd"))
@@ -175,6 +175,7 @@ func _test_vector_b_dps_bottlenecks() -> void:
 		dinghy_player.queue_free()
 
 		# Test 8 HP Ironclad vs Barricade
+		GameState.is_game_active = true
 		var ironclad_player = player_scene.instantiate()
 		add_child(ironclad_player)
 		var ironclad_data = load("res://src/data/resources/user_vessels/ironclad_ship.tres") as ShipData

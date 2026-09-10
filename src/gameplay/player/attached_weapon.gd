@@ -440,7 +440,7 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 	else:
 		AudioManager.play_sfx("cannon_shots")
 		if camera and camera.has_method("add_trauma"):
-			camera.add_trauma(0.08)
+			camera.add_trauma(0.08, 0.35)
 			
 		var ball = proj_scene.instantiate() as Area3D
 		if ball:
@@ -477,7 +477,7 @@ func fire_scattershot(proj_dir: Vector3 = Vector3.ZERO, world_container: Node = 
 	AudioManager.play_sfx("sfx_scattershot")
 	var camera = get_tree().get_first_node_in_group("game_camera")
 	if camera and camera.has_method("add_trauma"):
-		camera.add_trauma(0.15)
+		camera.add_trauma(0.15, 0.35)
 
 	var scene_to_use: PackedScene = p_proj_scene
 	if not scene_to_use:

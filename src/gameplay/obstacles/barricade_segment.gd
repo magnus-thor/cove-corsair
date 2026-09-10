@@ -56,6 +56,21 @@ func _ready() -> void:
 	
 	_update_label_visuals()
 
+func _physics_process(delta: float) -> void:
+	if _is_destroyed or not GameState.is_game_active:
+		return
+	if forward_speed > 0.0:
+		global_position.z += forward_speed * delta
+	# Barricade slats are static river wall components.
+	# When the player shoots a gap and steers through, the remaining intact slats
+	# must NEVER inflict leak_threat damage.
+	# The parent chunk cleans up at +30m behind the camera; as a fallback,
+	# slats clean up if they drift > 35m behind the player.
+	var player = get_tree().get_first_node_in_group("player")
+	var player_z = player.global_position.z if player else 0.0
+	if global_position.z > (player_z + 35.0):
+		queue_free()
+
 func _update_label_visuals() -> void:
 	if not hp_label:
 		return
@@ -74,6 +89,13 @@ func take_damage(amount: int) -> void:
 func die() -> void:
 	if _is_destroyed:
 		return
+	collision_layer = 0
+	collision_mask = 0
+	var col = get_node_or_null("CollisionShape3D")
+	if col:
+		col.set_deferred("disabled", true)
+	set_deferred("monitoring", false)
+	set_deferred("monitorable", false)
 	if VFXManager:
 		VFXManager.spawn_wood_debris(global_position)
 	AudioManager.play_sfx("sfx_wood_smash")

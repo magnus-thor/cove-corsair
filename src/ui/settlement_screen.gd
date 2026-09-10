@@ -25,12 +25,14 @@ signal map_requested
 @onready var total_banked_label: Label = %TotalBankedLabel
 
 @onready var primary_button: Button = %PrimaryButton
+@onready var bonus_claim_button: Button = %BonusClaimButton
 @onready var shipyard_button: Button = %ShipyardButton
 @onready var shipyard_badge: PanelContainer = %ShipyardBadge
 @onready var shipyard_badge_label: Label = %ShipyardBadgeLabel
 @onready var map_button: Button = %MapButton
 
 var _is_victory: bool = false
+var _bonus_claimed: bool = false
 var _run_doubloons: int = 0
 var _completion_bonus: int = 0
 var _total_banked: int = 0
@@ -53,6 +55,8 @@ func _ready() -> void:
 
 	if primary_button:
 		primary_button.pressed.connect(_on_primary_pressed)
+	if bonus_claim_button:
+		bonus_claim_button.pressed.connect(_on_bonus_claim_pressed)
 	if shipyard_button:
 		shipyard_button.pressed.connect(_on_shipyard_pressed)
 	if map_button:
@@ -83,7 +87,9 @@ func show_victory(coins_collected: int, completion_bonus: int, banked_total: int
 func _present_modal() -> void:
 	visible = true
 	get_tree().paused = true
-	GameState.set_performance_mode(false)
+	if GameState:
+		GameState.is_game_active = false
+		GameState.set_performance_mode(false)
 
 	# 1. Setup Header & Subtitle
 	if _is_victory:
@@ -105,6 +111,11 @@ func _present_modal() -> void:
 				primary_button.text = "MAP COMPLETE"
 			else:
 				primary_button.text = "NEXT LEVEL"
+		_bonus_claimed = false
+		if bonus_claim_button:
+			bonus_claim_button.visible = true
+			bonus_claim_button.disabled = false
+			bonus_claim_button.text = "✦ CLAIM 2X BONUS DOUBLOONS"
 	else:
 		if header_label:
 			header_label.text = "SHIP SUNK!"
@@ -116,6 +127,8 @@ func _present_modal() -> void:
 			stars_container.visible = false
 		if bonus_row:
 			bonus_row.visible = false
+		if bonus_claim_button:
+			bonus_claim_button.visible = false
 		if primary_button:
 			primary_button.text = "RETRY"
 
@@ -228,6 +241,39 @@ func _refresh_banked_display() -> void:
 	_total_banked = GameState.doubloons
 	if total_banked_label:
 		total_banked_label.text = str(_total_banked)
+
+func _on_bonus_claim_pressed() -> void:
+	if _bonus_claimed or not _is_victory:
+		return
+	_bonus_claimed = true
+	
+	if bonus_claim_button:
+		bonus_claim_button.disabled = true
+		bonus_claim_button.text = "BONUS CLAIMED! ✦"
+		
+	var bonus_amount: int = _run_doubloons + _completion_bonus
+	if GameState:
+		GameState.is_game_active = false
+		GameState.doubloons += bonus_amount
+		GameState.save_game()
+		GameState.doubloons_changed.emit(GameState.doubloons)
+		
+	if AudioManager and AudioManager.has_method("play_sfx"):
+		AudioManager.play_sfx("coin_pickups", 1.2, 1.2, 4.0)
+		AudioManager.play_sfx("gate_passes", 0.9, 1.1)
+		
+	var old_total = _total_banked
+	_total_banked = GameState.doubloons
+	
+	if total_banked_label:
+		var tween = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+		tween.tween_method(func(val: float):
+			if total_banked_label:
+				total_banked_label.text = str(int(val))
+		, float(old_total), float(_total_banked), 0.5)
+		
+	_update_shipyard_button()
 
 func _on_primary_pressed() -> void:
 	if AudioManager and AudioManager.has_method("play_sfx"):

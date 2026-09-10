@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/test_campaign_master_balancing.gd" id="1_balancing_test"]
+
+[node name="TestCampaignMasterBalancing" type="Node3D"]
+script = ExtResource("1_balancing_test")

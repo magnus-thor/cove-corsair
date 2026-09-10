@@ -45,10 +45,9 @@ func _physics_process(delta: float) -> void:
 	var player = get_tree().get_first_node_in_group("player")
 	var player_z = player.global_position.z if player else 0.0
 	if global_position.z > (player_z + 3.0):
-		# All hazard types deal pass-by damage — any obstacle that scrolls past
-		# the player represents a navigational failure. Coral reef is excluded
-		# because it is handled separately by hazard_reef.gd.
-		if obstacle_type != ObstacleType.CORAL_REEF:
+		# Only active explosive hazards (fuse barrels, sea mines) deal pass-by leak damage.
+		# Barricades and loot barrels (wooden barrels, rune barrels) must NEVER deal leak damage.
+		if not is_in_group("barricade") and (obstacle_type == ObstacleType.FUSE_BARREL or obstacle_type == ObstacleType.SEA_MINE):
 			if player and player.has_method("leak_threat"):
 				player.leak_threat(self)
 		queue_free()
@@ -147,7 +146,38 @@ func die() -> void:
 		# Sea mine explosion VFX/smoke completely removed per user request
 	else:
 		_spawn_explosion()
-	_spawn_doubloons()
+	
+	# Doubloons / Chest drop logic:
+	# Rune Barrels gate chests behind level 5+:
+	# - For current_level >= 5: drop a 50-doubloon chest.
+	# - For current_level < 5: drop 3 standard coins inline.
+	if obstacle_type == ObstacleType.RUNE_BARREL:
+		var cur_lvl: int = 1
+		if has_node("/root/GameState"):
+			cur_lvl = int(get_node("/root/GameState").current_level)
+		if cur_lvl >= 5:
+			var chest_scene = load("res://src/gameplay/collectibles/collectible_chest.tscn")
+			if chest_scene:
+				var chest = chest_scene.instantiate() as Area3D
+				if "chest_value" in chest:
+					chest.chest_value = 50
+				var root = get_tree().current_scene
+				if root:
+					root.add_child(chest)
+				chest.global_position = Vector3(global_position.x, 0.15, global_position.z)
+		else:
+			doubloons_drop = 3
+			_spawn_doubloons()
+	else:
+		_spawn_doubloons()
+		if has_meta("spawns_chest"):
+			var chest_scene = load("res://src/gameplay/collectibles/collectible_chest.tscn")
+			if chest_scene:
+				var chest = chest_scene.instantiate() as Area3D
+				var root = get_tree().current_scene
+				if root:
+					root.add_child(chest)
+				chest.global_position = Vector3(global_position.x, 0.15, global_position.z)
 	
 	# Trigger camera shake on death!
 	var camera = get_tree().get_first_node_in_group("game_camera")
@@ -162,15 +192,6 @@ func die() -> void:
 	var player = get_tree().get_first_node_in_group("player")
 	if player and player.has_method("upgrade_ship"):
 		player.upgrade_ship(1)
-		
-	if has_meta("spawns_chest"):
-		var chest_scene = load("res://src/gameplay/collectibles/collectible_chest.tscn")
-		if chest_scene:
-			var chest = chest_scene.instantiate() as Area3D
-			var root = get_tree().current_scene
-			if root:
-				root.add_child(chest)
-			chest.global_position = Vector3(global_position.x, 0.15, global_position.z)
 			
 	queue_free()
 

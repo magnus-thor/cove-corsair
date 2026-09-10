@@ -63,6 +63,18 @@ func _ready() -> void:
 	add_to_group("enemies")
 	add_to_group("boss")
 	
+	if has_node("/root/GameState"):
+		var gs = get_node("/root/GameState")
+		if "current_level" in gs:
+			if gs.current_level == 2:
+				max_hp = 35
+			elif gs.current_level == 5:
+				max_hp = 55
+			elif gs.current_level == 10:
+				max_hp = 120
+			elif gs.current_level == 15:
+				max_hp = 220
+	
 	current_hp = max_hp
 	original_combat_z = combat_z_offset
 	
@@ -146,6 +158,14 @@ func _process_combat(delta: float) -> void:
 				_process_phase_3(delta)
 
 func _deploy_side_minions() -> void:
+	if has_node("/root/GameState") and get_node("/root/GameState").current_level <= 2:
+		return
+	var existing_enemies = get_tree().get_nodes_in_group("enemies").filter(
+		func(e): return is_instance_valid(e) and not e.is_in_group("boss") and not e.is_queued_for_deletion()
+	)
+	if existing_enemies.size() >= 2:
+		return
+		
 	if current_phase == 1:
 		_spawn_pressure_skiff(-0.6, 3.5)
 		_spawn_pressure_skiff(0.6, 3.5)
