@@ -149,6 +149,22 @@ shadow_color = Color(0, 0, 0, 0.3)
 shadow_size = 4
 shadow_offset = Vector2(0, 2)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vault_pill"]
+content_margin_left = 14.0
+content_margin_top = 6.0
+content_margin_right = 14.0
+content_margin_bottom = 6.0
+bg_color = Color(0.18, 0.14, 0.10, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.70, 0.55, 0.25, 0.8)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
 [node name="SettlementScreen" type="CanvasLayer" unique_id=73910284]
 process_mode = 3
 layer = 25
@@ -180,6 +196,38 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_modal")
 [node name="MainVBox" type="VBoxContainer" parent="CenterContainer/ModalPanel" unique_id=182947192]
 layout_mode = 2
 theme_override_constants/separation = 14
+
+[node name="VaultBar" type="PanelContainer" parent="CenterContainer/ModalPanel/MainVBox" unique_id=918237461]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_vault_pill")
+
+[node name="VaultHBox" type="HBoxContainer" parent="CenterContainer/ModalPanel/MainVBox/VaultBar" unique_id=918237462]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="VaultTitle" type="Label" parent="CenterContainer/ModalPanel/MainVBox/VaultBar/VaultHBox" unique_id=918237463]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.85, 0.78, 0.65, 1)
+text = "VAULT BALANCE:"
+
+[node name="VaultIcon" type="TextureRect" parent="CenterContainer/ModalPanel/MainVBox/VaultBar/VaultHBox" unique_id=918237464]
+custom_minimum_size = Vector2(18, 18)
+layout_mode = 2
+texture = ExtResource("3_coin_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="VaultBalanceLabel" type="Label" parent="CenterContainer/ModalPanel/MainVBox/VaultBar/VaultHBox" unique_id=918237465]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 17
+theme_override_colors/font_color = Color(1, 0.88, 0.35, 1)
+text = "0"
 
 [node name="HeaderBox" type="VBoxContainer" parent="CenterContainer/ModalPanel/MainVBox" unique_id=19384716]
 layout_mode = 2
@@ -305,7 +353,7 @@ size_flags_horizontal = 3
 theme_override_fonts/font = ExtResource("2_font_lilita")
 theme_override_font_sizes/font_size = 19
 theme_override_colors/font_color = Color(1, 0.95, 0.85, 1)
-text = "TOTAL BANKED"
+text = "BANKED THIS RUN"
 
 [node name="Icon" type="TextureRect" parent="CenterContainer/ModalPanel/MainVBox/BreakdownPanel/BreakdownVBox/TotalBankedRow" unique_id=19284024]
 custom_minimum_size = Vector2(26, 26)

@@ -59,7 +59,10 @@ func _apply_level_tuning() -> void:
 
 func _replace_trailing_enemy_with_pickup(entities: Node, enemy: Node) -> void:
 	var pos = enemy.position
-	var doubloons_amount = enemy.doubloons_drop if "doubloons_drop" in enemy else 3
+	var cur_lvl: int = 1
+	if has_node("/root/GameState") and "current_level" in get_node("/root/GameState"):
+		cur_lvl = int(get_node("/root/GameState").current_level)
+	var doubloons_amount = 1 if cur_lvl <= 2 else (enemy.doubloons_drop if "doubloons_drop" in enemy else 3)
 	entities.remove_child(enemy)
 	enemy.queue_free()
 	
@@ -80,9 +83,9 @@ func _replace_trailing_enemy_with_pickup(entities: Node, enemy: Node) -> void:
 		barrel.doubloons_drop = doubloons_amount
 		barrel.obstacle_type = DestructibleObstacle.ObstacleType.WOODEN_BARREL
 
-func _replace_front_hazard_with_pickup(entities: Node, enemy: Node, _cur_level: int) -> void:
+func _replace_front_hazard_with_pickup(entities: Node, enemy: Node, cur_level: int) -> void:
 	var pos = enemy.position
-	var doubloons_amount = enemy.doubloons_drop if "doubloons_drop" in enemy else 6
+	var doubloons_amount = 2 if cur_level <= 2 else (enemy.doubloons_drop if "doubloons_drop" in enemy else 6)
 	entities.remove_child(enemy)
 	enemy.queue_free()
 	

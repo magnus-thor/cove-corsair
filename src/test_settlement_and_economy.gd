@@ -233,7 +233,7 @@ func _test_chunk_payout_tuning() -> void:
 		elif c.is_in_group("destructible") and "doubloons_drop" in c:
 			m_coins += c.doubloons_drop
 	print("  [INFO] chunk_mine_gauntlet calculated total payout: %d doubloons" % m_coins)
-	assert_test(m_coins >= 30 and m_coins <= 45, "chunk_mine_gauntlet yields ~30-45 doubloons (actual: %d)" % m_coins)
+	assert_test(m_coins >= 4 and m_coins <= 15, "chunk_mine_gauntlet yields ~4-15 doubloons (actual: %d)" % m_coins)
 	mine.queue_free()
 
 	# Verify chunk_barricade_siege

@@ -39,6 +39,7 @@ var current_phase: int = 1
 var _target_z: float = -18.0
 var _weave_time: float = 0.0
 var _attack_timer: float = 0.0
+var _attack_cooldown: float = 2.0
 var _is_left_turn: bool = true
 var _flash_tweens: Dictionary = {}
 var _is_defeated: bool = false
@@ -67,9 +68,9 @@ func _ready() -> void:
 		var gs = get_node("/root/GameState")
 		if "current_level" in gs:
 			if gs.current_level == 2:
-				max_hp = 35
+				max_hp = 75
 			elif gs.current_level == 5:
-				max_hp = 55
+				max_hp = 85
 			elif gs.current_level == 10:
 				max_hp = 120
 			elif gs.current_level == 15:
@@ -89,6 +90,10 @@ func _ready() -> void:
 	if right_cannon_node: right_cannon_node.position = Vector3(2.0, 0.5, 0.5)
 	if boiler_node: boiler_node.position = Vector3(0.0, 0.6, 0.0)
 
+	_attack_timer = 0.0
+	_attack_cooldown = randf_range(1.8, 2.2)
+	call_deferred("_fire_warning_shot")
+
 func _physics_process(delta: float) -> void:
 	if _is_defeated or current_state == State.DYING:
 		return
@@ -100,9 +105,15 @@ func _physics_process(delta: float) -> void:
 	match current_state:
 		State.APPROACHING:
 			global_position.z = move_toward(global_position.z, _target_z, approach_speed * delta)
+			# Advance attack timer immediately upon entering the river chunk
+			_attack_timer += delta
+			if _attack_timer >= _attack_cooldown:
+				_attack_timer = 0.0
+				_attack_cooldown = randf_range(1.8, 2.2)
+				_fire_cannon_volley()
 			if abs(global_position.z - _target_z) < 0.5:
 				current_state = State.COMBAT
-				_attack_timer = 0.5
+				# Maintain active attack timer rather than waiting for an idle delay
 				
 		State.COMBAT:
 			_process_combat(delta)
@@ -326,8 +337,9 @@ func _fire_enraged_mortar(target_pos: Vector3) -> void:
 
 func _process_phase_1(delta: float) -> void:
 	_attack_timer += delta
-	if _attack_timer >= 2.2:
+	if _attack_timer >= _attack_cooldown:
 		_attack_timer = 0.0
+		_attack_cooldown = randf_range(1.8, 2.2)
 		_fire_cannon_volley()
 
 func _process_phase_2(delta: float) -> void:
@@ -357,6 +369,35 @@ func _process_phase_3(delta: float) -> void:
 		_eject_mine()
 
 # Actions
+func _fire_warning_shot() -> void:
+	if _is_defeated or not is_inside_tree():
+		return
+	var shoot_node: Node3D = left_cannon_node if randf() < 0.5 else right_cannon_node
+	var spawn_pos = shoot_node.global_position if shoot_node and is_instance_valid(shoot_node) else (global_position + Vector3(0.0, 0.5, 1.5))
+	
+	if enemy_cannonball_scene:
+		AudioManager.play_sfx("cannon_shots", 0.9, 1.1)
+		var ball = enemy_cannonball_scene.instantiate() as Area3D
+		var root = get_tree().current_scene
+		if root:
+			root.add_child(ball)
+		ball.global_position = spawn_pos
+		ball.rotation = rotation
+		
+		var player = get_tree().get_first_node_in_group("player")
+		var fire_dir = Vector3(0, 0, 1)
+		if player and is_instance_valid(player):
+			var to_player = (player.global_position - ball.global_position)
+			to_player.y = 0.0
+			if to_player.z > 0.1:
+				fire_dir = to_player.normalized()
+		if ball.has_method("setup"):
+			ball.setup(fire_dir, null, null)
+		if "direction" in ball:
+			ball.direction = fire_dir
+		if "speed" in ball:
+			ball.speed = 11.0
+
 func _fire_cannon_volley() -> void:
 	var shoot_node: Node3D = left_cannon_node if _is_left_turn else right_cannon_node
 	_is_left_turn = !(_is_left_turn) # Alternate sides
@@ -598,9 +639,21 @@ func _spawn_hull_explosion() -> void:
 		vfx.scale = Vector3.ONE * randf_range(1.5, 3.0)
 
 func _spawn_doubloon_fountain() -> void:
+	var cur_lvl = 1
+	if has_node("/root/GameState"):
+		var gs = get_node("/root/GameState")
+		if "current_level" in gs:
+			cur_lvl = int(gs.current_level)
+			
+	var vfx_mgr = get_tree().get_first_node_in_group("vfx_manager")
+	if vfx_mgr and vfx_mgr.has_method("spawn_coin_burst"):
+		vfx_mgr.spawn_coin_burst(global_position)
+	elif VFXManager and VFXManager.has_method("spawn_coin_burst"):
+		VFXManager.spawn_coin_burst(global_position)
+		
 	if not doubloon_scene:
 		return
-	var count = 150
+	var count = 0 if cur_lvl <= 1 else (5 if cur_lvl == 2 else (15 if cur_lvl <= 5 else 30))
 	for i in range(count):
 		var d = doubloon_scene.instantiate() as Area3D
 		if d:

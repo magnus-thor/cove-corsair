@@ -46,7 +46,7 @@ script = ExtResource("5_k704k")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 0.13, -12)
 collision_layer = 8
 script = ExtResource("7_5j6y0")
-value = 8
+value = 1
 
 [node name="MineGate2_Left" type="Area3D" parent="Entities" unique_id=1898302965 groups=["destructible"] instance=ExtResource("4_ggj8v")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.65, 0, -24)
@@ -60,7 +60,7 @@ script = ExtResource("5_k704k")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.13, -24)
 collision_layer = 8
 script = ExtResource("7_5j6y0")
-value = 8
+value = 1
 
 [node name="MineGate3_Left" type="Area3D" parent="Entities" unique_id=83411908 groups=["destructible"] instance=ExtResource("4_ggj8v")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, 0, -36)
@@ -74,7 +74,7 @@ script = ExtResource("5_k704k")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 0.13, -36)
 collision_layer = 8
 script = ExtResource("7_5j6y0")
-value = 8
+value = 1
 
 [node name="MineGate4_Left" type="Area3D" parent="Entities" unique_id=684170872 groups=["destructible"] instance=ExtResource("4_ggj8v")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.65, 0, -46)
@@ -88,7 +88,7 @@ script = ExtResource("5_k704k")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.13, -46)
 collision_layer = 8
 script = ExtResource("7_5j6y0")
-value = 8
+value = 1
 
 [node name="ChestSpawnMarker_HazardLeft" type="Marker3D" parent="Entities" unique_id=825448894]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.4, 0.05, -16)

@@ -25,6 +25,8 @@ func _ready() -> void:
 	test_rune_barrel_level_gating()
 	test_vessel_stats_and_economy_matrix()
 	test_settlement_2x_bonus_button()
+	test_settlement_banked_vs_vault_separation()
+	test_level_1_chunk_coin_density()
 
 	print("==========================================================")
 	print("  TOTAL RESULTS: %d / %d PASSED" % [passed_count, passed_count + failed_count])
@@ -134,8 +136,9 @@ func test_level_2_boss_ironjaw_and_properties() -> void:
 	var boss = boss_scene.instantiate() as BossWarBarge
 	add_child(boss)
 	boss._ready()
-	assert_test(boss.max_hp == 35, "Ironjaw War-Barge has 35 max HP on Level 2 (actual: %d)" % boss.max_hp)
-	assert_test(boss.current_hp == 35, "Ironjaw War-Barge has 35 current HP on Level 2 (actual: %d)" % boss.current_hp)
+	assert_test(boss.max_hp == 75, "Ironjaw War-Barge has 75 max HP on Level 2 (actual: %d)" % boss.max_hp)
+	assert_test(boss.current_hp == 75, "Ironjaw War-Barge has 75 current HP on Level 2 (actual: %d)" % boss.current_hp)
+	assert_test(boss._attack_cooldown >= 1.8 and boss._attack_cooldown <= 2.2, "Ironjaw attack cooldown initialized immediately (1.8s-2.2s)")
 
 	# Test minion suppression on Level 2
 	var prev_enemies = get_tree().get_nodes_in_group("enemies").size()
@@ -269,3 +272,66 @@ func test_settlement_2x_bonus_button() -> void:
 	assert_test(GameState.doubloons == post_claim_gold, "Double claim safely prevented")
 
 	screen.queue_free()
+
+func test_settlement_banked_vs_vault_separation() -> void:
+	print("\n--- 8. Settlement Screen Banked vs Vault Balance Separation ---")
+	var screen_scene = load("res://src/ui/settlement_screen.tscn") as PackedScene
+	var screen = screen_scene.instantiate() as SettlementScreen
+	add_child(screen)
+
+	GameState.doubloons = 1000
+	var run_coins = 30
+	var clear_bonus = 50
+	screen.show_victory(run_coins, clear_bonus, GameState.doubloons, 3)
+
+	# Initial Banked This Run should be 80
+	assert_test(screen._banked_this_run == 80, "Initial _banked_this_run is 80 (30 + 50)")
+	assert_test(screen.vault_balance_label != null, "VaultBalanceLabel exists in scene")
+	assert_test(screen.vault_balance_label.text == "1000", "Vault balance shows spendable wallet (1000)")
+
+	# Claim 2X bonus: doubles banked this run to 160, wallet to 1080
+	screen._on_bonus_claim_pressed()
+	assert_test(screen._banked_this_run == 160, "Banked this run doubled to 160 after 2X claim")
+	assert_test(screen.total_banked_label.text == "160", "total_banked_label text reflects 160")
+	assert_test(GameState.doubloons == 1080, "Wallet updated to 1080 after 2X claim")
+	assert_test(screen.vault_balance_label.text == "1080", "Vault balance label updated to 1080")
+
+	# Simulate spending 250 in Shipyard
+	GameState.doubloons -= 250 # 830 remaining
+	screen._refresh_banked_display()
+
+	# Crucial: Banked This Run MUST NOT mutate or decrease!
+	assert_test(screen._banked_this_run == 160, "Banked this run remains strictly 160 after shipyard purchase")
+	assert_test(screen.total_banked_label.text == "160", "Banked this run label remains strictly '160' after shipyard return")
+	assert_test(screen.vault_balance_label.text == "830", "Vault balance label accurately displays deducted 830")
+
+	screen.queue_free()
+
+func test_level_1_chunk_coin_density() -> void:
+	print("\n--- 9. Level 1 Chunk Coin Density & Payout Calibration ---")
+	var l1 = load("res://src/data/resources/levels/level_01.tres") as LevelData
+	assert_test(l1 != null, "level_01.tres loaded")
+
+	GameState.current_level = 1
+	var total_collectible_coins = 0
+
+	for chunk_scene in l1.chunk_scenes:
+		var chunk = chunk_scene.instantiate() as BaseTrackChunk
+		add_child(chunk)
+		chunk._ready()
+		
+		var entities = chunk.get_node_or_null("Entities")
+		if entities:
+			for c in entities.get_children():
+				if c.is_in_group("collectibles") or c.is_in_group("doubloons"):
+					total_collectible_coins += c.value if "value" in c else 1
+				elif c.is_in_group("destructible") and "doubloons_drop" in c:
+					total_collectible_coins += c.doubloons_drop
+				elif "obstacle_type" in c:
+					total_collectible_coins += 1
+		chunk.queue_free()
+
+	print("  [INFO] Level 1 total calculated collectible coins: %d" % total_collectible_coins)
+	assert_test(total_collectible_coins >= 25 and total_collectible_coins <= 38, "Total collectible coins in Level 1 chunks is between 25 and 38 (actual: %d)" % total_collectible_coins)
+	assert_test(total_collectible_coins < 40, "Total in-run coins collected before finish bonus is under 40 coins")
+

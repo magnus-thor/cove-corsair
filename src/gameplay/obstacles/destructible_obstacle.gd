@@ -92,14 +92,14 @@ func update_obstacle_visuals() -> void:
 				y_off = 0.37
 				sc = Vector3(1.0, 1.0, 1.0)
 				rot_deg = Vector3(0.0, 0.0, 0.0)
-				doubloons_drop = 2
+				doubloons_drop = 0
 			ObstacleType.CORAL_REEF:
 				tex = coral_reef_tex
 				p_size = 0.0028
 				y_off = 2.00
 				sc = Vector3(0.71, 0.71, 0.71)
 				rot_deg = Vector3(0.0, 40.0, 0.0)
-				doubloons_drop = 4
+				doubloons_drop = 0
 				
 		obstacle_sprite.texture = tex
 		obstacle_sprite.pixel_size = p_size
@@ -251,7 +251,7 @@ func _spawn_doubloons() -> void:
 		
 	var drop_count = doubloons_drop
 	if drop_count <= 0 and (obstacle_type == ObstacleType.WOODEN_BARREL or obstacle_type == ObstacleType.FUSE_BARREL or obstacle_type == ObstacleType.RUNE_BARREL):
-		drop_count = randi_range(1, 3)
+		drop_count = 1 if obstacle_type == ObstacleType.WOODEN_BARREL else (2 if obstacle_type == ObstacleType.FUSE_BARREL else 3)
 		
 	if drop_count <= 0:
 		return

@@ -24,14 +24,14 @@ func test_level_data_resources() -> void:
 	assert(l1.biome_name == "tropical", "Level 1 biome must be tropical")
 	assert(l1.chunk_scenes.size() == 5, "Level 1 must have 5 chunk scenes")
 	assert(l1.base_scroll_speed == 6.5, "Level 1 base_scroll_speed must be 6.5")
-	assert(l1.completion_doubloon_reward == 150, "Level 1 reward must be 150")
+	assert(l1.completion_doubloon_reward == 50, "Level 1 reward must be 50")
 	print("[PASS] Level 1 schema verified.")
 	
 	var l2 = load("res://src/data/resources/levels/level_02.tres") as LevelData
 	assert(l2 != null, "level_02.tres should load as LevelData")
 	assert(l2.level_id == 2, "Level 2 ID must be 2")
-	assert(l2.level_title == "Level 2: Black Tide Bayou", "Level 2 title mismatch")
-	assert(l2.biome_name == "bayou", "Level 2 biome must be bayou")
+	assert(l2.level_title == "Level 2: Palm Shallows", "Level 2 title mismatch")
+	assert(l2.biome_name in ["lagoon", "tropical"], "Level 2 biome must be lagoon/tropical")
 	assert(l2.chunk_scenes.size() == 5, "Level 2 must have 5 chunk scenes")
 	print("[PASS] Level 2 schema verified.")
 

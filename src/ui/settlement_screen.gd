@@ -23,6 +23,8 @@ signal map_requested
 @onready var bonus_row: HBoxContainer = %BonusRow
 @onready var bonus_label: Label = %BonusLabel
 @onready var total_banked_label: Label = %TotalBankedLabel
+@onready var run_spoils_label: Label = %TotalBankedLabel
+@onready var vault_balance_label: Label = get_node_or_null("%VaultBalanceLabel")
 
 @onready var primary_button: Button = %PrimaryButton
 @onready var bonus_claim_button: Button = %BonusClaimButton
@@ -35,6 +37,7 @@ var _is_victory: bool = false
 var _bonus_claimed: bool = false
 var _run_doubloons: int = 0
 var _completion_bonus: int = 0
+var _banked_this_run: int = 0
 var _total_banked: int = 0
 var _stars_earned: int = 1
 
@@ -62,10 +65,15 @@ func _ready() -> void:
 	if map_button:
 		map_button.pressed.connect(_on_map_pressed)
 
+	if GameState and GameState.has_signal("doubloons_changed"):
+		if not GameState.doubloons_changed.is_connected(_on_doubloons_changed):
+			GameState.doubloons_changed.connect(_on_doubloons_changed)
+
 func show_defeat(coins_collected: int, _distance_reached: float, banked_total: int) -> void:
 	_is_victory = false
 	_run_doubloons = coins_collected
 	_completion_bonus = 0
+	_banked_this_run = coins_collected
 	_total_banked = banked_total
 	_stars_earned = 0
 	_present_modal()
@@ -74,6 +82,7 @@ func show_victory(coins_collected: int, completion_bonus: int, banked_total: int
 	_is_victory = true
 	_run_doubloons = coins_collected
 	_completion_bonus = completion_bonus
+	_banked_this_run = coins_collected + completion_bonus
 	_total_banked = banked_total
 	_stars_earned = clamp(stars, 1, 3)
 	
@@ -136,7 +145,8 @@ func _present_modal() -> void:
 	if run_doubloons_label:
 		run_doubloons_label.text = "0"
 	if total_banked_label:
-		total_banked_label.text = str(_total_banked - (_run_doubloons + _completion_bonus))
+		total_banked_label.text = "0"
+	_update_vault_balance_display()
 
 	# 3. Check shipyard upgrade affordance
 	_update_shipyard_button()
@@ -145,7 +155,7 @@ func _present_modal() -> void:
 	_animate_open()
 
 	# 5. Roll-up count animation
-	_animate_breakdown(_run_doubloons, _completion_bonus, _total_banked)
+	_animate_breakdown(_run_doubloons, _completion_bonus, _banked_this_run)
 
 func _animate_open() -> void:
 	if _modal_tween and _modal_tween.is_valid():
@@ -165,7 +175,7 @@ func _animate_open() -> void:
 		_modal_tween.tween_property(modal_panel, "scale", Vector2.ONE, 0.4)
 		_modal_tween.tween_property(modal_panel, "modulate:a", 1.0, 0.3)
 
-func _animate_breakdown(run_coins: int, bonus: int, final_bank: int) -> void:
+func _animate_breakdown(run_coins: int, bonus: int, final_run_bank: int) -> void:
 	if _tally_tween and _tally_tween.is_valid():
 		_tally_tween.kill()
 
@@ -191,11 +201,10 @@ func _animate_breakdown(run_coins: int, bonus: int, final_bank: int) -> void:
 				bonus_label.text = "+%d" % int(val)
 		, 0.0, float(bonus), 0.75)
 
-	var starting_bank = max(0, final_bank - (run_coins + bonus))
 	_tally_tween.tween_method(func(val: float):
 		if total_banked_label:
 			total_banked_label.text = str(int(val))
-	, float(starting_bank), float(final_bank), 0.85)
+	, 0.0, float(final_run_bank), 0.85)
 
 func _update_stars(count: int) -> void:
 	var stars = [star_1, star_2, star_3]
@@ -237,10 +246,18 @@ func _update_shipyard_button() -> void:
 			shipyard_badge.visible = false
 		shipyard_button.modulate = Color.WHITE
 
+func _update_vault_balance_display() -> void:
+	if vault_balance_label and GameState:
+		vault_balance_label.text = str(GameState.doubloons)
+
+func _on_doubloons_changed(_new_amt: int) -> void:
+	_update_vault_balance_display()
+	_update_shipyard_button()
+
 func _refresh_banked_display() -> void:
 	_total_banked = GameState.doubloons
-	if total_banked_label:
-		total_banked_label.text = str(_total_banked)
+	_update_vault_balance_display()
+	# Banked This Run label remains strictly cached and never mutates when spending in shipyard!
 
 func _on_bonus_claim_pressed() -> void:
 	if _bonus_claimed or not _is_victory:
@@ -262,17 +279,20 @@ func _on_bonus_claim_pressed() -> void:
 		AudioManager.play_sfx("coin_pickups", 1.2, 1.2, 4.0)
 		AudioManager.play_sfx("gate_passes", 0.9, 1.1)
 		
-	var old_total = _total_banked
+	var old_run_spoils = _banked_this_run
+	_banked_this_run += bonus_amount
 	_total_banked = GameState.doubloons
 	
 	if total_banked_label:
+		total_banked_label.text = str(_banked_this_run)
 		var tween = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 		tween.tween_method(func(val: float):
 			if total_banked_label:
 				total_banked_label.text = str(int(val))
-		, float(old_total), float(_total_banked), 0.5)
+		, float(old_run_spoils), float(_banked_this_run), 0.5)
 		
+	_update_vault_balance_display()
 	_update_shipyard_button()
 
 func _on_primary_pressed() -> void:
