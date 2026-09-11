@@ -15,6 +15,8 @@ signal boss_arena_reached(boss_chunk: BaseTrackChunk)
 @export var cleanup_distance_behind_camera: float = 30.0
 @export var camera_activation_distance: float = 75.0
 
+const BOSS_BUFFER_CHUNK_SCENE: PackedScene = preload("res://src/gameplay/chunks/chunk_boss_intro_buffer.tscn")
+
 var active_chunks: Array[BaseTrackChunk] = []
 var total_track_distance: float = 0.0
 var distance_traveled: float = 0.0
@@ -169,6 +171,26 @@ func assemble_level(data: LevelData = null) -> void:
 		if not chunk_instance:
 			continue
 			
+		# If transitioning into a boss chunk, ensure buffer chunk and gate suppression
+		if chunk_instance.is_boss_chunk:
+			if not active_chunks.is_empty():
+				var prev_chunk = active_chunks.back()
+				_suppress_gates_in_chunk_final_portion(prev_chunk, 0.30)
+				
+				# Insert empty transition/buffer chunk if preceding chunk is not already a buffer
+				if prev_chunk.chunk_id != "boss_intro_buffer" and BOSS_BUFFER_CHUNK_SCENE:
+					var buffer_instance = BOSS_BUFFER_CHUNK_SCENE.instantiate() as BaseTrackChunk
+					if buffer_instance:
+						add_child(buffer_instance)
+						buffer_instance.position = Vector3(0.0, 0.0, current_z_offset)
+						current_z_offset -= buffer_instance.CHUNK_LENGTH
+						active_chunks.append(buffer_instance)
+						print("[CHUNK ASSEMBLER] Inserted 50m buffer chunk before boss: %s" % buffer_instance.name)
+			
+		# If this is the starting chunk (index 0), enforce safe clearance runway (>= 24.0m) from player start
+		if active_chunks.is_empty():
+			_enforce_start_clearance_in_chunk(chunk_instance, 24.0)
+
 		add_child(chunk_instance)
 		chunk_instance.position = Vector3(0.0, 0.0, current_z_offset)
 		var c_len = chunk_instance.CHUNK_LENGTH
@@ -272,3 +294,61 @@ func _on_boss_arena_reached(boss_chunk: BaseTrackChunk) -> void:
 		
 	boss_arena_reached.emit(boss_chunk)
 	print("[CHUNK ASSEMBLER] Clean transition into Boss Arena: %s" % boss_chunk.name)
+
+## Suppresses multiplier gates occurring in the final portion (e.g. 30%) of a chunk.
+func _suppress_gates_in_chunk_final_portion(chunk: BaseTrackChunk, portion: float = 0.30) -> void:
+	if not chunk or not is_instance_valid(chunk):
+		return
+	var threshold_z = -chunk.CHUNK_LENGTH * (1.0 - portion) # e.g. -35.0m for 50m chunk
+	for child in chunk.find_children("*", "", true, false):
+		if not is_instance_valid(child):
+			continue
+		if child.is_in_group("multiplier_gate") or (child is Area3D and child.has_method("apply_multiplier")):
+			# Check Z relative to chunk origin
+			var rel_z = child.position.z
+			if rel_z <= threshold_z:
+				print("[CHUNK ASSEMBLER] Suppressing multiplier gate '%s' in final %.0f%% (Z=%.1fm <= %.1fm) of chunk %s" % [
+					child.name, portion * 100.0, rel_z, threshold_z, chunk.name
+				])
+				if child.get_parent():
+					child.get_parent().remove_child(child)
+				child.queue_free()
+
+## Enforces a safe clearance runway at the start of a level so no hazards/mines appear dangerously close to the vessel.
+func _enforce_start_clearance_in_chunk(chunk: BaseTrackChunk, min_clearance: float = 24.0) -> void:
+	if not chunk or not is_instance_valid(chunk):
+		return
+	var entities = chunk.find_child("Entities", true, false)
+	if not entities:
+		return
+	for child in entities.get_children():
+		if not is_instance_valid(child):
+			continue
+		var is_hazard = child is HazardSeaMine or child is HazardThermalGeyser or child.is_in_group("hazards") or child.name.to_lower().contains("mine")
+		if is_hazard and child.position.z > -min_clearance:
+			print("[CHUNK ASSEMBLER] Suppressed early hazard '%s' at Z=%.1fm in starting chunk (< %.1fm clearance)" % [child.name, child.position.z, min_clearance])
+			if child.get_parent():
+				child.get_parent().remove_child(child)
+			child.queue_free()
+
+## Fast-forwards the runner track directly to the boss chunk entrance for isolated testing.
+func jump_to_boss() -> void:
+	if not is_assembled:
+		return
+	for chunk in active_chunks:
+		if is_instance_valid(chunk) and chunk.is_boss_chunk:
+			# Shift all chunks forward so the boss chunk starts at Z = 0
+			var current_chunk_z = chunk.global_position.z
+			var delta_z = 0.0 - current_chunk_z
+			for c in active_chunks:
+				if is_instance_valid(c):
+					c.global_position.z += delta_z
+			distance_traveled = total_track_distance
+			var gs = _get_game_state()
+			if gs:
+				gs.distance_traveled = total_track_distance
+				if gs.has_signal("progress_changed"):
+					gs.progress_changed.emit(total_track_distance, total_track_distance)
+			_on_boss_arena_reached(chunk)
+			print("[CHUNK ASSEMBLER] Jumped directly to boss chunk: %s" % chunk.name)
+			break

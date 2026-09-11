@@ -11,6 +11,12 @@ enum State { APPROACHING, COMBAT, SUBMERGED, DYING }
 @export var weave_speed: float = 1.3
 @export var patrol_width: float = 3.0
 
+# Inspector-exposed Boss Tuning Properties
+@export var attack_interval: float = 2.4
+@export var spawn_hazard_enabled: bool = true
+@export var hazard_telegraph_time: float = 1.8
+@export var max_active_adds: int = 2
+
 # Phase thresholds
 var current_phase: int = 1
 var combat_time: float = 0.0
@@ -22,6 +28,7 @@ var _submerge_duration: float = 3.2
 var _minion_timer: float = 0.0
 var _mortar_timer: float = 0.0
 var _cannon_timer: float = 0.0
+var is_barrage_active: bool = false
 var _is_defeated: bool = false
 var current_state: State = State.APPROACHING
 var _base_y: float = 1.45
@@ -84,17 +91,18 @@ func _process_combat(delta: float) -> void:
 		
 	# Spectral Cannon Volley (Fires downriver toward player)
 	_cannon_timer += delta
-	var cannon_cd = 2.4 if current_phase == 1 else (1.9 if current_phase == 2 else 1.4)
+	var cannon_cd = attack_interval if current_phase == 1 else (attack_interval * 0.8 if current_phase == 2 else attack_interval * 0.6)
 	if _cannon_timer >= cannon_cd:
 		_cannon_timer = 0.0
 		_fire_spectral_cannon_volley()
 
-	# Poison Mortar
-	_mortar_timer += delta
-	var mortar_cooldown = 3.5 if current_phase == 1 else (2.5 if current_phase == 2 else 1.6)
-	if _mortar_timer >= mortar_cooldown:
-		_mortar_timer = 0.0
-		_fire_poison_mortars()
+	# Poison Mortar (paused if hazard spawning disabled or during active barrage)
+	if spawn_hazard_enabled and not is_barrage_active:
+		_mortar_timer += delta
+		var mortar_cooldown = 3.5 if current_phase == 1 else (2.5 if current_phase == 2 else 1.6)
+		if _mortar_timer >= mortar_cooldown:
+			_mortar_timer = 0.0
+			_fire_poison_mortars()
 		
 	# Submerge cycle in Phase 2 & 3
 	if current_phase >= 2:
@@ -144,21 +152,32 @@ func _fire_spectral_cannon_volley() -> void:
 			ball.speed = 10.5
 
 func _fire_poison_mortars() -> void:
+	if not spawn_hazard_enabled or is_barrage_active:
+		return
 	var player = get_tree().get_first_node_in_group("player")
 	if not player or not is_instance_valid(player):
 		return
 		
-	var count = 2 if current_phase == 1 else 3
+	# Select which lateral lane to leave GUARANTEED clear:
+	# Available lateral lanes: -3.5 (Left), 0.0 (Center), 3.5 (Right)
+	var lanes = [-3.5, 0.0, 3.5]
+	var safe_lane = lanes.pick_random()
+	var attack_lanes = lanes.filter(func(l): return l != safe_lane)
+	
+	is_barrage_active = true
+	var count = min(attack_lanes.size(), 2 if current_phase == 1 else 3)
 	for i in range(count):
+		var target_lane_x = attack_lanes[i % attack_lanes.size()]
 		get_tree().create_timer(i * 0.25).timeout.connect(func():
 			if _is_defeated or not is_instance_valid(self):
+				is_barrage_active = false
 				return
-			var spread_x = randf_range(-3.0, 3.0)
-			var target_pos = player.global_position + Vector3(spread_x, 0, randf_range(-2.0, 2.0))
-			_telegraph_and_strike_mortar(target_pos)
+			var target_pos = Vector3(target_lane_x + randf_range(-0.4, 0.4), 0, player.global_position.z + randf_range(-1.5, 1.5))
+			var is_last = (i == count - 1)
+			_telegraph_and_strike_mortar(target_pos, is_last)
 		)
 
-func _telegraph_and_strike_mortar(pos: Vector3) -> void:
+func _telegraph_and_strike_mortar(pos: Vector3, is_last: bool = false) -> void:
 	var marker = MeshInstance3D.new()
 	var disc = CylinderMesh.new()
 	disc.top_radius = 1.6
@@ -176,11 +195,16 @@ func _telegraph_and_strike_mortar(pos: Vector3) -> void:
 	
 	AudioManager.play_sfx("cannon_shots", 0.8, 1.0)
 	
+	var tele_duration = maxf(1.6, hazard_telegraph_time)
 	var tween = marker.create_tween()
 	var vfx_scene = explosion_scene
 	var tree = get_tree()
-	tween.tween_property(mat, "albedo_color:a", 0.8, 1.6)
+	tween.tween_property(mat, "albedo_color:a", 0.8, tele_duration)
 	tween.tween_callback(Callable(BossPhantomDredge, "execute_poison_mortar_detonation").bind(marker.global_position, vfx_scene, tree))
+	tween.tween_callback(func():
+		if is_last:
+			is_barrage_active = false
+	)
 	tween.tween_callback(marker.queue_free)
 
 static func execute_poison_mortar_detonation(pos: Vector3, vfx_prefab: PackedScene, tree: SceneTree) -> void:
@@ -302,7 +326,7 @@ func _spawn_bayou_adds(lane_x_override: float = NAN, type_choice: int = -1) -> v
 	var existing_enemies = get_tree().get_nodes_in_group("enemies").filter(
 		func(e): return is_instance_valid(e) and not e.is_in_group("boss") and not e.is_queued_for_deletion()
 	)
-	if existing_enemies.size() >= 2:
+	if existing_enemies.size() >= max_active_adds:
 		return
 
 	var parent = get_tree().get_first_node_in_group("level_controller")

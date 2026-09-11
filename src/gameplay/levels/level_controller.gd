@@ -127,6 +127,21 @@ func setup_active_queue() -> void:
 				active_queue.append(we)
 		active_queue.sort_custom(func(a, b): return a.distance < b.distance)
 
+	# Suppress multiplier gates on the final 30% immediately preceding boss encounter (buffer zone)
+	var gate_suppression_dist = 250.0 * 0.70 # 175.0m
+	active_queue = active_queue.filter(func(ev):
+		var dist = ev.trigger_distance if "trigger_distance" in ev else ev.get("distance", 0.0)
+		var is_gate = false
+		if ev is SpawnEvent and ev.entity_type == SpawnEvent.EntityType.MULTIPLIER_GATE:
+			is_gate = true
+		elif typeof(ev) == TYPE_DICTIONARY and ev.get("type", "") == "gate":
+			is_gate = true
+		if is_gate and dist >= gate_suppression_dist:
+			print("[LEVEL CONTROLLER] Suppressed multiplier gate at %.1fm (final 30%% before boss)" % dist)
+			return false
+		return true
+	)
+
 func load_level_resource(res: LevelData) -> void:
 	if not res:
 		return
@@ -853,13 +868,32 @@ func _spawn_boss() -> void:
 			main_root.add_child(boss)
 		else:
 			add_child(boss)
-		boss.global_position = Vector3(0.0, 0.0, player_z - 18.0)
-		print("[BOSS] Spawned boss for ", level_data.level_title if level_data else "Level", " with HP: ", str(level_data.boss_hp) if (level_data and "boss_hp" in level_data) else "default")
+		boss.global_position = Vector3(0.0, 0.0, player_z - 35.0)
+		print("[BOSS] Spawned boss for %s with HP: %s at Z = %.1f (35m buffer zone)" % [
+			level_data.level_title if level_data else "Level",
+			str(level_data.boss_hp) if (level_data and "boss_hp" in level_data) else "default",
+			boss.global_position.z
+		])
 
 		# Lock camera to boss arena
 		var camera = get_tree().get_first_node_in_group("game_camera")
 		if camera and camera.has_method("start_boss_focus"):
 			camera.start_boss_focus(boss)
+
+## Jumps directly to the boss chunk / arena encounter for isolated testing.
+func jump_to_boss() -> void:
+	if chunk_assembler and chunk_assembler.is_assembled:
+		chunk_assembler.jump_to_boss()
+		return
+	current_distance = 250.0
+	GameState.distance_traveled = 250.0
+	base_scroll_speed = 0.0
+	var track_mgr = get_tree().get_first_node_in_group("track_manager")
+	if track_mgr:
+		track_mgr.scroll_speed = 0.0
+	active_queue.clear()
+	_spawn_boss()
+	print("[LEVEL CONTROLLER] Jumped directly to boss encounter")
 
 ## Constructs invisible StaticBody3D physical collision walls bounding the navigable corridor at X = +/- 6.0
 func _setup_boundary_walls() -> void:

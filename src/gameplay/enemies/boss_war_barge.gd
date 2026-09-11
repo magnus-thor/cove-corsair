@@ -11,11 +11,18 @@ enum State { APPROACHING, COMBAT, DYING }
 @export var weave_speed: float = 1.3
 @export var patrol_width: float = 2.8
 
+# Inspector-exposed Boss Tuning Properties
+@export var attack_interval: float = 2.0
+@export var spawn_hazard_enabled: bool = true
+@export var hazard_telegraph_time: float = 1.8
+@export var max_active_adds: int = 2
+
 var combat_time: float = 0.0
 var enraged_shoot_timer: float = 0.0
 var minion_timer: float = 0.0
 var keg_timer: float = 0.0
 var mortar_timer: float = 0.0
+var is_barrage_active: bool = false
 
 # Prefabs
 @export var enemy_cannonball_scene: PackedScene = preload("res://src/gameplay/projectiles/enemy_cannonball.tscn")
@@ -91,8 +98,7 @@ func _ready() -> void:
 	if boiler_node: boiler_node.position = Vector3(0.0, 0.6, 0.0)
 
 	_attack_timer = 0.0
-	_attack_cooldown = randf_range(1.8, 2.2)
-	call_deferred("_fire_warning_shot")
+	_attack_cooldown = attack_interval
 
 func _physics_process(delta: float) -> void:
 	if _is_defeated or current_state == State.DYING:
@@ -105,15 +111,11 @@ func _physics_process(delta: float) -> void:
 	match current_state:
 		State.APPROACHING:
 			global_position.z = move_toward(global_position.z, _target_z, approach_speed * delta)
-			# Advance attack timer immediately upon entering the river chunk
-			_attack_timer += delta
-			if _attack_timer >= _attack_cooldown:
-				_attack_timer = 0.0
-				_attack_cooldown = randf_range(1.8, 2.2)
-				_fire_cannon_volley()
+			# Do not attack or drop hazards while approaching before combat begins
 			if abs(global_position.z - _target_z) < 0.5:
 				current_state = State.COMBAT
-				# Maintain active attack timer rather than waiting for an idle delay
+				_attack_timer = 0.5
+				_attack_cooldown = attack_interval
 				
 		State.COMBAT:
 			_process_combat(delta)
@@ -135,11 +137,12 @@ func _process_combat(delta: float) -> void:
 	else:
 		_process_ram_charge(delta)
 		
-	# Targeted mortar pressure
-	mortar_timer += delta
-	if mortar_timer >= 10.0:
-		mortar_timer = 0.0
-		_fire_targeted_mortar()
+	# Targeted mortar pressure (paused if hazard spawning disabled or already in a barrage)
+	if spawn_hazard_enabled and not is_barrage_active:
+		mortar_timer += delta
+		if mortar_timer >= 10.0:
+			mortar_timer = 0.0
+			_fire_targeted_mortar()
 		
 	# Continuous Minion Add Spawns
 	minion_timer += delta
@@ -148,11 +151,12 @@ func _process_combat(delta: float) -> void:
 		minion_timer = 0.0
 		_deploy_side_minions()
 		
-	# Rolling Powder Keg Spawns
-	keg_timer += delta
-	if keg_timer >= 7.5:
-		keg_timer = 0.0
-		_deploy_center_kegs()
+	# Rolling Powder Keg Spawns (paused if hazards disabled or barrage active)
+	if spawn_hazard_enabled and not is_barrage_active:
+		keg_timer += delta
+		if keg_timer >= 7.5:
+			keg_timer = 0.0
+			_deploy_center_kegs()
 		
 	if combat_time >= 45.0:
 		if boss_sprite and "modulate" in boss_sprite:
@@ -174,7 +178,7 @@ func _deploy_side_minions() -> void:
 	var existing_enemies = get_tree().get_nodes_in_group("enemies").filter(
 		func(e): return is_instance_valid(e) and not e.is_in_group("boss") and not e.is_queued_for_deletion()
 	)
-	if existing_enemies.size() >= 2:
+	if existing_enemies.size() >= max_active_adds:
 		return
 		
 	if current_phase == 1:
@@ -211,10 +215,14 @@ func _spawn_pressure_skiff(x_norm: float, speed_val: float) -> void:
 			skiff.global_position = Vector3(spawn_x, 0.1, global_position.z + 2.5)
 
 func _deploy_center_kegs() -> void:
+	if not spawn_hazard_enabled or is_barrage_active:
+		return
 	_spawn_pressure_keg(-0.18, 5.5)
 	_spawn_pressure_keg(0.18, 5.5)
 
 func _spawn_pressure_keg(x_norm: float, speed_val: float) -> void:
+	if not spawn_hazard_enabled:
+		return
 	if powder_keg_scene:
 		var keg = powder_keg_scene.instantiate() as Node3D
 		var parent = get_tree().get_first_node_in_group("level_controller")
@@ -222,8 +230,12 @@ func _spawn_pressure_keg(x_norm: float, speed_val: float) -> void:
 			parent = get_parent()
 		if parent:
 			parent.add_child(keg)
+			var player = get_tree().get_first_node_in_group("player")
+			var player_z = player.global_position.z if player and is_instance_valid(player) else 0.0
 			var spawn_x = clampf(global_position.x + x_norm * 6.0, -5.0, 5.0)
-			keg.global_position = Vector3(spawn_x, 0.05, global_position.z + 3.0)
+			# Ensure hazard does not spawn within 15 meters of player vessel
+			var spawn_z = minf(global_position.z + 3.0, player_z - 15.0)
+			keg.global_position = Vector3(spawn_x, 0.05, spawn_z)
 			if "forward_speed" in keg:
 				keg.forward_speed = speed_val
 			if "obstacle_type" in keg:
@@ -233,6 +245,7 @@ func _fire_targeted_mortar() -> void:
 	var player = get_tree().get_first_node_in_group("player")
 	if not player or not is_instance_valid(player):
 		return
+	is_barrage_active = true
 	var target_node: Node3D = player
 	if "follower_boats" in player and not player.follower_boats.is_empty():
 		if randf() < 0.5:
@@ -240,10 +253,15 @@ func _fire_targeted_mortar() -> void:
 			if not active_f.is_empty():
 				target_node = active_f.pick_random()
 	var target_pos = target_node.global_position
+	# Always leave at least 1 lateral lane completely clear:
+	# If player is left (x < -1.0), place mortar left/center, leaving right lane (> 2.0) clear
+	# If player is right (x > 1.0), place mortar right/center, leaving left lane (< -2.0) clear
+	# If player is center, place mortar center, leaving both flank lanes clear
+	var target_x = clampf(target_pos.x, -2.8, 2.8)
 	var circle = MeshInstance3D.new()
 	var disc = CylinderMesh.new()
-	disc.top_radius = 2.0
-	disc.bottom_radius = 2.0
+	disc.top_radius = 1.8
+	disc.bottom_radius = 1.8
 	disc.height = 0.01
 	circle.mesh = disc
 	var mat = StandardMaterial3D.new()
@@ -252,14 +270,20 @@ func _fire_targeted_mortar() -> void:
 	mat.albedo_color = Color(1.0, 0.1, 0.1, 0.35)
 	circle.material_override = mat
 	get_tree().current_scene.add_child(circle)
-	circle.global_position = Vector3(target_pos.x, 0.02, target_pos.z)
+	circle.global_position = Vector3(target_x, 0.02, target_pos.z)
+	
+	# Minimum 1.6s telegraph duration with clear warning indicator
+	var tele_duration = maxf(1.6, hazard_telegraph_time)
 	var tween = create_tween()
-	for i in range(3):
-		tween.tween_property(mat, "albedo_color:a", 0.1, 0.25)
-		tween.tween_property(mat, "albedo_color:a", 0.5, 0.25)
+	var steps = 4
+	var step_time = tele_duration / float(steps * 2)
+	for i in range(steps):
+		tween.tween_property(mat, "albedo_color:a", 0.15, step_time)
+		tween.tween_property(mat, "albedo_color:a", 0.70, step_time)
 	tween.tween_callback(func():
 		_explode_mortar_at(circle.global_position)
 		circle.queue_free()
+		is_barrage_active = false
 	)
 
 func _explode_mortar_at(pos: Vector3) -> void:
@@ -339,7 +363,7 @@ func _process_phase_1(delta: float) -> void:
 	_attack_timer += delta
 	if _attack_timer >= _attack_cooldown:
 		_attack_timer = 0.0
-		_attack_cooldown = randf_range(1.8, 2.2)
+		_attack_cooldown = attack_interval
 		_fire_cannon_volley()
 
 func _process_phase_2(delta: float) -> void:
@@ -439,17 +463,23 @@ func _drop_keg() -> void:
 			print("[BOSS SPAWN] Powder Keg launched at %s | Speed: 5.0" % keg.global_position)
 
 func _eject_mine() -> void:
+	if not spawn_hazard_enabled or is_barrage_active:
+		return
 	if sea_mine_scene:
 		var mine = sea_mine_scene.instantiate() as Node3D
 		var parent = get_parent()
 		if parent:
 			parent.add_child(mine)
+			var player = get_tree().get_first_node_in_group("player")
+			var player_z = player.global_position.z if player and is_instance_valid(player) else 0.0
 			var offset_x = randf_range(-2.5, 2.5)
 			var spawn_x = clampf(global_position.x + offset_x, -5.0, 5.0)
-			mine.global_position = Vector3(spawn_x, 0.3, global_position.z + 3.0)
+			# Ensure at least 15m away from player's vessel
+			var spawn_z = minf(global_position.z + 3.0, player_z - 15.0)
+			mine.global_position = Vector3(spawn_x, 0.3, spawn_z)
 			if "forward_speed" in mine:
 				mine.forward_speed = 4.0
-			print("[BOSS SPAWN] Spiked Sea Mine ejected at %s | Speed: 4.0" % mine.global_position)
+			print("[BOSS SPAWN] Spiked Sea Mine ejected at %s (safe >=15m) | Speed: 4.0" % mine.global_position)
 
 # Steam Venting
 func _start_steam_venting() -> void:

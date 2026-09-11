@@ -11,6 +11,12 @@ enum State { APPROACHING, COMBAT, RAMMING, DYING }
 @export var weave_speed: float = 1.1
 @export var patrol_width: float = 2.6
 
+# Inspector-exposed Boss Tuning Properties
+@export var attack_interval: float = 2.2
+@export var spawn_hazard_enabled: bool = true
+@export var hazard_telegraph_time: float = 1.8
+@export var max_active_adds: int = 2
+
 # Component HP
 var hp_port_turret: int = 150
 var hp_starboard_turret: int = 150
@@ -27,6 +33,7 @@ var _attack_timer: float = 0.0
 var _geyser_timer: float = 0.0
 var _ram_timer: float = 0.0
 var _minion_timer: float = 0.0
+var is_barrage_active: bool = false
 var _is_defeated: bool = false
 var _charge_dir: int = 1
 var _y_base: float = 0.5
@@ -96,17 +103,18 @@ func _process_combat(delta: float) -> void:
 		
 	# Turret Broadsides
 	_attack_timer += delta
-	var attack_cd = 2.2 if current_phase == 1 else (1.6 if current_phase == 2 else 0.9)
+	var attack_cd = attack_interval if current_phase == 1 else (attack_interval * 0.75 if current_phase == 2 else attack_interval * 0.5)
 	if _attack_timer >= attack_cd:
 		_attack_timer = 0.0
 		_fire_fortress_salvo()
 		
-	# Geyser Slams
-	_geyser_timer += delta
-	var geyser_cd = 7.0 if current_phase == 1 else (5.0 if current_phase == 2 else 3.5)
-	if _geyser_timer >= geyser_cd:
-		_geyser_timer = 0.0
-		_trigger_geyser_slam()
+	# Geyser Slams (paused if hazards disabled or barrage active)
+	if spawn_hazard_enabled and not is_barrage_active:
+		_geyser_timer += delta
+		var geyser_cd = 7.0 if current_phase == 1 else (5.0 if current_phase == 2 else 3.5)
+		if _geyser_timer >= geyser_cd:
+			_geyser_timer = 0.0
+			_trigger_geyser_slam()
 		
 	# Ram Overdrive Trigger (Phase 2 & 3)
 	if current_phase >= 2 and hp_prow_ram > 0:
@@ -134,6 +142,10 @@ func _fire_fortress_salvo() -> void:
 		shoot_points.append(furnace_core_node)
 		
 	AudioManager.play_sfx("cannon_shots", 0.7, 0.9, 2.0)
+	is_barrage_active = true
+	get_tree().create_timer(1.2).timeout.connect(func():
+		is_barrage_active = false
+	)
 	
 	for point in shoot_points:
 		if not is_instance_valid(point):
@@ -163,6 +175,8 @@ func _fire_fortress_salvo() -> void:
 			ball.direction = fire_dir
 
 func _trigger_geyser_slam() -> void:
+	if not spawn_hazard_enabled or is_barrage_active:
+		return
 	AudioManager.play_sfx("barrel_breaks", 0.5, 0.7, 4.0)
 	AudioManager.play_sfx("water_splashes", 0.5, 0.7, 3.0)
 	
@@ -192,7 +206,15 @@ func _trigger_geyser_slam() -> void:
 		if thermal_geyser_scene:
 			var geyser = thermal_geyser_scene.instantiate() as Node3D
 			get_tree().current_scene.add_child(geyser)
-			geyser.global_position = Vector3(lx, 0.0, player.global_position.z + randf_range(-0.5, 1.5))
+			# Ensure hazard NEVER spawns within 15 meters of player vessel
+			var safe_z = minf(player.global_position.z - 16.0, global_position.z + 3.0)
+			geyser.global_position = Vector3(lx, 0.0, safe_z)
+			if "forward_speed" in geyser:
+				geyser.forward_speed = 6.5
+			if "telegraph_duration" in geyser:
+				geyser.telegraph_duration = maxf(1.6, hazard_telegraph_time)
+			if "eruption_duration" in geyser:
+				geyser.eruption_duration = 1.8
 
 func _start_ram_overdrive() -> void:
 	current_state = State.RAMMING
@@ -234,6 +256,12 @@ func _process_ram_overdrive(delta: float) -> void:
 			current_state = State.COMBAT
 
 func _spawn_bastion_minions() -> void:
+	var existing_enemies = get_tree().get_nodes_in_group("enemies").filter(
+		func(e): return is_instance_valid(e) and not e.is_in_group("boss") and not e.is_queued_for_deletion()
+	)
+	if existing_enemies.size() >= max_active_adds:
+		return
+		
 	var root = get_tree().current_scene
 	if not root: root = get_tree().get_first_node_in_group("level_controller")
 	if not root: root = get_parent()
@@ -257,6 +285,13 @@ func _spawn_bastion_minions() -> void:
 		spawns.append({"type": "gunner", "pos": Vector3(0.0, 0.1, global_position.z + 4.0)})
 		spawns.append({"type": "raft", "pos": Vector3(-3.0, 0.1, global_position.z + 3.2)})
 		spawns.append({"type": "raft", "pos": Vector3(3.0, 0.1, global_position.z + 3.2)})
+
+	# Cap spawns according to max_active_adds
+	var available_slots = max_active_adds - existing_enemies.size()
+	if available_slots <= 0:
+		return
+	if spawns.size() > available_slots:
+		spawns = spawns.slice(0, available_slots)
 
 	for s in spawns:
 		var mob: Area3D = null

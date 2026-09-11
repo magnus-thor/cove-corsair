@@ -9,6 +9,9 @@ enum State { APPROACHING, COMBAT, DYING }
 @export var combat_z_offset: float = -18.0
 @export var weave_speed: float = 1.8
 @export var attack_interval: float = 2.5
+@export var spawn_hazard_enabled: bool = true
+@export var hazard_telegraph_time: float = 1.8
+@export var max_active_adds: int = 2
 
 @export var doubloon_scene: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
 @export var explosion_scene: PackedScene = preload("res://src/gameplay/vfx/barrel_explosion.tscn")
@@ -79,8 +82,14 @@ func _physics_process(delta: float) -> void:
 				_perform_attack()
 
 func _perform_attack() -> void:
+	if not spawn_hazard_enabled:
+		return
 	var lanes = [-2.2, 0.0, 2.2]
 	lanes.shuffle()
+	
+	var player = get_tree().get_first_node_in_group("player")
+	var player_z = player.global_position.z if player and is_instance_valid(player) else 0.0
+	var safe_z = minf(global_position.z + 2.5, player_z - 15.0)
 	
 	for i in range(2):
 		var spawn_x = lanes[i]
@@ -90,7 +99,7 @@ func _perform_attack() -> void:
 			var spawn_parent = root if root else get_parent()
 			if spawn_parent:
 				spawn_parent.add_child(keg)
-				keg.global_position = Vector3(spawn_x, 0.5, global_position.z + 2.5)
+				keg.global_position = Vector3(spawn_x, 0.5, safe_z)
 				if "forward_speed" in keg:
 					keg.forward_speed = 6.0
 

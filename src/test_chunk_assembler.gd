@@ -51,7 +51,8 @@ func test_chunk_scenes_and_assembler() -> void:
 	var l1 = load("res://src/data/resources/levels/level_01.tres") as LevelData
 	assembler.assemble_level(l1)
 	
-	assert(assembler.active_chunks.size() == 5, "Assembler must have 5 active chunks")
+	# Level 1 has 5 authored chunks + 1 dynamic boss intro buffer chunk = 6 chunks
+	assert(assembler.active_chunks.size() == 6, "Assembler must have 6 active chunks (including boss buffer)")
 	
 	var expected_z: float = 0.0
 	for i in range(assembler.active_chunks.size()):

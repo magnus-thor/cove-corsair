@@ -11,7 +11,14 @@ func _ready() -> void:
 func _on_area_entered(area: Area3D) -> void:
 	if _is_destroyed:
 		return
-	if area.is_in_group("player") or area.is_in_group("follower") or area.is_in_group("cannonballs"):
+	if area.is_in_group("player") or area.is_in_group("follower") or area.is_in_group("cannonballs") or area.is_in_group("enemies"):
+		if area.is_in_group("enemies") and not area.is_in_group("boss"):
+			if area.has_method("take_damage"):
+				area.take_damage(20)
+			elif "current_hp" in area:
+				area.current_hp -= 20
+				if area.current_hp <= 0 and area.has_method("die"):
+					area.die()
 		die()
 
 ## Override base take_damage so cannonball hits route through HazardSeaMine.die() only.
@@ -47,6 +54,17 @@ func die() -> void:
 			# Deal 1 fleet/hull damage on direct contact
 			if player.has_method("leak_threat"):
 				player.leak_threat(self)
+
+	# Detonate / damage any nearby enemy vessels in explosion radius
+	for enemy in get_tree().get_nodes_in_group("enemies"):
+		if is_instance_valid(enemy) and not enemy.is_in_group("boss") and not enemy.is_queued_for_deletion():
+			if explosion_pos.distance_to(enemy.global_position) < 3.0:
+				if enemy.has_method("take_damage"):
+					enemy.take_damage(20)
+				elif "current_hp" in enemy:
+					enemy.current_hp -= 20
+					if enemy.current_hp <= 0 and enemy.has_method("die"):
+						enemy.die()
 	
 	doubloons_drop = 0 # Mine is a hazard and does not drop gold
 	

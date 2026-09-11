@@ -463,7 +463,7 @@ func build_level_resources() -> void:
 	l3.fog_color = Color(0.45, 0.18, 0.12, 1.0)
 	l3.fog_density = 0.02
 	l3.river_width_world = 12.0
-	l3.chunk_scenes = [mine, barricade, mine, barricade, boss_3]
+	l3.chunk_scenes = [warmup, mine, barricade, mine, boss_3]
 	ResourceSaver.save(l3, "res://src/data/resources/levels/level_03.tres")
 	ResourceSaver.save(l3, "res://src/data/resources/levels/level_03_brimstone_bastion.tres")
 	print("Saved level_03.tres and level_03_brimstone_bastion.tres")

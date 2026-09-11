@@ -39,12 +39,13 @@ pixel_size = 0.0036
 alpha_cut = 1
 texture = ExtResource("2_geyser_tex")
 
-
-
+[node name="TelegraphDecal" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+mesh = SubResource("CylinderMesh_telegraph")
 
 [node name="DamageArea" type="Area3D" parent="."]
 collision_layer = 4
-collision_mask = 2
+collision_mask = 6
 monitoring = false
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="DamageArea"]

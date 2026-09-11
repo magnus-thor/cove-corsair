@@ -1,0 +1,35 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://src/gameplay/chunks/base_track_chunk.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/models/structure-platform-dock.glb" id="2_dock"]
+[ext_resource type="PackedScene" path="res://assets/models/palm-detailed-straight.glb" id="3_palm"]
+[ext_resource type="PackedScene" path="res://assets/models/rocks-a.glb" id="4_rocks_a"]
+[ext_resource type="PackedScene" path="res://assets/models/rocks-b.glb" id="5_rocks_b"]
+
+[node name="BossIntroBuffer" type="Node3D"]
+script = ExtResource("1_script")
+chunk_id = "boss_intro_buffer"
+
+[node name="ChunkStart" type="Marker3D" parent="."]
+
+[node name="ChunkEnd" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -50)
+
+[node name="Banks" type="Node3D" parent="."]
+
+[node name="Dock_Left" type="Node3D" parent="Banks" instance=ExtResource("2_dock")]
+transform = Transform3D(-5.24537e-08, 0, 1.5, 0, 1, 0, -1.2, 0, -6.55671e-08, -8, 0, -10)
+
+[node name="Palm_Left" type="Node3D" parent="Banks" instance=ExtResource("3_palm")]
+transform = Transform3D(1.29904, 0, 0.75, 0, 1.5, 0, -0.75, 0, 1.29904, -9.5, 0, -25)
+
+[node name="RocksA_Left" type="Node3D" parent="Banks" instance=ExtResource("4_rocks_a")]
+transform = Transform3D(1.13137, 0, 1.13137, 0, 1.6, 0, -1.13137, 0, 1.13137, -9.8, 0, -40)
+
+[node name="Palm_Right" type="Node3D" parent="Banks" instance=ExtResource("3_palm")]
+transform = Transform3D(1.14907, 0, -0.964181, 0, 1.5, 0, 0.964181, 0, 1.14907, 9.5, 0, -15)
+
+[node name="RocksB_Right" type="Node3D" parent="Banks" instance=ExtResource("5_rocks_b")]
+transform = Transform3D(1.69145, 0, -0.615636, 0, 1.8, 0, 0.615636, 0, 1.69145, 9.8, 0, -32)
+
+[node name="Entities" type="Node3D" parent="."]

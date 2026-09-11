@@ -207,3 +207,30 @@ func _update_active_player_vessel() -> void:
 	if player.has_method("apply_ship_data"):
 		player.apply_ship_data(ship)
 
+func _unhandled_input(event: InputEvent) -> void:
+	if not OS.is_debug_build():
+		return
+	if not (event is InputEventKey) or not event.is_pressed() or event.is_echo():
+		return
+	var key = (event as InputEventKey).keycode
+	match key:
+		KEY_BRACKETLEFT:
+			if GameState.current_level > 1:
+				GameState.current_level -= 1
+				GameState.current_selected_level = GameState.current_level
+				GameState.should_auto_start = true
+				get_tree().reload_current_scene()
+		KEY_BRACKETRIGHT:
+			if GameState.current_level < 45:
+				GameState.current_level += 1
+				GameState.current_selected_level = GameState.current_level
+				GameState.should_auto_start = true
+				get_tree().reload_current_scene()
+		KEY_B:
+			var ctrl = get_tree().get_first_node_in_group("level_controller")
+			if ctrl and ctrl.has_method("jump_to_boss"):
+				ctrl.jump_to_boss()
+		KEY_R:
+			GameState.should_auto_start = true
+			get_tree().reload_current_scene()
+
