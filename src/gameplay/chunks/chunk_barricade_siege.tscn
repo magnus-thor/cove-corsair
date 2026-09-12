@@ -52,8 +52,8 @@ script = ExtResource("7_3txa0")
 [node name="Barrel_RuneChest" type="Area3D" parent="Entities" unique_id=1884731962 groups=["destructible"] instance=ExtResource("8_0h1at")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, -30)
 script = ExtResource("9_4kp4g")
-hp = 2
-obstacle_type = 2
+hp = 1
+obstacle_type = 0
 metadata/spawns_chest = true
 
 [node name="MultiplierGate" type="Area3D" parent="Entities" unique_id=1864665149 groups=["multiplier_gate"] instance=ExtResource("10_mxap3")]
@@ -80,4 +80,4 @@ forward_speed = 1.8
 [node name="ChestSpawnMarker_HazardFlank" type="Marker3D" parent="Entities" unique_id=629956992]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.4, 0.05, -34)
 script = ExtResource("12_p20ko")
-chest_value = 50
+chest_value = 15

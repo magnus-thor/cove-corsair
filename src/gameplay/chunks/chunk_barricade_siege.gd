@@ -85,19 +85,12 @@ func _replace_trailing_enemy_with_pickup(entities: Node, enemy: Node) -> void:
 
 func _replace_front_hazard_with_pickup(entities: Node, enemy: Node, cur_level: int) -> void:
 	var pos = enemy.position
-	var doubloons_amount = 2 if cur_level <= 2 else (enemy.doubloons_drop if "doubloons_drop" in enemy else 6)
+	var doubloons_amount = 2 if cur_level <= 2 else (enemy.doubloons_drop if "doubloons_drop" in enemy else 4)
 	entities.remove_child(enemy)
 	enemy.queue_free()
 	
-	# Spawn a gentle wooden barrel pickup yielding the doubloons
-	if BARREL_SCENE:
-		var barrel = BARREL_SCENE.instantiate() as Area3D
-		entities.add_child(barrel)
-		barrel.position = Vector3(pos.x, 0.05, pos.z)
-		barrel.hp = 1
-		barrel.doubloons_drop = doubloons_amount
-		barrel.obstacle_type = DestructibleObstacle.ObstacleType.WOODEN_BARREL
-	elif COIN_SCENE:
+	# Spawn gentle floating coins yielding the doubloons
+	if COIN_SCENE:
 		for i in range(doubloons_amount):
 			var coin = COIN_SCENE.instantiate() as Area3D
 			entities.add_child(coin)
@@ -105,3 +98,11 @@ func _replace_front_hazard_with_pickup(entities: Node, enemy: Node, cur_level: i
 			coin.position = Vector3(pos.x, 0.13, pos.z + offset_z)
 			if "value" in coin:
 				coin.value = 1
+	elif BARREL_SCENE:
+		var barrel = BARREL_SCENE.instantiate() as Area3D
+		entities.add_child(barrel)
+		barrel.add_to_group("destructible")
+		barrel.position = Vector3(pos.x, 0.05, pos.z)
+		barrel.hp = 1
+		barrel.doubloons_drop = doubloons_amount
+		barrel.obstacle_type = DestructibleObstacle.ObstacleType.WOODEN_BARREL

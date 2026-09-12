@@ -8,12 +8,13 @@
 
 [resource]
 script = ExtResource("5_o8q8m")
+river_width_world = 12.0
 level_id = 18
 level_title = "Level 18: Witch's Channel"
 biome_name = "bayou"
 base_scroll_speed = 9.8
 chunk_scenes = Array[PackedScene]([ExtResource("1_svgol"), ExtResource("2_psha7"), ExtResource("3_3enrp"), ExtResource("2_psha7"), ExtResource("2_psha7"), ExtResource("3_3enrp"), ExtResource("2_psha7"), ExtResource("2_psha7")])
-completion_doubloon_reward = 525
+completion_doubloon_reward = 170
 horizon_texture = ExtResource("4_cqy0j")
 water_albedo = Color(0.12, 0.25, 0.18, 0.92)
 fog_color = Color(0.22, 0.35, 0.28, 1)

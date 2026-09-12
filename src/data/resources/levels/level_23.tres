@@ -8,12 +8,13 @@
 
 [resource]
 script = ExtResource("5_pam62")
+river_width_world = 12.0
 level_id = 23
 level_title = "Level 23: Rotwood Reach"
 biome_name = "bayou"
 base_scroll_speed = 10.5
 chunk_scenes = Array[PackedScene]([ExtResource("1_y30kx"), ExtResource("2_ut1e1"), ExtResource("3_jlcbe"), ExtResource("2_ut1e1"), ExtResource("2_ut1e1"), ExtResource("3_jlcbe"), ExtResource("2_ut1e1"), ExtResource("3_jlcbe")])
-completion_doubloon_reward = 625
+completion_doubloon_reward = 190
 horizon_texture = ExtResource("4_nsaqy")
 water_albedo = Color(0.12, 0.25, 0.18, 0.92)
 fog_color = Color(0.22, 0.35, 0.28, 1)

@@ -8,9 +8,11 @@
 
 [resource]
 script = ExtResource("5_4uowd")
+river_width_world = 12.0
+biome_name = "tropical"
 level_id = 13
 level_title = "Level 13: Coral Labyrinth"
-base_scroll_speed = 9.0
+base_scroll_speed = 9.2
 chunk_scenes = Array[PackedScene]([ExtResource("1_84pdr"), ExtResource("2_nvgdx"), ExtResource("3_lwsph"), ExtResource("2_nvgdx"), ExtResource("2_nvgdx"), ExtResource("3_lwsph")])
-completion_doubloon_reward = 400
+completion_doubloon_reward = 130
 horizon_texture = ExtResource("4_vc4vj")

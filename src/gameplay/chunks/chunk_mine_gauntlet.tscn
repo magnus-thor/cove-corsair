@@ -93,8 +93,9 @@ value = 1
 [node name="ChestSpawnMarker_HazardLeft" type="Marker3D" parent="Entities" unique_id=825448894]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.4, 0.05, -16)
 script = ExtResource("8_yo1pm")
+chest_value = 15
 
 [node name="ChestSpawnMarker_HazardRight" type="Marker3D" parent="Entities" unique_id=899456178]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.4, 0.05, -40)
 script = ExtResource("8_yo1pm")
-chest_value = 100
+chest_value = 20

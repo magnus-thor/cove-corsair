@@ -8,12 +8,13 @@
 
 [resource]
 script = ExtResource("5_131dh")
+river_width_world = 12.0
 level_id = 39
 level_title = "Level 39: Sulfur Chasm"
 biome_name = "brimstone"
-base_scroll_speed = 12.350000000000001
+base_scroll_speed = 12.3
 chunk_scenes = Array[PackedScene]([ExtResource("1_o138p"), ExtResource("2_04pu3"), ExtResource("3_d1pwn"), ExtResource("2_04pu3"), ExtResource("2_04pu3"), ExtResource("3_d1pwn"), ExtResource("2_04pu3"), ExtResource("2_04pu3"), ExtResource("3_d1pwn"), ExtResource("2_04pu3"), ExtResource("3_d1pwn")])
-completion_doubloon_reward = 1050
+completion_doubloon_reward = 285
 horizon_texture = ExtResource("4_feqg7")
 water_albedo = Color(0.35, 0.1, 0.08, 0.95)
 fog_color = Color(0.45, 0.18, 0.12, 1)

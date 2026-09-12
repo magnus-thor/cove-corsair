@@ -9,12 +9,13 @@
 
 [resource]
 script = ExtResource("6_uwbwc")
+river_width_world = 12.0
 level_id = 30
-level_title = "Level 30: Bone-Beard's Armada"
+level_title = "Level 30: Bonebeard's Armada"
 biome_name = "bayou"
 base_scroll_speed = 11.5
 chunk_scenes = Array[PackedScene]([ExtResource("1_n53fa"), ExtResource("2_kscrn"), ExtResource("3_hmhpc"), ExtResource("2_kscrn"), ExtResource("2_kscrn"), ExtResource("3_hmhpc"), ExtResource("2_kscrn"), ExtResource("2_kscrn"), ExtResource("4_2e3wm")])
-completion_doubloon_reward = 750
+completion_doubloon_reward = 290
 horizon_texture = ExtResource("5_40vuc")
 water_albedo = Color(0.12, 0.25, 0.18, 0.92)
 fog_color = Color(0.22, 0.35, 0.28, 1)

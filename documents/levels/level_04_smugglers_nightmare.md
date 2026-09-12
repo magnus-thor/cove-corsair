@@ -1,71 +1,144 @@
-# Level 4: Smuggler's Nightmare - Technical Specification
+---
+level_id: 4
+level_title: "Level 4: Sunken Reefs"
+biome_name: "tropical"
+base_scroll_speed: 7.5
+completion_doubloon_reward: 85
+river_width_world: 12.0
+resource_file: "res://src/data/resources/levels/level_04.tres"
+---
 
-**Smuggler's Nightmare** ramps up the campaign difficulty by revisiting the coastal archipelago under nightfall and heavy waters, featuring faster wave spawns, barricade choke points, high-speed Kamikaze Rafts, and an upgraded **Captain Ironjaw's Nightmare Flagship** boss.
+# Level 4: Sunken Reefs - Technical Specification
+
+> **Biome:** Tropical Lagoon / Archipelago  
+> **Course Distance:** 350.0m (7 Chunks @ 50m) | **Base Scroll Speed:** 7.5 m/s  
+> **Level Clear Bonus:** 85 🪙 Doubloons | **Base Max Gold:** ~130 🪙 Doubloons (2X: ~260 🪙)
+
+---
+
+## 🛠️ Level Tuning & Modding Guide
+
+This document is bidirectionally linked to the game's runtime resources. You can edit this level's configuration directly in the header block above or via the parameters below.
+
+* **To change maximum coins or clear reward:** Change `completion_doubloon_reward` in the YAML header above.
+* **To change level scroll speed:** Change `base_scroll_speed` in the YAML header above.
+* **To apply changes directly to the game:** Run the synchronization script:
+  ```bash
+  python src/tools/sync_level_docs.py
+  ```
+  *(or double-click `sync_levels.bat` in the project root, or execute `godot --headless --script src/tools/sync_level_docs.gd`)*
+* The corresponding Godot resource file [`level_04.tres`](file:///f:/projects/cove-corsair/src/data/resources/levels/level_04.tres) will be immediately updated and reflected in-game!
 
 ---
 
 ## 1. Level Identity & Environment Configuration
 
-* **Level Resource:** [`level_04_smugglers_nightmare.tres`](file:///f:/projects/cove-corsair/src/data/resources/levels/level_04_smugglers_nightmare.tres)
-* **Biome Identifier:** `smugglers_run` (Coastal Archipelago - Night / Midnight Ocean)
-* **Target Distance:** $250.0\text{m}$ (Scripted timeline from $0\text{m} \rightarrow 250\text{m}$, Boss encounter triggers at $250\text{m}$)
-* **Base Scroll Speed:** $10.5\text{ m/s}$
-* **River Width (World Units):** $12.0\text{m}$ ($X \in [-6.0, +6.0]$)
-* **Starting Vessel:** [The Dinghy](file:///f:/projects/cove-corsair/src/data/resources/user_vessels/dinghy_ship.tres) (1 Starting Hull Point)
+* **Level Resource:** [`level_04.tres`](file:///f:/projects/cove-corsair/src/data/resources/levels/level_04.tres)
+* **Biome Identifier:** `tropical` (Tropical Lagoon / Archipelago)
+* **Target Course Distance:** 350.0m (7 Track Chunks @ 50.0m each)
+* **Base Scroll Speed:** 7.5 m/s
+* **River Width (World Units):** 12.0m (X between -6.0 and +6.0)
+* **Minimum Viable Vessel:** Dinghy T1
+* **Recommended Vessel:** Dinghy T2
 * **Environment Palette:**
-  * **Water Albedo:** Deep Midnight Ocean Blue `Color(0.04, 0.35, 0.55, 0.92)`
-  * **Fog Color:** Dark Storm Blue `Color(0.18, 0.28, 0.42, 1.0)`
-  * **Fog Density:** `0.008` (Light atmospheric night mist)
+  * **Water Surface Albedo:** Clear Turquoise Cyan `Color(0.08, 0.58, 0.82, 0.88)`
+  * **Atmospheric Fog Color:** Tropical Sky Blue `Color(0.48, 0.76, 0.94, 1.0)`
+  * **Atmospheric Fog Density:** `0.0 (Crystal clear open daylight)`
 
 ---
 
-## 2. Entity Roster & Mechanics
+## 2. Lane Objects & Tactical Hazards
 
-| Entity Class | Type Name | HP / Profile | Behavior & Mechanics |
+The river channel is populated with dynamic destructible obstacles, hazard emplacements, multiplier arches, and high-value loot chests:
+
+| Entity Category | Entity Type | HP / Armor | Function, Mechanics & In-Game Yield |
 | :--- | :--- | :--- | :--- |
-| **Obstacle** | Wooden / Fuse / Rune Barrels | $4\text{-}6\text{ HP}$ | Hardened obstacles requiring rapid concentrated fire. |
-| **Obstacle** | Barricade Wall | $3\text{ HP}$ per segment | Interlocking wooden barricades spanning lanes with narrow gap passages. |
-| **Hazard** | Sea Mine | Indestructible / Explosive | Floating explosive hazard; triggers lane splash on contact. |
-| **Hazard** | Reef Outcrop | Indestructible | Environmental rock formations constricting channel navigation. |
-| **Mob** | Skeleton Rowers | $5\text{-}7\text{ HP}$ ($2.2\text{-}2.8\text{ m/s}$) | Accelerated forward enemy rowers. |
-| **Mob** | Raider Skiffs | $12\text{-}14\text{ HP}$ ($3.4\text{-}3.6\text{ m/s}$) | Aggressive hostile skiffs with increased HP profiles. |
-| **Mob** | Kamikaze Rafts | $14\text{-}16\text{ HP}$ ($7.5\text{-}7.8\text{ m/s}$) | Ultra-fast explosive rafts charging down lanes at high speeds. |
-| **Gate** | Fleet & Multiplier Gate | Translucent Arch | Fleet Gates ($+1, +2$ Fleet Members) positioned before major enemy waves. |
+| **Obstacle** | Wooden Barrels | 1 HP | Basic target practice barrel. Yields 1-3 doubloons upon destruction. |
+| **Obstacle** | Fuse Barrels | 1-2 HP | Volatile red explosive barrels. Detonates in a 3.5m radius, clearing adjacent obstacles and dealing splash damage. |
+| **Obstacle** | Rune Barrels / Chests | 2 HP | Mystical barrel dropping 3 coins (L1-4) or a high-value 50 doubloon chest (L5+). |
+| **Obstacle** | Barricade Slat Wall | 3 HP | Fortified wooden/iron palisade blocking river lanes. Requires focused firepower or Bombard splash. |
+| **Hazard** | Environmental Hazards | Indestructible | Indestructible Reef Outcrops, Spiked Sea Mines (1 HP, contact detonation), Shallows Sandbars |
+| **Multiplier Gate** | Fleet Gate | Translucent Arch | Passes vessel through to add +1 or +2 follower skiffs, expanding fleet broadside firepower. |
+| **Multiplier Gate** | Cannonball Multiplier | Glowing Portal | Multiplies shot count (+2, x2, x3) to shred oncoming high-HP barricade clusters. |
+| **Collectible** | Floating Doubloons | Pick-up | Gold coins floating in river channels (1 coin each). Magnetized by active fleet prows. |
+| **Collectible** | Gated Hazard Chests | Pick-up | High-value chests spawned in mine gauntlets (75 & 100 coins) and barricade flanks (50 coins). |
 
 ---
 
-## 3. Timeline Wave Structure
+## 3. Enemy Vessels & Combat Mechanics
 
-The level features 27 scripted timeline events structured into four high-speed tactical phases across $250\text{m}$:
+Hostile craft deployed throughout this stage's chunks:
 
-```
-[0m] Start ───► [50m] Fleet Gate (+2) ───► [145m] Barricade Gauntlet ───► [178m] Pre-Boss Fleet Gate (+2) ───► [250m] Boss Battle
-```
-
-### Phase Breakdown:
-1. **$0\text{m} - 50\text{m}$ (Night Incursion & Initial Ambushes):**
-   * Early obstacle clusters paired with faster Skeleton Rowers ($5\text{ HP}, 2.2\text{ m/s}$).
-   * Reef Hazard at $22\text{m}$ and Sea Mine at $28\text{m}$ force early lane switching.
-   * $+2$ Fleet Gate at $50\text{m}$ mobilizes broadside support early.
-2. **$50\text{m} - 140\text{m}$ (Kamikaze Waves & Skiff Attacks):**
-   * Raider Skiffs ($12\text{ HP}$) paired with high-speed Kamikaze Rafts ($14\text{ HP}, 7.5\text{ m/s}$) at $74\text{m}$.
-   * $+1$ Fleet Gate at $100\text{m}$ provides recovery after dense obstacle & mine encounters.
-3. **$140\text{m} - 200\text{m}$ (Barricade Bottleneck & Raider Charge):**
-   * At $145\text{m}$, a 4-point **Barricade Wall** ($3\text{ HP}$) blocks the channel with a single lane gap.
-   * Followed immediately by Kamikaze Rafts ($16\text{ HP}, 7.8\text{ m/s}$) and dual Raider Skiffs.
-   * $+2$ Fleet Gate at $178\text{m}$ maxes out fleet capacity.
-4. **$200\text{m} - 250\text{m}$ (Nightmare Flagship Approach):**
-   * Heavy fuse obstacles ($6\text{ HP}$), sea mines, and final skeleton rower wave ($7\text{ HP}$).
-   * Boss warning banner at $236\text{m}$ ("NIGHTMARE FLAGSHIP APPROACHING!").
+| Vessel Class | Type Name | HP / Profile | Speed | Behavior, Attack Patterns & Yield |
+| :--- | :--- | :--- | :--- | :--- |
+| **Light Craft** | Skeleton Rowers | 2 HP | 1.5 m/s | Slow forward advance; perfect calibration target. Drops 2 doubloons upon sinking. |
+| **Raider Skiff** | Hostile Skiff / Grave Skiff | 4-12 HP | 2.5-3.5 m/s | Agile raider craft with lateral strafing patterns to disrupt firing lanes. Drops 2-4 doubloons. |
+| **Heavy Craft** | Turtle Raft / Tide Cutter | 6-18 HP | 1.5-2.5 m/s | Armor-plated barge capable of ramming. Demands sustained stream DPS. Drops 4-6 doubloons. |
+| **Fast Striker** | Kamikaze / Brimstone Raft | 5-30 HP | 6.0-6.5 m/s | High-speed ramming craft charging directly down river. Detonates on impact. Drops 3-5 doubloons. |
+| **Specialist** | Skeleton Rowers (2 HP | High HP | Variable | Stage-specific combat vessel demanding tactical avoidance or focused burst. |
 
 ---
 
-## 4. Boss Specification: Nightmare Flagship (Captain Ironjaw)
+## 4. Boss Encounter & Combat Strengths
 
-* **Boss Scene:** [`boss_war_barge.tscn`](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_war_barge.tscn) / [`boss_war_barge.gd`](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_war_barge.gd)
-* **Total Health:** $300\text{ HP}$ (Upgraded from Level 1's $220\text{ HP}$)
-* **Boss Archetype:** Heavy Iron-Plated War Barge
-* **Attack Behavior & Pacing:**
-  * Higher health pool ($300\text{ HP}$) requiring sustained salvo fire.
-  * Rapid swivel gun mortar volleys targeting active player lane positions.
-  * Boiler core exposure windows reduced, demanding precise timing during overheat phases.
+### **Boss Identity:** Ironjaw Skirmish Flagship (**None** (Hazard slalom focus))
+
+* **Boss Scene:** [`boss_war_barge.tscn`](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_war_barge.tscn)
+* **Boss Script:** [`boss_war_barge.gd`](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_war_barge.gd)
+* **Total Health:** **40 HP**
+* **Vessel Archetype:** Armored Pirate Cutter / Heavy Steam War-Barge
+* **Minion Escorts:** No minion summons; focused 1v1 duel.
+
+### Destructible Sub-Components & Hit Zones:
+* **Port Swivel Turret (30 HP):** Fires telegraphed mortar volleys into player lanes
+* **Starboard Swivel Turret (30 HP):** Fires alternating grape-shot cannonballs
+* **Frontal Ramming Prow / Armor Plate (40 HP):** Absorbs forward cannon fire
+* **Exposed Boiler Core (Critical Hit Zone):** Takes 2.0x damage during steam vents
+
+### Tactical Strengths:
+* **Offensive Coverage:** Heavy hull armor that deflects unaligned fire; synchronized broadside salvos requiring quick lane shifts; high ramming damage if player vessel is pinned.
+* **Defensive Resilience:** Armored hull mitigates unaligned cannon fire.
+* **Escort Reinforcements:** No minion summons; focused 1v1 duel.
+
+### Vulnerabilities & Counter-Tactics:
+* **Exploitable Openings:** Exposed boiler vents periodically release steam after turrets are disabled, exposing critical core for massive double damage. Slow turn rate allows agile Skiffs to flank safely.
+* **Weapon Synergy:** Bombard Skiff mortars bypass frontal armor; The Dinghy's responsive turning evades telegraphed mortar circles.
+
+### Boss Attack Phases:
+1. **Phase 1: Cruiser Salvo:** Alternates port and starboard cannonballs while deploying forward mines.
+2. **Phase 2: Boiler Venting:** Under 50% HP or upon loss of side turrets, vents steam and charges forward.
+3. **Phase 3: Desperation Barrage:** Continuous grape-shot spray with increased fire rate until sunk.
+
+---
+
+## 5. Maximum Coin Yield & Economy Breakdown
+
+Gold in **Level 4: Sunken Reefs** is earned through destructible barrels, enemy sinks, hidden hazard chests, pre-boss totems, and stage clear rewards:
+
+| Reward Source | Yield Range | Drop Mechanics & Exact Breakdown |
+| :--- | :--- | :--- |
+| **Floating Doubloon Pickups** | ~15-35 coins | Loose channel coins collected along river paths and buffer runway. |
+| **Destructible Barrels & Sinks** | ~25-50 coins | Wooden/fuse barrels and sunk enemy mobs (rowers, skiffs, turtle rafts). |
+| **Gated Mine & Flank Chests** | 0 coins (L1-4: Chests locked) | High-value loot chests locked behind sea mine corridors (75 & 100 coins) and barricade flanks (50 coins). |
+| **Pre-Boss Totems & Rune Chests** | ~6-12 coins | Destructible rune totems in pre-boss buffer and boss arena dropping 50-doubloon chests. |
+| **TOTAL IN-RUN EARNINGS** | **~57 🪙** | **Maximum gold gathered during course navigation and boss engagement.** |
+| **Level Clear Bonus** | **85 🪙** | Guaranteed completion reward awarded on defeating the boss / dock arrival. |
+| **BASE MAXIMUM TOTAL** | **~142 🪙** | **Total doubloons banked without ad multiplier.** |
+| **2X AD MULTIPLIER TOTAL** | **~284 🪙** | **Total doubloons banked when tapping [ ✦ CLAIM 2X BONUS ] on Settlement Screen.** |
+
+> 💡 **Why In-Run Coins Scale on Level 5+:**
+> On Levels 1–4, `ChestSpawnMarker` chests remain dormant (`min_level = 5`), yielding ~40–60 in-run coins. From Level 5 onward, full hazard chests unlock (75–100 gold each), scaling in-run earnings to **~57 coins** per run!
+
+---
+
+## 6. Chunk Progression & Wave Milestones
+
+```
+[0m] Warmup ──► [87m] Mine / Barricade ──► [175m] Fleet Gate ──► [300m] Pre-Boss Gauntlet & Runway ──► [350m] Ironjaw Skirmish Flagship
+```
+
+* **0m - 87m (Initial Deployment & Calibration):** Warmup channel with open water, initial barrel formations, and light Skeleton Rower encounters.
+* **87m - 175m (Tactical Hazard Gate):** Dense mine gauntlet or barricade slat barrier forcing decisive steering, burst fire, and reward chest acquisition.
+* **175m - 300m (Fleet Reinforcement & Climax Gauntlet):** Multiplier gates allow expanding follower vessel count to max broadside potential while navigating high-density barricades and charging enemy formations.
+* **300m - 350m (Pre-Boss Approach & Buffer Runway):** 50-meter pre-boss approach featuring coin trails, warning skull totems, a final +1 Fleet Multiplier Gate, and a lone scout rower, preparing the player for arena transition.
+* **350m (Boss Arena Engagement):** Camera locks to boss focus. Sinking **Ironjaw Skirmish Flagship (**None** (Hazard slalom focus))** triggers the grand victory fanfare and opens the Settlement Screen.

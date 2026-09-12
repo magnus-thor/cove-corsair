@@ -9,12 +9,13 @@
 
 [resource]
 script = ExtResource("6_rkxo8")
+river_width_world = 12.0
 level_id = 45
-level_title = "Level 45: Bone-Beard's Throne"
+level_title = "Level 45: Bonebeard's Throne"
 biome_name = "brimstone"
 base_scroll_speed = 13.0
 chunk_scenes = Array[PackedScene]([ExtResource("1_dokr1"), ExtResource("2_rwffm"), ExtResource("3_rwxeq"), ExtResource("2_rwffm"), ExtResource("2_rwffm"), ExtResource("3_rwxeq"), ExtResource("2_rwffm"), ExtResource("2_rwffm"), ExtResource("3_rwxeq"), ExtResource("2_rwffm"), ExtResource("4_jkgr0")])
-completion_doubloon_reward = 1200
+completion_doubloon_reward = 550
 horizon_texture = ExtResource("5_plce7")
 water_albedo = Color(0.35, 0.1, 0.08, 0.95)
 fog_color = Color(0.45, 0.18, 0.12, 1)

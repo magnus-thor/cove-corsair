@@ -8,12 +8,13 @@
 
 [resource]
 script = ExtResource("5_e5t4j")
+river_width_world = 12.0
 level_id = 6
-level_title = "Level 6: Brimstone Inferno"
-biome_name = "brimstone"
-base_scroll_speed = 9.5
+level_title = "Level 6: Corsair's Cut"
+biome_name = "tropical"
+base_scroll_speed = 8.0
 chunk_scenes = Array[PackedScene]([ExtResource("1_72t5a"), ExtResource("2_ywjvn"), ExtResource("1_72t5a"), ExtResource("2_ywjvn"), ExtResource("3_jg4qb")])
-completion_doubloon_reward = 500
+completion_doubloon_reward = 90
 horizon_texture = ExtResource("4_aguiy")
 water_albedo = Color(0.4, 0.08, 0.05, 0.98)
 fog_color = Color(0.5, 0.15, 0.1, 1)

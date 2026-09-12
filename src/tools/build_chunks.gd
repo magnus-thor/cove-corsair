@@ -264,7 +264,7 @@ func build_mine_gauntlet_chunk() -> void:
 	var m_left = Marker3D.new()
 	m_left.name = "ChestSpawnMarker_HazardLeft"
 	m_left.set_script(CHEST_MARKER_SCRIPT)
-	m_left.chest_value = 75
+	m_left.chest_value = 15
 	m_left.min_level = 5
 	m_left.position = Vector3(-3.4, 0.05, -16.0)
 	entities.add_child(m_left)
@@ -273,7 +273,7 @@ func build_mine_gauntlet_chunk() -> void:
 	var m_right = Marker3D.new()
 	m_right.name = "ChestSpawnMarker_HazardRight"
 	m_right.set_script(CHEST_MARKER_SCRIPT)
-	m_right.chest_value = 100
+	m_right.chest_value = 20
 	m_right.min_level = 5
 	m_right.position = Vector3(3.4, 0.05, -40.0)
 	entities.add_child(m_right)
@@ -314,14 +314,13 @@ func build_barricade_siege_chunk() -> void:
 	wall.position = Vector3(0.0, 0.0, -22.0)
 	wall.owner = root
 	
-	# Armored chest rune barrel at Z = -30
+	# Standard wooden barrel at Z = -30
 	var chest_barrel = BARREL_SCENE.instantiate()
 	chest_barrel.name = "Barrel_RuneChest"
 	entities.add_child(chest_barrel)
 	chest_barrel.position = Vector3(0.0, 0.05, -30.0)
-	chest_barrel.obstacle_type = 2 # RUNE_BARREL
-	chest_barrel.hp = 2
-	chest_barrel.set_meta("spawns_chest", true)
+	chest_barrel.obstacle_type = 0 # WOODEN_BARREL
+	chest_barrel.hp = 1
 	chest_barrel.owner = root
 	
 	# Multiplier gate (+2 Fleet) reward at Z = -38
@@ -358,7 +357,7 @@ func build_barricade_siege_chunk() -> void:
 	var m_flank = Marker3D.new()
 	m_flank.name = "ChestSpawnMarker_HazardFlank"
 	m_flank.set_script(CHEST_MARKER_SCRIPT)
-	m_flank.chest_value = 50
+	m_flank.chest_value = 15
 	m_flank.min_level = 5
 	m_flank.position = Vector3(3.4, 0.05, -34.0)
 	entities.add_child(m_flank)
@@ -393,7 +392,7 @@ func build_boss_chunk(filename: String, chunk_id: String, boss_prefab: PackedSce
 	totem_left.name = "Barrel_TotemLeft"
 	entities.add_child(totem_left)
 	totem_left.position = Vector3(-4.8, 0.05, -6.0)
-	totem_left.obstacle_type = 2 # RUNE
+	totem_left.obstacle_type = 0 # WOODEN_BARREL
 	totem_left.hp = 1
 	totem_left.owner = root
 	
@@ -401,7 +400,7 @@ func build_boss_chunk(filename: String, chunk_id: String, boss_prefab: PackedSce
 	totem_right.name = "Barrel_TotemRight"
 	entities.add_child(totem_right)
 	totem_right.position = Vector3(4.8, 0.05, -6.0)
-	totem_right.obstacle_type = 2 # RUNE
+	totem_right.obstacle_type = 0 # WOODEN_BARREL
 	totem_right.hp = 1
 	totem_right.owner = root
 	

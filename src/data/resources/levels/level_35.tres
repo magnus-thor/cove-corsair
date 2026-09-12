@@ -9,12 +9,13 @@
 
 [resource]
 script = ExtResource("6_pvtw2")
+river_width_world = 12.0
 level_id = 35
 level_title = "Level 35: Ironjaw's Crucible"
 biome_name = "brimstone"
-base_scroll_speed = 11.950000000000001
+base_scroll_speed = 11.9
 chunk_scenes = Array[PackedScene]([ExtResource("1_ab0do"), ExtResource("2_cv6pk"), ExtResource("3_d2twa"), ExtResource("2_cv6pk"), ExtResource("2_cv6pk"), ExtResource("3_d2twa"), ExtResource("2_cv6pk"), ExtResource("2_cv6pk"), ExtResource("3_d2twa"), ExtResource("4_cxlmq")])
-completion_doubloon_reward = 900
+completion_doubloon_reward = 320
 horizon_texture = ExtResource("5_dvti2")
 water_albedo = Color(0.35, 0.1, 0.08, 0.95)
 fog_color = Color(0.45, 0.18, 0.12, 1)

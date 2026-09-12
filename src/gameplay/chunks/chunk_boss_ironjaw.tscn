@@ -37,9 +37,9 @@ transform = Transform3D(2.2, 0, 0, 0, 2.2, 0, 0, 0, 2.2, 10, 0, -30)
 [node name="Barrel_TotemLeft" type="Area3D" parent="Entities" unique_id=2081600842 groups=["destructible"] instance=ExtResource("5_1f8mn")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.8, 0.05, -6)
 script = ExtResource("6_ps1np")
-obstacle_type = 2
+obstacle_type = 0
 
 [node name="Barrel_TotemRight" type="Area3D" parent="Entities" unique_id=660018847 groups=["destructible"] instance=ExtResource("5_1f8mn")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.8, 0.05, -6)
 script = ExtResource("6_ps1np")
-obstacle_type = 2
+obstacle_type = 0

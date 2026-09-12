@@ -9,12 +9,13 @@
 
 [resource]
 script = ExtResource("6_vc6av")
+river_width_world = 12.0
 level_id = 25
 level_title = "Level 25: Phantom Trench"
 biome_name = "bayou"
 base_scroll_speed = 10.8
 chunk_scenes = Array[PackedScene]([ExtResource("1_xs6i3"), ExtResource("2_as8qb"), ExtResource("3_nvgbp"), ExtResource("2_as8qb"), ExtResource("2_as8qb"), ExtResource("3_nvgbp"), ExtResource("2_as8qb"), ExtResource("4_e6amu")])
-completion_doubloon_reward = 650
+completion_doubloon_reward = 240
 horizon_texture = ExtResource("5_66qmy")
 water_albedo = Color(0.12, 0.25, 0.18, 0.92)
 fog_color = Color(0.22, 0.35, 0.28, 1)

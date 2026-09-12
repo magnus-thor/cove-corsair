@@ -8,12 +8,13 @@
 
 [resource]
 script = ExtResource("5_c3jx3")
+river_width_world = 12.0
 level_id = 28
 level_title = "Level 28: Dead Man's Bayou"
 biome_name = "bayou"
-base_scroll_speed = 11.200000000000001
+base_scroll_speed = 11.2
 chunk_scenes = Array[PackedScene]([ExtResource("1_vqvee"), ExtResource("2_ce61w"), ExtResource("3_hv70r"), ExtResource("2_ce61w"), ExtResource("2_ce61w"), ExtResource("3_hv70r"), ExtResource("2_ce61w"), ExtResource("2_ce61w"), ExtResource("2_ce61w")])
-completion_doubloon_reward = 725
+completion_doubloon_reward = 220
 horizon_texture = ExtResource("4_bk2lb")
 water_albedo = Color(0.12, 0.25, 0.18, 0.92)
 fog_color = Color(0.22, 0.35, 0.28, 1)

@@ -135,7 +135,9 @@ func _physics_process(delta: float) -> void:
 	global_position.x = clampf(global_position.x, -5.0, 5.0)
 	
 	# Match rotation
-	global_transform.basis = global_transform.basis.slerp(player.global_transform.basis, rotation_lerp_speed * delta)
+	var p_basis = player.global_transform.basis.orthonormalized()
+	var cur_basis = global_transform.basis.orthonormalized()
+	global_transform.basis = cur_basis.slerp(p_basis, rotation_lerp_speed * delta).orthonormalized()
 	
 	# Auto-fires in sync with the fleet
 	var shooting_enabled = player.is_shooting_enabled if ("is_shooting_enabled" in player) else true

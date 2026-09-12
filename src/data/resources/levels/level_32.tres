@@ -8,12 +8,13 @@
 
 [resource]
 script = ExtResource("5_604q0")
+river_width_world = 12.0
 level_id = 32
 level_title = "Level 32: Magma Surge"
 biome_name = "brimstone"
-base_scroll_speed = 11.600000000000001
+base_scroll_speed = 11.6
 chunk_scenes = Array[PackedScene]([ExtResource("1_45mgb"), ExtResource("2_rnf3x"), ExtResource("3_2bovj"), ExtResource("2_rnf3x"), ExtResource("2_rnf3x"), ExtResource("3_2bovj"), ExtResource("2_rnf3x"), ExtResource("2_rnf3x"), ExtResource("2_rnf3x")])
-completion_doubloon_reward = 850
+completion_doubloon_reward = 245
 horizon_texture = ExtResource("4_2cj52")
 water_albedo = Color(0.35, 0.1, 0.08, 0.95)
 fog_color = Color(0.45, 0.18, 0.12, 1)

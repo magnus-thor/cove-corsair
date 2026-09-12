@@ -9,6 +9,8 @@
 
 [resource]
 script = ExtResource("6_n1mq7")
+river_width_world = 12.0
+biome_name = "tropical"
 level_title = "Level 1: Smuggler's Run"
 base_scroll_speed = 6.5
 completion_doubloon_reward = 50

@@ -29,14 +29,14 @@ func test_vessel_economics() -> void:
 		"dinghy": {
 			"res_path": "res://src/data/resources/user_vessels/dinghy_ship.tres",
 			"unlock": 0,
-			"costs": [0, 300, 750],
-			"tier_prices": {2: 300, 3: 750}
+			"costs": [0, 250, 1000],
+			"tier_prices": {2: 250, 3: 1000}
 		},
 		"sloop": {
 			"res_path": "res://src/data/resources/user_vessels/sloop_ship.tres",
-			"unlock": 600,
-			"costs": [600, 800, 1500],
-			"tier_prices": {2: 800, 3: 1500}
+			"unlock": 500,
+			"costs": [500, 700, 1600],
+			"tier_prices": {2: 700, 3: 1600}
 		},
 		"bombard_skiff": {
 			"res_path": "res://src/data/resources/user_vessels/bombard_skiff_ship.tres",
@@ -97,7 +97,7 @@ func test_all_45_level_resources() -> void:
 		assert(lvl_res.level_id == lvl, "Level %d level_id mismatch (got %d)" % [lvl, lvl_res.level_id])
 		assert(lvl_res.chunk_scenes.size() >= 5, "Level %d must have at least 5 chunks" % lvl)
 		assert(lvl_res.base_scroll_speed >= (6.5 if lvl == 1 else 7.0), "Level %d speed must be >= 6.5" % lvl)
-		assert(lvl_res.completion_doubloon_reward >= 150, "Level %d doubloon reward must be >= 150" % lvl)
+		assert(lvl_res.completion_doubloon_reward >= 50, "Level %d doubloon reward must be >= 50" % lvl)
 		assert(lvl_res.water_albedo != Color.BLACK, "Level %d water_albedo must be configured" % lvl)
 		assert(lvl_res.biome_name in ["tropical", "bayou", "brimstone"], "Level %d invalid biome: %s" % [lvl, lvl_res.biome_name])
 		
@@ -172,8 +172,15 @@ func test_chunk_assembler_samples() -> void:
 		var lvl_res = load(GameState.LEVEL_RESOURCES[lvl]) as LevelData
 		assembler.assemble_level(lvl_res)
 		
-		assert(assembler.active_chunks.size() == lvl_res.chunk_scenes.size(), 
-			"Level %d assembled chunk count mismatch" % lvl)
+		var has_boss = false
+		for scene in lvl_res.chunk_scenes:
+			var path = scene.resource_path if scene else ""
+			if "boss" in path:
+				has_boss = true
+				break
+		var expected_chunks = lvl_res.chunk_scenes.size() + (1 if has_boss else 0)
+		assert(assembler.active_chunks.size() == expected_chunks, 
+			"Level %d assembled chunk count mismatch (expected %d, got %d)" % [lvl, expected_chunks, assembler.active_chunks.size()])
 		
 		var expected_z = 0.0
 		for i in range(assembler.active_chunks.size()):

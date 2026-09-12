@@ -1,77 +1,144 @@
-# Level 6: Brimstone Inferno - Technical Specification
+---
+level_id: 6
+level_title: "Level 6: Corsair's Cut"
+biome_name: "tropical"
+base_scroll_speed: 8.0
+completion_doubloon_reward: 90
+river_width_world: 12.0
+resource_file: "res://src/data/resources/levels/level_06.tres"
+---
 
-**Brimstone Inferno** is the ultimate campaign level of **Cove Corsair**, set in a roaring molten magma abyss guarded by erupting Thermal Geysers, armored Iron Gunners, hyper-velocity Brimstone Rafts, an upgraded Bombard Siege Ship mini-boss, and the monumental **Infernal Siege Fortress** boss ($1000\text{ HP}$).
+# Level 6: Corsair's Cut - Technical Specification
+
+> **Biome:** Tropical Lagoon / Archipelago  
+> **Course Distance:** 350.0m (7 Chunks @ 50m) | **Base Scroll Speed:** 8.0 m/s  
+> **Level Clear Bonus:** 90 🪙 Doubloons | **Base Max Gold:** ~140 🪙 Doubloons (2X: ~280 🪙)
+
+---
+
+## 🛠️ Level Tuning & Modding Guide
+
+This document is bidirectionally linked to the game's runtime resources. You can edit this level's configuration directly in the header block above or via the parameters below.
+
+* **To change maximum coins or clear reward:** Change `completion_doubloon_reward` in the YAML header above.
+* **To change level scroll speed:** Change `base_scroll_speed` in the YAML header above.
+* **To apply changes directly to the game:** Run the synchronization script:
+  ```bash
+  python src/tools/sync_level_docs.py
+  ```
+  *(or double-click `sync_levels.bat` in the project root, or execute `godot --headless --script src/tools/sync_level_docs.gd`)*
+* The corresponding Godot resource file [`level_06.tres`](file:///f:/projects/cove-corsair/src/data/resources/levels/level_06.tres) will be immediately updated and reflected in-game!
 
 ---
 
 ## 1. Level Identity & Environment Configuration
 
-* **Level Resource:** [`level_06_brimstone_inferno.tres`](file:///f:/projects/cove-corsair/src/data/resources/levels/level_06_brimstone_inferno.tres)
-* **Biome Identifier:** `brimstone_bastion` (Infernal Volcanic Caldera / Magma Abyss)
-* **Target Distance:** $320.0\text{m}$ (Scripted timeline from $0\text{m} \rightarrow 320\text{m}$, Boss encounter triggers at $320\text{m}$)
-* **Base Scroll Speed:** $11.0\text{ m/s}$
-* **River Width (World Units):** $12.0\text{m}$ ($X \in [-6.0, +6.0]$)
-* **Starting Vessel:** [The Ironclad](file:///f:/projects/cove-corsair/src/data/resources/user_vessels/ironclad_ship.tres) (8 Starting Hull Points)
+* **Level Resource:** [`level_06.tres`](file:///f:/projects/cove-corsair/src/data/resources/levels/level_06.tres)
+* **Biome Identifier:** `tropical` (Tropical Lagoon / Archipelago)
+* **Target Course Distance:** 350.0m (7 Track Chunks @ 50.0m each)
+* **Base Scroll Speed:** 8.0 m/s
+* **River Width (World Units):** 12.0m (X between -6.0 and +6.0)
+* **Minimum Viable Vessel:** Dinghy T2
+* **Recommended Vessel:** Sloop T1
 * **Environment Palette:**
-  * **Water Albedo:** Infernal Molten Lava Red `Color(0.35, 0.08, 0.04, 0.95)`
-  * **Fog Color:** Blazing Ash Orange/Red `Color(0.45, 0.15, 0.08, 1.0)`
-  * **Fog Density:** `0.02` (Dense volcanic ash and glowing ember storm)
+  * **Water Surface Albedo:** Clear Turquoise Cyan `Color(0.08, 0.58, 0.82, 0.88)`
+  * **Atmospheric Fog Color:** Tropical Sky Blue `Color(0.48, 0.76, 0.94, 1.0)`
+  * **Atmospheric Fog Density:** `0.0 (Crystal clear open daylight)`
 
 ---
 
-## 2. Entity Roster & Mechanics
+## 2. Lane Objects & Tactical Hazards
 
-| Entity Class | Type Name | HP / Profile | Behavior & Mechanics |
+The river channel is populated with dynamic destructible obstacles, hazard emplacements, multiplier arches, and high-value loot chests:
+
+| Entity Category | Entity Type | HP / Armor | Function, Mechanics & In-Game Yield |
 | :--- | :--- | :--- | :--- |
-| **Hazard** | Thermal Geyser | Indestructible | Erupts periodically with high-temperature thermal plumes, dealing instant hull damage. |
-| **Mob** | Iron Gunner | $30\text{-}38\text{ HP}$ ($2.8\text{-}3.2\text{ m/s}$) | Heavy volcanic gunboats firing long-range cannonball salvos down player lanes. |
-| **Mob** | Brimstone Raft | $22\text{-}28\text{ HP}$ ($8.2\text{-}9.0\text{ m/s}$) | Ultra-fast magma rafts charging downriver that explode violently upon destruction or contact. |
-| **Mini-Boss** | Bombard Siege Ship | $140\text{ HP}$ ($1.4\text{ m/s}$) | Heavy mortar mini-boss spawning mid-run ($122\text{m}$) launching targeted mortar fire. |
-| **Gate** | Fleet Gate | Translucent Arch | Fleet Gates ($+2$ Fleet Members) enabling maximum follower fleet assembly. |
-| **Collectible**| Coin Arc | $8\text{-}10$ Doubloons | Long doubloon arcs guiding maneuver paths through geyser openings. |
+| **Obstacle** | Wooden Barrels | 1 HP | Basic target practice barrel. Yields 1-3 doubloons upon destruction. |
+| **Obstacle** | Fuse Barrels | 1-2 HP | Volatile red explosive barrels. Detonates in a 3.5m radius, clearing adjacent obstacles and dealing splash damage. |
+| **Obstacle** | Rune Barrels / Chests | 2 HP | Mystical barrel dropping 3 coins (L1-4) or a high-value 50 doubloon chest (L5+). |
+| **Obstacle** | Barricade Slat Wall | 4 HP | Fortified wooden/iron palisade blocking river lanes. Requires focused firepower or Bombard splash. |
+| **Hazard** | Environmental Hazards | Indestructible | Indestructible Reef Outcrops, Spiked Sea Mines (1 HP, contact detonation), Shallows Sandbars |
+| **Multiplier Gate** | Fleet Gate | Translucent Arch | Passes vessel through to add +1 or +2 follower skiffs, expanding fleet broadside firepower. |
+| **Multiplier Gate** | Cannonball Multiplier | Glowing Portal | Multiplies shot count (+2, x2, x3) to shred oncoming high-HP barricade clusters. |
+| **Collectible** | Floating Doubloons | Pick-up | Gold coins floating in river channels (1 coin each). Magnetized by active fleet prows. |
+| **Collectible** | Gated Hazard Chests | Pick-up | High-value chests spawned in mine gauntlets (75 & 100 coins) and barricade flanks (50 coins). |
 
 ---
 
-## 3. Timeline Wave Structure
+## 3. Enemy Vessels & Combat Mechanics
 
-The level contains 28 timeline events structured into four intense tactical phases across $320\text{m}$:
+Hostile craft deployed throughout this stage's chunks:
 
-```
-[0m] Start ───► [54m] Fleet Gate (+2) ───► [122m] Bombard Mini-Boss ───► [222m] Fleet Gate (+2) ───► [320m] Boss Battle
-```
-
-### Phase Breakdown:
-1. **$0\text{m} - 54\text{m}$ (The Infernal Pass):**
-   * Early dual Thermal Geysers at $8\text{m}$ ($X = \pm 0.4$) followed by Iron Gunner ($30\text{ HP}$) at $18\text{m}$.
-   * High-speed Brimstone Rafts ($22\text{ HP}, 8.2\text{ m/s}$) at $30\text{m}$ paired with triple Thermal Geysers at $42\text{m}$.
-   * $+2$ Fleet Gate at $54\text{m}$ provides early fleet reinforcement.
-2. **$54\text{m} - 122\text{m}$ (Magma Gauntlet & Bombard Spawn):**
-   * Coin arc ($8$ coins) followed by dual Iron Gunners ($34\text{ HP}$) at $78\text{m}$.
-   * Triple Brimstone Rafts ($24\text{ HP}, 8.5\text{ m/s}$) at $106\text{m}$ passing through narrow geyser lanes.
-   * **Bombard Siege Ship Mini-Boss** ($140\text{ HP}$) spawns at $122\text{m}$.
-3. **$122\text{m} - 222\text{m}$ (Fortress Resupply & Heavy Waves):**
-   * Coin arc ($9$ coins) and $+2$ Fleet Gate at $154\text{m}$.
-   * Interlocking dual Iron Gunners ($36\text{ HP}$) and dual Brimstone Rafts ($26\text{ HP}, 8.8\text{ m/s}$).
-   * Central Thermal Geyser at $210\text{m}$ preceding the $+2$ Fleet Gate at $222\text{m}$.
-4. **$222\text{m} - 320\text{m}$ (Inferno Gauntlet & Final Siege):**
-   * Triple Iron Gunner formation ($38\text{ HP}$ each at $X = -0.5, 0.0, +0.5$) at $236\text{m}$.
-   * 10-coin arc sequence followed by dual Thermal Geysers and triple high-speed Brimstone Rafts ($28\text{ HP}, 9.0\text{ m/s}$).
-   * Boss warning banner at $302\text{m}$ ("THE INFERNAL SIEGE FORTRESS AWAKENS (1000 HP)!").
+| Vessel Class | Type Name | HP / Profile | Speed | Behavior, Attack Patterns & Yield |
+| :--- | :--- | :--- | :--- | :--- |
+| **Light Craft** | Skeleton Rowers | 2 HP | 1.5 m/s | Slow forward advance; perfect calibration target. Drops 2 doubloons upon sinking. |
+| **Raider Skiff** | Hostile Skiff / Grave Skiff | 4-12 HP | 2.5-3.5 m/s | Agile raider craft with lateral strafing patterns to disrupt firing lanes. Drops 2-4 doubloons. |
+| **Heavy Craft** | Turtle Raft / Tide Cutter | 6-18 HP | 1.5-2.5 m/s | Armor-plated barge capable of ramming. Demands sustained stream DPS. Drops 4-6 doubloons. |
+| **Fast Striker** | Kamikaze / Brimstone Raft | 5-30 HP | 6.0-6.5 m/s | High-speed ramming craft charging directly down river. Detonates on impact. Drops 3-5 doubloons. |
+| **Specialist** | Skeleton Rowers (2 HP | High HP | Variable | Stage-specific combat vessel demanding tactical avoidance or focused burst. |
 
 ---
 
-## 4. Boss Specification: Infernal Siege Fortress
+## 4. Boss Encounter & Combat Strengths
 
-* **Boss Scene:** [`boss_siege_fortress.tscn`](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_siege_fortress.tscn) / [`boss_siege_fortress.gd`](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_siege_fortress.gd)
-* **Total Health:** $1000\text{ HP}$ (Upgraded from Level 3's $800\text{ HP}$)
-* **Boss Archetype:** Floating Iron Fortress / Dreadnought Citadel
-* **Destructible Sub-Components & Scaling:**
-  * **Port Mortar Turret:** $188\text{ HP}$ (Scaled dynamically from $1000\text{ HP}$ total pool)
-  * **Starboard Mortar Turret:** $188\text{ HP}$
-  * **Frontal Prow Ram:** $188\text{ HP}$
-  * **Central Magma Core:** $436\text{ HP}$
-* **Boss Behavior & Attack Phases:**
-  * **Phase 1: Dual Siege Mortar Salvos (100% - 70% HP):** Mortar turrets lock onto player coordinates with rapid red telegraph circles.
-  * **Phase 2: Lateral Magma Vents & Raft Escorts (70% - 30% HP):** Side vents spew lava streams while spawning escort rafts.
-  * **Phase 3: Core Meltdown (Below 30% HP):** Central Magma Core exposes, launching continuous screen-shaking mortar barrages until reduced to $0\text{ HP}$.
-  * **Victory Condition:** Core destruction triggers campaign completion, end-of-game victory UI, and total campaign stats summary.
+### **Boss Identity:** Volcanic Bastion Flagship (**None** (Mine gauntlet focus))
+
+* **Boss Scene:** [`boss_siege_fortress.tscn`](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_siege_fortress.tscn)
+* **Boss Script:** [`boss_siege_fortress.gd`](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_siege_fortress.gd)
+* **Total Health:** **800 HP**
+* **Vessel Archetype:** Massive Floating River Bastion / Dreadnought Citadel
+* **Minion Escorts:** No minion releases; pure siege confrontation.
+
+### Destructible Sub-Components & Hit Zones:
+* **Port Heavy Bow Mortar (100 HP):** Lobs high-arc explosive shells with large AoE impact
+* **Starboard Heavy Bow Mortar (100 HP):** Synchronized high-arc shell bombardment
+* **Dual Rotating Chaingun Turrets (60 HP):** Continuous rapid fire down center lanes
+* Central Magma / Iron Core (Exposed upon turret destruction, 2.5x critical multiplier)
+
+### Tactical Strengths:
+* **Offensive Coverage:** Enormous health pool and impenetrable front bastion plating; multi-lane mortar bombardment denies player cover; high damage output at close range.
+* **Defensive Resilience:** Armored hull mitigates unaligned cannon fire.
+* **Escort Reinforcements:** No minion releases; pure siege confrontation.
+
+### Vulnerabilities & Counter-Tactics:
+* **Exploitable Openings:** Completely stationary or slow-moving forward crawl; vulnerable to Bombard Skiff siege mortars from range; destroying mortar turrets exposes fragile core for 2.5x critical damage.
+* **Weapon Synergy:** Bombard Skiff mortars bypass frontal armor; The Dinghy's responsive turning evades telegraphed mortar circles.
+
+### Boss Attack Phases:
+1. **Phase 1: Dual Mortar Siege:** Alternates mortar volleys with center-lane chaingun suppression.
+2. **Phase 2: Magma Vent Eruption:** Side vents open, spewing lateral flame jets that deny outer lanes.
+3. **Phase 3: Core Meltdown:** Critical core exposed; screen shakes with massive explosions until destroyed.
+
+---
+
+## 5. Maximum Coin Yield & Economy Breakdown
+
+Gold in **Level 6: Corsair's Cut** is earned through destructible barrels, enemy sinks, hidden hazard chests, pre-boss totems, and stage clear rewards:
+
+| Reward Source | Yield Range | Drop Mechanics & Exact Breakdown |
+| :--- | :--- | :--- |
+| **Floating Doubloon Pickups** | ~15-35 coins | Loose channel coins collected along river paths and buffer runway. |
+| **Destructible Barrels & Sinks** | ~25-50 coins | Wooden/fuse barrels and sunk enemy mobs (rowers, skiffs, turtle rafts). |
+| **Gated Mine & Flank Chests** | ~639 coins | High-value loot chests locked behind sea mine corridors (75 & 100 coins) and barricade flanks (50 coins). |
+| **Pre-Boss Totems & Rune Chests** | ~100-200 coins | Destructible rune totems in pre-boss buffer and boss arena dropping 50-doubloon chests. |
+| **TOTAL IN-RUN EARNINGS** | **~789 🪙** | **Maximum gold gathered during course navigation and boss engagement.** |
+| **Level Clear Bonus** | **90 🪙** | Guaranteed completion reward awarded on defeating the boss / dock arrival. |
+| **BASE MAXIMUM TOTAL** | **~879 🪙** | **Total doubloons banked without ad multiplier.** |
+| **2X AD MULTIPLIER TOTAL** | **~1758 🪙** | **Total doubloons banked when tapping [ ✦ CLAIM 2X BONUS ] on Settlement Screen.** |
+
+> 💡 **Why In-Run Coins Scale on Level 5+:**
+> On Levels 1–4, `ChestSpawnMarker` chests remain dormant (`min_level = 5`), yielding ~40–60 in-run coins. From Level 5 onward, full hazard chests unlock (75–100 gold each), scaling in-run earnings to **~789 coins** per run!
+
+---
+
+## 6. Chunk Progression & Wave Milestones
+
+```
+[0m] Warmup ──► [87m] Mine / Barricade ──► [175m] Fleet Gate ──► [300m] Pre-Boss Gauntlet & Runway ──► [350m] Volcanic Bastion Flagship
+```
+
+* **0m - 87m (Initial Deployment & Calibration):** Warmup channel with open water, initial barrel formations, and light Skeleton Rower encounters.
+* **87m - 175m (Tactical Hazard Gate):** Dense mine gauntlet or barricade slat barrier forcing decisive steering, burst fire, and reward chest acquisition.
+* **175m - 300m (Fleet Reinforcement & Climax Gauntlet):** Multiplier gates allow expanding follower vessel count to max broadside potential while navigating high-density barricades and charging enemy formations.
+* **300m - 350m (Pre-Boss Approach & Buffer Runway):** 50-meter pre-boss approach featuring coin trails, warning skull totems, a final +1 Fleet Multiplier Gate, and a lone scout rower, preparing the player for arena transition.
+* **350m (Boss Arena Engagement):** Camera locks to boss focus. Sinking **Volcanic Bastion Flagship (**None** (Mine gauntlet focus))** triggers the grand victory fanfare and opens the Settlement Screen.
