@@ -1,22 +1,24 @@
 [gd_resource type="Resource" script_class="LevelData" format=3]
 
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_warmup.tscn" id="1_dokr1"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_mine_gauntlet.tscn" id="2_rwffm"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_barricade_siege.tscn" id="3_rwxeq"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_boss_bonebeard.tscn" id="4_jkgr0"]
-[ext_resource type="Texture2D" path="res://assets/textures/horizon_smugglers_run.png" id="5_plce7"]
-[ext_resource type="Script" path="res://src/data/resources/level_data.gd" id="6_rkxo8"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_warmup.tscn" id="chunk_1"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_mine_gauntlet.tscn" id="chunk_2"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_barricade_siege.tscn" id="chunk_3"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_reef_slalom.tscn" id="chunk_4"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_gunner_ambush.tscn" id="chunk_5"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_boss_bonebeard.tscn" id="chunk_6"]
+[ext_resource type="Texture2D" path="res://assets/textures/horizon_brimstone.png" id="ext_horizon"]
+[ext_resource type="Script" path="res://src/data/resources/level_data.gd" id="ext_script"]
 
 [resource]
-script = ExtResource("6_rkxo8")
-river_width_world = 12.0
+script = ExtResource("ext_script")
 level_id = 45
 level_title = "Level 45: Bonebeard's Throne"
-biome_name = "brimstone"
-base_scroll_speed = 13.0
-chunk_scenes = Array[PackedScene]([ExtResource("1_dokr1"), ExtResource("2_rwffm"), ExtResource("3_rwxeq"), ExtResource("2_rwffm"), ExtResource("2_rwffm"), ExtResource("3_rwxeq"), ExtResource("2_rwffm"), ExtResource("2_rwffm"), ExtResource("3_rwxeq"), ExtResource("2_rwffm"), ExtResource("4_jkgr0")])
-completion_doubloon_reward = 550
-horizon_texture = ExtResource("5_plce7")
-water_albedo = Color(0.35, 0.1, 0.08, 0.95)
-fog_color = Color(0.45, 0.18, 0.12, 1)
-fog_density = 0.02
+biome_name = "brimstone_bastion"
+base_scroll_speed = 12.0
+chunk_scenes = Array[PackedScene]([ExtResource("chunk_1"), ExtResource("chunk_2"), ExtResource("chunk_3"), ExtResource("chunk_2"), ExtResource("chunk_3"), ExtResource("chunk_4"), ExtResource("chunk_2"), ExtResource("chunk_5"), ExtResource("chunk_6")])
+completion_doubloon_reward = 1134
+horizon_texture = ExtResource("ext_horizon")
+water_albedo = Color(0.28, 0.14, 0.12, 0.92)
+fog_color = Color(0.45, 0.22, 0.18, 1.0)
+fog_density = 0.018
+river_width_world = 12.0

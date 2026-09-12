@@ -1,9 +1,9 @@
 ---
 level_id: 34
 level_title: "Level 34: Obsidian Strait"
-biome_name: "brimstone"
-base_scroll_speed: 11.8
-completion_doubloon_reward: 255
+biome_name: "tropical"
+base_scroll_speed: 10.6
+completion_doubloon_reward: 490
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_34.tres"
 ---

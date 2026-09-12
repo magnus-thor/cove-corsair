@@ -45,9 +45,27 @@ var _flash_tween: Tween
 @onready var visual_container: Node3D = get_node_or_null("VisualContainer") if get_node_or_null("VisualContainer") else get_node_or_null("BossSprite")
 @onready var hit_box: Area3D = $HitBox
 
+var is_arena_active: bool = false
+
+func activate_arena() -> void:
+	is_arena_active = true
+	print("[BOSS ARENA] Activated Phantom Dredge: vulnerability enabled | HP: %d/%d" % [current_hp, max_hp])
+
 func _ready() -> void:
 	add_to_group("enemies")
 	add_to_group("boss")
+	
+	if has_node("/root/GameState"):
+		var gs = get_node("/root/GameState")
+		if "current_level" in gs:
+			var lvl: int = gs.current_level
+			if lvl <= 10:
+				max_hp = 550
+			elif lvl <= 25:
+				max_hp = 1100
+			else:
+				max_hp = 1600
+				
 	current_hp = max_hp
 	_base_y = 1.45
 	if visual_container:
@@ -55,6 +73,7 @@ func _ready() -> void:
 	
 	GameState.boss_spawned_event.emit("The Phantom Dredge", max_hp)
 	GameState.boss_health_changed.emit(current_hp, max_hp)
+
 
 func _physics_process(delta: float) -> void:
 	if _is_defeated or current_state == State.DYING:
@@ -353,10 +372,11 @@ func _spawn_bayou_adds(lane_x_override: float = NAN, type_choice: int = -1) -> v
 		cutter.forward_speed = 5.0
 
 func take_damage(amount: int) -> void:
-	if _is_defeated or current_state == State.SUBMERGED:
+	if _is_defeated or current_state == State.SUBMERGED or not is_arena_active:
 		return
 		
 	current_hp = max(0, current_hp - amount)
+
 	print("[BOSS HIT] The Phantom Dredge took %d damage | HP: %d/%d" % [amount, current_hp, max_hp])
 	GameState.boss_health_changed.emit(current_hp, max_hp)
 	_flash_boss()

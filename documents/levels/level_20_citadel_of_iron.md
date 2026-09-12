@@ -1,9 +1,9 @@
 ---
 level_id: 20
-level_title: "Level 20: Citadel of Iron"
-biome_name: "bayou"
-base_scroll_speed: 10.0
-completion_doubloon_reward: 210
+level_title: "Level 20: Captain Bone-Beard"
+biome_name: "brimstone_bastion"
+base_scroll_speed: 8.9
+completion_doubloon_reward: 572
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_20.tres"
 ---

@@ -1,9 +1,9 @@
 ---
 level_id: 17
 level_title: "Level 17: Murkwater Run"
-biome_name: "bayou"
-base_scroll_speed: 9.6
-completion_doubloon_reward: 165
+biome_name: "brimstone_bastion"
+base_scroll_speed: 8.5
+completion_doubloon_reward: 261
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_17.tres"
 ---

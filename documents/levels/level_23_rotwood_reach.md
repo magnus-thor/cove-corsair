@@ -1,9 +1,9 @@
 ---
 level_id: 23
 level_title: "Level 23: Rotwood Reach"
-biome_name: "bayou"
-base_scroll_speed: 10.5
-completion_doubloon_reward: 190
+biome_name: "black_tide_bayou"
+base_scroll_speed: 9.2
+completion_doubloon_reward: 342
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_23.tres"
 ---

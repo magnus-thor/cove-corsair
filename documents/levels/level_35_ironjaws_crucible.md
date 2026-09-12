@@ -1,9 +1,9 @@
 ---
 level_id: 35
 level_title: "Level 35: Ironjaw's Crucible"
-biome_name: "brimstone"
-base_scroll_speed: 11.9
-completion_doubloon_reward: 320
+biome_name: "tropical"
+base_scroll_speed: 10.8
+completion_doubloon_reward: 909
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_35.tres"
 ---

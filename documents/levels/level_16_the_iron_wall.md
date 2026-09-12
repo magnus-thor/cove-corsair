@@ -1,9 +1,9 @@
 ---
 level_id: 16
 level_title: "Level 16: The Iron Wall"
-biome_name: "bayou"
-base_scroll_speed: 9.5
-completion_doubloon_reward: 160
+biome_name: "brimstone_bastion"
+base_scroll_speed: 8.4
+completion_doubloon_reward: 248
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_16.tres"
 ---

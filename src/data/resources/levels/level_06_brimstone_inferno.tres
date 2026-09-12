@@ -1,21 +1,23 @@
 [gd_resource type="Resource" script_class="LevelData" format=3]
 
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_mine_gauntlet.tscn" id="1_72t5a"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_barricade_siege.tscn" id="2_ywjvn"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_boss_siege_fortress.tscn" id="3_jg4qb"]
-[ext_resource type="Texture2D" path="res://assets/textures/horizon_smugglers_run.png" id="4_aguiy"]
-[ext_resource type="Script" path="res://src/data/resources/level_data.gd" id="5_e5t4j"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_warmup.tscn" id="chunk_1"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_reef_slalom.tscn" id="chunk_2"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_mine_gauntlet.tscn" id="chunk_3"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_barricade_siege.tscn" id="chunk_4"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_finish_line.tscn" id="chunk_5"]
+[ext_resource type="Texture2D" path="res://assets/textures/horizon_bayou.png" id="ext_horizon"]
+[ext_resource type="Script" path="res://src/data/resources/level_data.gd" id="ext_script"]
 
 [resource]
-script = ExtResource("5_e5t4j")
-river_width_world = 12.0
+script = ExtResource("ext_script")
 level_id = 6
 level_title = "Level 6: Corsair's Cut"
-biome_name = "tropical"
-base_scroll_speed = 8.0
-chunk_scenes = Array[PackedScene]([ExtResource("1_72t5a"), ExtResource("2_ywjvn"), ExtResource("1_72t5a"), ExtResource("2_ywjvn"), ExtResource("3_jg4qb")])
-completion_doubloon_reward = 90
-horizon_texture = ExtResource("4_aguiy")
-water_albedo = Color(0.4, 0.08, 0.05, 0.98)
-fog_color = Color(0.5, 0.15, 0.1, 1)
-fog_density = 0.025
+biome_name = "black_tide_bayou"
+base_scroll_speed = 7.1
+chunk_scenes = Array[PackedScene]([ExtResource("chunk_1"), ExtResource("chunk_2"), ExtResource("chunk_3"), ExtResource("chunk_4"), ExtResource("chunk_5")])
+completion_doubloon_reward = 112
+horizon_texture = ExtResource("ext_horizon")
+water_albedo = Color(0.12, 0.32, 0.22, 0.92)
+fog_color = Color(0.20, 0.38, 0.30, 1.0)
+fog_density = 0.02
+river_width_world = 12.0

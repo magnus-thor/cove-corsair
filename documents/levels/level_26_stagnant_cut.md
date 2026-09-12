@@ -1,9 +1,9 @@
 ---
 level_id: 26
 level_title: "Level 26: Stagnant Cut"
-biome_name: "bayou"
-base_scroll_speed: 10.9
-completion_doubloon_reward: 210
+biome_name: "pirate_citadel"
+base_scroll_speed: 9.6
+completion_doubloon_reward: 382
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_26.tres"
 ---

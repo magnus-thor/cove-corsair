@@ -1,9 +1,9 @@
 ---
 level_id: 42
 level_title: "Level 42: Doomspire Channel"
-biome_name: "brimstone"
-base_scroll_speed: 12.7
-completion_doubloon_reward: 305
+biome_name: "brimstone_bastion"
+base_scroll_speed: 11.6
+completion_doubloon_reward: 598
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_42.tres"
 ---

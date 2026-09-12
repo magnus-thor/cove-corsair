@@ -1,9 +1,9 @@
 ---
 level_id: 8
 level_title: "Level 8: Pelican Point"
-biome_name: "tropical"
-base_scroll_speed: 8.4
-completion_doubloon_reward: 105
+biome_name: "black_tide_bayou"
+base_scroll_speed: 7.4
+completion_doubloon_reward: 140
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_08.tres"
 ---

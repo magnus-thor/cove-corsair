@@ -1,0 +1,50 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/gameplay/chunks/base_track_chunk.gd" id="1_chunk"]
+[ext_resource type="PackedScene" path="res://assets/models/tower-complete-small.glb" id="2_tower"]
+[ext_resource type="PackedScene" path="res://assets/models/structure-platform-dock.glb" id="3_dock"]
+[ext_resource type="PackedScene" path="res://assets/models/rocks-b.glb" id="4_rocks"]
+[ext_resource type="PackedScene" path="res://src/gameplay/enemies/enemy_iron_gunner.tscn" id="5_gunner"]
+[ext_resource type="PackedScene" path="res://src/gameplay/enemies/enemy_brimstone_raft.tscn" id="6_raft"]
+[ext_resource type="PackedScene" path="res://src/gameplay/obstacles/barricade_wall.tscn" id="7_barricade"]
+[ext_resource type="PackedScene" path="res://src/gameplay/obstacles/destructible_barrel.tscn" id="8_barrel"]
+[ext_resource type="Script" path="res://src/gameplay/obstacles/destructible_barrel.gd" id="9_barrel_script"]
+
+[node name="ChunkGunnerAmbush" type="Node3D" unique_id=9834101]
+script = ExtResource("1_chunk")
+chunk_id = "gunner_ambush"
+
+[node name="ChunkStart" type="Marker3D" parent="." unique_id=9834102]
+
+[node name="ChunkEnd" type="Marker3D" parent="." unique_id=9834103]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -50)
+
+[node name="Banks" type="Node3D" parent="." unique_id=9834104]
+
+[node name="Tower_Left" type="Node3D" parent="Banks" unique_id=9834105 instance=ExtResource("2_tower")]
+transform = Transform3D(1, 0, 0, 0, 1.2, 0, 0, 0, 1, -9.5, 0, -18)
+
+[node name="Dock_Left" type="Node3D" parent="Banks" unique_id=9834106 instance=ExtResource("3_dock")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.5, 0, -28)
+
+[node name="Rocks_Right" type="Node3D" parent="Banks" unique_id=9834107 instance=ExtResource("4_rocks")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 10.5, 0, -22)
+
+[node name="Entities" type="Node3D" parent="." unique_id=9834108]
+
+[node name="IronGunner_Left" type="Area3D" parent="Entities" unique_id=9834109 groups=["destructible", "enemies"] instance=ExtResource("5_gunner")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0.1, -12)
+
+[node name="IronGunner_Right" type="Area3D" parent="Entities" unique_id=9834110 groups=["destructible", "enemies"] instance=ExtResource("5_gunner")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.1, -24)
+
+[node name="BrimstoneRaft_Charge" type="Area3D" parent="Entities" unique_id=9834111 groups=["destructible", "enemies"] instance=ExtResource("6_raft")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -34)
+
+[node name="TacticalBarricade" parent="Entities" unique_id=9834112 instance=ExtResource("7_barricade")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0, 0, -38)
+
+[node name="ExplosiveKeg" type="Area3D" parent="Entities" unique_id=9834113 groups=["destructible"] instance=ExtResource("8_barrel")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 0.05, -38)
+script = ExtResource("9_barrel_script")
+obstacle_type = 2

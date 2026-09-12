@@ -77,7 +77,10 @@ func _on_chunk_boss_arena_reached(boss_chunk: BaseTrackChunk) -> void:
 	var camera = get_tree().get_first_node_in_group("game_camera")
 	if camera and camera.has_method("start_boss_focus") and boss:
 		camera.start_boss_focus(boss)
+	if boss and boss.has_method("activate_arena"):
+		boss.activate_arena()
 	print("[LEVEL CONTROLLER] Locked camera to boss arena")
+
 
 func handle_player_defeat(coins_collected: int, distance_reached: float) -> void:
 	# 1. Freeze forward track scrolling smoothly

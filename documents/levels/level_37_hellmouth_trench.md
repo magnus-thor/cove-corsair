@@ -1,9 +1,9 @@
 ---
 level_id: 37
 level_title: "Level 37: Hellmouth Trench"
-biome_name: "brimstone"
-base_scroll_speed: 12.1
-completion_doubloon_reward: 275
+biome_name: "brimstone_bastion"
+base_scroll_speed: 11.0
+completion_doubloon_reward: 531
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_37.tres"
 ---

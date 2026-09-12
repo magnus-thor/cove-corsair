@@ -1,9 +1,9 @@
 ---
 level_id: 45
 level_title: "Level 45: Bonebeard's Throne"
-biome_name: "brimstone"
-base_scroll_speed: 13.0
-completion_doubloon_reward: 550
+biome_name: "brimstone_bastion"
+base_scroll_speed: 12.0
+completion_doubloon_reward: 1134
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_45.tres"
 ---

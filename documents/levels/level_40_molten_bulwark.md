@@ -1,9 +1,9 @@
 ---
 level_id: 40
 level_title: "Level 40: Molten Bulwark"
-biome_name: "brimstone"
-base_scroll_speed: 12.4
-completion_doubloon_reward: 380
+biome_name: "brimstone_bastion"
+base_scroll_speed: 11.4
+completion_doubloon_reward: 1022
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_40.tres"
 ---

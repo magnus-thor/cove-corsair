@@ -1,9 +1,9 @@
 ---
 level_id: 30
 level_title: "Level 30: Bonebeard's Armada"
-biome_name: "bayou"
-base_scroll_speed: 11.5
-completion_doubloon_reward: 290
+biome_name: "pirate_citadel"
+base_scroll_speed: 10.1
+completion_doubloon_reward: 796
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_30.tres"
 ---

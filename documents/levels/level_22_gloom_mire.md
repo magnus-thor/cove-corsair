@@ -1,9 +1,9 @@
 ---
 level_id: 22
 level_title: "Level 22: Gloom Mire"
-biome_name: "bayou"
-base_scroll_speed: 10.3
-completion_doubloon_reward: 185
+biome_name: "black_tide_bayou"
+base_scroll_speed: 9.1
+completion_doubloon_reward: 328
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_22.tres"
 ---

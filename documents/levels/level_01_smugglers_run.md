@@ -3,7 +3,7 @@ level_id: 1
 level_title: "Level 1: Smuggler's Run"
 biome_name: "tropical"
 base_scroll_speed: 6.5
-completion_doubloon_reward: 50
+completion_doubloon_reward: 45
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_01.tres"
 ---

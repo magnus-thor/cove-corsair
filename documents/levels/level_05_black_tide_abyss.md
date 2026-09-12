@@ -1,9 +1,9 @@
 ---
 level_id: 5
-level_title: "Level 5: Ironjaw's Scout"
+level_title: "Level 5: Captain Ironjaw"
 biome_name: "tropical"
-base_scroll_speed: 7.8
-completion_doubloon_reward: 100
+base_scroll_speed: 7.0
+completion_doubloon_reward: 234
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_05.tres"
 ---

@@ -1,0 +1,79 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/gameplay/chunks/chunk_finish_line.gd" id="1_finish"]
+[ext_resource type="PackedScene" path="res://assets/models/tower-complete-small.glb" id="2_tower"]
+[ext_resource type="PackedScene" path="res://assets/models/rocks-a.glb" id="3_rocks"]
+[ext_resource type="PackedScene" path="res://assets/models/castle-wall.glb" id="4_wall"]
+[ext_resource type="PackedScene" path="res://assets/models/castle-gate.glb" id="5_gate"]
+[ext_resource type="PackedScene" path="res://assets/models/flag-pirate-high.glb" id="6_flag"]
+[ext_resource type="PackedScene" path="res://src/gameplay/obstacles/barricade_wall.tscn" id="7_barricade"]
+[ext_resource type="PackedScene" path="res://src/gameplay/enemies/enemy_mob.tscn" id="8_enemy"]
+[ext_resource type="Script" path="res://src/gameplay/enemies/enemy_mob.gd" id="9_enemy_script"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_finish"]
+size = Vector3(12, 4, 3)
+
+[node name="ChunkFinishLine" type="Node3D" unique_id=9812401]
+script = ExtResource("1_finish")
+chunk_id = "finish_line"
+
+[node name="ChunkStart" type="Marker3D" parent="." unique_id=9812402]
+
+[node name="ChunkEnd" type="Marker3D" parent="." unique_id=9812403]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -50)
+
+[node name="Banks" type="Node3D" parent="." unique_id=9812404]
+
+[node name="Tower_Left" type="Node3D" parent="Banks" unique_id=9812405 instance=ExtResource("2_tower")]
+transform = Transform3D(1, 0, 0, 0, 1.2, 0, 0, 0, 1, -9.5, 0, -34)
+
+[node name="Tower_Right" type="Node3D" parent="Banks" unique_id=9812406 instance=ExtResource("2_tower")]
+transform = Transform3D(1, 0, 0, 0, 1.2, 0, 0, 0, 1, 9.5, 0, -34)
+
+[node name="RocksA_Left" type="Node3D" parent="Banks" unique_id=9812407 instance=ExtResource("3_rocks")]
+transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, -10.5, 0, -18)
+
+[node name="RocksA_Right" type="Node3D" parent="Banks" unique_id=9812408 instance=ExtResource("3_rocks")]
+transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, 10.5, 0, -18)
+
+[node name="Wall_Left" type="Node3D" parent="Banks" unique_id=9812409 instance=ExtResource("4_wall")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -7.5, 0, -34)
+
+[node name="Wall_Right" type="Node3D" parent="Banks" unique_id=9812410 instance=ExtResource("4_wall")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 7.5, 0, -34)
+
+[node name="Entities" type="Node3D" parent="." unique_id=9812411]
+
+[node name="GateCenter" type="Node3D" parent="Entities" unique_id=9812412 instance=ExtResource("5_gate")]
+transform = Transform3D(2.5, 0, 0, 0, 2.2, 0, 0, 0, 2.0, 0, 0, -34)
+
+[node name="Flag_Left" type="Node3D" parent="Entities" unique_id=9812413 instance=ExtResource("6_flag")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 2.5, -34)
+
+[node name="Flag_Right" type="Node3D" parent="Entities" unique_id=9812414 instance=ExtResource("6_flag")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 2.5, -34)
+
+[node name="FinishBarricade" parent="Entities" unique_id=9812415 instance=ExtResource("7_barricade")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -22)
+
+[node name="GuardRower_Left" type="Area3D" parent="Entities" unique_id=9812416 groups=["destructible", "enemies"] instance=ExtResource("8_enemy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0.1, -16)
+script = ExtResource("9_enemy_script")
+max_hp = 3
+current_hp = 3
+forward_speed = 1.0
+
+[node name="GuardRower_Right" type="Area3D" parent="Entities" unique_id=9812417 groups=["destructible", "enemies"] instance=ExtResource("8_enemy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.1, -16)
+script = ExtResource("9_enemy_script")
+max_hp = 3
+current_hp = 3
+forward_speed = 1.0
+
+[node name="FinishTrigger" type="Area3D" parent="." unique_id=9812421]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -34)
+collision_layer = 0
+collision_mask = 3
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="FinishTrigger" unique_id=9812422]
+shape = SubResource("BoxShape3D_finish")

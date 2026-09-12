@@ -1,22 +1,24 @@
 [gd_resource type="Resource" script_class="LevelData" format=3]
 
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_warmup.tscn" id="1_warmup"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_barricade_siege.tscn" id="2_barricade"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_mine_gauntlet.tscn" id="3_mine"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_boss_phantom_dredge.tscn" id="4_boss"]
-[ext_resource type="Texture2D" path="res://assets/textures/horizon_smugglers_run.png" id="5_horizon"]
-[ext_resource type="Script" path="res://src/data/resources/level_data.gd" id="6_script"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_warmup.tscn" id="chunk_1"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_reef_slalom.tscn" id="chunk_2"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_mine_gauntlet.tscn" id="chunk_3"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_barricade_siege.tscn" id="chunk_4"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_gunner_ambush.tscn" id="chunk_5"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_boss_ironjaw.tscn" id="chunk_6"]
+[ext_resource type="Texture2D" path="res://assets/textures/horizon_smugglers_run.png" id="ext_horizon"]
+[ext_resource type="Script" path="res://src/data/resources/level_data.gd" id="ext_script"]
 
 [resource]
-script = ExtResource("6_script")
-river_width_world = 12.0
+script = ExtResource("ext_script")
 level_id = 5
-level_title = "Level 5: Ironjaw's Scout"
+level_title = "Level 5: Captain Ironjaw"
 biome_name = "tropical"
-base_scroll_speed = 7.8
-chunk_scenes = Array[PackedScene]([ExtResource("1_warmup"), ExtResource("2_barricade"), ExtResource("3_mine"), ExtResource("2_barricade"), ExtResource("3_mine"), ExtResource("4_boss")])
-completion_doubloon_reward = 100
-horizon_texture = ExtResource("5_horizon")
-water_albedo = Color(0.12, 0.25, 0.18, 0.92)
-fog_color = Color(0.22, 0.35, 0.28, 1)
-fog_density = 0.015
+base_scroll_speed = 7.0
+chunk_scenes = Array[PackedScene]([ExtResource("chunk_1"), ExtResource("chunk_2"), ExtResource("chunk_3"), ExtResource("chunk_4"), ExtResource("chunk_5"), ExtResource("chunk_6")])
+completion_doubloon_reward = 234
+horizon_texture = ExtResource("ext_horizon")
+water_albedo = Color(0.08, 0.58, 0.82, 0.88)
+fog_color = Color(0.48, 0.76, 0.94, 1.0)
+fog_density = 0.005
+river_width_world = 12.0

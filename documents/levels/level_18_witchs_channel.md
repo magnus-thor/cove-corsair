@@ -1,9 +1,9 @@
 ---
 level_id: 18
 level_title: "Level 18: Witch's Channel"
-biome_name: "bayou"
-base_scroll_speed: 9.8
-completion_doubloon_reward: 170
+biome_name: "brimstone_bastion"
+base_scroll_speed: 8.6
+completion_doubloon_reward: 274
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_18.tres"
 ---

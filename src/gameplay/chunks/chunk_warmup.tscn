@@ -5,8 +5,6 @@
 [ext_resource type="PackedScene" path="res://assets/models/palm-detailed-straight.glb" id="3_5e74h"]
 [ext_resource type="PackedScene" path="res://assets/models/rocks-a.glb" id="4_cr020"]
 [ext_resource type="PackedScene" path="res://assets/models/rocks-b.glb" id="5_tv015"]
-[ext_resource type="PackedScene" path="res://src/gameplay/collectibles/collectible_doubloon.tscn" id="6_wse7p"]
-[ext_resource type="Script" path="res://src/gameplay/collectibles/collectible_doubloon.gd" id="7_hlyy5"]
 [ext_resource type="PackedScene" path="res://src/gameplay/obstacles/destructible_barrel.tscn" id="8_v8m1i"]
 [ext_resource type="Script" path="res://src/gameplay/obstacles/destructible_barrel.gd" id="9_ejvrq"]
 [ext_resource type="PackedScene" path="res://src/gameplay/enemies/enemy_mob.tscn" id="10_lll5g"]
@@ -44,31 +42,6 @@ transform = Transform3D(1.6914467, 0, -0.6156362, 0, 1.8, 0, 0.6156362, 0, 1.691
 transform = Transform3D(-5.2453668e-08, 0, -1.5, 0, 1, 0, 1.2, 0, -6.556708e-08, 8, 0, -42)
 
 [node name="Entities" type="Node3D" parent="." unique_id=1027259169]
-
-[node name="Doubloon_1" type="Area3D" parent="Entities" unique_id=1728383981 groups=["collectibles", "doubloons"] instance=ExtResource("6_wse7p")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.13, -8)
-collision_layer = 8
-script = ExtResource("7_hlyy5")
-
-[node name="Doubloon_2" type="Area3D" parent="Entities" unique_id=1647750758 groups=["collectibles", "doubloons"] instance=ExtResource("6_wse7p")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.13, -10)
-collision_layer = 8
-script = ExtResource("7_hlyy5")
-
-[node name="Doubloon_3" type="Area3D" parent="Entities" unique_id=1207588947 groups=["collectibles", "doubloons"] instance=ExtResource("6_wse7p")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.13, -12)
-collision_layer = 8
-script = ExtResource("7_hlyy5")
-
-[node name="Doubloon_4" type="Area3D" parent="Entities" unique_id=692406202 groups=["collectibles", "doubloons"] instance=ExtResource("6_wse7p")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.13, -14)
-collision_layer = 8
-script = ExtResource("7_hlyy5")
-
-[node name="Doubloon_5" type="Area3D" parent="Entities" unique_id=400971993 groups=["collectibles", "doubloons"] instance=ExtResource("6_wse7p")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.13, -16)
-collision_layer = 8
-script = ExtResource("7_hlyy5")
 
 [node name="Barrel_Center" type="Area3D" parent="Entities" unique_id=81469054 groups=["destructible"] instance=ExtResource("8_v8m1i")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, -22)

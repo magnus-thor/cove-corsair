@@ -2,8 +2,8 @@
 level_id: 2
 level_title: "Level 2: Palm Shallows"
 biome_name: "tropical"
-base_scroll_speed: 7.0
-completion_doubloon_reward: 65
+base_scroll_speed: 6.6
+completion_doubloon_reward: 58
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_02.tres"
 ---

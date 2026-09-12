@@ -5,8 +5,6 @@
 [ext_resource type="PackedScene" path="res://assets/models/palm-detailed-straight.glb" id="3_palm"]
 [ext_resource type="PackedScene" path="res://assets/models/rocks-a.glb" id="4_rocks_a"]
 [ext_resource type="PackedScene" path="res://assets/models/rocks-b.glb" id="5_rocks_b"]
-[ext_resource type="PackedScene" path="res://src/gameplay/collectibles/collectible_doubloon.tscn" id="6_doubloon"]
-[ext_resource type="Script" path="res://src/gameplay/collectibles/collectible_doubloon.gd" id="7_doubloon_script"]
 [ext_resource type="PackedScene" path="res://src/gameplay/obstacles/destructible_barrel.tscn" id="8_barrel"]
 [ext_resource type="Script" path="res://src/gameplay/obstacles/destructible_barrel.gd" id="9_barrel_script"]
 [ext_resource type="PackedScene" path="res://src/gameplay/obstacles/multiplier_gate.tscn" id="10_gate"]
@@ -41,21 +39,6 @@ transform = Transform3D(1.14907, 0, -0.964181, 0, 1.5, 0, 0.964181, 0, 1.14907, 
 transform = Transform3D(1.69145, 0, -0.615636, 0, 1.8, 0, 0.615636, 0, 1.69145, 9.8, 0, -32)
 
 [node name="Entities" type="Node3D" parent="."]
-
-[node name="Doubloon_1" type="Area3D" parent="Entities" groups=["collectibles", "doubloons"] instance=ExtResource("6_doubloon")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0, 0.13, -8)
-collision_layer = 8
-script = ExtResource("7_doubloon_script")
-
-[node name="Doubloon_2" type="Area3D" parent="Entities" groups=["collectibles", "doubloons"] instance=ExtResource("6_doubloon")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0.13, -12)
-collision_layer = 8
-script = ExtResource("7_doubloon_script")
-
-[node name="Doubloon_3" type="Area3D" parent="Entities" groups=["collectibles", "doubloons"] instance=ExtResource("6_doubloon")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0, 0.13, -16)
-collision_layer = 8
-script = ExtResource("7_doubloon_script")
 
 [node name="Barrel_TotemLeft" type="Area3D" parent="Entities" groups=["destructible"] instance=ExtResource("8_barrel")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8, 0.05, -16)

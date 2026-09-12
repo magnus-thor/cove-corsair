@@ -1,9 +1,9 @@
 ---
 level_id: 27
 level_title: "Level 27: Banshee Bog"
-biome_name: "bayou"
-base_scroll_speed: 11.0
-completion_doubloon_reward: 215
+biome_name: "pirate_citadel"
+base_scroll_speed: 9.8
+completion_doubloon_reward: 396
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_27.tres"
 ---

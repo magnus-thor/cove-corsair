@@ -1,9 +1,9 @@
 ---
 level_id: 10
-level_title: "Level 10: Captain Ironjaw"
-biome_name: "tropical"
-base_scroll_speed: 8.8
-completion_doubloon_reward: 145
+level_title: "Level 10: The Phantom Dredge"
+biome_name: "black_tide_bayou"
+base_scroll_speed: 7.6
+completion_doubloon_reward: 346
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_10.tres"
 ---

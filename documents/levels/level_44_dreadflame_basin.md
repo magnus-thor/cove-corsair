@@ -1,9 +1,9 @@
 ---
 level_id: 44
 level_title: "Level 44: Dreadflame Basin"
-biome_name: "brimstone"
-base_scroll_speed: 12.9
-completion_doubloon_reward: 320
+biome_name: "brimstone_bastion"
+base_scroll_speed: 11.9
+completion_doubloon_reward: 626
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_44.tres"
 ---

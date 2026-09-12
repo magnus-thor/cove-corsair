@@ -1,9 +1,9 @@
 ---
 level_id: 6
 level_title: "Level 6: Corsair's Cut"
-biome_name: "tropical"
-base_scroll_speed: 8.0
-completion_doubloon_reward: 90
+biome_name: "black_tide_bayou"
+base_scroll_speed: 7.1
+completion_doubloon_reward: 112
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_06.tres"
 ---

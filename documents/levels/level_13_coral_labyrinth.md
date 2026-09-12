@@ -1,9 +1,9 @@
 ---
 level_id: 13
 level_title: "Level 13: Coral Labyrinth"
-biome_name: "tropical"
-base_scroll_speed: 9.2
-completion_doubloon_reward: 130
+biome_name: "pirate_citadel"
+base_scroll_speed: 8.0
+completion_doubloon_reward: 207
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_13.tres"
 ---

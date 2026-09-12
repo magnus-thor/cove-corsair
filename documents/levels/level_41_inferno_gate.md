@@ -1,9 +1,9 @@
 ---
 level_id: 41
 level_title: "Level 41: Inferno Gate"
-biome_name: "brimstone"
-base_scroll_speed: 12.5
-completion_doubloon_reward: 300
+biome_name: "brimstone_bastion"
+base_scroll_speed: 11.5
+completion_doubloon_reward: 585
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_41.tres"
 ---

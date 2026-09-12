@@ -1,9 +1,9 @@
 ---
 level_id: 36
 level_title: "Level 36: Pyroclast Pass"
-biome_name: "brimstone"
-base_scroll_speed: 12.0
-completion_doubloon_reward: 270
+biome_name: "brimstone_bastion"
+base_scroll_speed: 10.9
+completion_doubloon_reward: 518
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_36.tres"
 ---

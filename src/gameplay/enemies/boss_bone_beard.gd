@@ -26,14 +26,43 @@ var _flash_tween: Tween
 var _attack_timer: float = 0.0
 var _weave_time: float = 0.0
 var _target_z: float = -18.0
+var _current_base_y: float = 0.0
 var _is_defeated: bool = false
-var _current_base_y: float = 2.15
+var is_arena_active: bool = false
+
+func activate_arena() -> void:
+	is_arena_active = true
+	print("[BOSS ARENA] Activated Captain Bone-Beard: vulnerability enabled | HP: %d/%d" % [current_hp, max_hp])
+
+func take_damage(amount: int) -> void:
+	if _is_defeated or current_state == State.DYING or not is_arena_active:
+		return
+	current_hp = max(0, current_hp - amount)
+	print("[BOSS HIT] Captain Bone-Beard took %d damage | HP: %d/%d" % [amount, current_hp, max_hp])
+	if GameState.has_signal("boss_health_changed"):
+		GameState.boss_health_changed.emit(current_hp, max_hp)
+	_flash_red()
+	_update_health_bar()
+	if current_hp <= 0:
+		boss_defeat()
 
 func _ready() -> void:
 	_clean_shadow_nodes(self)
 	add_to_group("enemies")
 	add_to_group("boss")
 	add_to_group("destructible")
+	
+	if has_node("/root/GameState"):
+		var gs = get_node("/root/GameState")
+		if "current_level" in gs:
+			var lvl: int = gs.current_level
+			if lvl <= 15:
+				max_hp = 650
+			elif lvl <= 30:
+				max_hp = 1200
+			else:
+				max_hp = 2200
+				
 	current_hp = max_hp
 	if boss_sprite:
 		boss_sprite.position.y = _current_base_y
@@ -51,6 +80,7 @@ func _ready() -> void:
 	var player = get_tree().get_first_node_in_group("player")
 	var player_z = player.global_position.z if player else 0.0
 	_target_z = player_z + combat_z_offset
+
 
 func _physics_process(delta: float) -> void:
 	if _is_defeated or current_state == State.DYING:
@@ -102,20 +132,6 @@ func _perform_attack() -> void:
 				keg.global_position = Vector3(spawn_x, 0.5, safe_z)
 				if "forward_speed" in keg:
 					keg.forward_speed = 6.0
-
-func take_damage(amount: int) -> void:
-	if _is_defeated or current_state == State.DYING:
-		return
-
-	current_hp = max(0, current_hp - amount)
-	_update_health_bar()
-	_flash_red()
-	AudioManager.play_sfx("barrel_hits")
-	if GameState.has_signal("boss_health_changed"):
-		GameState.boss_health_changed.emit(current_hp, max_hp)
-
-	if current_hp <= 0:
-		boss_defeat()
 
 func _flash_red() -> void:
 	if not boss_sprite:

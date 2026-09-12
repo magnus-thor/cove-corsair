@@ -1,9 +1,9 @@
 ---
 level_id: 21
 level_title: "Level 21: Serpent's Nest"
-biome_name: "bayou"
-base_scroll_speed: 10.2
-completion_doubloon_reward: 180
+biome_name: "black_tide_bayou"
+base_scroll_speed: 9.0
+completion_doubloon_reward: 315
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_21.tres"
 ---

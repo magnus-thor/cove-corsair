@@ -1,9 +1,9 @@
 ---
 level_id: 12
 level_title: "Level 12: Smuggler's Gate"
-biome_name: "tropical"
-base_scroll_speed: 9.0
-completion_doubloon_reward: 125
+biome_name: "pirate_citadel"
+base_scroll_speed: 7.9
+completion_doubloon_reward: 194
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_12.tres"
 ---

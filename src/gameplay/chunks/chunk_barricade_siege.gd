@@ -4,7 +4,6 @@ extends BaseTrackChunk
 ## Custom controller for chunk_barricade_siege.
 ## Enforces safe buffer zones behind barricade walls and adapts hazards for early campaign levels.
 
-const COIN_SCENE: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
 const BARREL_SCENE: PackedScene = preload("res://src/gameplay/obstacles/destructible_barrel.tscn")
 
 func _ready() -> void:
@@ -66,18 +65,11 @@ func _replace_trailing_enemy_with_pickup(entities: Node, enemy: Node) -> void:
 	entities.remove_child(enemy)
 	enemy.queue_free()
 	
-	# Spawn a gentle floating coin arc or wooden barrel pickup
-	if COIN_SCENE:
-		for i in range(doubloons_amount):
-			var coin = COIN_SCENE.instantiate() as Area3D
-			entities.add_child(coin)
-			var offset_z = (i - 1) * 1.5
-			coin.position = Vector3(pos.x, 0.13, pos.z + offset_z)
-			if "value" in coin:
-				coin.value = 1
-	elif BARREL_SCENE:
+	# Spawn a wooden barrel pickup that drops doubloons when destroyed
+	if BARREL_SCENE:
 		var barrel = BARREL_SCENE.instantiate() as Area3D
 		entities.add_child(barrel)
+		barrel.add_to_group("destructible")
 		barrel.position = Vector3(pos.x, 0.05, pos.z)
 		barrel.hp = 1
 		barrel.doubloons_drop = doubloons_amount
@@ -89,16 +81,8 @@ func _replace_front_hazard_with_pickup(entities: Node, enemy: Node, cur_level: i
 	entities.remove_child(enemy)
 	enemy.queue_free()
 	
-	# Spawn gentle floating coins yielding the doubloons
-	if COIN_SCENE:
-		for i in range(doubloons_amount):
-			var coin = COIN_SCENE.instantiate() as Area3D
-			entities.add_child(coin)
-			var offset_z = (i - (doubloons_amount / 2.0)) * 1.2
-			coin.position = Vector3(pos.x, 0.13, pos.z + offset_z)
-			if "value" in coin:
-				coin.value = 1
-	elif BARREL_SCENE:
+	# Spawn a wooden barrel pickup that drops doubloons when destroyed
+	if BARREL_SCENE:
 		var barrel = BARREL_SCENE.instantiate() as Area3D
 		entities.add_child(barrel)
 		barrel.add_to_group("destructible")

@@ -53,12 +53,18 @@ var _flash_tweens: Dictionary = {}
 @onready var prow_ram_node: Node3D = $ProwRam
 @onready var furnace_core_node: Node3D = $FurnaceCore
 
+var is_arena_active: bool = false
 var _base_mesh_scale: Vector3 = Vector3(4.74, 4.74, 4.74)
+
+func activate_arena() -> void:
+	is_arena_active = true
+	print("[BOSS ARENA] Activated Siege Fortress: vulnerability enabled | HP: %d/%d" % [current_hp, max_hp])
 
 func _ready() -> void:
 	add_to_group("enemies")
 	add_to_group("boss")
 	current_hp = max_hp
+
 	if boss_sprite:
 		boss_sprite.position.y = _y_base
 		boss_sprite.scale = Vector3(4.74, 4.74, 4.74)
@@ -309,9 +315,13 @@ func _spawn_bastion_minions() -> void:
 				print("[BOSS MINION] Spawning %s at pos: %s | HP: %d" % [mob.name, mob.global_position, mob.current_hp])
 
 # Damage Routing
-func damage_component(comp_name: String, amount: int, _from_bow: bool) -> void:
-	if _is_defeated:
+func take_damage(amount: int) -> void:
+	damage_component("furnace_core", amount, false)
+
+func damage_component(comp_name: String, amount: int, _from_bow: bool = false) -> void:
+	if _is_defeated or not is_arena_active:
 		return
+
 		
 	if GameState.boss_spawned:
 		print("[BOSS HIT] The Siege Fortress [%s] took %d dmg | HP: %d/%d" % [comp_name, amount, current_hp, max_hp])

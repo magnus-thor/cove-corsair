@@ -1,0 +1,60 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/gameplay/chunks/base_track_chunk.gd" id="1_chunk"]
+[ext_resource type="PackedScene" path="res://assets/models/palm-detailed-bend.glb" id="2_palm"]
+[ext_resource type="PackedScene" path="res://assets/models/rocks-a.glb" id="3_rocks"]
+[ext_resource type="PackedScene" path="res://src/gameplay/obstacles/destructible_barrel.tscn" id="4_barrel"]
+[ext_resource type="Script" path="res://src/gameplay/obstacles/destructible_barrel.gd" id="5_barrel_script"]
+[ext_resource type="PackedScene" path="res://src/gameplay/enemies/enemy_tide_cutter.tscn" id="6_cutter"]
+[ext_resource type="PackedScene" path="res://src/gameplay/enemies/enemy_iron_gunner.tscn" id="7_gunner"]
+[ext_resource type="PackedScene" path="res://src/gameplay/obstacles/multiplier_gate.tscn" id="10_gate"]
+[ext_resource type="Script" path="res://src/gameplay/obstacles/multiplier_gate.gd" id="11_gate_script"]
+
+[node name="ChunkReefSlalom" type="Node3D" unique_id=9823101]
+script = ExtResource("1_chunk")
+chunk_id = "reef_slalom"
+
+[node name="ChunkStart" type="Marker3D" parent="." unique_id=9823102]
+
+[node name="ChunkEnd" type="Marker3D" parent="." unique_id=9823103]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -50)
+
+[node name="Banks" type="Node3D" parent="." unique_id=9823104]
+
+[node name="Palm_Left" type="Node3D" parent="Banks" unique_id=9823105 instance=ExtResource("2_palm")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1.2, 0, 8.74228e-08, 0, -1, -9.5, 0, -14)
+
+[node name="Rocks_Left" type="Node3D" parent="Banks" unique_id=9823106 instance=ExtResource("3_rocks")]
+transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, -10.5, 0, -32)
+
+[node name="Palm_Right" type="Node3D" parent="Banks" unique_id=9823107 instance=ExtResource("2_palm")]
+transform = Transform3D(1, 0, 0, 0, 1.2, 0, 0, 0, 1, 9.5, 0, -24)
+
+[node name="Rocks_Right" type="Node3D" parent="Banks" unique_id=9823108 instance=ExtResource("3_rocks")]
+transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, 10.5, 0, -42)
+
+[node name="Entities" type="Node3D" parent="." unique_id=9823109]
+
+[node name="SlalomBarrel_1" type="Area3D" parent="Entities" unique_id=9823110 groups=["destructible"] instance=ExtResource("4_barrel")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0.05, -10)
+script = ExtResource("5_barrel_script")
+obstacle_type = 2
+
+[node name="SlalomBarrel_2" type="Area3D" parent="Entities" unique_id=9823111 groups=["destructible"] instance=ExtResource("4_barrel")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.05, -18)
+script = ExtResource("5_barrel_script")
+obstacle_type = 2
+
+[node name="TideCutter_Flank" type="Area3D" parent="Entities" unique_id=9823112 groups=["destructible", "enemies"] instance=ExtResource("6_cutter")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -24)
+
+
+[node name="IronGunner_Guard" type="Area3D" parent="Entities" unique_id=9823116 groups=["destructible", "enemies"] instance=ExtResource("7_gunner")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0.1, -38)
+
+[node name="Gate_Modest" type="Area3D" parent="Entities" unique_id=9823117 groups=["multiplier_gate"] instance=ExtResource("10_gate")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -44)
+script = ExtResource("11_gate_script")
+value = 1
+custom_text = "+1"
+gate_action = "add_fleet_1"

@@ -1,22 +1,23 @@
 [gd_resource type="Resource" script_class="LevelData" format=3]
 
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_warmup.tscn" id="1_ab0do"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_mine_gauntlet.tscn" id="2_cv6pk"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_barricade_siege.tscn" id="3_d2twa"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_boss_ironjaw.tscn" id="4_cxlmq"]
-[ext_resource type="Texture2D" path="res://assets/textures/horizon_smugglers_run.png" id="5_dvti2"]
-[ext_resource type="Script" path="res://src/data/resources/level_data.gd" id="6_pvtw2"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_warmup.tscn" id="chunk_1"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_mine_gauntlet.tscn" id="chunk_2"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_gunner_ambush.tscn" id="chunk_3"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_reef_slalom.tscn" id="chunk_4"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_boss_ironjaw.tscn" id="chunk_5"]
+[ext_resource type="Texture2D" path="res://assets/textures/horizon_smugglers_run.png" id="ext_horizon"]
+[ext_resource type="Script" path="res://src/data/resources/level_data.gd" id="ext_script"]
 
 [resource]
-script = ExtResource("6_pvtw2")
-river_width_world = 12.0
+script = ExtResource("ext_script")
 level_id = 35
 level_title = "Level 35: Ironjaw's Crucible"
-biome_name = "brimstone"
-base_scroll_speed = 11.9
-chunk_scenes = Array[PackedScene]([ExtResource("1_ab0do"), ExtResource("2_cv6pk"), ExtResource("3_d2twa"), ExtResource("2_cv6pk"), ExtResource("2_cv6pk"), ExtResource("3_d2twa"), ExtResource("2_cv6pk"), ExtResource("2_cv6pk"), ExtResource("3_d2twa"), ExtResource("4_cxlmq")])
-completion_doubloon_reward = 320
-horizon_texture = ExtResource("5_dvti2")
-water_albedo = Color(0.35, 0.1, 0.08, 0.95)
-fog_color = Color(0.45, 0.18, 0.12, 1)
-fog_density = 0.02
+biome_name = "tropical"
+base_scroll_speed = 10.8
+chunk_scenes = Array[PackedScene]([ExtResource("chunk_1"), ExtResource("chunk_2"), ExtResource("chunk_3"), ExtResource("chunk_2"), ExtResource("chunk_3"), ExtResource("chunk_4"), ExtResource("chunk_2"), ExtResource("chunk_5")])
+completion_doubloon_reward = 909
+horizon_texture = ExtResource("ext_horizon")
+water_albedo = Color(0.08, 0.58, 0.82, 0.88)
+fog_color = Color(0.48, 0.76, 0.94, 1.0)
+fog_density = 0.005
+river_width_world = 12.0

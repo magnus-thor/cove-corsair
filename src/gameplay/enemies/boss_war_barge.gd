@@ -63,8 +63,12 @@ var ram_timer: float = 0.0
 var is_charging: bool = false
 var charge_direction: int = 1 # 1 = forward, -1 = retreating
 var original_combat_z: float = -18.0
-
+var is_arena_active: bool = false
 var _base_mesh_scale: Vector3 = Vector3.ONE
+
+func activate_arena() -> void:
+	is_arena_active = true
+	print("[BOSS ARENA] Activated Captain Ironjaw: vulnerability enabled | HP: %d/%d" % [current_hp, max_hp])
 
 func _ready() -> void:
 	_clean_shadow_nodes(self)
@@ -74,14 +78,17 @@ func _ready() -> void:
 	if has_node("/root/GameState"):
 		var gs = get_node("/root/GameState")
 		if "current_level" in gs:
-			if gs.current_level == 2:
-				max_hp = 75
-			elif gs.current_level == 5:
-				max_hp = 85
-			elif gs.current_level == 10:
-				max_hp = 120
-			elif gs.current_level == 15:
-				max_hp = 220
+			var lvl: int = gs.current_level
+			if lvl <= 5:
+				max_hp = 380
+			elif lvl <= 10:
+				max_hp = 550
+			elif lvl <= 20:
+				max_hp = 850
+			elif lvl <= 35:
+				max_hp = 1400
+			else:
+				max_hp = 2000
 	
 	current_hp = max_hp
 	original_combat_z = combat_z_offset
@@ -92,6 +99,7 @@ func _ready() -> void:
 	# Initial UI Trigger
 	GameState.boss_spawned_event.emit("Captain Ironjaw's War-Barge", max_hp)
 	GameState.boss_health_changed.emit(current_hp, max_hp)
+
 	
 	if left_cannon_node: left_cannon_node.position = Vector3(-2.0, 0.5, 0.5)
 	if right_cannon_node: right_cannon_node.position = Vector3(2.0, 0.5, 0.5)
@@ -548,10 +556,11 @@ func _process_ram_charge(delta: float) -> void:
 			ram_timer = 0.0
 
 func take_damage(amount: int) -> void:
-	if _is_defeated:
+	if _is_defeated or not is_arena_active:
 		return
 		
 	var actual_damage = amount
+
 	if is_venting_steam:
 		actual_damage *= 2 # Critical hit during steam venting!
 		_show_crit_flash()

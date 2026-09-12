@@ -1,9 +1,9 @@
 ---
 level_id: 25
 level_title: "Level 25: Phantom Trench"
-biome_name: "bayou"
-base_scroll_speed: 10.8
-completion_doubloon_reward: 240
+biome_name: "black_tide_bayou"
+base_scroll_speed: 9.5
+completion_doubloon_reward: 684
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_25.tres"
 ---
