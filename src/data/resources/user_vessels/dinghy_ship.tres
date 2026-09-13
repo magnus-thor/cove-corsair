@@ -35,5 +35,5 @@ hardpoint_scales = {
 }
 current_tier = 1
 upgrade_costs = Array[int]([0, 250, 1000])
-tier_descriptions = Array[String](["Base Bow Chaser", "+ Monkey Bomber Crew", "+ Skeleton Tosser Crew"])
+tier_descriptions = Array[String](["Standard Hull (2 HP, 1 Weapon Socket)", "Reinforced Hull (3 HP, 1 Weapon + 1 Crew Socket)", "Masterwork Hull (4 HP, 1 Weapon + 2 Crew Sockets)"])
 tier_sockets = Array[Array]([["BowMount"], ["BowMount", "MidDeckCrew"], ["BowMount", "MidDeckCrew", "AftDeckCrew"]])

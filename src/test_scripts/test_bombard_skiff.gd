@@ -146,6 +146,8 @@ func _ready() -> void:
 
 	# --- TEST 4: Tier 3 Full Battery & Scattershot Fan Spread ---
 	print("\n--- 4. Testing Tier 3 Battery & Scattershot Carronades ---")
+	GameState.unlocked_crew["monkey_bomber"] = 1
+	GameState.equip_crew("bombard_skiff", "QuarterdeckCrew", "monkey_bomber")
 	boat.apply_tier(3)
 	assert_test(boat.equipped_weapons.has("BowMortarMount"), "Tier 3 has 'BowMortarMount'")
 	assert_test(boat.equipped_weapons.has("QuarterdeckCrew"), "Tier 3 has 'QuarterdeckCrew'")

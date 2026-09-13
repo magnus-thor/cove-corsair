@@ -271,49 +271,22 @@ theme_override_font_sizes/font_size = 24
 theme_override_styles/normal = SubResource("StyleBoxFlat_tab_active")
 text = "VESSELS"
 
-[node name="TabCrew" type="PanelContainer" parent="RootMargin/MainVBox/TabsHBox"]
+[node name="TabCrew" type="Button" parent="RootMargin/MainVBox/TabsHBox"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 size_flags_horizontal = 3
-mouse_filter = 0
-theme_override_styles/panel = SubResource("StyleBoxFlat_tab_locked")
-
-[node name="Margin" type="MarginContainer" parent="RootMargin/MainVBox/TabsHBox/TabCrew"]
-layout_mode = 2
-mouse_filter = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_right = 8
-
-[node name="HBox" type="HBoxContainer" parent="RootMargin/MainVBox/TabsHBox/TabCrew/Margin"]
-layout_mode = 2
-mouse_filter = 2
-theme_override_constants/separation = 6
-alignment = 1
-
-[node name="CrewLabel" type="Label" parent="RootMargin/MainVBox/TabsHBox/TabCrew/Margin/HBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.72, 0.64, 0.56, 1)
-theme_override_fonts/font = ExtResource("2_font_lilita")
-theme_override_font_sizes/font_size = 22
-text = "CREW"
-vertical_alignment = 1
-
-[node name="SoonBadge" type="PanelContainer" parent="RootMargin/MainVBox/TabsHBox/TabCrew/Margin/HBox"]
-custom_minimum_size = Vector2(46, 22)
-layout_mode = 2
-size_flags_vertical = 4
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_soon_badge")
-
-[node name="SoonLabel" type="Label" parent="RootMargin/MainVBox/TabsHBox/TabCrew/Margin/HBox/SoonBadge"]
-layout_mode = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.2, 0.12, 0.05, 1)
+theme_override_constants/outline_size = 4
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.5)
+theme_override_constants/shadow_offset_y = 2
 theme_override_fonts/font = ExtResource("2_font_lilita")
-theme_override_font_sizes/font_size = 13
-text = "SOON"
-horizontal_alignment = 1
-vertical_alignment = 1
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab_locked")
+text = "CREW"
 
 [node name="TabWeapons" type="PanelContainer" parent="RootMargin/MainVBox/TabsHBox"]
 unique_name_in_owner = true

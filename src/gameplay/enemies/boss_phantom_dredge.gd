@@ -14,7 +14,7 @@ enum State { APPROACHING, COMBAT, SUBMERGED, DYING }
 # Inspector-exposed Boss Tuning Properties
 @export var attack_interval: float = 2.4
 @export var spawn_hazard_enabled: bool = true
-@export var hazard_telegraph_time: float = 1.8
+@export var hazard_telegraph_time: float = 1.6
 @export var max_active_adds: int = 2
 
 # Phase thresholds
@@ -41,6 +41,7 @@ var _flash_tween: Tween
 @export var biogas_pod_scene: PackedScene = preload("res://src/gameplay/obstacles/hazard_biogas_pod.tscn")
 @export var doubloon_scene: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
 @export var explosion_scene: PackedScene = preload("res://src/gameplay/vfx/barrel_explosion.tscn")
+@export var telegraph_geyser_scene: PackedScene = preload("res://src/gameplay/vfx/telegraph_spectral_geyser.tscn")
 
 @onready var visual_container: Node3D = get_node_or_null("VisualContainer") if get_node_or_null("VisualContainer") else get_node_or_null("BossSprite")
 @onready var hit_box: Area3D = $HitBox
@@ -116,13 +117,15 @@ func _process_combat(delta: float) -> void:
 		visual_container.position.y = _base_y + sin(_weave_time * 2.5) * 0.08
 		
 	# Spectral Cannon Volley (Fires downriver toward player)
-	_cannon_timer += delta
-	var cannon_cd = attack_interval if current_phase == 1 else (attack_interval * 0.8 if current_phase == 2 else attack_interval * 0.6)
-	if _cannon_timer >= cannon_cd:
-		_cannon_timer = 0.0
-		_fire_spectral_cannon_volley()
+	# PAUSE direct boss cannon fire while geysers are channeling/warning/active
+	if not is_barrage_active:
+		_cannon_timer += delta
+		var cannon_cd = attack_interval if current_phase == 1 else (attack_interval * 0.8 if current_phase == 2 else attack_interval * 0.6)
+		if _cannon_timer >= cannon_cd:
+			_cannon_timer = 0.0
+			_fire_spectral_cannon_volley()
 
-	# Poison Mortar (paused if hazard spawning disabled or during active barrage)
+	# Poison Mortar / Geysers (paused if hazard spawning disabled or during active barrage)
 	if spawn_hazard_enabled and not is_barrage_active:
 		_mortar_timer += delta
 		var mortar_cooldown = 3.5 if current_phase == 1 else (2.5 if current_phase == 2 else 1.6)
@@ -147,7 +150,7 @@ func _process_combat(delta: float) -> void:
 		_spawn_bayou_adds()
 
 func _fire_spectral_cannon_volley() -> void:
-	if not enemy_cannonball_scene or current_state == State.SUBMERGED or _is_defeated:
+	if not enemy_cannonball_scene or current_state == State.SUBMERGED or _is_defeated or is_barrage_active:
 		return
 	AudioManager.play_sfx("cannon_shots", 0.85, 1.15, -2.0)
 	var player = get_tree().get_first_node_in_group("player")
@@ -186,53 +189,81 @@ func _fire_poison_mortars() -> void:
 		return
 		
 	# Select which lateral lane to leave GUARANTEED clear:
-	# Available lateral lanes: -3.5 (Left), 0.0 (Center), 3.5 (Right)
-	var lanes = [-3.5, 0.0, 3.5]
+	# Available lateral lanes: -3.2 (Left), 0.0 (Center), 3.2 (Right)
+	var lanes = [-3.2, 0.0, 3.2]
 	var safe_lane = lanes.pick_random()
 	var attack_lanes = lanes.filter(func(l): return l != safe_lane)
 	
 	is_barrage_active = true
-	var count = min(attack_lanes.size(), 2 if current_phase == 1 else 3)
+	var count = min(attack_lanes.size(), 2)
 	for i in range(count):
-		var target_lane_x = attack_lanes[i % attack_lanes.size()]
+		var target_lane_x = attack_lanes[i]
 		get_tree().create_timer(i * 0.25).timeout.connect(func():
 			if _is_defeated or not is_instance_valid(self):
 				is_barrage_active = false
 				return
-			var target_pos = Vector3(target_lane_x + randf_range(-0.4, 0.4), 0, player.global_position.z + randf_range(-1.5, 1.5))
+			var target_pos = Vector3(target_lane_x + randf_range(-0.15, 0.15), 0, player.global_position.z + randf_range(-1.2, 1.2))
 			var is_last = (i == count - 1)
 			_telegraph_and_strike_mortar(target_pos, is_last)
 		)
 
 func _telegraph_and_strike_mortar(pos: Vector3, is_last: bool = false) -> void:
-	var marker = MeshInstance3D.new()
-	var disc = CylinderMesh.new()
-	disc.top_radius = 1.6
-	disc.bottom_radius = 1.6
-	disc.height = 0.02
-	marker.mesh = disc
-	
-	var mat = StandardMaterial3D.new()
-	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.albedo_color = Color(0.1, 0.9, 0.3, 0.35)
-	marker.material_override = mat
-	get_tree().current_scene.add_child(marker)
-	marker.global_position = Vector3(pos.x, 0.03, pos.z)
-	
-	AudioManager.play_sfx("cannon_shots", 0.8, 1.0)
-	
-	var tele_duration = maxf(1.6, hazard_telegraph_time)
-	var tween = marker.create_tween()
-	var vfx_scene = explosion_scene
-	var tree = get_tree()
-	tween.tween_property(mat, "albedo_color:a", 0.8, tele_duration)
-	tween.tween_callback(Callable(BossPhantomDredge, "execute_poison_mortar_detonation").bind(marker.global_position, vfx_scene, tree))
-	tween.tween_callback(func():
+	if _is_defeated or not is_instance_valid(self):
 		if is_last:
 			is_barrage_active = false
-	)
-	tween.tween_callback(marker.queue_free)
+		return
+
+	var tele_duration = maxf(1.6, hazard_telegraph_time)
+	var scene_to_use = telegraph_geyser_scene
+	var tree = get_tree()
+	var root = tree.current_scene if tree else null
+	if not root:
+		root = get_parent()
+	if not root:
+		if is_last:
+			is_barrage_active = false
+		return
+
+	AudioManager.play_sfx("cannon_shots", 0.8, 1.0)
+
+	if scene_to_use:
+		var marker = scene_to_use.instantiate()
+		root.add_child(marker)
+		marker.global_position = Vector3(pos.x, 0.03, pos.z)
+		marker.setup(tele_duration, 1.6)
+		var vfx_scene = explosion_scene
+		marker.countdown_finished.connect(func(detonation_pos: Vector3):
+			BossPhantomDredge.execute_poison_mortar_detonation(detonation_pos, vfx_scene, tree)
+			if is_last:
+				tree.create_timer(0.4).timeout.connect(func():
+					is_barrage_active = false
+				)
+		)
+	else:
+		var marker = MeshInstance3D.new()
+		var disc = CylinderMesh.new()
+		disc.top_radius = 1.6
+		disc.bottom_radius = 1.6
+		disc.height = 0.02
+		marker.mesh = disc
+		
+		var mat = StandardMaterial3D.new()
+		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		mat.albedo_color = Color(0.1, 0.9, 0.3, 0.35)
+		marker.material_override = mat
+		root.add_child(marker)
+		marker.global_position = Vector3(pos.x, 0.03, pos.z)
+		
+		var tween = marker.create_tween()
+		var vfx_scene = explosion_scene
+		tween.tween_property(mat, "albedo_color:a", 0.8, tele_duration)
+		tween.tween_callback(Callable(BossPhantomDredge, "execute_poison_mortar_detonation").bind(marker.global_position, vfx_scene, tree))
+		tween.tween_callback(func():
+			if is_last:
+				is_barrage_active = false
+		)
+		tween.tween_callback(marker.queue_free)
 
 static func execute_poison_mortar_detonation(pos: Vector3, vfx_prefab: PackedScene, tree: SceneTree) -> void:
 	if not tree:
@@ -350,6 +381,8 @@ func _resurface() -> void:
 	_fire_poison_mortars()
 
 func _spawn_bayou_adds(lane_x_override: float = NAN, type_choice: int = -1) -> void:
+	if is_barrage_active:
+		return # Enforce add suppression: zero new adds while geysers are warning or active
 	var existing_enemies = get_tree().get_nodes_in_group("enemies").filter(
 		func(e): return is_instance_valid(e) and not e.is_in_group("boss") and not e.is_queued_for_deletion()
 	)
@@ -422,12 +455,25 @@ func _check_phase() -> void:
 		weave_speed = 2.0
 		AudioManager.play_sfx("gate_passes", 0.7, 0.9)
 
+func die() -> void:
+	boss_defeat()
+
 func boss_defeat() -> void:
 	if _is_defeated:
 		return
 	_is_defeated = true
+	is_barrage_active = false
 	current_state = State.DYING
 	GameState.targets_destroyed += 1
+	
+	# Immediate cleanup of active telegraphs so lingering geysers don't damage player after victory
+	var telegraphs = get_tree().get_nodes_in_group("spectral_geyser_telegraphs")
+	for tele in telegraphs:
+		if is_instance_valid(tele):
+			if tele.has_method("cancel_and_cleanup"):
+				tele.cancel_and_cleanup()
+			else:
+				tele.queue_free()
 	
 	# Series of massive green and fire explosions
 	var tween = create_tween()

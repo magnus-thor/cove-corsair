@@ -26,6 +26,9 @@ extends Area3D
 ## Splash radius multiplier applied when cannonballs exceed soft cap
 @export var splash_radius_multiplier: float = 1.0
 
+var crew_id: String = ""
+var crew_level: int = 1
+
 ## Hit splash VFX to spawn on impact or expiration
 @export var hit_splash_scene: PackedScene = preload("res://src/gameplay/vfx/hit_splash.tscn")
 
@@ -78,6 +81,33 @@ func setup(p_direction: Vector3, p_ammo_data: AmmoData, p_weapon_data: WeaponDat
 	# Determine damage
 	damage = ammo_data.damage if ammo_data else 1
 	
+	# Determine crew overrides
+	if has_meta("crew_id"):
+		crew_id = str(get_meta("crew_id"))
+	if has_meta("crew_level"):
+		crew_level = int(get_meta("crew_level"))
+		
+	if crew_id == "monkey_bomber":
+		if crew_level == 1:
+			damage = 3
+			splash_radius_multiplier = 1.0
+		elif crew_level == 2:
+			damage = 5
+			splash_radius_multiplier = 1.12
+		else:
+			damage = 5
+			splash_radius_multiplier = 1.12
+	elif crew_id == "skeleton_tosser":
+		if crew_level == 1:
+			damage = 4
+			splash_radius_multiplier = 0.8
+		elif crew_level == 2:
+			damage = 6
+			splash_radius_multiplier = 1.12
+		else:
+			damage = 6
+			splash_radius_multiplier = 1.12
+
 	# Determine scale
 	if ammo_data and ammo_data.scale_multiplier != 1.0:
 		scale = Vector3.ONE * ammo_data.scale_multiplier
@@ -447,6 +477,75 @@ func _apply_splash_damage(exclude_target: Node = null) -> void:
 				var dist = (obj as Node3D).global_position.distance_to(global_position)
 				if dist <= radius and obj.has_method("take_damage"):
 					obj.take_damage(splash_dmg)
+
+	if crew_id == "monkey_bomber" and crew_level >= 3 and not has_meta("is_cluster_sub"):
+		_trigger_cluster_bounce()
+	elif crew_id == "skeleton_tosser" and crew_level >= 3:
+		_trigger_lingering_napalm()
+
+func _trigger_cluster_bounce() -> void:
+	var root = get_tree().current_scene if get_tree() else get_parent()
+	if not root:
+		return
+	var ball_scene = load("res://src/gameplay/projectiles/cannonball.tscn")
+	if not ball_scene:
+		return
+	for offset_x in [-1.0, 1.0]:
+		var mini = ball_scene.instantiate() as Area3D
+		mini.set_meta("is_cluster_sub", true)
+		root.add_child(mini)
+		mini.global_position = global_position + Vector3(offset_x, 0.4, randf_range(-0.4, 0.4))
+		mini.damage = 3
+		mini.speed = 8.0
+		mini.max_range = 3.5
+		var dir = Vector3(offset_x * 0.4, 0.2, -0.8).normalized()
+		mini.setup(dir, ammo_data, null)
+		mini.scale = Vector3(0.5, 0.5, 0.5)
+
+func _trigger_lingering_napalm() -> void:
+	var root = get_tree().current_scene if get_tree() else get_parent()
+	if not root:
+		return
+	var puddle = Area3D.new()
+	puddle.collision_layer = 2
+	puddle.collision_mask = 5 # hits enemies and destructibles
+	root.add_child(puddle)
+	puddle.global_position = Vector3(global_position.x, 0.05, global_position.z)
+	
+	var col = CollisionShape3D.new()
+	var shape = CylinderShape3D.new()
+	shape.radius = 2.4
+	shape.height = 1.0
+	col.shape = shape
+	puddle.add_child(col)
+	
+	# Visual fire pool
+	var mesh_inst = MeshInstance3D.new()
+	var disc = CylinderMesh.new()
+	disc.top_radius = 2.4
+	disc.bottom_radius = 2.4
+	disc.height = 0.02
+	mesh_inst.mesh = disc
+	var mat = StandardMaterial3D.new()
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.albedo_color = Color(1.0, 0.4, 0.05, 0.6)
+	mesh_inst.material_override = mat
+	puddle.add_child(mesh_inst)
+	
+	# Napalm damage ticks over 2 seconds
+	var napalm_tween = puddle.create_tween()
+	for i in range(4):
+		napalm_tween.tween_callback(func():
+			if is_instance_valid(puddle):
+				for body in puddle.get_overlapping_areas():
+					if is_instance_valid(body) and body.is_in_group("enemies") and not body.is_in_group("player"):
+						if body.has_method("take_damage"):
+							body.take_damage(2)
+		)
+		napalm_tween.tween_interval(0.5)
+	napalm_tween.tween_property(mat, "albedo_color:a", 0.0, 0.4)
+	napalm_tween.tween_callback(puddle.queue_free)
 
 func apply_gate_glow() -> void:
 	var sprite_node = get_node_or_null("Sprite3D") as Sprite3D

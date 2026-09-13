@@ -28,15 +28,23 @@ signal shipyard_closed
 
 # Category Tabs
 @onready var tab_vessels: Button = %TabVessels
-@onready var tab_crew: PanelContainer = %TabCrew
+@onready var tab_crew: Button = %TabCrew
 @onready var tab_weapons: PanelContainer = %TabWeapons
 
 const CARD_SCENE: PackedScene = preload("res://src/ui/shipyard/vessel_card.tscn")
 const VesselCardScript = preload("res://src/ui/shipyard/vessel_card.gd")
+const CREW_CARD_SCENE: PackedScene = preload("res://src/ui/shipyard/crew_card.tscn")
+const CrewCardScript = preload("res://src/ui/shipyard/crew_card.gd")
+
+enum TabType { VESSELS, CREW }
+var current_tab: TabType = TabType.VESSELS
 
 var vessel_ids: Array[String] = ["dinghy", "sloop", "ironclad", "bombard_skiff"]
 var card_instances: Dictionary = {} # vessel_id -> VesselCard
 var selected_vessel_id: String = "dinghy"
+
+var crew_ids: Array[String] = ["monkey_bomber", "skeleton_tosser"]
+var crew_card_instances: Dictionary = {} # crew_id -> CrewCard
 
 # Action button state enum
 enum ActionState { BUY, UPGRADE, EQUIP, EQUIPPED, DISABLED }
@@ -48,6 +56,8 @@ var style_btn_upgrade: StyleBoxFlat
 var style_btn_equip: StyleBoxFlat
 var style_btn_disabled: StyleBoxFlat
 var style_btn_upgrade_disabled: StyleBoxFlat
+var style_tab_active: StyleBoxFlat
+var style_tab_inactive: StyleBoxFlat
 
 func _ready() -> void:
 	GameState.set_performance_mode(false)
@@ -63,13 +73,17 @@ func _ready() -> void:
 	if equip_button:
 		equip_button.pressed.connect(_on_equip_pressed)
 
+	if tab_vessels:
+		tab_vessels.pressed.connect(_on_tab_vessels_pressed)
 	if tab_crew:
-		tab_crew.gui_input.connect(_on_locked_tab_clicked)
+		tab_crew.pressed.connect(_on_tab_crew_pressed)
 	if tab_weapons:
 		tab_weapons.gui_input.connect(_on_locked_tab_clicked)
 
 	GameState.doubloons_changed.connect(_on_doubloons_changed)
 	GameState.active_vessel_changed.connect(_on_active_vessel_changed)
+	GameState.crew_unlocked.connect(func(_id, _lvl): _refresh_crew_cards())
+	GameState.crew_equipped.connect(func(_ship, _sock, _id): _refresh_crew_cards())
 
 	# Default selected vessel to active vessel
 	if GameState.active_vessel in vessel_ids:
@@ -77,6 +91,7 @@ func _ready() -> void:
 	else:
 		selected_vessel_id = "dinghy"
 
+	_update_tab_headers()
 	_build_grid_cards()
 	_update_purse_display()
 	_update_inspection_drawer()
@@ -155,6 +170,31 @@ func _init_button_styles() -> void:
 	style_btn_upgrade_disabled.corner_radius_top_right = 16
 	style_btn_upgrade_disabled.corner_radius_bottom_right = 16
 	style_btn_upgrade_disabled.corner_radius_bottom_left = 16
+
+	# Tab styles
+	style_tab_active = StyleBoxFlat.new()
+	style_tab_active.bg_color = Color(0.85, 0.45, 0.12, 1.0)
+	style_tab_active.border_width_left = 3
+	style_tab_active.border_width_top = 3
+	style_tab_active.border_width_right = 3
+	style_tab_active.border_width_bottom = 3
+	style_tab_active.border_color = Color(1.0, 0.82, 0.45, 1.0)
+	style_tab_active.corner_radius_top_left = 12
+	style_tab_active.corner_radius_top_right = 12
+	style_tab_active.corner_radius_bottom_right = 12
+	style_tab_active.corner_radius_bottom_left = 12
+
+	style_tab_inactive = StyleBoxFlat.new()
+	style_tab_inactive.bg_color = Color(0.24, 0.18, 0.14, 0.85)
+	style_tab_inactive.border_width_left = 2
+	style_tab_inactive.border_width_top = 2
+	style_tab_inactive.border_width_right = 2
+	style_tab_inactive.border_width_bottom = 2
+	style_tab_inactive.border_color = Color(0.4, 0.3, 0.24, 1.0)
+	style_tab_inactive.corner_radius_top_left = 12
+	style_tab_inactive.corner_radius_top_right = 12
+	style_tab_inactive.corner_radius_bottom_right = 12
+	style_tab_inactive.corner_radius_bottom_left = 12
 
 func _build_grid_cards() -> void:
 	if not grid_container:
@@ -363,12 +403,101 @@ func _on_action_pressed() -> void:
 
 func _on_doubloons_changed(_amount: int) -> void:
 	_update_purse_display()
-	_refresh_card_selections()
-	_update_inspection_drawer()
+	if current_tab == TabType.VESSELS:
+		_refresh_card_selections()
+		_update_inspection_drawer()
+	else:
+		_refresh_crew_cards()
 
 func _on_active_vessel_changed(_v_id: String) -> void:
-	_refresh_card_selections()
+	if current_tab == TabType.VESSELS:
+		_refresh_card_selections()
+		_update_inspection_drawer()
+	else:
+		_refresh_crew_cards()
+
+func _on_tab_vessels_pressed() -> void:
+	if current_tab == TabType.VESSELS:
+		return
+	current_tab = TabType.VESSELS
+	AudioManager.play_sfx("gate_passes", 1.0, 1.2)
+	_update_tab_headers()
+	_build_grid_cards()
+	if drawer_panel:
+		drawer_panel.visible = true
 	_update_inspection_drawer()
+
+func _on_tab_crew_pressed() -> void:
+	if current_tab == TabType.CREW:
+		return
+	current_tab = TabType.CREW
+	AudioManager.play_sfx("gate_passes", 1.0, 1.2)
+	_update_tab_headers()
+	if drawer_panel:
+		drawer_panel.visible = false
+	_build_crew_cards()
+
+func _update_tab_headers() -> void:
+	if tab_vessels:
+		if current_tab == TabType.VESSELS:
+			tab_vessels.add_theme_stylebox_override("normal", style_tab_active)
+			tab_vessels.modulate = Color.WHITE
+		else:
+			tab_vessels.add_theme_stylebox_override("normal", style_tab_inactive)
+			tab_vessels.modulate = Color(0.7, 0.7, 0.7, 0.8)
+
+	if tab_crew:
+		if current_tab == TabType.CREW:
+			tab_crew.add_theme_stylebox_override("normal", style_tab_active)
+			tab_crew.modulate = Color.WHITE
+		else:
+			tab_crew.add_theme_stylebox_override("normal", style_tab_inactive)
+			tab_crew.modulate = Color(0.7, 0.7, 0.7, 0.8)
+
+func _build_crew_cards() -> void:
+	if not grid_container:
+		return
+
+	# Clear existing children
+	for child in grid_container.get_children():
+		child.queue_free()
+	card_instances.clear()
+	crew_card_instances.clear()
+
+	for c_id in crew_ids:
+		var card = CREW_CARD_SCENE.instantiate() as CrewCardScript
+		grid_container.add_child(card)
+		card.setup_crew(c_id)
+		card.buy_requested.connect(_on_crew_buy_requested)
+		card.upgrade_requested.connect(_on_crew_upgrade_requested)
+		card.equip_requested.connect(_on_crew_equip_requested)
+		crew_card_instances[c_id] = card
+
+func _refresh_crew_cards() -> void:
+	for c_id in crew_card_instances:
+		var card = crew_card_instances[c_id]
+		if is_instance_valid(card) and card.has_method("update_card"):
+			card.update_card()
+
+func _on_crew_buy_requested(c_id: String) -> void:
+	if GameState.buy_crew(c_id):
+		AudioManager.play_sfx("coin_pickups", 1.0, 1.2)
+		AudioManager.play_sfx("barrel_hits")
+		_update_purse_display()
+		_refresh_crew_cards()
+
+func _on_crew_upgrade_requested(c_id: String) -> void:
+	if GameState.upgrade_crew_level(c_id):
+		AudioManager.play_sfx("coin_pickups", 1.1, 1.3)
+		AudioManager.play_sfx("gate_passes")
+		_update_purse_display()
+		_refresh_crew_cards()
+
+func _on_crew_equip_requested(c_id: String) -> void:
+	if GameState.toggle_equip_crew_active_ship(c_id):
+		AudioManager.play_sfx("coin_pickups", 1.0, 1.2)
+		AudioManager.play_sfx("gate_passes")
+		_refresh_crew_cards()
 
 func _on_locked_tab_clicked(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
@@ -391,3 +520,4 @@ func _format_number(val: int) -> String:
 	if val < 0:
 		res = "-" + res
 	return res
+

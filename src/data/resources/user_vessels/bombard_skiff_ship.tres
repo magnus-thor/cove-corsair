@@ -40,10 +40,9 @@ hardpoint_scales = {
 socket_weapons = {
 "BowMortarMount": "res://src/data/resources/user_crew/weapon_bow_mortar.tres",
 "PortRailMount": "res://src/data/resources/user_crew/weapon_scattershot.tres",
-"QuarterdeckCrew": "res://src/data/resources/user_crew/crew_monkey_bomber.tres",
 "StarboardRailMount": "res://src/data/resources/user_crew/weapon_scattershot.tres"
 }
 current_tier = 1
 upgrade_costs = Array[int]([1000, 1200, 2200])
-tier_descriptions = Array[String](["Heavy Siege Mortar (AoE)", "+ Quarterdeck Crew Support", "+ Dual Side Scattershot Carronades"])
+tier_descriptions = Array[String](["Artillery Skiff (3 HP, 1 Weapon Socket)", "Reinforced Keel (4 HP, 1 Weapon + 1 Crew Socket)", "Siege Dreadnought (5 HP, All Sockets Unlocked)"])
 tier_sockets = Array[Array]([["BowMortarMount"], ["BowMortarMount", "QuarterdeckCrew"], ["BowMortarMount", "QuarterdeckCrew", "PortRailMount", "StarboardRailMount"]])

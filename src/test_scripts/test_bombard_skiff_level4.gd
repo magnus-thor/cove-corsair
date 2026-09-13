@@ -88,6 +88,8 @@ func _ready() -> void:
 	GameState.upgrade_vessel_tier("bombard_skiff")
 	assert_test(GameState.get_vessel_tier("bombard_skiff") == 3, "Bombard Skiff upgraded to Tier 3 in GameState")
 
+	GameState.unlocked_crew["monkey_bomber"] = 1
+	GameState.equip_crew("bombard_skiff", "QuarterdeckCrew", "monkey_bomber")
 	player.apply_tier(3)
 	assert_test(player.current_tier == 3, "Player boat applied Tier 3")
 	assert_test(player.equipped_weapons.has("BowMortarMount"), "Tier 3 has BowMortarMount")

@@ -16,6 +16,8 @@ signal boss_spawned_event(boss_name: String, max_val: int)
 @warning_ignore("unused_signal")
 signal boss_health_changed(current: int, max_val: int)
 signal active_vessel_changed(vessel_id: String)
+signal crew_unlocked(crew_id: String, level: int)
+signal crew_equipped(ship_id: String, socket_name: String, crew_id: String)
 @warning_ignore("unused_signal")
 signal run_failed(coins_collected: int, distance_reached: float)
 
@@ -31,6 +33,8 @@ var vessel_tiers: Dictionary = {
 	"bombard_skiff": 1
 }
 var active_vessel: String = "dinghy"
+var unlocked_crew: Dictionary = {}
+var equipped_crew: Dictionary = {}
 # Persistent Progression & Level Map State
 var highest_unlocked_level: int = 1
 var current_selected_level: int = 1
@@ -76,9 +80,9 @@ const VESSEL_CATALOG: Dictionary = {
 		"purchase_price": 0,
 		"tier_prices": { 2: 250, 3: 1000 },
 		"tier_descriptions": {
-			1: "Bow Chaser Cannon",
-			2: "Bow Chaser + Monkey Bomber",
-			3: "Bow Chaser + Monkey Bomber + Skeleton Tosser"
+			1: "Standard Hull & Bow Chaser",
+			2: "Reinforced Hull (3 HP, 1 Weapon + 1 Crew Socket)",
+			3: "Masterwork Hull (4 HP, 1 Weapon + 2 Crew Sockets)"
 		},
 		"base_hp": 2,
 		"base_speed": 12.0,
@@ -93,9 +97,9 @@ const VESSEL_CATALOG: Dictionary = {
 		"purchase_price": 500,
 		"tier_prices": { 2: 700, 3: 1600 },
 		"tier_descriptions": {
-			1: "Bow Chaser Cannon",
-			2: "Bow Chaser + Monkey Bomber + Skeleton Tosser",
-			3: "Bow Chaser + Monkey Bomber + Skeleton Tosser + Port & Starboard Swivel Guns"
+			1: "Standard Hull & Bow Chasers",
+			2: "Reinforced Oak (5 HP, 1 Weapon + 1 Crew Socket)",
+			3: "Fleet Flagship (6 HP, All Sockets Unlocked)"
 		},
 		"base_hp": 4,
 		"base_speed": 11.0,
@@ -110,9 +114,9 @@ const VESSEL_CATALOG: Dictionary = {
 		"purchase_price": 1400,
 		"tier_prices": { 2: 1800, 3: 3000 },
 		"tier_descriptions": {
-			1: "Heavy Frontal Cannon Battery",
-			2: "Heavy Battery + Monkey Bomber + Skeleton Tosser",
-			3: "Heavy Battery + Monkey + Skeleton + Quad Swivel Gun Battery"
+			1: "Armored Plating & Heavy Battery",
+			2: "Reinforced Iron (9 HP, 1 Weapon + 1 Crew Socket)",
+			3: "Dreadnought Hull (10 HP, All Sockets Unlocked)"
 		},
 		"base_hp": 8,
 		"base_speed": 7.5,
@@ -127,9 +131,9 @@ const VESSEL_CATALOG: Dictionary = {
 		"purchase_price": 1000,
 		"tier_prices": { 2: 1200, 3: 2200 },
 		"tier_descriptions": {
-			1: "Heavy Siege Mortar (AoE)",
-			2: "Heavy Mortar + Quarterdeck Crew Support",
-			3: "Heavy Mortar + Crew + Dual Side Scattershot Carronades"
+			1: "Artillery Skiff (3 HP, 1 Weapon Socket)",
+			2: "Reinforced Keel (4 HP, 1 Weapon + 1 Crew Socket)",
+			3: "Siege Dreadnought (5 HP, All Sockets Unlocked)"
 		},
 		"base_hp": 3,
 		"base_speed": 9.0,
@@ -137,6 +141,38 @@ const VESSEL_CATALOG: Dictionary = {
 		"preview_texture": "res://assets/sprites/user_vessels/The Bombard Skiff.png"
 	}
 }
+
+const CREW_CATALOG: Dictionary = {
+	"monkey_bomber": {
+		"id": "monkey_bomber",
+		"name": "Monkey Bomber",
+		"role": "BOMBARDIER",
+		"resource_path": "res://src/data/resources/user_crew/crew_monkey_bomber.tres",
+		"preview_texture": "res://assets/sprites/user_crew/weapon_deckhand_sniper_back.png",
+		"unlock_price": 350,
+		"upgrade_prices": { 2: 500, 3: 850 },
+		"levels": {
+			1: { "damage": 3, "cooldown": 1.2, "description": "3 AoE damage, 1.2s cooldown" },
+			2: { "damage": 5, "cooldown": 1.0, "description": "5 AoE damage, 1.0s cooldown" },
+			3: { "damage": 5, "cooldown": 1.0, "description": "5 AoE damage + secondary mini-cluster bounce" }
+		}
+	},
+	"skeleton_tosser": {
+		"id": "skeleton_tosser",
+		"name": "Skeleton Tosser",
+		"role": "PYROTECHNIC",
+		"resource_path": "res://src/data/resources/user_crew/crew_skeleton_tosser.tres",
+		"preview_texture": "res://assets/sprites/user_crew/skeleton_crew.png",
+		"unlock_price": 550,
+		"upgrade_prices": { 2: 750, 3: 1200 },
+		"levels": {
+			1: { "damage": 4, "cooldown": 1.4, "description": "4 direct damage + short burn" },
+			2: { "damage": 6, "cooldown": 1.2, "description": "6 damage, wider fire radius" },
+			3: { "damage": 6, "cooldown": 1.2, "description": "Lingering napalm effect on water surface" }
+		}
+	}
+}
+
 
 const LEVEL_RESOURCES: Dictionary = {
 	1: "res://src/data/resources/levels/level_01.tres",
@@ -357,6 +393,151 @@ func can_afford_active_vessel_upgrade() -> bool:
 	var cost = get_upgrade_cost(active_vessel, next_tier)
 	return cost > 0 and doubloons >= cost
 
+# --- Crew Meta & Outfitting ---
+func is_crew_unlocked(crew_id: String) -> bool:
+	return unlocked_crew.has(crew_id) and int(unlocked_crew[crew_id]) >= 1
+
+func get_crew_level(crew_id: String) -> int:
+	return int(unlocked_crew.get(crew_id, 0))
+
+func get_crew_unlock_cost(crew_id: String) -> int:
+	if CREW_CATALOG.has(crew_id):
+		return CREW_CATALOG[crew_id]["unlock_price"]
+	return 0
+
+func get_crew_upgrade_cost(crew_id: String, target_level: int) -> int:
+	if CREW_CATALOG.has(crew_id):
+		return CREW_CATALOG[crew_id]["upgrade_prices"].get(target_level, 0)
+	return 0
+
+func buy_crew(crew_id: String) -> bool:
+	if not CREW_CATALOG.has(crew_id):
+		return false
+	if is_crew_unlocked(crew_id):
+		return false
+	var cost = get_crew_unlock_cost(crew_id)
+	if doubloons < cost:
+		return false
+	doubloons -= cost
+	unlocked_crew[crew_id] = 1
+	save_game()
+	doubloons_changed.emit(doubloons)
+	crew_unlocked.emit(crew_id, 1)
+	return true
+
+func upgrade_crew_level(crew_id: String) -> bool:
+	if not is_crew_unlocked(crew_id):
+		return false
+	var cur_lvl = get_crew_level(crew_id)
+	if cur_lvl >= 3:
+		return false
+	var next_lvl = cur_lvl + 1
+	var cost = get_crew_upgrade_cost(crew_id, next_lvl)
+	if doubloons < cost:
+		return false
+	doubloons -= cost
+	unlocked_crew[crew_id] = next_lvl
+	save_game()
+	doubloons_changed.emit(doubloons)
+	crew_unlocked.emit(crew_id, next_lvl)
+	return true
+
+func get_crew_sockets_for_ship(ship_id: String, tier: int = -1) -> Array[String]:
+	var ship_res = get_vessel_resource(ship_id)
+	if not ship_res:
+		return []
+	if tier < 1:
+		tier = get_vessel_tier(ship_id)
+	if ship_res.tier_sockets.is_empty():
+		return []
+	var s_idx = clampi(tier - 1, 0, ship_res.tier_sockets.size() - 1)
+	var active_sockets: Array = ship_res.tier_sockets[s_idx]
+	var crew_sockets: Array[String] = []
+	for s_name in active_sockets:
+		var s_lower = str(s_name).to_lower()
+		if "crew" in s_lower:
+			crew_sockets.append(str(s_name))
+	return crew_sockets
+
+func get_equipped_crew(ship_id: String, socket_name: String) -> String:
+	if not equipped_crew.has(ship_id):
+		return ""
+	var ship_map = equipped_crew[ship_id]
+	if ship_map is Dictionary and ship_map.has(socket_name):
+		return str(ship_map[socket_name])
+	return ""
+
+func is_crew_equipped_on_ship(ship_id: String, crew_id: String) -> bool:
+	if not equipped_crew.has(ship_id):
+		return false
+	var ship_map = equipped_crew[ship_id]
+	if ship_map is Dictionary:
+		for s in ship_map:
+			if ship_map[s] == crew_id:
+				return true
+	return false
+
+func is_crew_equipped_on_active_ship(crew_id: String) -> bool:
+	return is_crew_equipped_on_ship(active_vessel, crew_id)
+
+func equip_crew(ship_id: String, socket_name: String, crew_id: String) -> bool:
+	if not is_crew_unlocked(crew_id):
+		return false
+	if not equipped_crew.has(ship_id) or not (equipped_crew[ship_id] is Dictionary):
+		equipped_crew[ship_id] = {}
+	# If this crew is already on another socket on this ship, unequip from old socket
+	for s in equipped_crew[ship_id].keys():
+		if equipped_crew[ship_id][s] == crew_id:
+			equipped_crew[ship_id].erase(s)
+	equipped_crew[ship_id][socket_name] = crew_id
+	save_game()
+	crew_equipped.emit(ship_id, socket_name, crew_id)
+	return true
+
+func unequip_crew(ship_id: String, socket_name: String) -> bool:
+	if not equipped_crew.has(ship_id) or not (equipped_crew[ship_id] is Dictionary):
+		return false
+	if equipped_crew[ship_id].has(socket_name):
+		equipped_crew[ship_id].erase(socket_name)
+		save_game()
+		crew_equipped.emit(ship_id, socket_name, "")
+		return true
+	return false
+
+func toggle_equip_crew_active_ship(crew_id: String) -> bool:
+	if not is_crew_unlocked(crew_id):
+		return false
+	if not is_vessel_owned(active_vessel):
+		return false
+	var cur_tier = get_vessel_tier(active_vessel)
+	var available_sockets = get_crew_sockets_for_ship(active_vessel, cur_tier)
+	
+	# Safe Ship Swap Guard: If vessel has 0 crew sockets (e.g. Tier 1), cannot equip
+	if available_sockets.is_empty():
+		return false
+		
+	# If already equipped on active ship, unequip it!
+	if is_crew_equipped_on_active_ship(crew_id):
+		var ship_map = equipped_crew.get(active_vessel, {})
+		for s in ship_map.keys():
+			if ship_map[s] == crew_id:
+				unequip_crew(active_vessel, s)
+				return true
+		return false
+		
+	# Otherwise find first open socket or replace first socket
+	var target_socket = ""
+	var ship_map = equipped_crew.get(active_vessel, {})
+	for s in available_sockets:
+		if not ship_map.has(s) or ship_map[s] == "":
+			target_socket = s
+			break
+	if target_socket == "":
+		target_socket = available_sockets[0]
+		
+	return equip_crew(active_vessel, target_socket, crew_id)
+
+
 func add_doubloons(amount: int) -> void:
 	if is_game_active:
 		add_run_doubloons(amount)
@@ -462,6 +643,8 @@ func reset_save_data() -> void:
 		"bombard_skiff": 1
 	}
 	active_vessel = "dinghy"
+	unlocked_crew = {}
+	equipped_crew = {}
 	highest_unlocked_level = 1
 	current_selected_level = 1
 	unlocked_levels = 1
@@ -483,6 +666,8 @@ func save_game() -> void:
 		"owned_vessels": owned_vessels,
 		"vessel_tiers": vessel_tiers,
 		"active_vessel": active_vessel,
+		"unlocked_crew": unlocked_crew,
+		"equipped_crew": equipped_crew,
 		"highest_unlocked_level": highest_unlocked_level,
 		"current_selected_level": current_selected_level,
 		"just_cleared_level": just_cleared_level,
@@ -508,6 +693,8 @@ func load_game() -> void:
 	owned_vessels = ["dinghy"]
 	vessel_tiers = {"dinghy": 1, "sloop": 1, "ironclad": 1, "bombard_skiff": 1}
 	active_vessel = "dinghy"
+	unlocked_crew = {}
+	equipped_crew = {}
 	highest_unlocked_level = 1
 	current_selected_level = 1
 	unlocked_levels = 1
@@ -564,6 +751,28 @@ func load_game() -> void:
 		else:
 			active_vessel = "dinghy"
 
+		if data.has("unlocked_crew") and data["unlocked_crew"] is Dictionary:
+			unlocked_crew = {}
+			for c_id in data["unlocked_crew"]:
+				var cid_str = str(c_id)
+				if cid_str in CREW_CATALOG:
+					unlocked_crew[cid_str] = clamp(int(data["unlocked_crew"][c_id]), 1, 3)
+		else:
+			unlocked_crew = {}
+
+		if data.has("equipped_crew") and data["equipped_crew"] is Dictionary:
+			equipped_crew = {}
+			for s_id in data["equipped_crew"]:
+				var sid_str = str(s_id)
+				if data["equipped_crew"][s_id] is Dictionary:
+					equipped_crew[sid_str] = {}
+					for sock in data["equipped_crew"][s_id]:
+						var c_val = str(data["equipped_crew"][s_id][sock])
+						if c_val in CREW_CATALOG:
+							equipped_crew[sid_str][str(sock)] = c_val
+		else:
+			equipped_crew = {}
+
 		if data.has("highest_unlocked_level"):
 			highest_unlocked_level = clamp(int(data["highest_unlocked_level"]), 1, 45)
 		elif data.has("unlocked_levels"):
@@ -605,7 +814,10 @@ func load_game() -> void:
 		active_vessel = "dinghy"
 		owned_vessels = ["dinghy"]
 		vessel_tiers["dinghy"] = 1
+		unlocked_crew = {}
+		equipped_crew = {}
 		highest_unlocked_level = 1
 		current_selected_level = 1
 		unlocked_levels = 1
 		current_level = 1
+

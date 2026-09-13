@@ -8,6 +8,9 @@ extends Node3D
 		if is_node_ready():
 			_apply_weapon_data()
 
+@export var crew_id: String = ""
+@export var crew_level: int = 1
+
 @export var projectile_scene: PackedScene = preload("res://src/gameplay/projectiles/cannonball.tscn")
 
 @onready var sprite_3d: Sprite3D = $Sprite3D
@@ -22,6 +25,10 @@ var current_target: Node3D = null
 var throw_tween: Tween = null
 var wander_tween: Tween = null
 var hop_in_done: bool = false
+
+var fire_rate: float:
+	get:
+		return weapon_data.fire_rate if weapon_data else 1.0
 
 func _ready() -> void:
 	if weapon_data:
@@ -153,6 +160,12 @@ func _apply_weapon_data() -> void:
 		_:
 			scale = Vector3(0.6, 0.6, 0.6)
 	
+	if is_crew:
+		if crew_id == "monkey_bomber" or "monkey" in w_name:
+			weapon_data.fire_rate = 1.2 if crew_level == 1 else 1.0
+		elif crew_id == "skeleton_tosser" or "skeleton" in w_name:
+			weapon_data.fire_rate = 1.4 if crew_level == 1 else 1.2
+
 	fire_timer = randf_range(0.0, weapon_data.fire_rate * 0.5)
 	wander_timer = randf_range(2.0, 3.5)
 	idle_timer = randf_range(0.0, TAU)
@@ -432,6 +445,13 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 			if ball.has_method("set_spawn_pos"):
 				ball.set_spawn_pos(spawn_pos)
 			
+			if "crew_id" in ball:
+				ball.crew_id = crew_id
+			ball.set_meta("crew_id", crew_id)
+			if "crew_level" in ball:
+				ball.crew_level = crew_level
+			ball.set_meta("crew_level", crew_level)
+
 			if ball.has_method("setup"):
 				ball.setup(proj_dir, weapon_data.default_ammo, weapon_data)
 				
@@ -458,6 +478,13 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 			if ball.has_method("set_spawn_pos"):
 				ball.set_spawn_pos(spawn_pos)
 			
+			if "crew_id" in ball:
+				ball.crew_id = crew_id
+			ball.set_meta("crew_id", crew_id)
+			if "crew_level" in ball:
+				ball.crew_level = crew_level
+			ball.set_meta("crew_level", crew_level)
+
 			if ball.has_method("setup"):
 				ball.setup(proj_dir, weapon_data.default_ammo, weapon_data)
 				

@@ -23,11 +23,6 @@ signal run_failed(coins_collected: int, distance_reached: float)
 const DEFAULT_SOCKET_WEAPONS: Dictionary = {
 	"BowMount": "res://src/data/resources/user_crew/weapon_bow_chaser.tres",
 	"BowMortarMount": "res://src/data/resources/user_crew/weapon_bow_mortar.tres",
-	"MidDeckCrew": "res://src/data/resources/user_crew/crew_monkey_bomber.tres",
-	"MonkeyCrew": "res://src/data/resources/user_crew/crew_monkey_bomber.tres",
-	"QuarterdeckCrew": "res://src/data/resources/user_crew/crew_monkey_bomber.tres",
-	"AftDeckCrew": "res://src/data/resources/user_crew/crew_skeleton_tosser.tres",
-	"SkeletonCrew": "res://src/data/resources/user_crew/crew_skeleton_tosser.tres",
 	"PortSwivelMount": "res://src/data/resources/user_crew/weapon_port_swivel.tres",
 	"StarboardSwivelMount": "res://src/data/resources/user_crew/weapon_port_swivel.tres",
 	"PortSwivelMount1": "res://src/data/resources/user_crew/weapon_port_swivel.tres",
@@ -329,20 +324,34 @@ func apply_tier(tier_level: int) -> void:
 	if not ship_data or ship_data.tier_sockets.is_empty():
 		return
 	current_tier = tier_level
+	
+	# Hull Tier Decoupling: strictly scale Base Hull HP and Max Speed with Tier
+	max_health = ship_data.max_health + (tier_level - 1)
+	current_health = max_health
+	keyboard_speed = ship_data.move_speed + (tier_level - 1) * 1.5
+	lerp_speed = keyboard_speed * 1.3
+	health_changed.emit(current_health, max_health)
+
 	var active_sockets: Array = ship_data.tier_sockets[clampi(tier_level - 1, 0, ship_data.tier_sockets.size() - 1)]
 
 	var weapons_map: Dictionary = DEFAULT_SOCKET_WEAPONS.duplicate()
 	if "socket_weapons" in ship_data and not ship_data.socket_weapons.is_empty():
 		weapons_map.merge(ship_data.socket_weapons, true)
 
-	# Filter weapons_map directly against active_sockets
+	# Filter weapons_map directly against active_sockets, decoupling crew throwers
 	var filtered_map: Dictionary = {}
 	for s in active_sockets:
-		if weapons_map.has(s):
+		var s_lower = str(s).to_lower()
+		if "crew" in s_lower:
+			# Crew sockets start empty unless equipped by the player in GameState
+			var equipped_cid = GameState.get_equipped_crew(ship_data.ship_id, str(s)) if GameState else ""
+			if equipped_cid != "" and GameState and GameState.CREW_CATALOG.has(equipped_cid):
+				filtered_map[s] = GameState.CREW_CATALOG[equipped_cid]["resource_path"]
+		elif weapons_map.has(s):
 			filtered_map[s] = weapons_map[s]
 	weapons_map = filtered_map
 
-	# Remove any currently equipped weapons whose sockets are no longer in this tier
+	# Safe Ship Swap Guard: Remove any currently equipped weapons whose sockets are no longer in this tier
 	var sockets_to_remove: Array[String] = []
 	for s in equipped_weapons.keys():
 		if not weapons_map.has(s):
@@ -360,7 +369,13 @@ func apply_tier(tier_level: int) -> void:
 		elif val is WeaponData:
 			w_data = val
 		if w_data:
-			equip_weapon_to_socket(socket_name, w_data)
+			var s_lower = str(socket_name).to_lower()
+			var c_id = ""
+			var c_lvl = 1
+			if "crew" in s_lower and GameState:
+				c_id = GameState.get_equipped_crew(ship_data.ship_id, str(socket_name))
+				c_lvl = GameState.get_crew_level(c_id)
+			equip_weapon_to_socket(socket_name, w_data, c_id, c_lvl)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if is_game_over:
@@ -631,7 +646,7 @@ func _setup_calibration_mode() -> void:
 func clear_all_weapons() -> void:
 	clear_weapons()
 
-func equip_weapon_to_socket(socket_name: String, weapon_data: WeaponData) -> void:
+func equip_weapon_to_socket(socket_name: String, weapon_data: WeaponData, crew_id: String = "", crew_level: int = 1) -> void:
 	if ship_data and not ship_data.hardpoint_offsets.has(socket_name):
 		return # strictly forbid sockets not defined in ship_data
 		
@@ -657,13 +672,17 @@ func equip_weapon_to_socket(socket_name: String, weapon_data: WeaponData) -> voi
 	if equipped_weapons.has(socket_name):
 		var old_weapon = equipped_weapons[socket_name]
 		if is_instance_valid(old_weapon):
-			if old_weapon.weapon_data == weapon_data:
+			if old_weapon.weapon_data == weapon_data and ("crew_level" in old_weapon and old_weapon.crew_level == crew_level):
 				return # Weapon already active and firing seamlessly
 			old_weapon.queue_free()
 		equipped_weapons.erase(socket_name)
 		
 	var attached_weapon_scene = load("res://src/gameplay/player/attached_weapon.tscn")
 	var weapon_instance = attached_weapon_scene.instantiate() as AttachedWeapon
+	if "crew_id" in weapon_instance:
+		weapon_instance.crew_id = crew_id
+	if "crew_level" in weapon_instance:
+		weapon_instance.crew_level = crew_level
 	if weapon_instance.has_method("setup_weapon"):
 		weapon_instance.setup_weapon(weapon_data)
 	else:

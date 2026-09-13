@@ -39,11 +39,16 @@ func _physics_process(delta: float) -> void:
 	if sprite_node:
 		sprite_node.position.y = 1.0 + sin(_time * 4.0) * 0.05
 		
-	# Shooting logic - rapid blowdart burst
-	_shoot_timer += delta
-	if _shoot_timer >= shoot_interval:
+	# Shooting logic - rapid blowdart burst (suppressed while boss geysers are active or warning)
+	var boss = get_tree().get_first_node_in_group("boss")
+	var geysers_active = (boss != null and is_instance_valid(boss) and "is_barrage_active" in boss and boss.is_barrage_active)
+	if geysers_active:
 		_shoot_timer = 0.0
-		_fire_dart_burst()
+	else:
+		_shoot_timer += delta
+		if _shoot_timer >= shoot_interval:
+			_shoot_timer = 0.0
+			_fire_dart_burst()
 		
 	var player = get_tree().get_first_node_in_group("player")
 	var player_z = player.global_position.z if player else 0.0
@@ -55,6 +60,9 @@ func _physics_process(delta: float) -> void:
 
 func _fire_dart_burst() -> void:
 	if not enemy_cannonball_scene:
+		return
+	var boss_node = get_tree().get_first_node_in_group("boss")
+	if boss_node != null and is_instance_valid(boss_node) and "is_barrage_active" in boss_node and boss_node.is_barrage_active:
 		return
 	
 	for i in range(burst_count):
