@@ -7,7 +7,9 @@ extends Node3D
 signal finished
 
 func _ready() -> void:
+	top_level = true
 	if water_column:
+		water_column.local_coords = true
 		water_column.restart()
 		water_column.emitting = true
 		water_column.finished.connect(_on_particles_finished)

@@ -1,6 +1,8 @@
 class_name HazardSeaMine
 extends DestructibleObstacle
 
+@export var explosion_scene: PackedScene = preload("res://src/vfx/vfx_mine_explosion.tscn")
+
 func _ready() -> void:
 	obstacle_type = ObstacleType.SEA_MINE
 	super._ready()
@@ -31,11 +33,25 @@ func die() -> void:
 	if _is_destroyed:
 		return
 	var explosion_pos = global_position
+	explosion_pos.y = 0.05
 	_is_destroyed = true
 	set_deferred("monitoring", false)
 	set_deferred("monitorable", false)
 	
-	# Sea mine explosion VFX/smoke completely removed per user request
+	# Spawn explosion VFX strictly at the mine's world coordinates
+	if VFXManager and VFXManager.has_method("spawn_mine_explosion"):
+		VFXManager.spawn_mine_explosion(explosion_pos)
+	elif VFXManager and VFXManager.has_method("spawn_explosion"):
+		VFXManager.spawn_explosion(explosion_pos)
+	elif explosion_scene:
+		var vfx = explosion_scene.instantiate() as Node3D
+		vfx.top_level = true
+		vfx.position = explosion_pos
+		var root = get_tree().current_scene if get_tree() else null
+		if root:
+			root.add_child(vfx)
+		vfx.global_position = explosion_pos
+
 	AudioManager.play_sfx("sfx_mine_detonate")
 	
 	# Apply knockback and deal 1 fleet damage to the player if close (direct contact)

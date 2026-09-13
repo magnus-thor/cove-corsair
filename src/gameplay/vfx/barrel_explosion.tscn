@@ -65,10 +65,12 @@ material = SubResource("StandardMaterial3D_burst")
 size = Vector2(0.25, 0.25)
 
 [node name="BarrelExplosion" type="Node3D"]
+top_level = true
 script = ExtResource("1_vfx_script")
 max_lifetime = 0.7
 
 [node name="WoodDebrisParticles" type="GPUParticles3D" parent="."]
+local_coords = true
 emitting = false
 amount = 14
 lifetime = 0.6
@@ -78,6 +80,7 @@ process_material = SubResource("ParticleProcessMaterial_debris")
 draw_pass_1 = SubResource("BoxMesh_splinter")
 
 [node name="WaterBurstParticles" type="GPUParticles3D" parent="."]
+local_coords = true
 emitting = false
 amount = 16
 lifetime = 0.5

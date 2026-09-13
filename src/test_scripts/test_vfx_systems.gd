@@ -96,10 +96,15 @@ func _test_mortar_geyser_particles_and_waterline() -> void:
 		assert_test(is_equal_approx(ring.position.y, 0.05), "ShockwaveRing aligned flat at water surface (Y = 0.05)")
 
 func _test_mine_explosion_particles() -> void:
-	print("\n--- 4. Sea Mine Explosion Particles (Disabled / Smoke Removed) ---")
+	print("\n--- 4. Sea Mine Explosion Particles ---")
 	var mine_pos = Vector3(0.0, 0.2, -8.0)
 	var effect = VFXManager.spawn_mine_explosion(mine_pos)
-	assert_test(effect == null, "spawn_mine_explosion returns null while smoke is removed from code")
+	assert_test(effect != null, "spawn_mine_explosion returns valid instance")
+	if effect:
+		assert_test(is_equal_approx(effect.global_position.x, mine_pos.x), "Mine explosion spawned at exact X coordinate")
+		assert_test(is_equal_approx(effect.global_position.z, mine_pos.z), "Mine explosion spawned at exact Z coordinate")
+		var ring = effect.get_node_or_null("SmokeRing")
+		assert_test(ring != null, "SmokeRing mesh exists in mine explosion")
 
 func _test_entity_destruction_hooks() -> void:
 	print("\n--- 5. Entity Destruction Hooks ---")
@@ -138,7 +143,7 @@ func _test_entity_destruction_hooks() -> void:
 	count_before = vfx_container.get_child_count() if vfx_container else 0
 	mine.die()
 	count_after = vfx_container.get_child_count() if vfx_container else 0
-	assert_test(count_after == count_before, "HazardSeaMine.die() does not spawn mine explosion while smoke removed")
+	assert_test(count_after > count_before, "HazardSeaMine.die() spawned mine explosion in world container")
 	
 	# D. Mortar Cannonball splash damage -> spawn_mortar_splash
 	var ball = Cannonball.new()

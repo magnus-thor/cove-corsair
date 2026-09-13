@@ -30,6 +30,9 @@ var crew_id: String = ""
 var crew_level: int = 1
 var ammo_id: String = ""
 
+const TRAIL_3D_SCENE: PackedScene = preload("res://src/vfx/trail_3d.tscn")
+var _trail = null
+
 ## Hit splash VFX to spawn on impact or expiration
 @export var hit_splash_scene: PackedScene = preload("res://src/gameplay/vfx/hit_splash.tscn")
 
@@ -53,6 +56,42 @@ func set_spawn_pos(pos: Vector3) -> void:
 	_spawn_pos = pos
 	_base_spawn_y = pos.y
 	_spawn_pos_initialized = true
+
+func attach_fire_trail() -> void:
+	if _trail and is_instance_valid(_trail):
+		return
+	if TRAIL_3D_SCENE:
+		var t = TRAIL_3D_SCENE.instantiate() as Node3D
+		if t:
+			add_child(t)
+			_trail = t
+
+func _detach_trail() -> void:
+	if _trail and is_instance_valid(_trail):
+		_trail.detach_and_fade()
+		_trail = null
+
+func _check_and_attach_fire_trail() -> void:
+	if _trail and is_instance_valid(_trail):
+		return
+	var is_fire_proj: bool = false
+	if crew_id == "skeleton_tosser":
+		is_fire_proj = true
+	elif has_meta("is_incendiary") and bool(get_meta("is_incendiary")):
+		is_fire_proj = true
+	elif has_meta("is_fire") and bool(get_meta("is_fire")):
+		is_fire_proj = true
+	elif has_meta("is_volcanic") and bool(get_meta("is_volcanic")):
+		is_fire_proj = true
+	elif has_meta("is_magma") and bool(get_meta("is_magma")):
+		is_fire_proj = true
+	elif ammo_data and ("fire" in ammo_data.ammo_name.to_lower() or "incendiary" in ammo_data.ammo_name.to_lower() or "napalm" in ammo_data.ammo_name.to_lower()):
+		is_fire_proj = true
+	elif weapon_data and ("fire" in weapon_data.weapon_name.to_lower() or "incendiary" in weapon_data.weapon_name.to_lower() or "skeleton" in weapon_data.weapon_name.to_lower()):
+		is_fire_proj = true
+
+	if is_fire_proj:
+		attach_fire_trail()
 
 func setup(p_direction: Vector3, p_ammo_data: AmmoData, p_weapon_data: WeaponData = null) -> void:
 	if p_direction != Vector3.ZERO:
@@ -156,6 +195,8 @@ func setup(p_direction: Vector3, p_ammo_data: AmmoData, p_weapon_data: WeaponDat
 		spins_in_flight = true
 	else:
 		spins_in_flight = false
+		
+	_check_and_attach_fire_trail()
 
 func _ready() -> void:
 	top_level = true
@@ -166,6 +207,7 @@ func _ready() -> void:
 	_apply_visual_styling()
 	if ammo_data:
 		_apply_ammo_data()
+	_check_and_attach_fire_trail()
 	call_deferred("_enable_collisions")
 
 func _enable_collisions() -> void:
@@ -360,6 +402,7 @@ func _physics_process(delta: float) -> void:
 		set_deferred("monitorable", false)
 		AudioManager.play_sfx("water_splashes")
 		_spawn_splash(true)
+		_detach_trail()
 		queue_free()
 		return
 
@@ -372,6 +415,7 @@ func _physics_process(delta: float) -> void:
 			print("[CANNON EXPIRED] %s lifetime ended at %s" % [name, global_position])
 		AudioManager.play_sfx("water_splashes")
 		_spawn_splash(true)
+		_detach_trail()
 		queue_free()
 
 func _sweep_chain_shot_mines() -> void:
@@ -421,6 +465,7 @@ func _on_hit(target: Node) -> void:
 						player.take_hit(damage, "enemy_cannonball")
 			AudioManager.play_sfx("barrel_hits")
 			_spawn_splash(false)
+			_detach_trail()
 			queue_free()
 		return
 		
@@ -481,19 +526,22 @@ func _on_hit(target: Node) -> void:
 			_apply_splash_damage(target)
 				
 		_spawn_splash(false)
+		_detach_trail()
 		queue_free()
 
 func _spawn_splash(at_water_level: bool = false) -> void:
 	if hit_splash_scene:
 		var splash = hit_splash_scene.instantiate() as Node3D
+		var splash_pos = global_position
+		if at_water_level:
+			splash_pos.y = 0.02
+		splash.top_level = true
+		splash.position = splash_pos
 		var root = get_tree().current_scene
 		if root:
 			root.add_child(splash)
 		elif get_parent():
 			get_parent().add_child(splash)
-		var splash_pos = global_position
-		if at_water_level:
-			splash_pos.y = 0.02
 		splash.global_position = splash_pos
 
 func _apply_splash_damage(exclude_target: Node = null) -> void:

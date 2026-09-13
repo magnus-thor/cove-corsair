@@ -40,10 +40,12 @@ material = SubResource("StandardMaterial3D_splash")
 size = Vector2(0.18, 0.18)
 
 [node name="HitSplash" type="Node3D"]
+top_level = true
 script = ExtResource("1_vfx_script")
 max_lifetime = 0.5
 
 [node name="SplashParticles" type="GPUParticles3D" parent="."]
+local_coords = true
 emitting = false
 amount = 16
 lifetime = 0.4

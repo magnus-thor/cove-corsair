@@ -32,9 +32,11 @@ inner_radius = 0.82
 outer_radius = 1.0
 
 [node name="VFXMortarGeyser" type="Node3D"]
+top_level = true
 script = ExtResource("1_geyser_script")
 
 [node name="WaterColumn" type="CPUParticles3D" parent="."]
+local_coords = true
 emitting = false
 amount = 24
 lifetime = 0.6

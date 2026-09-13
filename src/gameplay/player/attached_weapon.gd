@@ -451,6 +451,8 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 			if "crew_level" in ball:
 				ball.crew_level = crew_level
 			ball.set_meta("crew_level", crew_level)
+			if crew_id == "skeleton_tosser" or (weapon_data and ("skeleton" in weapon_data.weapon_name.to_lower() or "fire" in weapon_data.weapon_name.to_lower() or "incendiary" in weapon_data.weapon_name.to_lower())):
+				ball.set_meta("is_incendiary", true)
 
 			if not is_hostile and GameState:
 				var a_id = GameState.get_active_ammo()
@@ -490,6 +492,8 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 			if "crew_level" in ball:
 				ball.crew_level = crew_level
 			ball.set_meta("crew_level", crew_level)
+			if crew_id == "skeleton_tosser" or (weapon_data and ("skeleton" in weapon_data.weapon_name.to_lower() or "fire" in weapon_data.weapon_name.to_lower() or "incendiary" in weapon_data.weapon_name.to_lower())):
+				ball.set_meta("is_incendiary", true)
 
 			if not is_hostile and GameState:
 				var a_id = GameState.get_active_ammo()

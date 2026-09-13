@@ -9,11 +9,14 @@ extends Node3D
 		modulate = val
 
 func _ready() -> void:
+	top_level = true
 	var particle_nodes: Array[Node] = []
 	particle_nodes.append_array(find_children("*", "GPUParticles3D", true, false))
 	particle_nodes.append_array(find_children("*", "CPUParticles3D", true, false))
 	
 	for p in particle_nodes:
+		if "local_coords" in p:
+			p.local_coords = true
 		if p is GPUParticles3D:
 			p.restart()
 			p.emitting = true

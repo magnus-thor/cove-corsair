@@ -142,8 +142,14 @@ func die() -> void:
 		AudioManager.play_sfx("barrel_breaks")
 	var explosion_pos = global_position
 	if obstacle_type == ObstacleType.SEA_MINE:
+		explosion_pos.y = 0.05
 		AudioManager.play_sfx("sfx_mine_detonate")
-		# Sea mine explosion VFX/smoke completely removed per user request
+		if VFXManager and VFXManager.has_method("spawn_mine_explosion"):
+			VFXManager.spawn_mine_explosion(explosion_pos)
+		elif VFXManager and VFXManager.has_method("spawn_explosion"):
+			VFXManager.spawn_explosion(explosion_pos)
+		else:
+			_spawn_explosion()
 	else:
 		_spawn_explosion()
 	
@@ -238,6 +244,8 @@ func _apply_explosion_damage() -> void:
 func _spawn_explosion() -> void:
 	if barrel_explosion_scene:
 		var vfx = barrel_explosion_scene.instantiate() as Node3D
+		vfx.top_level = true
+		vfx.position = global_position
 		var root = get_tree().current_scene
 		if root:
 			root.add_child(vfx)

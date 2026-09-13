@@ -5,6 +5,29 @@ extends Area3D
 @export var lifetime: float = 4.5
 var direction: Vector3 = Vector3(0, 0, 1)
 
+const TRAIL_3D_SCENE: PackedScene = preload("res://src/vfx/trail_3d.tscn")
+var _trail = null
+
+func attach_fire_trail() -> void:
+	if _trail and is_instance_valid(_trail):
+		return
+	if TRAIL_3D_SCENE:
+		var t = TRAIL_3D_SCENE.instantiate() as Node3D
+		if t:
+			add_child(t)
+			_trail = t
+
+func _detach_trail() -> void:
+	if _trail and is_instance_valid(_trail):
+		_trail.detach_and_fade()
+		_trail = null
+
+func _check_and_attach_fire_trail() -> void:
+	if _trail and is_instance_valid(_trail):
+		return
+	if has_meta("is_fire") or has_meta("is_incendiary") or has_meta("is_volcanic") or has_meta("is_magma") or has_meta("is_brimstone"):
+		attach_fire_trail()
+
 func setup(p_direction: Vector3 = Vector3.ZERO, _p_ammo_data = null, _p_weapon_data = null) -> void:
 	if p_direction != Vector3.ZERO:
 		direction = p_direction.normalized()
@@ -49,6 +72,8 @@ func _ready() -> void:
 			to_player.y = 0.0
 			if to_player.length_squared() > 0.01 and to_player.z > 0.1:
 				direction = to_player.normalized()
+				
+	_check_and_attach_fire_trail()
 
 func set_color(color: Color) -> void:
 	var spr = get_node_or_null("AmmoSprite") as Sprite3D
@@ -87,6 +112,7 @@ func _physics_process(delta: float) -> void:
 	global_position += fwd * speed * delta
 	lifetime -= delta
 	if lifetime <= 0.0:
+		_detach_trail()
 		queue_free()
 
 func _on_hit(target: Node) -> void:
@@ -118,4 +144,5 @@ func _on_hit(target: Node) -> void:
 			if root:
 				root.add_child(splash)
 			splash.global_position = global_position
+		_detach_trail()
 		queue_free()

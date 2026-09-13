@@ -17,6 +17,8 @@ radial_segments = 8
 rings = 1
 
 [node name="VFXCoinBurst" type="CPUParticles3D"]
+top_level = true
+local_coords = true
 emitting = false
 amount = 16
 lifetime = 0.7

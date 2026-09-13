@@ -49,6 +49,12 @@ func _spawn_effect(packed_scene: PackedScene, world_pos: Vector3, lifetime: floa
 	if not instance:
 		return null
 		
+	# Ensure top_level = true and set position to world_pos before add_child
+	# so that any child nodes or particle emitters in _ready() execute at the
+	# exact world coordinates rather than inheriting parent/scene offsets (e.g. user vessel at Z = -33.36m).
+	instance.top_level = true
+	instance.position = world_pos
+	
 	var parent = _get_vfx_parent()
 	if parent:
 		parent.add_child(instance)
@@ -97,9 +103,13 @@ func spawn_mortar_splash(world_pos: Vector3) -> Node3D:
 	water_aligned_pos.y = clampf(world_pos.y, WATER_SURFACE_MIN_Y, WATER_SURFACE_MAX_Y)
 	return _spawn_effect(SCENE_MORTAR_GEYSER, water_aligned_pos, 0.6)
 
-## Sea mine explosion / smoke VFX completely disabled per user request (will be re-added later).
-func spawn_mine_explosion(_world_pos: Vector3) -> Node3D:
-	return null
+## Spawns fiery sea mine explosion with core flash and smoke shockwave.
+func spawn_mine_explosion(world_pos: Vector3) -> Node3D:
+	return _spawn_effect(SCENE_MINE_EXPLOSION, world_pos, 0.45)
+
+## Alias for explosion spawning at a world coordinate.
+func spawn_explosion(world_pos: Vector3) -> Node3D:
+	return spawn_mine_explosion(world_pos)
 
 ## Spawns fountain burst of golden coin particles erupting upward upon chest collection.
 func spawn_coin_burst(world_pos: Vector3) -> Node3D:

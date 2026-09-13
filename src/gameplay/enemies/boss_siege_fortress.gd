@@ -163,8 +163,11 @@ func _fire_fortress_salvo() -> void:
 		else:
 			get_parent().add_child(ball)
 		ball.global_position = point.global_position + Vector3(0, 0.4, 1.2)
+		ball.set_meta("is_fire", true)
 		if ball.has_method("set_color"):
 			ball.set_color(Color(1.0, 0.45, 0.1))
+		if ball.has_method("attach_fire_trail"):
+			ball.attach_fire_trail()
 		if "speed" in ball:
 			ball.speed = 18.0
 

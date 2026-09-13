@@ -358,6 +358,9 @@ func _fire_enraged_mortar(target_pos: Vector3) -> void:
 		
 	ball.global_position = global_position + Vector3(randf_range(-1.5, 1.5), 1.0, 2.0)
 	ball.scale = Vector3(1.8, 1.8, 1.8)
+	ball.set_meta("is_fire", true)
+	if ball.has_method("attach_fire_trail"):
+		ball.attach_fire_trail()
 	if "speed" in ball:
 		ball.speed = 13.0
 	

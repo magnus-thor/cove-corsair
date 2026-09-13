@@ -13,6 +13,8 @@ material = SubResource("StandardMaterial3D_timber")
 size = Vector3(0.08, 0.26, 0.08)
 
 [node name="VFXWoodSplinter" type="CPUParticles3D"]
+top_level = true
+local_coords = true
 emitting = false
 amount = 10
 lifetime = 0.5

@@ -23,4 +23,6 @@ func _ready() -> void:
 				if img:
 					spr.texture = ImageTexture.create_from_image(img)
 					
+	set_meta("is_fire", true)
 	super._ready()
+	attach_fire_trail()
