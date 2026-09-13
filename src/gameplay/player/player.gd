@@ -73,6 +73,7 @@ const DEFAULT_SOCKET_WEAPONS: Dictionary = {
 var dragging: bool = false
 var target_x: float = 0.0
 var half_width: float = 0.0
+var float_time: float = 0.0
 
 var max_health: int = 3
 var current_health: int = 3
@@ -90,8 +91,9 @@ var shoot_timer: float = 0.0
 var score: int = 0
 var doubloons: int = 0
 var is_game_over: bool = false
-var float_time: float = 0.0
 var hit_invulnerability_timer: float = 0.0
+var ram_absorb_charges_remaining: int = 1
+var fire_frenzy_timer: float = 0.0
 
 @export var is_shooting_enabled: bool = false
 @export var end_game_ui_scene: PackedScene = preload("res://src/ui/end_game_ui.tscn")
@@ -154,6 +156,10 @@ func _ready() -> void:
 	if Engine.has_singleton("GameState") or get_node_or_null("/root/GameState"):
 		if not GameState.active_vessel_changed.is_connected(_on_active_vessel_changed):
 			GameState.active_vessel_changed.connect(_on_active_vessel_changed)
+		if not GameState.fire_frenzy_triggered.is_connected(_on_fire_frenzy_triggered):
+			GameState.fire_frenzy_triggered.connect(_on_fire_frenzy_triggered)
+	
+	ram_absorb_charges_remaining = 1
 	
 	var level_ship = GameState.get_current_ship_resource() if GameState.has_method("get_current_ship_resource") else null
 	if level_ship:
@@ -397,6 +403,11 @@ func _physics_process(delta: float) -> void:
 	if hit_invulnerability_timer > 0.0:
 		hit_invulnerability_timer = maxf(0.0, hit_invulnerability_timer - delta)
 
+	if fire_frenzy_timer > 0.0:
+		fire_frenzy_timer = maxf(0.0, fire_frenzy_timer - delta)
+		if fire_frenzy_timer <= 0.0:
+			fire_rate_multiplier = 1.0
+
 	if is_game_over:
 		return
 		
@@ -525,13 +536,32 @@ func spawn_floating_text_at_position(text_val: String, color_val: Color) -> void
 
 
 
+func _on_fire_frenzy_triggered(duration: float) -> void:
+	fire_frenzy_timer = duration # Refresh timer without compounding
+	fire_rate_multiplier = 1.25 # +25% faster firing rate
+	spawn_floating_text_at_position("🔥 FIRE FRENZY! +25% SPEED", Color(1.0, 0.8, 0.2))
+	AudioManager.play_sfx("gate_passes", 1.2, 1.4)
+
+func damage_fleet(amount: int = 1, source_info: String = "poison_mortar_geyser") -> void:
+	GameState.record_hit()
+	if not follower_boats.is_empty():
+		leak_threat(null)
+	else:
+		take_hit(amount, source_info)
+
 func take_hit(amount: int = 1, source_info: String = "") -> void:
+	# Plating damage mitigation
+	var active_plating = GameState.get_active_plating() if GameState else "none"
+	var s_lower = source_info.to_lower()
+	if active_plating == "spectral_ward" and ("spectral" in s_lower or "geyser" in s_lower or "mortar" in s_lower or "poison" in s_lower or "ghost" in s_lower):
+		amount = max(1, int(round(amount * 0.4))) # -60% geyser/spectral damage
+	elif active_plating == "brimstone_fireproof" and ("brimstone" in s_lower or "fire" in s_lower or "magma" in s_lower or "lava" in s_lower or "flame" in s_lower):
+		amount = max(1, int(round(amount * 0.5))) # -50% fire hazard damage
+
 	# I-frame guard: prevent stacked damage from overlapping contacts in the same frame
-	# (barricade handles its own i-frame; leak_threat is throttled by follower loss)
-	if source_info != "leak_threat" and source_info != "Collision with Barricade":
-		if hit_invulnerability_timer > 0.0:
-			return
-		hit_invulnerability_timer = 0.8
+	if hit_invulnerability_timer > 0.0:
+		return
+	hit_invulnerability_timer = 0.8
 	
 	if source_info != "leak_threat":
 		GameState.record_hit()
@@ -558,6 +588,17 @@ func _on_area_entered(area: Area3D) -> void:
 		var is_barricade = area is BarricadeSegment or area.is_in_group("barricade") or (area.get_parent() and area.get_parent().is_in_group("barricade"))
 		
 		if is_barricade:
+			if GameState and GameState.get_active_plating() == "spiked_iron_prow" and ram_absorb_charges_remaining > 0:
+				ram_absorb_charges_remaining -= 1
+				hit_invulnerability_timer = 0.5
+				spawn_floating_text_at_position("🛡️ PROW RAM ABSORBED!", Color(0.3, 0.9, 1.0))
+				AudioManager.play_sfx("sfx_wood_smash", 0.9, 1.1)
+				if area.has_method("take_damage"):
+					area.take_damage(20)
+				elif area.has_method("die"):
+					area.die()
+				return
+
 			if hit_invulnerability_timer > 0.0:
 				# Collision damage already applied this burst; damage barricade segment without re-damaging hull
 				if area.has_method("take_damage"):
@@ -573,8 +614,19 @@ func _on_area_entered(area: Area3D) -> void:
 				area.die()
 			return
 
-		var is_sea_mine = area is HazardSeaMine or (area is DestructibleObstacle and area.obstacle_type == DestructibleObstacle.ObstacleType.SEA_MINE)
+		var is_sea_mine = area is HazardSeaMine or (area is DestructibleObstacle and area.obstacle_type == DestructibleObstacle.ObstacleType.SEA_MINE) or ("mine" in area.name.to_lower()) or area.is_in_group("sea_mine")
 		if is_sea_mine:
+			if GameState and GameState.get_active_plating() == "spiked_iron_prow" and ram_absorb_charges_remaining > 0:
+				ram_absorb_charges_remaining -= 1
+				hit_invulnerability_timer = 0.6 # Nullifies both contact and explosion splash for that single impact
+				spawn_floating_text_at_position("🛡️ PROW RAM ABSORBED!", Color(0.3, 0.9, 1.0))
+				AudioManager.play_sfx("sfx_mine_detonate", 0.8, 1.0)
+				if area.has_method("die"):
+					area.die()
+				else:
+					area.queue_free()
+				return
+
 			# Let mine.die() handle its own explosion VFX at the mine's position.
 			# take_hit() will check i-frames internally.
 			if area.has_method("die"):
@@ -582,6 +634,19 @@ func _on_area_entered(area: Area3D) -> void:
 			else:
 				area.queue_free()
 			take_hit(1, "Collision with Sea Mine")
+			return
+
+		if GameState and GameState.get_active_plating() == "spiked_iron_prow" and ram_absorb_charges_remaining > 0 and not area.is_in_group("boss"):
+			ram_absorb_charges_remaining -= 1
+			hit_invulnerability_timer = 0.5
+			spawn_floating_text_at_position("🛡️ PROW RAM ABSORBED!", Color(0.3, 0.9, 1.0))
+			AudioManager.play_sfx("barrel_breaks", 0.9, 1.1)
+			if area.has_method("take_damage"):
+				area.take_damage(10)
+			elif area.has_method("die"):
+				area.die()
+			else:
+				area.queue_free()
 			return
 
 		AudioManager.play_sfx("barrel_hits")
@@ -757,6 +822,8 @@ func remove_follower(follower: Node3D) -> void:
 func leak_threat(_threat_node: Node3D) -> void:
 	if is_game_over or not GameState.is_game_active:
 		return
+	if hit_invulnerability_timer > 0.0:
+		return
 		
 	# 1. Trigger a 0.2s red screen-edge flash (Vignette alert)
 	var hud = get_tree().get_first_node_in_group("top_hud")
@@ -800,10 +867,6 @@ func leak_threat(_threat_node: Node3D) -> void:
 		# Spawn the floating label first so it's visible even if game_over fires.
 		spawn_floating_text_at_position("-HULL", Color(1.0, 0.1, 0.1))
 		take_hit(1, "leak_threat")
-
-func damage_fleet(_amount: int = 1) -> void:
-	GameState.record_hit()
-	leak_threat(null)
 
 func add_follower_ships(amount: int) -> void:
 	var can_add = 4 - follower_boats.size()

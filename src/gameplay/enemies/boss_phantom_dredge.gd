@@ -458,6 +458,18 @@ func _check_phase() -> void:
 func die() -> void:
 	boss_defeat()
 
+func interrupt_channel() -> void:
+	if is_barrage_active:
+		is_barrage_active = false
+		print("[BOSS INTERRUPTED] Spectral Salt interrupted geyser barrage channel!")
+		var telegraphs = get_tree().get_nodes_in_group("spectral_geyser_telegraphs")
+		for tele in telegraphs:
+			if is_instance_valid(tele):
+				if tele.has_method("cancel_and_cleanup"):
+					tele.cancel_and_cleanup()
+				else:
+					tele.queue_free()
+
 func boss_defeat() -> void:
 	if _is_defeated:
 		return

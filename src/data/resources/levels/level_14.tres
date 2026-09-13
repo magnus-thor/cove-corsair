@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_reef_slalom.tscn" id="chunk_2"]
 [ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_gunner_ambush.tscn" id="chunk_3"]
 [ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_finish_line.tscn" id="chunk_4"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_fodder_swarm.tscn" id="chunk_fodder"]
 [ext_resource type="Texture2D" path="res://assets/textures/horizon_citadel.png" id="ext_horizon"]
 [ext_resource type="Script" path="res://src/data/resources/level_data.gd" id="ext_script"]
 
@@ -13,7 +14,7 @@ level_id = 14
 level_title = "Level 14: Siren's Shoals"
 biome_name = "pirate_citadel"
 base_scroll_speed = 8.1
-chunk_scenes = Array[PackedScene]([ExtResource("chunk_1"), ExtResource("chunk_2"), ExtResource("chunk_3"), ExtResource("chunk_2"), ExtResource("chunk_3"), ExtResource("chunk_4")])
+chunk_scenes = Array[PackedScene]([ExtResource("chunk_1"), ExtResource("chunk_2"), ExtResource("chunk_fodder"), ExtResource("chunk_3"), ExtResource("chunk_4")])
 completion_doubloon_reward = 220
 horizon_texture = ExtResource("ext_horizon")
 water_albedo = Color(0.10, 0.28, 0.46, 0.90)

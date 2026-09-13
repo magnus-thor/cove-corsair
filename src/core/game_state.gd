@@ -18,6 +18,9 @@ signal boss_health_changed(current: int, max_val: int)
 signal active_vessel_changed(vessel_id: String)
 signal crew_unlocked(crew_id: String, level: int)
 signal crew_equipped(ship_id: String, socket_name: String, crew_id: String)
+signal outfitting_unlocked(item_id: String)
+signal outfitting_equipped(ship_id: String, category: String, item_id: String)
+signal fire_frenzy_triggered(duration: float)
 @warning_ignore("unused_signal")
 signal run_failed(coins_collected: int, distance_reached: float)
 
@@ -35,6 +38,28 @@ var vessel_tiers: Dictionary = {
 var active_vessel: String = "dinghy"
 var unlocked_crew: Dictionary = {}
 var equipped_crew: Dictionary = {}
+
+# Outfitting State: Tactical Ammo & Hull Platings
+var unlocked_outfitting: Dictionary = {
+	"standard_iron": true,
+	"none": true
+}
+var equipped_ammo: Dictionary = {
+	"dinghy": "standard_iron",
+	"sloop": "standard_iron",
+	"ironclad": "standard_iron",
+	"bombard_skiff": "standard_iron"
+}
+var equipped_plating: Dictionary = {
+	"dinghy": "none",
+	"sloop": "none",
+	"ironclad": "none",
+	"bombard_skiff": "none"
+}
+
+# Fodder Streak Tracking
+var fodder_kill_timestamps: Array[float] = []
+
 # Persistent Progression & Level Map State
 var highest_unlocked_level: int = 1
 var current_selected_level: int = 1
@@ -173,6 +198,76 @@ const CREW_CATALOG: Dictionary = {
 	}
 }
 
+const OUTFITTING_CATALOG: Dictionary = {
+	"standard_iron": {
+		"id": "standard_iron",
+		"name": "Standard Iron Shot",
+		"category": "ammo",
+		"price": 0,
+		"description": "Standard forged cannonballs. Balanced velocity and baseline kinetic damage.",
+		"resource_path": "res://src/data/resources/user_ammo/ammo_standard_iron.tres",
+		"preview_texture": "res://assets/sprites/ammo/ammo_heavy_shot.png"
+	},
+	"battering_shot": {
+		"id": "battering_shot",
+		"name": "Battering Shot",
+		"category": "ammo",
+		"price": 400,
+		"description": "+100% damage vs Barricade Walls and heavy timber barriers.",
+		"resource_path": "res://src/data/resources/user_ammo/ammo_battering_shot.tres",
+		"preview_texture": "res://assets/sprites/ammo/ammo_heavy_shot.png"
+	},
+	"chain_shot": {
+		"id": "chain_shot",
+		"name": "Chain Shot",
+		"category": "ammo",
+		"price": 500,
+		"description": "Interlinked chain shot. Sweeps and detonates sea mines in a radius safely.",
+		"resource_path": "res://src/data/resources/user_ammo/ammo_chain_shot.tres",
+		"preview_texture": "res://assets/sprites/ammo/ammo_throwing_axe.png"
+	},
+	"spectral_salt": {
+		"id": "spectral_salt",
+		"name": "Spectral Salt Shot",
+		"category": "ammo",
+		"price": 650,
+		"description": "+50% damage vs Ghost/Spectral craft and interrupts boss casting channels.",
+		"resource_path": "res://src/data/resources/user_ammo/ammo_spectral_salt.tres",
+		"preview_texture": "res://assets/sprites/ammo/ammo_coconut_bomb.png"
+	},
+	"none": {
+		"id": "none",
+		"name": "Standard Wood Hull",
+		"category": "plating",
+		"price": 0,
+		"description": "Unmodified seasoned oak hull with standard naval durability.",
+		"preview_texture": "res://assets/sprites/user_vessels/The Dinghy.png"
+	},
+	"spectral_ward": {
+		"id": "spectral_ward",
+		"name": "Spectral Ward Plating",
+		"category": "plating",
+		"price": 600,
+		"description": "Reduces damage from spectral geysers/circles by 60% and negates movement slows.",
+		"preview_texture": "res://assets/sprites/enemy_vessels/Ghost Sloop.png"
+	},
+	"brimstone_fireproof": {
+		"id": "brimstone_fireproof",
+		"name": "Brimstone Fireproof Plating",
+		"category": "plating",
+		"price": 750,
+		"description": "Volcanic slate cladding. Reduces magma and fire hazard damage by 50%.",
+		"preview_texture": "res://assets/sprites/ammo/ammo_fire_bomb.png"
+	},
+	"spiked_iron_prow": {
+		"id": "spiked_iron_prow",
+		"name": "Spiked Iron Prow",
+		"category": "plating",
+		"price": 500,
+		"description": "Reinforced ramming prow. Completely absorbs 1 obstacle ram impact per level with 0 damage.",
+		"preview_texture": "res://assets/sprites/enemy_vessels/Armored Turtle-Raft.png"
+	}
+}
 
 const LEVEL_RESOURCES: Dictionary = {
 	1: "res://src/data/resources/levels/level_01.tres",
@@ -537,6 +632,82 @@ func toggle_equip_crew_active_ship(crew_id: String) -> bool:
 		
 	return equip_crew(active_vessel, target_socket, crew_id)
 
+# --- Outfitting Management (Tactical Ammo & Hull Platings) ---
+
+func is_outfitting_unlocked(item_id: String) -> bool:
+	if item_id == "standard_iron" or item_id == "none" or item_id == "":
+		return true
+	return unlocked_outfitting.get(item_id, false)
+
+func get_equipped_ammo(ship_id: String) -> String:
+	return equipped_ammo.get(ship_id, "standard_iron")
+
+func get_equipped_plating(ship_id: String) -> String:
+	return equipped_plating.get(ship_id, "none")
+
+func get_active_ammo() -> String:
+	return get_equipped_ammo(active_vessel)
+
+func get_active_plating() -> String:
+	return get_equipped_plating(active_vessel)
+
+func buy_outfitting(item_id: String) -> bool:
+	if not OUTFITTING_CATALOG.has(item_id):
+		return false
+	if is_outfitting_unlocked(item_id):
+		return true
+	var price = OUTFITTING_CATALOG[item_id].get("price", 0)
+	if doubloons < price:
+		return false
+	doubloons -= price
+	unlocked_outfitting[item_id] = true
+	save_game()
+	doubloons_changed.emit(doubloons)
+	outfitting_unlocked.emit(item_id)
+	return true
+
+func equip_ammo(ship_id: String, ammo_id: String) -> bool:
+	if not is_outfitting_unlocked(ammo_id):
+		return false
+	equipped_ammo[ship_id] = ammo_id
+	save_game()
+	outfitting_equipped.emit(ship_id, "ammo", ammo_id)
+	return true
+
+func equip_plating(ship_id: String, plating_id: String) -> bool:
+	if not is_outfitting_unlocked(plating_id):
+		return false
+	equipped_plating[ship_id] = plating_id
+	save_game()
+	outfitting_equipped.emit(ship_id, "plating", plating_id)
+	return true
+
+func toggle_equip_outfitting_active_ship(item_id: String) -> bool:
+	if not OUTFITTING_CATALOG.has(item_id):
+		return false
+	if not is_outfitting_unlocked(item_id):
+		return false
+	var cat = OUTFITTING_CATALOG[item_id].get("category", "")
+	if cat == "ammo":
+		if get_active_ammo() == item_id and item_id != "standard_iron":
+			return equip_ammo(active_vessel, "standard_iron")
+		return equip_ammo(active_vessel, item_id)
+	elif cat == "plating":
+		if get_active_plating() == item_id and item_id != "none":
+			return equip_plating(active_vessel, "none")
+		return equip_plating(active_vessel, item_id)
+	return false
+
+func record_fodder_kill() -> void:
+	var now = Time.get_ticks_msec() / 1000.0
+	fodder_kill_timestamps.append(now)
+	var cutoff = now - 2.0
+	fodder_kill_timestamps = fodder_kill_timestamps.filter(func(t): return t >= cutoff)
+	if fodder_kill_timestamps.size() >= 3:
+		fodder_kill_timestamps.clear()
+		fire_frenzy_triggered.emit(2.5)
+
+
 
 func add_doubloons(amount: int) -> void:
 	if is_game_active:
@@ -645,6 +816,9 @@ func reset_save_data() -> void:
 	active_vessel = "dinghy"
 	unlocked_crew = {}
 	equipped_crew = {}
+	unlocked_outfitting = {"standard_iron": true, "none": true}
+	equipped_ammo = {"dinghy": "standard_iron", "sloop": "standard_iron", "ironclad": "standard_iron", "bombard_skiff": "standard_iron"}
+	equipped_plating = {"dinghy": "none", "sloop": "none", "ironclad": "none", "bombard_skiff": "none"}
 	highest_unlocked_level = 1
 	current_selected_level = 1
 	unlocked_levels = 1
@@ -668,6 +842,9 @@ func save_game() -> void:
 		"active_vessel": active_vessel,
 		"unlocked_crew": unlocked_crew,
 		"equipped_crew": equipped_crew,
+		"unlocked_outfitting": unlocked_outfitting,
+		"equipped_ammo": equipped_ammo,
+		"equipped_plating": equipped_plating,
 		"highest_unlocked_level": highest_unlocked_level,
 		"current_selected_level": current_selected_level,
 		"just_cleared_level": just_cleared_level,
@@ -773,6 +950,35 @@ func load_game() -> void:
 		else:
 			equipped_crew = {}
 
+		if data.has("unlocked_outfitting") and data["unlocked_outfitting"] is Dictionary:
+			unlocked_outfitting = {"standard_iron": true, "none": true}
+			for o_id in data["unlocked_outfitting"]:
+				var oid_str = str(o_id)
+				if oid_str in OUTFITTING_CATALOG:
+					unlocked_outfitting[oid_str] = bool(data["unlocked_outfitting"][o_id])
+		else:
+			unlocked_outfitting = {"standard_iron": true, "none": true}
+
+		if data.has("equipped_ammo") and data["equipped_ammo"] is Dictionary:
+			equipped_ammo = {"dinghy": "standard_iron", "sloop": "standard_iron", "ironclad": "standard_iron", "bombard_skiff": "standard_iron"}
+			for s_id in data["equipped_ammo"]:
+				var sid_str = str(s_id)
+				var a_val = str(data["equipped_ammo"][s_id])
+				if a_val in OUTFITTING_CATALOG:
+					equipped_ammo[sid_str] = a_val
+		else:
+			equipped_ammo = {"dinghy": "standard_iron", "sloop": "standard_iron", "ironclad": "standard_iron", "bombard_skiff": "standard_iron"}
+
+		if data.has("equipped_plating") and data["equipped_plating"] is Dictionary:
+			equipped_plating = {"dinghy": "none", "sloop": "none", "ironclad": "none", "bombard_skiff": "none"}
+			for s_id in data["equipped_plating"]:
+				var sid_str = str(s_id)
+				var p_val = str(data["equipped_plating"][s_id])
+				if p_val in OUTFITTING_CATALOG:
+					equipped_plating[sid_str] = p_val
+		else:
+			equipped_plating = {"dinghy": "none", "sloop": "none", "ironclad": "none", "bombard_skiff": "none"}
+
 		if data.has("highest_unlocked_level"):
 			highest_unlocked_level = clamp(int(data["highest_unlocked_level"]), 1, 45)
 		elif data.has("unlocked_levels"):
@@ -816,6 +1022,9 @@ func load_game() -> void:
 		vessel_tiers["dinghy"] = 1
 		unlocked_crew = {}
 		equipped_crew = {}
+		unlocked_outfitting = {"standard_iron": true, "none": true}
+		equipped_ammo = {"dinghy": "standard_iron", "sloop": "standard_iron", "ironclad": "standard_iron", "bombard_skiff": "standard_iron"}
+		equipped_plating = {"dinghy": "none", "sloop": "none", "ironclad": "none", "bombard_skiff": "none"}
 		highest_unlocked_level = 1
 		current_selected_level = 1
 		unlocked_levels = 1

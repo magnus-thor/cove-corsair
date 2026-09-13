@@ -29,14 +29,16 @@ signal shipyard_closed
 # Category Tabs
 @onready var tab_vessels: Button = %TabVessels
 @onready var tab_crew: Button = %TabCrew
-@onready var tab_weapons: PanelContainer = %TabWeapons
+@onready var tab_outfitting: Button = %TabOutfitting
 
 const CARD_SCENE: PackedScene = preload("res://src/ui/shipyard/vessel_card.tscn")
 const VesselCardScript = preload("res://src/ui/shipyard/vessel_card.gd")
 const CREW_CARD_SCENE: PackedScene = preload("res://src/ui/shipyard/crew_card.tscn")
 const CrewCardScript = preload("res://src/ui/shipyard/crew_card.gd")
+const OUTFITTING_CARD_SCENE: PackedScene = preload("res://src/ui/shipyard/outfitting_card.tscn")
+const OutfittingCardScript = preload("res://src/ui/shipyard/outfitting_card.gd")
 
-enum TabType { VESSELS, CREW }
+enum TabType { VESSELS, CREW, OUTFITTING }
 var current_tab: TabType = TabType.VESSELS
 
 var vessel_ids: Array[String] = ["dinghy", "sloop", "ironclad", "bombard_skiff"]
@@ -45,6 +47,7 @@ var selected_vessel_id: String = "dinghy"
 
 var crew_ids: Array[String] = ["monkey_bomber", "skeleton_tosser"]
 var crew_card_instances: Dictionary = {} # crew_id -> CrewCard
+var outfitting_card_instances: Dictionary = {} # item_id -> OutfittingCard
 
 # Action button state enum
 enum ActionState { BUY, UPGRADE, EQUIP, EQUIPPED, DISABLED }
@@ -77,13 +80,15 @@ func _ready() -> void:
 		tab_vessels.pressed.connect(_on_tab_vessels_pressed)
 	if tab_crew:
 		tab_crew.pressed.connect(_on_tab_crew_pressed)
-	if tab_weapons:
-		tab_weapons.gui_input.connect(_on_locked_tab_clicked)
+	if tab_outfitting:
+		tab_outfitting.pressed.connect(_on_tab_outfitting_pressed)
 
 	GameState.doubloons_changed.connect(_on_doubloons_changed)
 	GameState.active_vessel_changed.connect(_on_active_vessel_changed)
 	GameState.crew_unlocked.connect(func(_id, _lvl): _refresh_crew_cards())
 	GameState.crew_equipped.connect(func(_ship, _sock, _id): _refresh_crew_cards())
+	GameState.outfitting_unlocked.connect(func(_id): _refresh_outfitting_cards())
+	GameState.outfitting_equipped.connect(func(_ship, _cat, _id): _refresh_outfitting_cards())
 
 	# Default selected vessel to active vessel
 	if GameState.active_vessel in vessel_ids:
@@ -406,15 +411,19 @@ func _on_doubloons_changed(_amount: int) -> void:
 	if current_tab == TabType.VESSELS:
 		_refresh_card_selections()
 		_update_inspection_drawer()
-	else:
+	elif current_tab == TabType.CREW:
 		_refresh_crew_cards()
+	elif current_tab == TabType.OUTFITTING:
+		_refresh_outfitting_cards()
 
 func _on_active_vessel_changed(_v_id: String) -> void:
 	if current_tab == TabType.VESSELS:
 		_refresh_card_selections()
 		_update_inspection_drawer()
-	else:
+	elif current_tab == TabType.CREW:
 		_refresh_crew_cards()
+	elif current_tab == TabType.OUTFITTING:
+		_refresh_outfitting_cards()
 
 func _on_tab_vessels_pressed() -> void:
 	if current_tab == TabType.VESSELS:
@@ -437,6 +446,16 @@ func _on_tab_crew_pressed() -> void:
 		drawer_panel.visible = false
 	_build_crew_cards()
 
+func _on_tab_outfitting_pressed() -> void:
+	if current_tab == TabType.OUTFITTING:
+		return
+	current_tab = TabType.OUTFITTING
+	AudioManager.play_sfx("gate_passes", 1.0, 1.2)
+	_update_tab_headers()
+	if drawer_panel:
+		drawer_panel.visible = false
+	_build_outfitting_cards()
+
 func _update_tab_headers() -> void:
 	if tab_vessels:
 		if current_tab == TabType.VESSELS:
@@ -454,6 +473,14 @@ func _update_tab_headers() -> void:
 			tab_crew.add_theme_stylebox_override("normal", style_tab_inactive)
 			tab_crew.modulate = Color(0.7, 0.7, 0.7, 0.8)
 
+	if tab_outfitting:
+		if current_tab == TabType.OUTFITTING:
+			tab_outfitting.add_theme_stylebox_override("normal", style_tab_active)
+			tab_outfitting.modulate = Color.WHITE
+		else:
+			tab_outfitting.add_theme_stylebox_override("normal", style_tab_inactive)
+			tab_outfitting.modulate = Color(0.7, 0.7, 0.7, 0.8)
+
 func _build_crew_cards() -> void:
 	if not grid_container:
 		return
@@ -463,6 +490,7 @@ func _build_crew_cards() -> void:
 		child.queue_free()
 	card_instances.clear()
 	crew_card_instances.clear()
+	outfitting_card_instances.clear()
 
 	for c_id in crew_ids:
 		var card = CREW_CARD_SCENE.instantiate() as CrewCardScript
@@ -499,9 +527,42 @@ func _on_crew_equip_requested(c_id: String) -> void:
 		AudioManager.play_sfx("gate_passes")
 		_refresh_crew_cards()
 
-func _on_locked_tab_clicked(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		AudioManager.play_sfx("gate_passes", 0.7, 0.8)
+func _build_outfitting_cards() -> void:
+	if not grid_container:
+		return
+
+	for child in grid_container.get_children():
+		child.queue_free()
+	card_instances.clear()
+	crew_card_instances.clear()
+	outfitting_card_instances.clear()
+
+	for item_id in GameState.OUTFITTING_CATALOG:
+		var card = OUTFITTING_CARD_SCENE.instantiate() as OutfittingCardScript
+		grid_container.add_child(card)
+		card.setup_item(item_id)
+		card.buy_requested.connect(_on_outfitting_buy_requested)
+		card.equip_requested.connect(_on_outfitting_equip_requested)
+		outfitting_card_instances[item_id] = card
+
+func _refresh_outfitting_cards() -> void:
+	for item_id in outfitting_card_instances:
+		var card = outfitting_card_instances[item_id]
+		if is_instance_valid(card) and card.has_method("update_card"):
+			card.update_card()
+
+func _on_outfitting_buy_requested(item_id: String) -> void:
+	if GameState.buy_outfitting(item_id):
+		AudioManager.play_sfx("coin_pickups", 1.0, 1.2)
+		AudioManager.play_sfx("barrel_hits")
+		_update_purse_display()
+		_refresh_outfitting_cards()
+
+func _on_outfitting_equip_requested(item_id: String) -> void:
+	if GameState.toggle_equip_outfitting_active_ship(item_id):
+		AudioManager.play_sfx("coin_pickups", 1.0, 1.2)
+		AudioManager.play_sfx("gate_passes")
+		_refresh_outfitting_cards()
 
 func _on_back_pressed() -> void:
 	AudioManager.play_sfx("gate_passes")

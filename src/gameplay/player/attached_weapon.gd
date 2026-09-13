@@ -452,6 +452,12 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 				ball.crew_level = crew_level
 			ball.set_meta("crew_level", crew_level)
 
+			if not is_hostile and GameState:
+				var a_id = GameState.get_active_ammo()
+				ball.set_meta("ammo_id", a_id)
+				if "ammo_id" in ball:
+					ball.ammo_id = a_id
+
 			if ball.has_method("setup"):
 				ball.setup(proj_dir, weapon_data.default_ammo, weapon_data)
 				
@@ -484,6 +490,12 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 			if "crew_level" in ball:
 				ball.crew_level = crew_level
 			ball.set_meta("crew_level", crew_level)
+
+			if not is_hostile and GameState:
+				var a_id = GameState.get_active_ammo()
+				ball.set_meta("ammo_id", a_id)
+				if "ammo_id" in ball:
+					ball.ammo_id = a_id
 
 			if ball.has_method("setup"):
 				ball.setup(proj_dir, weapon_data.default_ammo, weapon_data)

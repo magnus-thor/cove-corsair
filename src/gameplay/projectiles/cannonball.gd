@@ -28,6 +28,7 @@ extends Area3D
 
 var crew_id: String = ""
 var crew_level: int = 1
+var ammo_id: String = ""
 
 ## Hit splash VFX to spawn on impact or expiration
 @export var hit_splash_scene: PackedScene = preload("res://src/gameplay/vfx/hit_splash.tscn")
@@ -107,6 +108,16 @@ func setup(p_direction: Vector3, p_ammo_data: AmmoData, p_weapon_data: WeaponDat
 		else:
 			damage = 6
 			splash_radius_multiplier = 1.12
+
+	# Determine outfitting ammo overrides
+	if has_meta("ammo_id"):
+		ammo_id = str(get_meta("ammo_id"))
+	if ammo_id == "battering_shot" and crew_id == "":
+		damage = max(damage, 2)
+	elif ammo_id == "spectral_salt" and crew_id == "":
+		damage = max(damage, 2)
+	elif ammo_id == "chain_shot":
+		splash_radius_multiplier = maxf(splash_radius_multiplier, 1.4)
 
 	# Determine scale
 	if ammo_data and ammo_data.scale_multiplier != 1.0:
@@ -338,6 +349,10 @@ func _physics_process(delta: float) -> void:
 		if model and model.visible:
 			model.rotate_x(spin_speed * delta)
 
+	# Chain Shot sweeps and detonates sea mines in a radius safely
+	if ammo_id == "chain_shot" and not (is_hostile or is_in_group("enemy_projectiles") or has_meta("is_hostile")):
+		_sweep_chain_shot_mines()
+
 	# Travel distance clamp (primary check: total travel progress vs max_range)
 	if _distance_traveled >= max_range or global_position.distance_to(_spawn_pos) >= max_range:
 		_is_destroyed = true
@@ -358,6 +373,20 @@ func _physics_process(delta: float) -> void:
 		AudioManager.play_sfx("water_splashes")
 		_spawn_splash(true)
 		queue_free()
+
+func _sweep_chain_shot_mines() -> void:
+	var tree = get_tree()
+	if not tree:
+		return
+	var destructibles = tree.get_nodes_in_group("destructible")
+	for obj in destructibles:
+		if is_instance_valid(obj) and not obj.is_queued_for_deletion():
+			var is_mine = (obj is DestructibleObstacle and obj.obstacle_type == DestructibleObstacle.ObstacleType.SEA_MINE) or ("mine" in obj.name.to_lower()) or obj.is_in_group("sea_mine")
+			if is_mine and global_position.distance_to(obj.global_position) <= 3.5:
+				if obj.has_method("die"):
+					obj.die()
+				else:
+					obj.queue_free()
 
 func _on_hit(target: Node) -> void:
 	if _is_destroyed or not target or not is_instance_valid(target):
@@ -424,11 +453,28 @@ func _on_hit(target: Node) -> void:
 				damage
 			])
 		
+		var hit_damage = damage
+		var is_barricade = target.is_in_group("barricade") or (target.get_parent() and target.get_parent().is_in_group("barricade")) or ("barricade" in target.name.to_lower())
+		if ammo_id == "battering_shot" and is_barricade:
+			hit_damage *= 2
+
+		var is_spectral = target.is_in_group("ghost") or target.is_in_group("spectral") or (target.get_parent() and (target.get_parent().is_in_group("ghost") or target.get_parent().is_in_group("spectral"))) or ("grave" in target.name.to_lower()) or ("phantom" in target.name.to_lower()) or ("ghost" in target.name.to_lower()) or ("dredge" in target.name.to_lower()) or target.is_in_group("boss")
+		if ammo_id == "spectral_salt" and is_spectral:
+			hit_damage = int(round(hit_damage * 1.5))
+			if target.has_method("interrupt_channel"):
+				target.interrupt_channel()
+			elif target.get_parent() and target.get_parent().has_method("interrupt_channel"):
+				target.get_parent().interrupt_channel()
+			elif "is_barrage_active" in target:
+				target.is_barrage_active = false
+			elif target.get_parent() and "is_barrage_active" in target.get_parent():
+				target.get_parent().is_barrage_active = false
+
 		AudioManager.play_sfx("barrel_hits")
 		if target.has_method("take_damage"):
-			target.take_damage(damage)
+			target.take_damage(hit_damage)
 		elif target.get_parent() and target.get_parent().has_method("take_damage"):
-			target.get_parent().take_damage(damage)
+			target.get_parent().take_damage(hit_damage)
 			
 		# Apply splash AoE to nearby destructibles if ammo has splash_radius
 		if (ammo_data and ammo_data.splash_radius > 0.0) or splash_radius_multiplier > 1.0:

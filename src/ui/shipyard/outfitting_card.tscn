@@ -1,0 +1,149 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://src/ui/shipyard/outfitting_card.gd" id="1_script"]
+[ext_resource type="FontFile" path="res://assets/fonts/LilitaOne-Regular.ttf" id="2_font"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
+bg_color = Color(0.18, 0.12, 0.08, 0.95)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.42, 0.28, 0.16, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+shadow_color = Color(0, 0, 0, 0.4)
+shadow_size = 6
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_badge"]
+bg_color = Color(0.15, 0.45, 0.78, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_icon_bg"]
+bg_color = Color(0.12, 0.08, 0.05, 0.8)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn"]
+bg_color = Color(0.72, 0.13, 0.18, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="OutfittingCard" type="PanelContainer"]
+custom_minimum_size = Vector2(0, 300)
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+script = ExtResource("1_script")
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VBox" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HeaderHBox" type="HBoxContainer" parent="Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ItemNameLabel" type="Label" parent="Margin/VBox/HeaderHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 0.95, 0.8, 1)
+theme_override_colors/font_outline_color = Color(0.15, 0.08, 0.04, 1)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 20
+text = "BATTERING SHOT"
+vertical_alignment = 1
+
+[node name="CategoryBadge" type="PanelContainer" parent="Margin/VBox/HeaderHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_badge")
+
+[node name="Margin" type="MarginContainer" parent="Margin/VBox/HeaderHBox/CategoryBadge"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 2
+
+[node name="CategoryBadgeLabel" type="Label" parent="Margin/VBox/HeaderHBox/CategoryBadge/Margin"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 13
+text = "TACTICAL AMMO"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="IconCenter" type="PanelContainer" parent="Margin/VBox"]
+custom_minimum_size = Vector2(0, 90)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_icon_bg")
+
+[node name="ItemIcon" type="TextureRect" parent="Margin/VBox/IconCenter"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(70, 70)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DescLabel" type="Label" parent="Margin/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.85, 0.75, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 14
+text = "+100% damage vs Barricade Walls and heavy timber barriers."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="ButtonsHBox" type="HBoxContainer" parent="Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 10
+theme_override_constants/separation = 6
+
+[node name="BuyButton" type="Button" parent="Margin/VBox/ButtonsHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn")
+text = "BUY: 400 🪙"
+
+[node name="EquipButton" type="Button" parent="Margin/VBox/ButtonsHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn")
+text = "EQUIP"
