@@ -16,6 +16,7 @@ enum State { APPROACHING, COMBAT, DYING }
 @export var doubloon_scene: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
 @export var explosion_scene: PackedScene = preload("res://src/gameplay/vfx/barrel_explosion.tscn")
 @export var powder_keg_scene: PackedScene = preload("res://src/gameplay/obstacles/destructible_barrel.tscn")
+@export var twin_salvo_scene: PackedScene = preload("res://src/gameplay/projectiles/boss_projectile_twin_cannon_salvo.tscn")
 
 @onready var boss_sprite: Node3D = get_node_or_null("BossMesh") if get_node_or_null("BossMesh") else get_node_or_null("BossSprite")
 @onready var health_bar_progress: ProgressBar = get_node_or_null("HealthBarViewport/HealthBarControl/VBoxContainer/ProgressBar")
@@ -23,7 +24,9 @@ enum State { APPROACHING, COMBAT, DYING }
 
 var current_state: State = State.APPROACHING
 var _flash_tween: Tween
+var _base_scale: Vector3 = Vector3(4.48, 4.48, 4.48)
 var _attack_timer: float = 0.0
+var _attack_count: int = 0
 var _weave_time: float = 0.0
 var _target_z: float = -18.0
 var _current_base_y: float = 0.0
@@ -65,9 +68,13 @@ func _ready() -> void:
 				
 	current_hp = max_hp
 	if boss_sprite:
+		_current_base_y = 2.00
 		boss_sprite.position.y = _current_base_y
 		boss_sprite.scale = Vector3(4.48, 4.48, 4.48)
+		_base_scale = boss_sprite.scale
 		boss_sprite.rotation_degrees = Vector3.ZERO
+		if boss_sprite is Sprite3D:
+			boss_sprite.pixel_size = 0.0021
 	_update_health_bar()
 	area_entered.connect(_on_area_entered)
 	
@@ -114,6 +121,52 @@ func _physics_process(delta: float) -> void:
 func _perform_attack() -> void:
 	if not spawn_hazard_enabled:
 		return
+	_attack_count += 1
+	if _attack_count % 2 == 1:
+		_fire_twin_cannon_salvo()
+	else:
+		_drop_powder_kegs()
+
+func _fire_twin_cannon_salvo(target_lane_x: float = NAN) -> void:
+	if not twin_salvo_scene or _is_defeated or current_state == State.DYING:
+		return
+	
+	AudioManager.play_sfx("cannon_shots", 0.85, 1.1, 1.5)
+	
+	var player = get_tree().get_first_node_in_group("player")
+	var root = get_tree().current_scene
+	var spawn_parent = root if root else get_parent()
+	if not spawn_parent:
+		return
+		
+	var target_x: float = global_position.x
+	if not is_nan(target_lane_x):
+		target_x = target_lane_x
+	elif player and is_instance_valid(player):
+		target_x = player.global_position.x
+
+	var salvo = twin_salvo_scene.instantiate() as Area3D
+	spawn_parent.add_child(salvo)
+	salvo.global_position = Vector3(global_position.x, 0.5, global_position.z + 2.5)
+	
+	var fire_dir = Vector3(0, 0, 1)
+	if player and is_instance_valid(player):
+		var to_player = Vector3(target_x - salvo.global_position.x, 0.0, player.global_position.z - salvo.global_position.z)
+		if to_player.z > 0.1:
+			fire_dir = to_player.normalized()
+	
+	if salvo.has_method("setup"):
+		salvo.setup(fire_dir, null, null)
+	if "direction" in salvo:
+		salvo.direction = fire_dir
+	if "speed" in salvo:
+		salvo.speed = 12.0
+	print("[BOSS ATTACK] Captain Bone-Beard fired Fire Twin Cannon Salvo downriver towards X=%.2f" % target_x)
+
+func _fire_bonebeard_salvo() -> void:
+	_fire_twin_cannon_salvo()
+
+func _drop_powder_kegs() -> void:
 	var lanes = [-2.2, 0.0, 2.2]
 	lanes.shuffle()
 	
@@ -134,19 +187,20 @@ func _perform_attack() -> void:
 					keg.forward_speed = 6.0
 
 func _flash_red() -> void:
-	if not boss_sprite:
+	if not is_instance_valid(boss_sprite):
 		return
 	if _flash_tween and _flash_tween.is_valid():
 		_flash_tween.kill()
+		boss_sprite.scale = _base_scale
 
 	_flash_tween = create_tween()
 	if "modulate" in boss_sprite:
 		_flash_tween.tween_property(boss_sprite, "modulate", Color(3.0, 0.2, 0.2, 1.0), 0.07)
 		_flash_tween.tween_property(boss_sprite, "modulate", Color.WHITE, 0.12)
 	else:
-		var sc = boss_sprite.scale
-		_flash_tween.tween_property(boss_sprite, "scale", sc * 1.08, 0.07)
-		_flash_tween.tween_property(boss_sprite, "scale", sc, 0.12)
+		boss_sprite.scale = _base_scale
+		_flash_tween.tween_property(boss_sprite, "scale", _base_scale * 1.05, 0.04)
+		_flash_tween.tween_property(boss_sprite, "scale", _base_scale, 0.08)
 
 func _update_health_bar() -> void:
 	if health_bar_progress:

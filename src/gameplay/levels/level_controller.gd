@@ -532,6 +532,8 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 				var pod = biogas_pod_scene.instantiate() as Area3D
 				add_child(pod)
 				pod.global_position = Vector3(x_world, 0.0, z_spawn)
+				if "forward_speed" in pod:
+					pod.forward_speed = float(event.get("speed", 3.0))
 
 		# ── Grave Skiffs (Level 2) ────────────────────────────────────────────
 		"grave_skiffs":

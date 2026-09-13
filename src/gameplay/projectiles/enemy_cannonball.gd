@@ -20,8 +20,24 @@ func _ready() -> void:
 	add_to_group("enemy_projectiles")
 	area_entered.connect(_on_hit)
 	body_entered.connect(_on_hit)
+	
+	# Auto-detect 2D billboard sprite: if present, hide default 3D sphere meshes
+	var spr = get_node_or_null("AmmoSprite") as Sprite3D
+	if not spr:
+		spr = get_node_or_null("Sprite3D") as Sprite3D
+	if spr:
+		var core = get_node_or_null("FireCore")
+		if core: core.visible = false
+		var glow = get_node_or_null("FireGlow")
+		if glow: glow.visible = false
 
 func set_color(color: Color) -> void:
+	var spr = get_node_or_null("AmmoSprite") as Sprite3D
+	if not spr:
+		spr = get_node_or_null("Sprite3D") as Sprite3D
+	if spr:
+		spr.modulate = color
+
 	var core = get_node_or_null("FireCore") as MeshInstance3D
 	if core:
 		var mat = StandardMaterial3D.new()

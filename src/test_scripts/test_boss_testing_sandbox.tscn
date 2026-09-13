@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://b5so2wk4el7fg"]
+
+[ext_resource type="Script" path="res://src/test_scripts/test_boss_testing_sandbox.gd" id="1_test"]
+
+[node name="TestBossTestingSandbox" type="Node"]
+script = ExtResource("1_test")

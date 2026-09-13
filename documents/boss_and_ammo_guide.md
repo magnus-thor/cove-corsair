@@ -18,7 +18,7 @@ When the chunk is reached, [BaseTrackChunk](file:///f:/projects/cove-corsair/src
 | Boss Scene | Script | Typical Boss Identity |
 | :--- | :--- | :--- |
 | [boss_war_barge.tscn](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_war_barge.tscn) | [boss_war_barge.gd](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_war_barge.gd) | **Ironjaw** — Armored steam war barge with broadsides, steam venting, and mortar barrage. |
-| [boss_bone_beard.tscn](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_bone_beard.tscn) | [boss_bone_beard.gd](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_bone_beard.gd) | **Captain Bone-Beard** — Fast twin-frigate with high weave speed and powder keg drops. |
+| [boss_bone_beard.tscn](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_bone_beard.tscn) | [boss_bone_beard.gd](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_bone_beard.gd) | **Captain Bone-Beard** — Fast twin-frigate with high weave speed, rolling powder keg drops, and Fire Twin Cannon Salvos. |
 | [boss_phantom_dredge.tscn](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_phantom_dredge.tscn) | [boss_phantom_dredge.gd](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_phantom_dredge.gd) | **Phantom Dredge** — Submerging bayou dredger with dive and surface combat cycles. |
 | [boss_siege_fortress.tscn](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_siege_fortress.tscn) | [boss_siege_fortress.gd](file:///f:/projects/cove-corsair/src/gameplay/enemies/boss_siege_fortress.gd) | **Siege Fortress** — Heavy volcanic citadel craft with multi-turret crossfire. |
 
@@ -120,3 +120,50 @@ add_child(ball)
 ball.global_position = left_cannon_node.global_position
 ball.set_color(Color(0.2, 0.9, 0.3)) # Emerald cursed projectile!
 ```
+
+### Option 4: Dedicated Boss Multi-Projectile & Salvo Prefabs
+Bosses with specialized multi-shot attacks (such as **Captain Bone-Beard's** twin catamaran hulls) use dedicated salvo projectile scenes:
+- **Sprite Texture**: `res://assets/sprites/ammo/boss_ammo_fire_twin_cannon_salvo.png`
+- **Scene**: [boss_projectile_twin_cannon_salvo.tscn](file:///f:/projects/cove-corsair/src/gameplay/projectiles/boss_projectile_twin_cannon_salvo.tscn) (script: [boss_projectile_twin_cannon_salvo.gd](file:///f:/projects/cove-corsair/src/gameplay/projectiles/boss_projectile_twin_cannon_salvo.gd))
+- **Ammo Data**: [ammo_fire_twin_cannon_salvo.tres](file:///f:/projects/cove-corsair/src/data/resources/user_ammo/ammo_fire_twin_cannon_salvo.tres)
+- **Mechanics**: Combines dual blazing cannonballs into a single wide-lane salvo hitbox (`BoxShape3D(2.4, 1.2, 1.2)`), traveling downriver at $12\text{ m/s}$ with auto-detected spherical billboard rendering.
+- **Trigger**: Called in combat via `_fire_twin_cannon_salvo()` and testable via the `💥 Fire Twin Cannon Salvo` button in the Boss Sandbox.
+
+---
+
+## 🧪 5. Interactive Boss & Weapon Testing Sandbox
+
+For rapid design iteration, hitbox calibration, and attack animation testing, use the dedicated **Boss & Weapon Testing Sandbox**:
+
+- **Scene Path**: `res://src/levels/boss_testing_sandbox.tscn`
+- **Controller Script**: [boss_testing_sandbox.gd](file:///f:/projects/cove-corsair/src/levels/boss_testing_sandbox.gd)
+
+### How to Run:
+1. In the Godot Editor FileSystem dock, navigate to `res://src/levels/boss_testing_sandbox.tscn`.
+2. Right-click the scene and select **Play Scene** (or press **F6** with the scene open).
+
+### Key Features:
+- **Boss Selector & Phases**:
+  - Switch instantly between **Captain Ironjaw**, **Captain Bone-Beard**, **The Phantom Dredge**, **The Siege Fortress**, and mini-bosses (**Bombard Skiff**, **Toxic Harvester**).
+  - Modify HP in real-time (`-10`, `-50`, `-200`, `Full Heal`) or trigger instant defeat animations.
+  - Switch combat phases (`Phase 1`, `Phase 2`, `Phase 3`, `Enraged`).
+  - Freeze boss movement in place for precise aiming and hitbox tests (`Freeze Movement: ON/OFF`).
+  - Component-level destruction tests for the **Siege Fortress** (*Port Turret*, *Starboard Turret*, *Prow Ram*, *Furnace Core*).
+- **Weapons & Attack Triggers**:
+  - Toggle automated attacks (`Auto-Attacks: ON/OFF`) or test individual attacks with dedicated trigger buttons:
+    - *Ironjaw*: Alternating Cannons, Targeted Mortar Barrage, Steam Venting, Ram Charge.
+    - *Bone-Beard*: Powder Keg Barrage.
+    - *Phantom Dredge*: Spectral Volley, Poison Mortar, Dive/Submerge, Water Shockwaves, Resurface.
+    - *Siege Fortress*: Multi-Turret Broadside, Thermal Geyser Slam, Ram Overdrive.
+  - Projectile customization: Live speed slider (4–24 m/s) and live color tints (*Default Steel*, *Blazing Fire*, *Spectral Cyan*, *Void Purple*, *Toxic Acid*).
+  - Test-fire projectiles down specific river lanes (Left `-3m`, Center `0m`, Right `+3m`).
+- **Minion & Hazard Spawns**:
+  - Spawn individual minion adds (*Pressure Skiffs*, *Grave Skiffs*, *Tide Cutters*, *Iron Gunners*, *Brimstone Rafts*, or full *Bayou Swarms*).
+  - Deploy river hazards (*Powder Kegs*, *Spiked Sea Mines*, *Biogas Pods*, *Thermal Geysers*).
+  - Instant cleanup buttons: `Clear Minions`, `Clear Hazards`, `Clear Projectiles`, and `💥 CLEAR ALL`.
+- **Direct Boss Director & Animation Showcase**:
+  - No player ship or gameplay interruptions: you have complete puppeteer control over the boss.
+  - An invisible/subtle target buoy handles all attack landings and impact explosions.
+  - Camera presets: `[Front Framing]` (inspection framing right in front of boss), `[3/4 Quarter]` (isometric), `[Top-Down]` (tactical), and `[Waterline]` (profile view).
+  - Time scale controls: `Pause (||)`, `0.1x Slow-Mo`, `0.25x`, `0.5x`, `1x`, `2x` for frame-by-frame inspection of muzzle flashes, projectile trajectories, and telegraph markers.
+  - Press **H** to toggle the controls GUI on/off for clean screenshot and video capture.

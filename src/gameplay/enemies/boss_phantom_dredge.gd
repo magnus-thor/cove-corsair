@@ -70,6 +70,13 @@ func _ready() -> void:
 	_base_y = 1.45
 	if visual_container:
 		visual_container.position.y = _base_y
+		visual_container.scale = Vector3(1.00, 1.00, 1.00)
+		visual_container.rotation_degrees = Vector3(0.0, 178.0, 0.0)
+		if visual_container is Sprite3D:
+			visual_container.pixel_size = 0.0021
+		for child in visual_container.get_children():
+			if child is Sprite3D:
+				child.pixel_size = 0.0021
 	
 	GameState.boss_spawned_event.emit("The Phantom Dredge", max_hp)
 	GameState.boss_health_changed.emit(current_hp, max_hp)

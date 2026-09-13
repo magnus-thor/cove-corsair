@@ -7,6 +7,8 @@ extends Area3D
 @export var damage_per_tick: int = 3
 @export var tick_interval: float = 0.4
 
+@export var forward_speed: float = 3.0
+
 var _is_popped: bool = false
 var _pulse_time: float = 0.0
 ## Per-cloud player damage cooldown (seconds). Prevents fleet-wipe on first tick.
@@ -24,6 +26,14 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if _is_popped:
 		return
+	if forward_speed != 0.0:
+		global_position.z += forward_speed * delta
+		var player = get_tree().get_first_node_in_group("player")
+		var player_z = player.global_position.z if player else 0.0
+		if global_position.z > (player_z + 8.0):
+			queue_free()
+			return
+
 	_pulse_time += delta * 4.0
 	var scale_factor = 1.0 + sin(_pulse_time) * 0.12
 	if pod_sprite:

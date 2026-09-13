@@ -94,6 +94,11 @@ func _ready() -> void:
 	original_combat_z = combat_z_offset
 	
 	if boss_sprite:
+		boss_sprite.position.y = 0.22
+		boss_sprite.scale = Vector3(3.39, 3.39, 3.39)
+		boss_sprite.rotation_degrees = Vector3(0.0, 91.0, 0.0)
+		if boss_sprite is Sprite3D:
+			boss_sprite.pixel_size = 0.0021
 		_base_mesh_scale = boss_sprite.scale
 	
 	# Initial UI Trigger

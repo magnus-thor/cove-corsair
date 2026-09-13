@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/enemies/boss_bone_beard.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://v00jmx7xnglw" path="res://assets/models/enemy/vessels/captain_bone-beard’s_twin_frigate.glb" id="2_frigate_mesh"]
 [ext_resource type="PackedScene" path="res://src/gameplay/collectibles/collectible_doubloon.tscn" id="3_doubloon"]
 [ext_resource type="PackedScene" path="res://src/gameplay/vfx/barrel_explosion.tscn" id="4_explosion"]
 [ext_resource type="PackedScene" path="res://src/gameplay/obstacles/destructible_barrel.tscn" id="5_keg"]
+[ext_resource type="PackedScene" path="res://src/gameplay/projectiles/boss_projectile_twin_cannon_salvo.tscn" id="6_salvo"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_boss"]
 size = Vector3(4.8, 2.0, 3.2)
@@ -17,9 +18,10 @@ script = ExtResource("1_script")
 doubloon_scene = ExtResource("3_doubloon")
 explosion_scene = ExtResource("4_explosion")
 powder_keg_scene = ExtResource("5_keg")
+twin_salvo_scene = ExtResource("6_salvo")
 
 [node name="BossMesh" parent="." instance=ExtResource("2_frigate_mesh")]
-transform = Transform3D(4.48, 0, 0, 0, 4.48, 0, 0, 0, 4.48, 0, 2.15, 0)
+transform = Transform3D(4.48, 0, 0, 0, 4.48, 0, 0, 0, 4.48, 0, 2, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
