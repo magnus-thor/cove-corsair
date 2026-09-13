@@ -5,6 +5,11 @@ extends Area3D
 
 enum ObstacleType { WOODEN_BARREL, FUSE_BARREL, RUNE_BARREL, SEA_MINE, CORAL_REEF }
 
+## Emitted when this obstacle is destroyed (past-tense event, SSOT Rule 1).
+## Listeners (GameState, LevelController) use this to award score/XP — the obstacle
+## never pushes directly into the player or other peers.
+signal obstacle_destroyed(obstacle_type: ObstacleType, world_pos: Vector3)
+
 ## Visual obstacle HP
 @export var hp: int = 1
 @export var obstacle_type: ObstacleType = ObstacleType.WOODEN_BARREL:
@@ -111,6 +116,13 @@ func update_obstacle_visuals() -> void:
 		scale = sc
 		rotation_degrees = rot_deg
 
+## Canonical damage entry point (Signal Up / Call Down Rule 2).
+## Callers supply a source_info string so the victim can apply mitigation and so
+## debug logs can trace damage origins without the caller needing to inspect internals.
+func take_hit(amount: int, source_info: String = "") -> void:
+	take_damage(amount)
+
+## Backward-compatible bridge — existing callers (cannonball, enemy scripts) continue to work.
 func take_damage(amount: int) -> void:
 	if _is_destroyed:
 		return
@@ -134,6 +146,15 @@ func die() -> void:
 	if _is_destroyed:
 		return
 	_is_destroyed = true
+
+	# Rule 4 — Immediate collider shutdown: prevent ghost collisions on the corpse frame.
+	collision_layer = 0
+	collision_mask = 0
+	for child in get_children():
+		if child is CollisionShape3D:
+			child.set_deferred("disabled", true)
+	set_deferred("monitoring", false)
+	set_deferred("monitorable", false)
 	
 	GameState.targets_destroyed += 1
 	if is_in_group("barricade"):
@@ -194,11 +215,12 @@ func die() -> void:
 	# Deal splash chain damage if explosive
 	if obstacle_type == ObstacleType.FUSE_BARREL or obstacle_type == ObstacleType.SEA_MINE:
 		_apply_explosion_damage()
-	
-	var player = get_tree().get_first_node_in_group("player")
-	if player and player.has_method("upgrade_ship"):
-		player.upgrade_ship(1)
-			
+
+	# Rule 1 — Signal Up: broadcast past-tense event with data payload.
+	# Listeners (LevelController, GameState, HUD) subscribe to award score/XP without
+	# the obstacle coupling to the player hierarchy directly.
+	obstacle_destroyed.emit(obstacle_type, global_position)
+		
 	queue_free()
 
 func _apply_explosion_damage() -> void:

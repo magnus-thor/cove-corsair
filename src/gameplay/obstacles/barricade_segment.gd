@@ -82,6 +82,10 @@ func _update_label_visuals() -> void:
 	else:
 		hp_label.modulate = Color(1.0, 0.2, 0.2) # red    – full health
 
+## Canonical damage entry point (Rule 2). Delegates to take_damage so label stays in sync.
+func take_hit(amount: int, source_info: String = "") -> void:
+	take_damage(amount)
+
 func take_damage(amount: int) -> void:
 	super.take_damage(amount)
 	_update_label_visuals()

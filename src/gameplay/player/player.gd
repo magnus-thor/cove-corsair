@@ -6,6 +6,11 @@ signal score_changed(new_score: int)
 signal doubloons_changed(new_doubloons: int)
 signal run_failed(coins_collected: int, distance_reached: float)
 
+## Standardised signal aliases (Rule 1 — past-tense, typed payloads).
+## These coexist with the legacy signals above so existing UI connections keep working.
+signal player_health_changed(current: int, max_val: int)
+signal player_sunk()
+
 @export var ship_data: ShipData:
 	set(val):
 		if ship_data == val:
@@ -325,6 +330,7 @@ func apply_ship_data(data: ShipData) -> void:
 	apply_tier(active_tier)
 		
 	health_changed.emit(current_health, max_health)
+	player_health_changed.emit(current_health, max_health)
 
 func apply_tier(tier_level: int) -> void:
 	if not ship_data or ship_data.tier_sockets.is_empty():
@@ -337,6 +343,7 @@ func apply_tier(tier_level: int) -> void:
 	keyboard_speed = ship_data.move_speed + (tier_level - 1) * 1.5
 	lerp_speed = keyboard_speed * 1.3
 	health_changed.emit(current_health, max_health)
+	player_health_changed.emit(current_health, max_health)
 
 	var active_sockets: Array = ship_data.tier_sockets[clampi(tier_level - 1, 0, ship_data.tier_sockets.size() - 1)]
 
@@ -573,6 +580,7 @@ func take_hit(amount: int = 1, source_info: String = "") -> void:
 	if current_health <= 0:
 		print("[FATAL DAMAGE] Killed by: %s | Damage: %d | Remaining HP: %d" % [source_info, amount, current_health])
 	health_changed.emit(current_health, max_health)
+	player_health_changed.emit(current_health, max_health)
 	if current_health <= 0:
 		game_over(false)
 
@@ -593,7 +601,9 @@ func _on_area_entered(area: Area3D) -> void:
 				hit_invulnerability_timer = 0.5
 				spawn_floating_text_at_position("🛡️ PROW RAM ABSORBED!", Color(0.3, 0.9, 1.0))
 				AudioManager.play_sfx("sfx_wood_smash", 0.9, 1.1)
-				if area.has_method("take_damage"):
+				if area.has_method("take_hit"):
+					area.take_hit(20, "spiked_prow_ram")
+				elif area.has_method("take_damage"):
 					area.take_damage(20)
 				elif area.has_method("die"):
 					area.die()
@@ -601,14 +611,18 @@ func _on_area_entered(area: Area3D) -> void:
 
 			if hit_invulnerability_timer > 0.0:
 				# Collision damage already applied this burst; damage barricade segment without re-damaging hull
-				if area.has_method("take_damage"):
+				if area.has_method("take_hit"):
+					area.take_hit(5, "barricade_graze")
+				elif area.has_method("take_damage"):
 					area.take_damage(5)
 				return
 			
 			hit_invulnerability_timer = 0.5
 			AudioManager.play_sfx("sfx_wood_smash")
 			take_hit(3, "Collision with Barricade")
-			if area.has_method("take_damage"):
+			if area.has_method("take_hit"):
+				area.take_hit(5, "player_vessel_ram")
+			elif area.has_method("take_damage"):
 				area.take_damage(5)
 			elif area.has_method("die"):
 				area.die()
@@ -641,7 +655,9 @@ func _on_area_entered(area: Area3D) -> void:
 			hit_invulnerability_timer = 0.5
 			spawn_floating_text_at_position("🛡️ PROW RAM ABSORBED!", Color(0.3, 0.9, 1.0))
 			AudioManager.play_sfx("barrel_breaks", 0.9, 1.1)
-			if area.has_method("take_damage"):
+			if area.has_method("take_hit"):
+				area.take_hit(10, "spiked_prow_ram")
+			elif area.has_method("take_damage"):
 				area.take_damage(10)
 			elif area.has_method("die"):
 				area.die()
@@ -653,10 +669,14 @@ func _on_area_entered(area: Area3D) -> void:
 		take_hit(1, "Collision with %s (%s)" % [area.name, str(area.get_groups())])
 			
 		if area.is_in_group("boss") or (area.get_parent() and area.get_parent().is_in_group("boss")):
-			if area.has_method("take_damage"):
+			if area.has_method("take_hit"):
+				area.take_hit(5, "player_vessel_ram")
+			elif area.has_method("take_damage"):
 				area.take_damage(5)
 		elif area.has_method("die"):
 			area.die()
+		elif area.has_method("take_hit"):
+			area.take_hit(5, "player_vessel_ram")
 		elif area.has_method("take_damage"):
 			area.take_damage(5)
 		else:
@@ -670,6 +690,7 @@ func game_over(victory: bool) -> void:
 	is_shooting_enabled = false
 	
 	if not victory:
+		player_sunk.emit()
 		var coins = GameState.run_doubloons
 		var dist = GameState.distance_traveled
 		GameState.bank_run_doubloons(0)

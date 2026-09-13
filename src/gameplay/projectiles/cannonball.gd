@@ -74,6 +74,18 @@ func _detach_trail() -> void:
 func _check_and_attach_fire_trail() -> void:
 	if _trail and is_instance_valid(_trail):
 		return
+	# Rule 4 (Trail3D selectivity) — Explicit deny list for standard ordnance.
+	# Iron, battering, and chain rounds must NEVER spawn fire trails regardless of
+	# any other flag that might be set on the projectile.
+	const NON_FIRE_AMMO: Array = ["standard_iron", "battering_shot", "chain_shot",
+		"iron_ball", "iron_round", "scattershot", "chain"]
+	if ammo_id != "" and ammo_id in NON_FIRE_AMMO:
+		return
+	# Similarly guard by ammo name
+	if ammo_data and ammo_data.ammo_name:
+		var aname = ammo_data.ammo_name.to_lower()
+		if "iron" in aname or "battering" in aname or "chain" in aname or "scatter" in aname:
+			return
 	var is_fire_proj: bool = false
 	if crew_id == "skeleton_tosser":
 		is_fire_proj = true
@@ -516,8 +528,14 @@ func _on_hit(target: Node) -> void:
 				target.get_parent().is_barrage_active = false
 
 		AudioManager.play_sfx("barrel_hits")
-		if target.has_method("take_damage"):
+		# Rule 2 — Call Down: projectile calls take_hit / take_damage on the victim.
+		# Projectile NEVER reads victim position, health state, or spawns victim VFX.
+		if target.has_method("take_hit"):
+			target.take_hit(hit_damage, ammo_id)
+		elif target.has_method("take_damage"):
 			target.take_damage(hit_damage)
+		elif target.get_parent() and target.get_parent().has_method("take_hit"):
+			target.get_parent().take_hit(hit_damage, ammo_id)
 		elif target.get_parent() and target.get_parent().has_method("take_damage"):
 			target.get_parent().take_damage(hit_damage)
 			

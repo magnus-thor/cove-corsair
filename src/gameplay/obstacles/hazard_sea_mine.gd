@@ -1,6 +1,10 @@
 class_name HazardSeaMine
 extends DestructibleObstacle
 
+## Emitted when the mine detonates (past-tense event, Rule 1).
+## Carries world position so listeners can apply area damage without coupling to mine internals.
+signal mine_detonated(world_pos: Vector3)
+
 @export var explosion_scene: PackedScene = preload("res://src/vfx/vfx_mine_explosion.tscn")
 
 func _ready() -> void:
@@ -15,7 +19,9 @@ func _on_area_entered(area: Area3D) -> void:
 		return
 	if area.is_in_group("player") or area.is_in_group("follower") or area.is_in_group("cannonballs") or area.is_in_group("enemies"):
 		if area.is_in_group("enemies") and not area.is_in_group("boss"):
-			if area.has_method("take_damage"):
+			if area.has_method("take_hit"):
+				area.take_hit(20, "sea_mine_collision")
+			elif area.has_method("take_damage"):
 				area.take_damage(20)
 			elif "current_hp" in area:
 				area.current_hp -= 20
@@ -23,10 +29,12 @@ func _on_area_entered(area: Area3D) -> void:
 					area.die()
 		die()
 
-## Override base take_damage so cannonball hits route through HazardSeaMine.die() only.
-## The base class die() calls _apply_explosion_damage() which incorrectly spawns VFX
-## and damage checks near the player rather than at the mine's position.
-func take_damage(_amount: int) -> void:
+## Canonical damage entry point — any hit detonates the mine.
+func take_hit(amount: int = 1, source_info: String = "") -> void:
+	die()
+
+## Backward-compatible bridge so existing callers (cannonball._on_hit) keep working.
+func take_damage(_amount: int = 1) -> void:
 	die()
 
 func die() -> void:
@@ -35,6 +43,13 @@ func die() -> void:
 	var explosion_pos = global_position
 	explosion_pos.y = 0.05
 	_is_destroyed = true
+
+	# Rule 4 — Immediate collider shutdown: prevent ghost contacts after detonation.
+	collision_layer = 0
+	collision_mask = 0
+	for child in get_children():
+		if child is CollisionShape3D:
+			child.set_deferred("disabled", true)
 	set_deferred("monitoring", false)
 	set_deferred("monitorable", false)
 	
@@ -54,28 +69,26 @@ func die() -> void:
 
 	AudioManager.play_sfx("sfx_mine_detonate")
 	
-	# Apply knockback and deal 1 fleet damage to the player if close (direct contact)
+	# Rule 2 — Call Down: the mine calls player.take_hit; player owns its own response
+	# (camera shake, i-frames, lateral drift — all handled inside player.take_hit).
+	# We never write to player.target_x or player.position directly.
 	var player = get_tree().get_first_node_in_group("player")
 	if player and is_instance_valid(player):
 		var dist = explosion_pos.distance_to(player.global_position)
 		if dist < 2.8:
-			var knockback_dir = sign(player.global_position.x - explosion_pos.x)
-			if knockback_dir == 0.0:
-				knockback_dir = 1.0 if randf() < 0.5 else -1.0
-			
-			if "target_x" in player and "half_width" in player:
-				player.target_x = clamp(player.target_x + knockback_dir * 2.8, -player.half_width, player.half_width)
-				player.position.x = player.target_x
-			
-			# Deal 1 fleet/hull damage on direct contact
-			if player.has_method("leak_threat"):
+			if player.has_method("take_hit"):
+				player.take_hit(1, "sea_mine_knockback")
+			elif player.has_method("leak_threat"):
 				player.leak_threat(self)
 
-	# Detonate / damage any nearby enemy vessels in explosion radius
+	# Detonate / damage any nearby enemy vessels in explosion radius.
+	# Rule 2 — Call Down: each enemy owns its own health; mine calls take_hit and stops there.
 	for enemy in get_tree().get_nodes_in_group("enemies"):
 		if is_instance_valid(enemy) and not enemy.is_in_group("boss") and not enemy.is_queued_for_deletion():
 			if explosion_pos.distance_to(enemy.global_position) < 3.0:
-				if enemy.has_method("take_damage"):
+				if enemy.has_method("take_hit"):
+					enemy.take_hit(20, "sea_mine_explosion")
+				elif enemy.has_method("take_damage"):
 					enemy.take_damage(20)
 				elif "current_hp" in enemy:
 					enemy.current_hp -= 20
@@ -83,6 +96,9 @@ func die() -> void:
 						enemy.die()
 	
 	doubloons_drop = 0 # Mine is a hazard and does not drop gold
+
+	# Rule 1 — Signal Up: broadcast past-tense event.
+	mine_detonated.emit(explosion_pos)
 	
 	# Safe removal
 	queue_free()

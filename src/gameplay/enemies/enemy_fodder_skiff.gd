@@ -4,6 +4,9 @@ extends Area3D
 ## High-speed 1-HP fodder skiff designed to spawn in rapid swarms.
 ## Awards 0 doubloons upon destruction, but feeds into the Fire Frenzy streak system.
 
+## Emitted when this vessel is destroyed (past-tense event, Rule 1).
+signal vessel_died(world_pos: Vector3)
+
 @export var max_hp: int = 1
 @export var current_hp: int = 1
 @export var forward_speed: float = 7.5
@@ -49,6 +52,10 @@ func _on_area_entered(area: Area3D) -> void:
 			player.take_hit(1, "fodder_skiff_ram")
 		die()
 
+## Canonical damage entry point (Rule 2).
+func take_hit(amount: int, source_info: String = "") -> void:
+	take_damage(amount)
+
 func take_damage(amount: int) -> void:
 	if _is_dead:
 		return
@@ -70,6 +77,18 @@ func die() -> void:
 	if _is_dead:
 		return
 	_is_dead = true
+
+	# Rule 1 — Signal Up: emit past-tense event before dismantling self.
+	vessel_died.emit(global_position)
+
+	# Rule 4 — Immediate collider shutdown: prevent ghost contacts on the corpse frame.
+	collision_layer = 0
+	collision_mask = 0
+	if collision_shape:
+		collision_shape.set_deferred("disabled", true)
+	set_deferred("monitoring", false)
+	set_deferred("monitorable", false)
+
 	GameState.targets_destroyed += 1
 	GameState.record_fodder_kill()
 	AudioManager.play_sfx("barrel_breaks")
