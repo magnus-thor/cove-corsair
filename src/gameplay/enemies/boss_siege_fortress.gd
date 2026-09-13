@@ -166,15 +166,18 @@ func _fire_fortress_salvo() -> void:
 		if ball.has_method("set_color"):
 			ball.set_color(Color(1.0, 0.45, 0.1))
 		if "speed" in ball:
-			ball.speed = 11.0
+			ball.speed = 18.0
 
 		var fire_dir = Vector3(0, 0, 1)
 		var player = get_tree().get_first_node_in_group("player")
 		if player and is_instance_valid(player):
 			var to_player = (player.global_position - ball.global_position)
 			to_player.y = 0.0
-			if to_player.z > 0.1:
+			if to_player.length_squared() > 0.01:
 				fire_dir = to_player.normalized()
+				if fire_dir.z < 0.1:
+					fire_dir.z = 0.4
+					fire_dir = fire_dir.normalized()
 		if ball.has_method("setup"):
 			ball.setup(fire_dir, null, null)
 		if "direction" in ball:

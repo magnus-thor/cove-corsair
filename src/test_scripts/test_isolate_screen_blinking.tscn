@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://0618swtmcqxo"]
 
-[ext_resource type="Script" path="res://src/test_isolate_screen_blinking.gd" id="1_isolate"]
+[ext_resource type="Script" path="res://src/test_scripts/test_isolate_screen_blinking.gd" id="1_isolate"]
 
 [node name="TestIsolateScreenBlinking" type="Node"]
 script = ExtResource("1_isolate")

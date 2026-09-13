@@ -56,27 +56,25 @@ func _launch_heavy_bombard() -> void:
 		
 	var target_pos = player.global_position + Vector3(randf_range(-1.0, 1.0), 0, randf_range(-0.5, 0.5))
 	
-	var reticle = MeshInstance3D.new()
-	var disc = CylinderMesh.new()
-	disc.top_radius = 2.6
-	disc.bottom_radius = 2.6
-	disc.height = 0.02
-	reticle.mesh = disc
+	var reticle = Sprite3D.new()
+	reticle.axis = Vector3.AXIS_Y
+	reticle.double_sided = true
+	var reticle_tex = preload("res://assets/sprites/ui/bombard_target_reticle.png")
+	reticle.texture = reticle_tex
+	reticle.pixel_size = 0.0058
+	reticle.modulate = Color(1.2, 0.45, 0.1, 0.35)
+	reticle.render_priority = 2
 	
-	var mat = StandardMaterial3D.new()
-	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.albedo_color = Color(1.0, 0.25, 0.05, 0.4)
-	reticle.material_override = mat
 	get_tree().current_scene.add_child(reticle)
-	reticle.global_position = Vector3(target_pos.x, 0.03, target_pos.z)
+	reticle.global_position = Vector3(target_pos.x, 0.04, target_pos.z)
 	
 	AudioManager.play_sfx("cannon_shots", 0.6, 0.8, 2.0)
 	
 	var tween = reticle.create_tween()
 	var vfx_scene = explosion_scene
 	var tree = get_tree()
-	tween.tween_property(mat, "albedo_color:a", 0.9, 1.1).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(reticle, "modulate:a", 1.0, 1.1).set_trans(Tween.TRANS_SINE)
+	tween.parallel().tween_property(reticle, "rotation:y", PI * 0.4, 1.1)
 	tween.tween_callback(Callable(EnemyMiniBossBombard, "execute_bombard_detonation").bind(reticle.global_position, vfx_scene, tree))
 	tween.tween_callback(reticle.queue_free)
 

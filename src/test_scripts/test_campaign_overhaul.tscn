@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://src/test_campaign_overhaul.gd" id="1_overhaul"]
+[ext_resource type="Script" path="res://src/test_scripts/test_campaign_overhaul.gd" id="1_overhaul"]
 
 [node name="TestCampaignOverhaul" type="Node"]
 script = ExtResource("1_overhaul")

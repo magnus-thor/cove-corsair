@@ -1,16 +1,16 @@
 [gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://src/data/enemy_data.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/enemy_vessels/Armored Turtle-Raft.png" id="2_tex"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemy_vessels/enemy_elite_ironclad.png" id="2_tex"]
 
 [resource]
 script = ExtResource("1_script")
-mob_name = "Elite Armored Raft"
+mob_name = "Elite Ironclad Dreadnought"
 sprite_texture = ExtResource("2_tex")
-pixel_size = 0.003
+pixel_size = 0.0032
 max_hp = 45
 forward_speed = 1.2
 doubloon_drop_count = 15
 is_boss = false
 y_offset = 1.4
-collision_size = Vector3(2.5, 1.5, 3.0)
+collision_size = Vector3(2.8, 1.6, 3.6)

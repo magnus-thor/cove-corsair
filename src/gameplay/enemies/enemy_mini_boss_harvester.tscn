@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/enemies/enemy_mini_boss_harvester.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/enemy_vessels/Armored Turtle-Raft.png" id="2_harvester_tex"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemy_vessels/enemy_harvester_steamer.png" id="2_harvester_tex"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_harvester"]
 size = Vector3(3.2, 1.8, 3.8)
@@ -36,10 +36,9 @@ shape = SubResource("BoxShape3D_harvester")
 
 [node name="Sprite3D" type="Sprite3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.766044, 0.642788, 0, -0.642788, 0.766044, 0, 1.35, 0)
-pixel_size = 0.003
+pixel_size = 0.0034
 alpha_cut = 1
 texture = ExtResource("2_harvester_tex")
-modulate = Color(0.65, 1.1, 0.75, 1)
 
 [node name="HealthBarSprite" type="Sprite3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)

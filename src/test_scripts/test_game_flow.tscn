@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://src/test_game_flow.gd" id="1_flow"]
+[ext_resource type="Script" path="res://src/test_scripts/test_game_flow.gd" id="1_flow"]
 
 [node name="TestGameFlow" type="Node"]
 script = ExtResource("1_flow")

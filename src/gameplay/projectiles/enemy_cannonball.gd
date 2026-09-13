@@ -1,7 +1,7 @@
 class_name EnemyCannonball
 extends Area3D
 
-@export var speed: float = 11.0
+@export var speed: float = 18.0
 @export var lifetime: float = 4.5
 var direction: Vector3 = Vector3(0, 0, 1)
 
@@ -9,7 +9,17 @@ func setup(p_direction: Vector3 = Vector3.ZERO, _p_ammo_data = null, _p_weapon_d
 	if p_direction != Vector3.ZERO:
 		direction = p_direction.normalized()
 	else:
-		direction = Vector3(0, 0, 1)
+		var player = get_tree().get_first_node_in_group("player") if get_tree() else null
+		if player and is_instance_valid(player):
+			var to_player = (player.global_position - global_position)
+			to_player.y = 0.0
+			if to_player.length_squared() > 0.01:
+				direction = to_player.normalized()
+			else:
+				direction = Vector3(0, 0, 1)
+		else:
+			direction = Vector3(0, 0, 1)
+
 	# Safeguard: Enemy projectiles must travel downriver (+Z) toward player
 	if direction.z < 0.0:
 		direction.z = abs(direction.z)
@@ -30,6 +40,15 @@ func _ready() -> void:
 		if core: core.visible = false
 		var glow = get_node_or_null("FireGlow")
 		if glow: glow.visible = false
+		
+	# If direction is default, aim toward player vessel at current position
+	if direction == Vector3(0, 0, 1):
+		var player = get_tree().get_first_node_in_group("player")
+		if player and is_instance_valid(player):
+			var to_player = (player.global_position - global_position)
+			to_player.y = 0.0
+			if to_player.length_squared() > 0.01 and to_player.z > 0.1:
+				direction = to_player.normalized()
 
 func set_color(color: Color) -> void:
 	var spr = get_node_or_null("AmmoSprite") as Sprite3D
@@ -54,7 +73,14 @@ func set_color(color: Color) -> void:
 		glow.material_override = mat
 
 
+var _time: float = 0.0
+
 func _physics_process(delta: float) -> void:
+	_time += delta
+	var spr = get_node_or_null("AmmoSprite") as Sprite3D
+	if spr:
+		spr.scale = Vector3.ONE * (1.0 + sin(_time * 16.0) * 0.05)
+		
 	var fwd = direction if direction != Vector3.ZERO else Vector3(0, 0, 1)
 	if fwd.z < 0.0:
 		fwd.z = abs(fwd.z)

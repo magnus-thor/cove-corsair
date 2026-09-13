@@ -426,14 +426,17 @@ func _fire_warning_shot() -> void:
 		if player and is_instance_valid(player):
 			var to_player = (player.global_position - ball.global_position)
 			to_player.y = 0.0
-			if to_player.z > 0.1:
+			if to_player.length_squared() > 0.01:
 				fire_dir = to_player.normalized()
+				if fire_dir.z < 0.1:
+					fire_dir.z = 0.4
+					fire_dir = fire_dir.normalized()
 		if ball.has_method("setup"):
 			ball.setup(fire_dir, null, null)
 		if "direction" in ball:
 			ball.direction = fire_dir
 		if "speed" in ball:
-			ball.speed = 11.0
+			ball.speed = 18.0
 
 func _fire_cannon_volley() -> void:
 	var shoot_node: Node3D = left_cannon_node if _is_left_turn else right_cannon_node
@@ -453,16 +456,17 @@ func _fire_cannon_volley() -> void:
 		if player and is_instance_valid(player):
 			var to_player = (player.global_position - ball.global_position)
 			to_player.y = 0.0
-			if to_player.z > 0.1:
+			if to_player.length_squared() > 0.01:
 				fire_dir = to_player.normalized()
-			else:
-				fire_dir = Vector3(0, 0, 1)
+				if fire_dir.z < 0.1:
+					fire_dir.z = 0.4
+					fire_dir = fire_dir.normalized()
 		if ball.has_method("setup"):
 			ball.setup(fire_dir, null, null)
 		if "direction" in ball:
 			ball.direction = fire_dir
 		if "speed" in ball:
-			ball.speed = 11.0
+			ball.speed = 18.0
 
 func _drop_keg() -> void:
 	if powder_keg_scene:

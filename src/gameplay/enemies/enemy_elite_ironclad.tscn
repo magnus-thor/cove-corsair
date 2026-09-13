@@ -2,10 +2,10 @@
 
 [ext_resource type="Script" path="res://src/gameplay/enemies/enemy_mob.gd" id="1_script"]
 [ext_resource type="Resource" path="res://src/data/resources/enemy_vessels/enemy_elite_ironclad.tres" id="2_enemy_data"]
-[ext_resource type="Texture2D" path="res://assets/sprites/enemy_vessels/Armored Turtle-Raft.png" id="3_ironclad_tex"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemy_vessels/enemy_elite_ironclad.png" id="3_ironclad_tex"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_mob"]
-size = Vector3(2.5, 1.5, 3.0)
+size = Vector3(2.8, 1.6, 3.6)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
 bg_color = Color(0.1, 0.1, 0.12, 0.8)
@@ -34,7 +34,7 @@ shape = SubResource("BoxShape3D_mob")
 
 [node name="EnemySprite" type="Sprite3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.766044, 0.642788, 0, -0.642788, 0.766044, 0, 1.4, 0)
-pixel_size = 0.003
+pixel_size = 0.0032
 alpha_cut = 1
 texture = ExtResource("3_ironclad_tex")
 

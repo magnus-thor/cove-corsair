@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/test_scripts/test_enemy_visual_overhaul.gd" id="1_test"]
+
+[node name="TestEnemyVisualOverhaul" type="Node3D"]
+script = ExtResource("1_test")

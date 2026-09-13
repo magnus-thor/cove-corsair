@@ -80,7 +80,8 @@ var obstacle_items: Array[Dictionary] = [
 	{"name": "Hazard Coral Reef", "scene": "res://src/gameplay/obstacles/hazard_reef.tscn"},
 	{"name": "Hazard Whirlpool", "scene": "res://src/gameplay/obstacles/hazard_whirlpool.tscn"},
 	{"name": "Barricade Wall", "scene": "res://src/gameplay/obstacles/barricade_wall.tscn"},
-	{"name": "Barricade Log Segment", "scene": "res://src/gameplay/obstacles/barricade_segment.tscn"}
+	{"name": "Barricade Log Segment", "scene": "res://src/gameplay/obstacles/barricade_segment.tscn"},
+	{"name": "Bombard Reticle Decal", "reticle": true}
 ]
 
 
@@ -101,7 +102,8 @@ var ammo_items: Array[Dictionary] = [
 	{"name": "Fire Bomb", "ammo_res": "res://src/data/resources/user_ammo/ammo_fire_bomb.tres"},
 	{"name": "Coconut Bomb", "ammo_res": "res://src/data/resources/user_ammo/ammo_coconut_bomb.tres"},
 	{"name": "Throwing Axe", "ammo_res": "res://src/data/resources/user_ammo/ammo_throwing_axe.tres"},
-	{"name": "Enemy Cannonball", "scene": "res://src/gameplay/projectiles/enemy_cannonball.tscn"}
+	{"name": "Enemy Flaming Cannonball", "scene": "res://src/gameplay/projectiles/enemy_cannonball.tscn"},
+	{"name": "Boss Twin Salvo", "scene": "res://src/gameplay/projectiles/boss_projectile_twin_cannon_salvo.tscn"}
 ]
 
 var ship_items: Array[Dictionary] = [
@@ -302,6 +304,8 @@ func _on_object_selected(obj_idx: int) -> void:
 						current_sprite = instance.get_node_or_null("BossSprite") as Sprite3D
 						if not current_sprite:
 							current_sprite = instance.get_node_or_null("EnemySprite") as Sprite3D
+						if not current_sprite:
+							current_sprite = instance.get_node_or_null("Sprite3D") as Sprite3D
 				
 		1: # Barrels, Hazards & Obstacles
 			if obj_idx < obstacle_items.size():
@@ -326,6 +330,18 @@ func _on_object_selected(obj_idx: int) -> void:
 						current_sprite = instance.get_node_or_null("ObstacleSprite") as Sprite3D
 						if not current_sprite:
 							current_sprite = instance.get_node_or_null("PodMesh") as Sprite3D
+						if not current_sprite:
+							current_sprite = instance.get_node_or_null("Sprite3D") as Sprite3D
+				elif item.has("reticle"):
+					var reticle = Sprite3D.new()
+					reticle.axis = Vector3.AXIS_Y
+					reticle.double_sided = true
+					reticle.texture = load("res://assets/sprites/ui/bombard_target_reticle.png")
+					reticle.pixel_size = 0.0058
+					reticle.modulate = Color(1.2, 0.45, 0.1, 0.85)
+					object_container.add_child(reticle)
+					current_object_node = reticle
+					current_sprite = reticle
 				
 		2: # Gates & Collectibles
 			if obj_idx < gate_items.size():
@@ -373,7 +389,9 @@ func _on_object_selected(obj_idx: int) -> void:
 						var instance = s_res.instantiate() as Node3D
 						object_container.add_child(instance)
 						current_object_node = instance
-						current_sprite = instance.get_node_or_null("Sprite3D") as Sprite3D
+						current_sprite = instance.get_node_or_null("AmmoSprite") as Sprite3D
+						if not current_sprite:
+							current_sprite = instance.get_node_or_null("Sprite3D") as Sprite3D
 						
 		4: # Player Ships
 			if obj_idx < ship_items.size():

@@ -66,13 +66,16 @@ func _fire_dual_cannons() -> void:
 			get_parent().add_child(ball)
 		ball.global_position = global_position + Vector3(offset_x, 0.5, 1.2)
 		if "speed" in ball:
-			ball.speed = 10.0
+			ball.speed = 19.0
 		var fire_dir = Vector3(0, 0, 1)
 		if player and is_instance_valid(player):
 			var to_player = (player.global_position - ball.global_position)
 			to_player.y = 0.0
-			if to_player.z > 0.1:
+			if to_player.length_squared() > 0.01:
 				fire_dir = to_player.normalized()
+				if fire_dir.z < 0.1:
+					fire_dir.z = 0.4
+					fire_dir = fire_dir.normalized()
 		if ball.has_method("setup"):
 			ball.setup(fire_dir, null, null)
 		if "direction" in ball:

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://uvm36r848k35"]
 
-[ext_resource type="Script" path="res://src/test_diagnostics_blinking.gd" id="1_diag"]
+[ext_resource type="Script" path="res://src/test_scripts/test_diagnostics_blinking.gd" id="1_diag"]
 
 [node name="TestDiagnosticsBlinking" type="Node"]
 script = ExtResource("1_diag")
