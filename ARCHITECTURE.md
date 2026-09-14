@@ -1,4 +1,6 @@
-Godot 4 Scalable Architecture & System Design GuideCore Philosophy: Loose Coupling, High Cohesion. Build small, isolated systems that communicate through explicit contracts and can run in isolation.1. Project Organization: Feature-First StructureAvoid organizing files by type (/scripts, /scenes, /textures). Organize by Feature Encapsulation. Everything needed for a feature to function lives together in the same folder.Plaintextres://
+# Godot 4 Scalable Architecture & System Design Guide
+
+## Core Philosophy: Loose Coupling, High Cohesion. Build small, isolated systems that communicate through explicit contracts and can run in isolation.1. Project Organization: Feature-First StructureAvoid organizing files by type (/scripts, /scenes, /textures). Organize by Feature Encapsulation. Everything needed for a feature to function lives together in the same folder.Plaintextres://
 ├── src/
 │   ├── core/                      # Global singletons / base primitives
 │   │   ├── event_bus.gd           # Lean, centralized event routing
