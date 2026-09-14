@@ -16,8 +16,6 @@ config/features=PackedStringArray("4.8", "Forward Plus")
 run/max_fps=60
 boot_splash/bg_color=Color(0.05, 0.08, 0.12, 1)
 boot_splash/image="res://assets/ui/splash.png"
-boot_splash/fullsize=true
-boot_splash/show_image=true
 config/icon="res://assets/ui/icon.png"
 
 [autoload]
