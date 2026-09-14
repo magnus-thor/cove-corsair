@@ -1,6 +1,6 @@
 ---
 level_id: 38
-level_title: "Level 38: Boiling Reach"
+level_title: "Level 38: Boiling Reach (Hazard Nav)"
 biome_name: "brimstone_bastion"
 base_scroll_speed: 11.1
 completion_doubloon_reward: 544

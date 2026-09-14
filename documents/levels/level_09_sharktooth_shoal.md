@@ -1,6 +1,6 @@
 ---
 level_id: 9
-level_title: "Level 9: Sharktooth Shoal"
+level_title: "Level 9: Sharktooth Shoal (Swarm Threat)"
 biome_name: "black_tide_bayou"
 base_scroll_speed: 7.5
 completion_doubloon_reward: 153

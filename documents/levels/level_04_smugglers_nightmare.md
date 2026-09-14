@@ -1,6 +1,6 @@
 ---
 level_id: 4
-level_title: "Level 4: Sunken Reefs"
+level_title: "Level 4: Sunken Reefs (Hazard Nav)"
 biome_name: "tropical"
 base_scroll_speed: 6.9
 completion_doubloon_reward: 86

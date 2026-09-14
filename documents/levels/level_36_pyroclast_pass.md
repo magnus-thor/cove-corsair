@@ -1,6 +1,6 @@
 ---
 level_id: 36
-level_title: "Level 36: Pyroclast Pass"
+level_title: "Level 36: Pyroclast Pass (Hazard Nav)"
 biome_name: "brimstone_bastion"
 base_scroll_speed: 10.9
 completion_doubloon_reward: 518

@@ -1,6 +1,6 @@
 ---
 level_id: 34
-level_title: "Level 34: Obsidian Strait"
+level_title: "Level 34: Obsidian Strait (Hazard Nav)"
 biome_name: "tropical"
 base_scroll_speed: 10.6
 completion_doubloon_reward: 490

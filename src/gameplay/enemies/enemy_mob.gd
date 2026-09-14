@@ -21,6 +21,10 @@ extends Area3D
 @export var forward_speed: float = 2.0
 @export var doubloons_drop: int = 2
 
+@export_group("Combat Behavior")
+@export var can_shoot: bool = false
+@export var is_gunner_vanguard: bool = false
+
 @export_group("Enemy Sprite Orientation")
 @export var enemy_pitch_deg: float = -40.0
 
@@ -122,27 +126,20 @@ func _physics_process(delta: float) -> void:
 		global_position.x = move_toward(global_position.x, player.global_position.x, 2.5 * delta)
 		global_position.x = clampf(global_position.x, -4.2, 4.2)
 		
-	# Active Combatant Shooting
-	var mob_name_lower = ""
-	if enemy_data:
-		mob_name_lower = enemy_data.mob_name.to_lower()
-	elif mob_type:
-		mob_name_lower = mob_type.to_lower()
-		
-	var can_fire = ("rower" in mob_name_lower or "skeleton" in mob_name_lower or "sloop" in mob_name_lower or "ghost" in mob_name_lower or "raider" in mob_name_lower or "skiff" in mob_name_lower or "elite" in mob_name_lower or "ironclad" in mob_name_lower)
+	# Active Combatant Shooting:
+	# Regular lane vessels and boss adds NEVER shoot.
+	# Only explicitly designated Gunner Vanguards at the end of non-boss levels shoot.
+	var is_boss_active = GameState.boss_spawned or get_tree().get_first_node_in_group("boss") != null
+	var can_fire = (can_shoot or is_gunner_vanguard) and not is_boss_active
 	if can_fire:
-		shoot_cooldown_timer += delta
-		var shoot_interval = 1.8
-		if "elite" in mob_name_lower or "ironclad" in mob_name_lower:
-			shoot_interval = 1.5
-		elif "rower" in mob_name_lower or "skeleton" in mob_name_lower:
-			shoot_interval = 2.4
-		elif "sloop" in mob_name_lower or "ghost" in mob_name_lower:
-			shoot_interval = 1.8
-			
-		if shoot_cooldown_timer >= shoot_interval:
-			shoot_cooldown_timer = 0.0
-			_fire_forward_cannonball()
+		var dist_to_player = abs(global_position.z - player_z)
+		# Only shoot if player is at fair distance (14m to 45m); never point-blank
+		if dist_to_player >= 14.0 and dist_to_player <= 45.0:
+			shoot_cooldown_timer += delta
+			var shoot_interval = 2.6
+			if shoot_cooldown_timer >= shoot_interval:
+				shoot_cooldown_timer = 0.0
+				_fire_forward_cannonball()
 		
 	# Clean up and leak threat if passed behind the player boat
 	if global_position.z > (player_z + 3.0):
@@ -165,7 +162,8 @@ func _fire_forward_cannonball() -> void:
 	# Spawn slightly ahead in positive Z (downriver facing)
 	ball.global_position = global_position + Vector3(0.0, 0.4, 1.2)
 	
-	var ball_speed = 18.0
+	# Calibrated dodgeable projectile speed (12.5 m/s) with telegraphed travel time
+	var ball_speed = 12.5
 	var mob_name_lower = ""
 	if enemy_data:
 		mob_name_lower = enemy_data.mob_name.to_lower()

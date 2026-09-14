@@ -1,6 +1,6 @@
 ---
 level_id: 2
-level_title: "Level 2: Palm Shallows"
+level_title: "Level 2: Palm Shallows (Hazard Nav)"
 biome_name: "tropical"
 base_scroll_speed: 6.6
 completion_doubloon_reward: 58

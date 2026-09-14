@@ -1,6 +1,6 @@
 ---
 level_id: 32
-level_title: "Level 32: Magma Surge"
+level_title: "Level 32: Magma Surge (Hazard Nav)"
 biome_name: "tropical"
 base_scroll_speed: 10.4
 completion_doubloon_reward: 464

@@ -7,6 +7,7 @@ extends Area3D
 @export var doubloons_drop: int = 3
 @export var shoot_interval: float = 1.3
 @export var burst_count: int = 2
+@export var can_shoot: bool = false
 
 @export var enemy_cannonball_scene: PackedScene = preload("res://src/gameplay/projectiles/enemy_cannonball.tscn")
 @export var doubloon_scene: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
@@ -39,19 +40,18 @@ func _physics_process(delta: float) -> void:
 	if sprite_node:
 		sprite_node.position.y = 1.0 + sin(_time * 4.0) * 0.05
 		
-	# Shooting logic - rapid blowdart burst (suppressed while boss geysers are active or warning)
-	var boss = get_tree().get_first_node_in_group("boss")
-	var geysers_active = (boss != null and is_instance_valid(boss) and "is_barrage_active" in boss and boss.is_barrage_active)
-	if geysers_active:
-		_shoot_timer = 0.0
-	else:
+	# Shooting logic - only if can_shoot is enabled and not during boss fight
+	var is_boss_active = GameState.boss_spawned or get_tree().get_first_node_in_group("boss") != null
+	var player = get_tree().get_first_node_in_group("player")
+	var player_z = player.global_position.z if player else 0.0
+	var dist_to_player = abs(global_position.z - player_z)
+	
+	if can_shoot and not is_boss_active and dist_to_player >= 14.0 and dist_to_player <= 45.0:
 		_shoot_timer += delta
 		if _shoot_timer >= shoot_interval:
 			_shoot_timer = 0.0
 			_fire_dart_burst()
 		
-	var player = get_tree().get_first_node_in_group("player")
-	var player_z = player.global_position.z if player else 0.0
 	if global_position.z > (player_z + 4.0):
 		GameState.record_mob_leaked()
 		if player and player.has_method("leak_threat"):

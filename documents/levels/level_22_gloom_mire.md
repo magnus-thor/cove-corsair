@@ -1,6 +1,6 @@
 ---
 level_id: 22
-level_title: "Level 22: Gloom Mire"
+level_title: "Level 22: Gloom Mire (Hazard Nav)"
 biome_name: "black_tide_bayou"
 base_scroll_speed: 9.1
 completion_doubloon_reward: 328

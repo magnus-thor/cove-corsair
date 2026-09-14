@@ -1,6 +1,6 @@
 ---
 level_id: 1
-level_title: "Level 1: Smuggler's Run"
+level_title: "Level 1: Smuggler's Run (Swarm Threat)"
 biome_name: "tropical"
 base_scroll_speed: 6.5
 completion_doubloon_reward: 45

@@ -1,6 +1,6 @@
 ---
 level_id: 25
-level_title: "Level 25: Phantom Trench"
+level_title: "Level 25: Phantom Trench (Boss Threat)"
 biome_name: "black_tide_bayou"
 base_scroll_speed: 9.5
 completion_doubloon_reward: 684

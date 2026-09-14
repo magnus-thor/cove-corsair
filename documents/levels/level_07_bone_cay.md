@@ -1,6 +1,6 @@
 ---
 level_id: 7
-level_title: "Level 7: Bone Cay"
+level_title: "Level 7: Bone Cay (Swarm Threat)"
 biome_name: "black_tide_bayou"
 base_scroll_speed: 7.2
 completion_doubloon_reward: 126

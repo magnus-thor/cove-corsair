@@ -1,6 +1,6 @@
 ---
 level_id: 31
-level_title: "Level 31: Cinder Rapids"
+level_title: "Level 31: Cinder Rapids (Swarm Threat)"
 biome_name: "tropical"
 base_scroll_speed: 10.2
 completion_doubloon_reward: 450

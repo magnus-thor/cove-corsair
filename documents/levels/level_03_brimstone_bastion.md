@@ -1,6 +1,6 @@
 ---
 level_id: 3
-level_title: "Level 3: Serpent's Reach"
+level_title: "Level 3: Serpent's Reach (Swarm Threat)"
 biome_name: "tropical"
 base_scroll_speed: 6.8
 completion_doubloon_reward: 72

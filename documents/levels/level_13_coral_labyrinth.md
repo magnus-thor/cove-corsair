@@ -1,6 +1,6 @@
 ---
 level_id: 13
-level_title: "Level 13: Coral Labyrinth"
+level_title: "Level 13: Coral Labyrinth (Swarm Threat)"
 biome_name: "pirate_citadel"
 base_scroll_speed: 8.0
 completion_doubloon_reward: 207

@@ -1,6 +1,6 @@
 ---
 level_id: 19
-level_title: "Level 19: Devil's Slalom"
+level_title: "Level 19: Devil's Slalom (Swarm Threat)"
 biome_name: "brimstone_bastion"
 base_scroll_speed: 8.8
 completion_doubloon_reward: 288

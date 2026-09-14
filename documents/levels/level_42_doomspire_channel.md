@@ -1,6 +1,6 @@
 ---
 level_id: 42
-level_title: "Level 42: Doomspire Channel"
+level_title: "Level 42: Doomspire Channel (Hazard Nav)"
 biome_name: "brimstone_bastion"
 base_scroll_speed: 11.6
 completion_doubloon_reward: 598

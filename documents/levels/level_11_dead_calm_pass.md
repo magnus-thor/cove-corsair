@@ -1,6 +1,6 @@
 ---
 level_id: 11
-level_title: "Level 11: Dead Calm Pass"
+level_title: "Level 11: Dead Calm Pass (Swarm Threat)"
 biome_name: "pirate_citadel"
 base_scroll_speed: 7.8
 completion_doubloon_reward: 180

@@ -1,6 +1,6 @@
 ---
 level_id: 28
-level_title: "Level 28: Dead Man's Bayou"
+level_title: "Level 28: Dead Man's Bayou (Hazard Nav)"
 biome_name: "pirate_citadel"
 base_scroll_speed: 9.9
 completion_doubloon_reward: 410

@@ -5,7 +5,9 @@ extends Area3D
 @export var current_hp: int = 22
 @export var forward_speed: float = 2.6
 @export var doubloons_drop: int = 4
-@export var shoot_interval: float = 1.6
+@export var shoot_interval: float = 2.4
+@export var can_shoot: bool = false
+@export var is_gunner_vanguard: bool = false
 
 @export var enemy_cannonball_scene: PackedScene = preload("res://src/gameplay/projectiles/enemy_cannonball.tscn")
 @export var doubloon_scene: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
@@ -37,12 +39,12 @@ func _apply_level_tuning() -> void:
 		max_hp = 4
 		current_hp = 4
 		forward_speed = 1.8
-		shoot_interval = 2.4
+		shoot_interval = 2.8
 	elif cur_lvl <= 6:
 		max_hp = 10
 		current_hp = 10
 		forward_speed = 2.2
-		shoot_interval = 2.0
+		shoot_interval = 2.4
 
 func _physics_process(delta: float) -> void:
 	if _is_dead or not GameState.is_game_active:
@@ -54,13 +56,18 @@ func _physics_process(delta: float) -> void:
 	if sprite_node:
 		sprite_node.position.y = 0.9 + sin(_time * 2.8) * 0.04
 		
-	_shoot_timer += delta
-	if _shoot_timer >= shoot_interval:
-		_shoot_timer = 0.0
-		_fire_dual_cannons()
-		
+	# Shooting logic: only shoot if explicitly marked as gunner vanguard and not in boss fight
+	var is_boss_active = GameState.boss_spawned or get_tree().get_first_node_in_group("boss") != null
 	var player = get_tree().get_first_node_in_group("player")
 	var player_z = player.global_position.z if player else 0.0
+	var dist_to_player = abs(global_position.z - player_z)
+
+	if (can_shoot or is_gunner_vanguard) and not is_boss_active and dist_to_player >= 14.0 and dist_to_player <= 45.0:
+		_shoot_timer += delta
+		if _shoot_timer >= shoot_interval:
+			_shoot_timer = 0.0
+			_fire_dual_cannons()
+		
 	if global_position.z > (player_z + 4.0):
 		GameState.record_mob_leaked()
 		if player and player.has_method("leak_threat"):
@@ -89,7 +96,7 @@ func _fire_dual_cannons() -> void:
 			get_parent().add_child(ball)
 		ball.global_position = global_position + Vector3(offset_x, 0.5, 1.2)
 		if "speed" in ball:
-			ball.speed = 19.0
+			ball.speed = 12.5
 		var fire_dir = Vector3(0, 0, 1)
 		if player and is_instance_valid(player):
 			var to_player = (player.global_position - ball.global_position)

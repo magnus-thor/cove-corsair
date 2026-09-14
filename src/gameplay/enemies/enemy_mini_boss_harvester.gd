@@ -41,10 +41,12 @@ func _physics_process(delta: float) -> void:
 	if sprite_node:
 		sprite_node.position.y = 1.2 + sin(_time * 3.0) * 0.06
 		
-	_mortar_timer += delta
-	if _mortar_timer >= mortar_interval:
-		_mortar_timer = 0.0
-		_launch_toxic_mortar()
+	var is_boss_active = GameState.boss_spawned or get_tree().get_first_node_in_group("boss") != null
+	if not is_boss_active:
+		_mortar_timer += delta
+		if _mortar_timer >= mortar_interval:
+			_mortar_timer = 0.0
+			_launch_toxic_mortar()
 		
 	var player = get_tree().get_first_node_in_group("player")
 	var player_z = player.global_position.z if player else 0.0

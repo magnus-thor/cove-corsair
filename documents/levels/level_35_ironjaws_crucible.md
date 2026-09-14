@@ -1,6 +1,6 @@
 ---
 level_id: 35
-level_title: "Level 35: Ironjaw's Crucible"
+level_title: "Level 35: Ironjaw's Crucible (Boss Threat)"
 biome_name: "tropical"
 base_scroll_speed: 10.8
 completion_doubloon_reward: 909

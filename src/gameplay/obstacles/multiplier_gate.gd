@@ -35,9 +35,9 @@ func _ready() -> void:
 	area_entered.connect(_on_area_entered)
 	# Enforce value clamping on ready
 	if operation == OperationType.ADD:
-		value = clamp(value, 1, 5)
+		value = clamp(value, 1, 6)
 	else:
-		value = clamp(value, 2, 3)
+		value = clamp(value, 2, 4)
 		
 	# Apply water calibration offset, pixel size, and scale
 	var gate_sprite = get_node_or_null("Visuals/GateSprite") as Sprite3D
@@ -49,6 +49,34 @@ func _ready() -> void:
 		
 	_clean_shadow_nodes(self)
 	update_visuals()
+
+func on_shot_hit(_cannonball: Node = null) -> void:
+	if not is_active:
+		return
+		
+	var cur_val = value
+	if not custom_text.is_empty():
+		var clean_text = custom_text.replace(" Ships", "").replace(" Ship", "").replace(" ships", "").replace(" ship", "").strip_edges()
+		var num = clean_text.to_int()
+		if num != 0:
+			cur_val = abs(num)
+			
+	var max_cap = 6
+	if cur_val < max_cap:
+		cur_val += 1
+		value = cur_val
+		custom_text = "+%d" % cur_val
+		update_visuals()
+		
+		AudioManager.play_sfx("gate_passes", 1.25, 1.4)
+		
+		if visuals:
+			var tween = create_tween().set_parallel(true)
+			visuals.scale = Vector3(1.3, 1.3, 1.3)
+			tween.tween_property(visuals, "scale", Vector3(1.09, 1.09, 1.09), 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+			if label_3d:
+				label_3d.modulate = Color(1.0, 1.0, 0.4)
+				tween.tween_property(label_3d, "modulate", Color(1.0, 0.85, 0.1), 0.2)
 
 func update_visuals() -> void:
 	var gate_sprite = get_node_or_null("Visuals/GateSprite") as Sprite3D
@@ -74,6 +102,11 @@ func update_visuals() -> void:
 
 func _on_area_entered(area: Area3D) -> void:
 	if not is_active:
+		return
+
+	# Handle cannonball shooting gate to increment multiplier
+	if area.is_in_group("cannonballs") and not area.is_in_group("enemy_projectiles"):
+		on_shot_hit(area)
 		return
 		
 	var is_player = area.name == "CollisionArea" or area.is_in_group("player") or (area.get_parent() and area.get_parent().is_in_group("player"))

@@ -1,6 +1,6 @@
 ---
 level_id: 18
-level_title: "Level 18: Witch's Channel"
+level_title: "Level 18: Witch's Channel (Hazard Nav)"
 biome_name: "brimstone_bastion"
 base_scroll_speed: 8.6
 completion_doubloon_reward: 274

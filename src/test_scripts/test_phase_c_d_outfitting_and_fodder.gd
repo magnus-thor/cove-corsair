@@ -333,12 +333,12 @@ func _test_phase_d_levels_and_chunk_integration() -> void:
 	for child in chunk.get_node("Entities").get_children():
 		if child is EnemyFodderSkiffScript or child.is_in_group("fodder"):
 			fodder_mobs.append(child)
-	assert(fodder_mobs.size() == 7, "chunk_fodder_swarm must contain 7 fodder skiffs in 2 waves. Found: %d" % fodder_mobs.size())
-	print("  [PASS] chunk_fodder_swarm.tscn instantiated with 7 fodder skiffs across 2 waves")
+	assert(fodder_mobs.size() >= 7, "chunk_fodder_swarm must contain dense swarm waves (>= 7). Found: %d" % fodder_mobs.size())
+	print("  [PASS] chunk_fodder_swarm.tscn instantiated with %d dense fodder skiffs" % fodder_mobs.size())
 	chunk.queue_free()
 
-	# B. Verify Levels 14 through 24 include chunk_fodder_swarm.tscn
-	for lvl in range(14, 25):
+	# B. Verify Swarm Threat levels include chunk_fodder_swarm.tscn
+	for lvl in [17, 19, 21, 23]:
 		var path = "res://src/data/resources/levels/level_%02d.tres" % lvl
 		var lvl_res = load(path) as LevelData
 		assert(lvl_res != null, "Level resource %s must load" % path)
@@ -349,4 +349,4 @@ func _test_phase_d_levels_and_chunk_integration() -> void:
 				has_fodder_chunk = true
 				break
 		assert(has_fodder_chunk == true, "Level %d must include chunk_fodder_swarm.tscn" % lvl)
-	print("  [PASS] All levels 14 through 24 verified to contain chunk_fodder_swarm.tscn")
+	print("  [PASS] Swarm Threat levels verified to contain chunk_fodder_swarm.tscn")

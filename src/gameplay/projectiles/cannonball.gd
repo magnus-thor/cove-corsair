@@ -481,8 +481,25 @@ func _on_hit(target: Node) -> void:
 			queue_free()
 		return
 		
+	# Special case for Multiplier Gate shooting:
+	if target.is_in_group("multiplier_gate") or (target.get_parent() and target.get_parent().is_in_group("multiplier_gate")):
+		var gate = target if target.is_in_group("multiplier_gate") else target.get_parent()
+		if gate.has_method("on_shot_hit"):
+			gate.on_shot_hit(self)
+		_is_destroyed = true
+		set_deferred("monitoring", false)
+		set_deferred("monitorable", false)
+		for child in get_children():
+			if child is CollisionShape3D:
+				child.set_deferred("disabled", true)
+		AudioManager.play_sfx("barrel_hits", 1.2, 1.4)
+		_spawn_splash(false)
+		_detach_trail()
+		queue_free()
+		return
+
 	# Ignore player, followers, other cannonballs, and non-combat items
-	if target.is_in_group("player") or target.is_in_group("follower") or target.is_in_group("cannonballs") or target.is_in_group("collectibles") or target.is_in_group("multiplier_gate"):
+	if target.is_in_group("player") or target.is_in_group("follower") or target.is_in_group("cannonballs") or target.is_in_group("collectibles"):
 		return
 
 	# Ignore already destroyed boss subparts

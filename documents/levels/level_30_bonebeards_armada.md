@@ -1,6 +1,6 @@
 ---
 level_id: 30
-level_title: "Level 30: Bonebeard's Armada"
+level_title: "Level 30: Bonebeard's Armada (Boss Threat)"
 biome_name: "pirate_citadel"
 base_scroll_speed: 10.1
 completion_doubloon_reward: 796

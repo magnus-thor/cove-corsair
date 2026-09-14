@@ -6,10 +6,10 @@
 [resource]
 script = ExtResource("1_script")
 ammo_name = "Heavy Shot"
-damage = 5
-aoe_damage = 3
+damage = 8
+aoe_damage = 5
 projectile_speed = 14.0
-splash_radius = 3.5
+splash_radius = 4.2
 sprite_texture = ExtResource("2_tex")
 scale_multiplier = 0.80
 pixel_size = 0.0007

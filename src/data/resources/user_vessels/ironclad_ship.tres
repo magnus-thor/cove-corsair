@@ -47,6 +47,6 @@ hardpoint_scales = {
 "StarboardSwivelMount2": Vector3(3.2, 3.2, 3.2)
 }
 current_tier = 1
-upgrade_costs = Array[int]([1400, 1800, 3000])
+upgrade_costs = Array[int]([2500, 3000, 5000])
 tier_descriptions = Array[String](["Armored Plating (8 HP, 1 Cannon + 1 Crew Socket)", "Reinforced Iron (9 HP, +15% Firepower, +2 Swivel Mounts)", "Dreadnought Hull (10 HP, +30% Firepower, All Sockets Unlocked)"])
 tier_sockets = Array[Array]([["BowMount", "MonkeyCrew"], ["BowMount", "MonkeyCrew", "PortSwivelMount1", "StarboardSwivelMount1"], ["BowMount", "MonkeyCrew", "SkeletonCrew", "PortSwivelMount1", "PortSwivelMount2", "StarboardSwivelMount1", "StarboardSwivelMount2"]])

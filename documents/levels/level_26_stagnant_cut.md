@@ -1,6 +1,6 @@
 ---
 level_id: 26
-level_title: "Level 26: Stagnant Cut"
+level_title: "Level 26: Stagnant Cut (Hazard Nav)"
 biome_name: "pirate_citadel"
 base_scroll_speed: 9.6
 completion_doubloon_reward: 382

@@ -1,6 +1,6 @@
 ---
 level_id: 21
-level_title: "Level 21: Serpent's Nest"
+level_title: "Level 21: Serpent's Nest (Swarm Threat)"
 biome_name: "black_tide_bayou"
 base_scroll_speed: 9.0
 completion_doubloon_reward: 315

@@ -1,6 +1,6 @@
 ---
 level_id: 8
-level_title: "Level 8: Pelican Point"
+level_title: "Level 8: Pelican Point (Hazard Nav)"
 biome_name: "black_tide_bayou"
 base_scroll_speed: 7.4
 completion_doubloon_reward: 140

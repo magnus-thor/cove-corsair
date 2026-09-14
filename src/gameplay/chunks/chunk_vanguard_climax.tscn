@@ -1,0 +1,69 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/gameplay/chunks/base_track_chunk.gd" id="1_chunk"]
+[ext_resource type="PackedScene" path="res://assets/models/tower-complete-small.glb" id="2_tower"]
+[ext_resource type="PackedScene" path="res://assets/models/rocks-a.glb" id="3_rocks"]
+[ext_resource type="PackedScene" path="res://assets/models/structure-fence.glb" id="4_fence"]
+[ext_resource type="PackedScene" path="res://src/gameplay/enemies/enemy_iron_gunner.tscn" id="5_gunner"]
+[ext_resource type="PackedScene" path="res://src/gameplay/obstacles/barricade_wall.tscn" id="6_barricade"]
+[ext_resource type="PackedScene" path="res://src/gameplay/enemies/enemy_mob.tscn" id="7_mob"]
+[ext_resource type="Script" path="res://src/gameplay/enemies/enemy_mob.gd" id="8_mob_script"]
+
+[node name="ChunkVanguardClimax" type="Node3D"]
+script = ExtResource("1_chunk")
+chunk_id = "vanguard_climax"
+
+[node name="ChunkStart" type="Marker3D" parent="."]
+
+[node name="ChunkEnd" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -50)
+
+[node name="Banks" type="Node3D" parent="."]
+
+[node name="Tower_Left" type="Node3D" parent="Banks" instance=ExtResource("2_tower")]
+transform = Transform3D(1, 0, 0, 0, 1.2, 0, 0, 0, 1, -9.5, 0, -26)
+
+[node name="Tower_Right" type="Node3D" parent="Banks" instance=ExtResource("2_tower")]
+transform = Transform3D(1, 0, 0, 0, 1.2, 0, 0, 0, 1, 9.5, 0, -26)
+
+[node name="Fence_Left" type="Node3D" parent="Banks" instance=ExtResource("4_fence")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 2, -7.5, 0, -16)
+
+[node name="Fence_Right" type="Node3D" parent="Banks" instance=ExtResource("4_fence")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 2, 7.5, 0, -16)
+
+[node name="Rocks_Left" type="Node3D" parent="Banks" instance=ExtResource("3_rocks")]
+transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, -10.5, 0, -38)
+
+[node name="Rocks_Right" type="Node3D" parent="Banks" instance=ExtResource("3_rocks")]
+transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, 10.5, 0, -38)
+
+[node name="Entities" type="Node3D" parent="."]
+
+[node name="FlankBarricade_Left" parent="Entities" instance=ExtResource("6_barricade")]
+transform = Transform3D(0.7, 0, 0, 0, 1, 0, 0, 0, 1, -3.2, 0, -14)
+
+[node name="FlankBarricade_Right" parent="Entities" instance=ExtResource("6_barricade")]
+transform = Transform3D(0.7, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, 0, -14)
+
+[node name="Vanguard_Gunner" type="Area3D" parent="Entities" groups=["destructible", "enemies"] instance=ExtResource("5_gunner")]
+transform = Transform3D(1.3, 0, 0, 0, 1.3, 0, 0, 0, 1.3, 0, 0.1, -26)
+can_shoot = true
+is_gunner_vanguard = true
+shoot_interval = 2.4
+
+[node name="EscortRower_Left" type="Area3D" parent="Entities" groups=["destructible", "enemies"] instance=ExtResource("7_mob")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6, 0.1, -34)
+script = ExtResource("8_mob_script")
+max_hp = 3
+current_hp = 3
+forward_speed = 1.2
+can_shoot = false
+
+[node name="EscortRower_Right" type="Area3D" parent="Entities" groups=["destructible", "enemies"] instance=ExtResource("7_mob")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 0.1, -34)
+script = ExtResource("8_mob_script")
+max_hp = 3
+current_hp = 3
+forward_speed = 1.2
+can_shoot = false

@@ -129,6 +129,15 @@ def get_boss_chunk(lvl: int) -> str:
         return "res://src/gameplay/chunks/chunk_boss_bonebeard.tscn"
     return ""
 
+def get_level_title(lvl: int) -> str:
+    base = LEVEL_TITLES.get(lvl, f"Level {lvl}: Expedition {lvl}")
+    if lvl % 5 == 0:
+        return f"{base} (Boss Threat)"
+    elif lvl % 2 == 1:
+        return f"{base} (Swarm Threat)"
+    else:
+        return f"{base} (Hazard Nav)"
+
 def get_chunk_sequence(lvl: int) -> list:
     is_boss = (lvl % 5 == 0)
     
@@ -138,53 +147,53 @@ def get_chunk_sequence(lvl: int) -> list:
     C_BARRICADE = "res://src/gameplay/chunks/chunk_barricade_siege.tscn"
     C_REEF = "res://src/gameplay/chunks/chunk_reef_slalom.tscn"
     C_GUNNER = "res://src/gameplay/chunks/chunk_gunner_ambush.tscn"
-    C_FINISH = "res://src/gameplay/chunks/chunk_finish_line.tscn"
     C_FODDER = "res://src/gameplay/chunks/chunk_fodder_swarm.tscn"
-    
-    # Progressive sequence recipes
-    if lvl == 1:
-        chunks = [C_WARMUP, C_MINE, C_BARRICADE, C_FINISH]
-    elif lvl == 2:
-        chunks = [C_WARMUP, C_MINE, C_REEF, C_BARRICADE, C_FINISH]
-    elif lvl == 3:
-        chunks = [C_WARMUP, C_REEF, C_FODDER, C_MINE, C_GUNNER, C_FINISH]
-    elif lvl == 4:
-        chunks = [C_WARMUP, C_MINE, C_BARRICADE, C_REEF, C_GUNNER, C_FINISH]
-    elif lvl == 5:
-        chunks = [C_WARMUP, C_REEF, C_MINE, C_BARRICADE, C_GUNNER, get_boss_chunk(5)]
-    elif lvl == 6:
-        chunks = [C_WARMUP, C_REEF, C_MINE, C_BARRICADE, C_FINISH]
-    elif lvl == 7:
-        chunks = [C_WARMUP, C_MINE, C_REEF, C_GUNNER, C_FINISH]
-    elif lvl == 8:
-        chunks = [C_WARMUP, C_BARRICADE, C_GUNNER, C_REEF, C_BARRICADE, C_FINISH]
-    elif lvl == 9:
-        chunks = [C_WARMUP, C_MINE, C_REEF, C_GUNNER, C_BARRICADE, C_FINISH]
-    elif lvl == 10:
-        chunks = [C_WARMUP, C_MINE, C_REEF, C_BARRICADE, C_GUNNER, get_boss_chunk(10)]
-    else:
-        # General algorithmic progression for L11-45
-        pattern = [
-            C_WARMUP,
-            C_REEF if lvl % 2 == 0 else C_MINE,
-            C_BARRICADE if lvl % 3 == 0 else C_GUNNER,
-            C_MINE if lvl % 2 == 1 else C_REEF,
-            C_GUNNER if lvl % 3 != 0 else C_BARRICADE,
-        ]
-        if lvl > 15:
-            pattern.append(C_REEF if lvl % 2 == 1 else C_GUNNER)
-        if lvl > 25:
-            pattern.append(C_BARRICADE if lvl % 2 == 0 else C_MINE)
-        if lvl > 35:
-            pattern.append(C_GUNNER)
-            
-        if is_boss:
-            pattern.append(get_boss_chunk(lvl))
+    C_CLIMAX = "res://src/gameplay/chunks/chunk_vanguard_climax.tscn"
+    C_FINISH = "res://src/gameplay/chunks/chunk_finish_line.tscn"
+
+    if is_boss:
+        boss_chunk = get_boss_chunk(lvl)
+        if lvl == 5:
+            return [C_WARMUP, C_REEF, C_MINE, C_BARRICADE, C_GUNNER, boss_chunk]
+        elif lvl <= 15:
+            return [C_WARMUP, C_MINE, C_REEF, C_BARRICADE, C_FODDER, C_GUNNER, boss_chunk]
+        elif lvl <= 30:
+            return [C_WARMUP, C_REEF, C_MINE, C_BARRICADE, C_FODDER, C_GUNNER, C_BARRICADE, boss_chunk]
         else:
-            pattern.append(C_FINISH)
-        chunks = pattern
-        
-    return chunks
+            return [C_WARMUP, C_MINE, C_REEF, C_BARRICADE, C_FODDER, C_GUNNER, C_MINE, C_BARRICADE, boss_chunk]
+
+    # Non-Boss level: 8 to 12 chunks
+    if lvl < 15:
+        target_len = 8 if lvl <= 6 else 9
+    elif lvl < 30:
+        target_len = 9 if lvl <= 22 else 10
+    else:
+        target_len = 10 if lvl <= 37 else 12
+
+    mid_count = target_len - 3 # Subtract Warmup, Climax, Finish
+    mid_chunks = []
+    
+    is_swarm = (lvl % 2 == 1)
+    if is_swarm:
+        # Swarm Assault: dense fodder skiff waves alternating with barricades (with mid-level multiplier gates)
+        for i in range(mid_count):
+            if i % 3 == 0:
+                mid_chunks.append(C_FODDER)
+            elif i % 3 == 1:
+                mid_chunks.append(C_BARRICADE) # Contains mid-level multiplier gate!
+            else:
+                mid_chunks.append(C_FODDER if lvl > 8 else C_REEF)
+    else:
+        # Obstacle Gauntlet: dense mines, reefs, and barricades testing agility and short-range high firepower
+        for i in range(mid_count):
+            if i % 3 == 0:
+                mid_chunks.append(C_MINE)
+            elif i % 3 == 1:
+                mid_chunks.append(C_REEF)
+            else:
+                mid_chunks.append(C_BARRICADE)
+
+    return [C_WARMUP] + mid_chunks + [C_CLIMAX, C_FINISH]
 
 def calculate_speed(lvl: int) -> float:
     # 6.5 m/s at L1 up to 12.0 m/s at L45
@@ -201,7 +210,7 @@ def calculate_reward(lvl: int) -> int:
 def build_tres_content(lvl: int) -> str:
     biome_key = get_biome_key(lvl)
     b = BIOMES[biome_key]
-    title = LEVEL_TITLES.get(lvl, f"Level {lvl}")
+    title = get_level_title(lvl)
     speed = calculate_speed(lvl)
     reward = calculate_reward(lvl)
     chunks = get_chunk_sequence(lvl)
@@ -273,7 +282,7 @@ def update_markdown_docs():
         reward = calculate_reward(lvl)
         biome_key = get_biome_key(lvl)
         b = BIOMES[biome_key]
-        title = LEVEL_TITLES[lvl]
+        title = get_level_title(lvl)
         chunks = get_chunk_sequence(lvl)
         dist = len(chunks) * 50.0
         
@@ -286,7 +295,7 @@ def update_markdown_docs():
         with open(fpath, "w", encoding="utf-8") as f:
             f.write(content)
             
-        print(f"Synced doc: {fname} (L{lvl}) -> Biome: {b['name']}, Speed: {speed}, Reward: {reward}")
+        print(f"Synced doc: {fname} (L{lvl}) -> Title: {title}, Biome: {b['name']}, Chunks: {len(chunks)}, Speed: {speed}, Reward: {reward}")
 
 def main():
     print(f"=== REBALANCING CAMPAIGN ACROSS ALL 45 LEVELS ===")
@@ -307,7 +316,7 @@ def main():
         filepath = os.path.join(RESOURCES_DIR, filename)
         with open(filepath, "w", encoding="utf-8") as f:
             f.write(tres_content)
-        print(f"Updated {filename}: {LEVEL_TITLES[lvl]} | Biome: {get_biome_key(lvl)} | Chunks: {len(get_chunk_sequence(lvl))} | Speed: {calculate_speed(lvl)}m/s")
+        print(f"Updated {filename}: {get_level_title(lvl)} | Biome: {get_biome_key(lvl)} | Chunks: {len(get_chunk_sequence(lvl))} | Speed: {calculate_speed(lvl)}m/s")
         
         # Also sync alias if present
         if lvl in alias_map:

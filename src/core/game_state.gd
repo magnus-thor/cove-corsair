@@ -136,8 +136,8 @@ const VESSEL_CATALOG: Dictionary = {
 		"name": "The Ironclad",
 		"archetype": "Armored Brawler",
 		"resource_path": "res://src/data/resources/user_vessels/ironclad_ship.tres",
-		"purchase_price": 1400,
-		"tier_prices": { 2: 1800, 3: 3000 },
+		"purchase_price": 2500,
+		"tier_prices": { 2: 3000, 3: 5000 },
 		"tier_descriptions": {
 			1: "Armored Plating & Heavy Battery",
 			2: "Reinforced Iron (9 HP, 1 Weapon + 1 Crew Socket)",
