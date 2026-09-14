@@ -603,16 +603,16 @@ func _trigger_cluster_bounce() -> void:
 	if not ball_scene:
 		return
 	for offset_x in [-1.0, 1.0]:
-		var mini = ball_scene.instantiate() as Area3D
-		mini.set_meta("is_cluster_sub", true)
-		root.add_child(mini)
-		mini.global_position = global_position + Vector3(offset_x, 0.4, randf_range(-0.4, 0.4))
-		mini.damage = 3
-		mini.speed = 8.0
-		mini.max_range = 3.5
+		var mini_ball = ball_scene.instantiate() as Area3D
+		mini_ball.set_meta("is_cluster_sub", true)
+		root.add_child(mini_ball)
+		mini_ball.global_position = global_position + Vector3(offset_x, 0.4, randf_range(-0.4, 0.4))
+		mini_ball.damage = 3
+		mini_ball.speed = 8.0
+		mini_ball.max_range = 3.5
 		var dir = Vector3(offset_x * 0.4, 0.2, -0.8).normalized()
-		mini.setup(dir, ammo_data, null)
-		mini.scale = Vector3(0.5, 0.5, 0.5)
+		mini_ball.setup(dir, ammo_data, null)
+		mini_ball.scale = Vector3(0.5, 0.5, 0.5)
 
 func _trigger_lingering_napalm() -> void:
 	var root = get_tree().current_scene if get_tree() else get_parent()

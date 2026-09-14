@@ -7,6 +7,7 @@ extends CanvasLayer
 
 signal shipyard_closed
 
+@onready var root_margin: MarginContainer = $RootMargin
 @onready var back_button: Button = %BackButton
 @onready var shipyard_title: Label = %ShipyardTitle
 @onready var purse_label: Label = %PurseLabel
@@ -68,6 +69,8 @@ func _ready() -> void:
 	layer = 35
 
 	_init_button_styles()
+	_apply_safe_area()
+	get_tree().root.size_changed.connect(_apply_safe_area)
 
 	if back_button:
 		back_button.pressed.connect(_on_back_pressed)
@@ -200,6 +203,34 @@ func _init_button_styles() -> void:
 	style_tab_inactive.corner_radius_top_right = 12
 	style_tab_inactive.corner_radius_bottom_right = 12
 	style_tab_inactive.corner_radius_bottom_left = 12
+
+func _apply_safe_area() -> void:
+	if not is_instance_valid(root_margin):
+		return
+	var safe_area: Rect2i = DisplayServer.get_display_safe_area()
+	var window_size: Vector2i = DisplayServer.window_get_size()
+	var margin_left: int = 16
+	var margin_right: int = 16
+	var margin_top: int = 16
+	var margin_bottom: int = 14
+
+	if window_size.x > 0 and window_size.y > 0 and safe_area.size.x > 0:
+		var vp_rect = get_viewport().get_visible_rect()
+		var scale_x = vp_rect.size.x / float(window_size.x)
+		var scale_y = vp_rect.size.y / float(window_size.y)
+		var in_l = int(safe_area.position.x * scale_x)
+		var in_r = int((window_size.x - safe_area.end.x) * scale_x)
+		var in_t = int(safe_area.position.y * scale_y)
+		var in_b = int((window_size.y - safe_area.end.y) * scale_y)
+		margin_left = maxi(margin_left, in_l + 8)
+		margin_right = maxi(margin_right, in_r + 8)
+		margin_top = maxi(margin_top, in_t + 8)
+		margin_bottom = maxi(margin_bottom, in_b + 6)
+
+	root_margin.add_theme_constant_override("margin_left", margin_left)
+	root_margin.add_theme_constant_override("margin_right", margin_right)
+	root_margin.add_theme_constant_override("margin_top", margin_top)
+	root_margin.add_theme_constant_override("margin_bottom", margin_bottom)
 
 func _build_grid_cards() -> void:
 	if not grid_container:

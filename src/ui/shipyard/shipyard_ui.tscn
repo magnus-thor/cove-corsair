@@ -119,6 +119,7 @@ shadow_size = 5
 shadow_offset = Vector2(0, 3)
 
 [node name="ShipyardUI" type="CanvasLayer"]
+process_mode = 3
 layer = 35
 script = ExtResource("1_shipyard_script")
 
@@ -147,22 +148,18 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 10
 
-[node name="HeaderBar" type="Control" parent="RootMargin/MainVBox"]
-custom_minimum_size = Vector2(0, 64)
+[node name="HeaderBar" type="HBoxContainer" parent="RootMargin/MainVBox"]
+custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_constants/separation = 8
+alignment = 1
 
 [node name="BackButton" type="Button" parent="RootMargin/MainVBox/HeaderBar"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(96, 48)
-layout_mode = 1
-anchors_preset = 4
-anchor_top = 0.5
-anchor_bottom = 0.5
-offset_top = -24.0
-offset_right = 96.0
-offset_bottom = 24.0
-grow_vertical = 2
+custom_minimum_size = Vector2(88, 44)
+layout_mode = 2
+size_flags_vertical = 4
 focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 0.96, 0.88, 1)
@@ -171,28 +168,19 @@ theme_override_constants/outline_size = 4
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.6)
 theme_override_constants/shadow_offset_y = 2
 theme_override_fonts/font = ExtResource("2_font_lilita")
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 20
 theme_override_styles/normal = SubResource("StyleBoxFlat_back_btn")
 text = "✕ BACK"
 
 [node name="TitleCenterBox" type="HBoxContainer" parent="RootMargin/MainVBox/HeaderBar"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -210.0
-offset_top = -30.0
-offset_right = 210.0
-offset_bottom = 30.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/separation = 8
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_constants/separation = 6
 alignment = 1
 
 [node name="AnchorIcon" type="TextureRect" parent="RootMargin/MainVBox/HeaderBar/TitleCenterBox"]
-custom_minimum_size = Vector2(32, 32)
+custom_minimum_size = Vector2(26, 26)
 layout_mode = 2
 size_flags_vertical = 4
 texture = ExtResource("4_anchor_icon")
@@ -202,33 +190,28 @@ stretch_mode = 5
 [node name="ShipyardTitle" type="Label" parent="RootMargin/MainVBox/HeaderBar/TitleCenterBox"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.96, 0.8, 0.38, 1)
 theme_override_colors/font_outline_color = Color(0.16, 0.08, 0.03, 1)
-theme_override_constants/outline_size = 7
+theme_override_constants/outline_size = 5
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.7)
-theme_override_constants/shadow_offset_y = 3
+theme_override_constants/shadow_offset_y = 2
 theme_override_fonts/font = ExtResource("2_font_lilita")
-theme_override_font_sizes/font_size = 52
+theme_override_font_sizes/font_size = 32
 text = "THE SHIPYARD"
+horizontal_alignment = 1
 vertical_alignment = 1
+clip_text = true
+text_overrun_behavior = 3
 
 [node name="PurseHBox" type="HBoxContainer" parent="RootMargin/MainVBox/HeaderBar"]
-layout_mode = 1
-anchors_preset = 6
-anchor_left = 1.0
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-offset_left = -190.0
-offset_top = -22.0
-offset_bottom = 22.0
-grow_horizontal = 0
-grow_vertical = 2
-theme_override_constants/separation = 6
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/separation = 4
 alignment = 2
 
 [node name="PurseIcon" type="TextureRect" parent="RootMargin/MainVBox/HeaderBar/PurseHBox"]
-custom_minimum_size = Vector2(34, 34)
+custom_minimum_size = Vector2(28, 28)
 layout_mode = 2
 size_flags_vertical = 4
 texture = ExtResource("3_coin_sack")
@@ -240,11 +223,11 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.95, 0.7, 1)
 theme_override_colors/font_outline_color = Color(0.14, 0.08, 0.03, 1)
-theme_override_constants/outline_size = 5
+theme_override_constants/outline_size = 4
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.6)
 theme_override_constants/shadow_offset_y = 2
 theme_override_fonts/font = ExtResource("2_font_lilita")
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 20
 text = "🪙 0 COINS"
 vertical_alignment = 1
 
@@ -354,7 +337,7 @@ theme_override_colors/font_color = Color(0.2, 0.12, 0.06, 1)
 theme_override_colors/font_outline_color = Color(1, 0.95, 0.85, 1)
 theme_override_constants/outline_size = 4
 theme_override_fonts/font = ExtResource("2_font_lilita")
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 24
 text = "THE DINGHY - AGILITY SKIFF (TIER 1)"
 horizontal_alignment = 1
 clip_text = true
@@ -381,7 +364,7 @@ theme_override_constants/outline_size = 4
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.25)
 theme_override_constants/shadow_offset_y = 2
 theme_override_fonts/font = ExtResource("2_font_lilita")
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 20
 text = "Hull: 3 HP"
 horizontal_alignment = 1
 clip_text = true
@@ -389,7 +372,7 @@ text_overrun_behavior = 3
 
 [node name="StatHpBar" type="ProgressBar" parent="RootMargin/MainVBox/DrawerPanel/DrawerMargin/DrawerVBox/StatsHBox/HpBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 12)
+custom_minimum_size = Vector2(0, 10)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
@@ -412,7 +395,7 @@ theme_override_constants/outline_size = 4
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.25)
 theme_override_constants/shadow_offset_y = 2
 theme_override_fonts/font = ExtResource("2_font_lilita")
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 20
 text = "Speed: 12 m/s"
 horizontal_alignment = 1
 clip_text = true
@@ -420,7 +403,7 @@ text_overrun_behavior = 3
 
 [node name="StatSpeedBar" type="ProgressBar" parent="RootMargin/MainVBox/DrawerPanel/DrawerMargin/DrawerVBox/StatsHBox/SpeedBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 12)
+custom_minimum_size = Vector2(0, 10)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
@@ -443,7 +426,7 @@ theme_override_constants/outline_size = 4
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.25)
 theme_override_constants/shadow_offset_y = 2
 theme_override_fonts/font = ExtResource("2_font_lilita")
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 20
 text = "Sockets: 1"
 horizontal_alignment = 1
 clip_text = true
@@ -451,7 +434,7 @@ text_overrun_behavior = 3
 
 [node name="StatSocketsBar" type="ProgressBar" parent="RootMargin/MainVBox/DrawerPanel/DrawerMargin/DrawerVBox/StatsHBox/SocketsBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 12)
+custom_minimum_size = Vector2(0, 10)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
@@ -469,7 +452,7 @@ theme_override_constants/outline_size = 3
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.2)
 theme_override_constants/shadow_offset_y = 2
 theme_override_fonts/font = ExtResource("2_font_lilita")
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 18
 text = "Current: Base Bow Chaser"
 horizontal_alignment = 1
 autowrap_mode = 2
@@ -484,7 +467,7 @@ theme_override_constants/outline_size = 3
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.2)
 theme_override_constants/shadow_offset_y = 2
 theme_override_fonts/font = ExtResource("2_font_lilita")
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 18
 text = "Next: + Monkey Bomber Crew"
 horizontal_alignment = 1
 autowrap_mode = 2
@@ -496,7 +479,7 @@ theme_override_constants/separation = 10
 
 [node name="EquipButton" type="Button" parent="RootMargin/MainVBox/DrawerPanel/DrawerMargin/DrawerVBox/ActionButtonsHBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 72)
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 size_flags_horizontal = 3
 focus_mode = 0
@@ -507,13 +490,13 @@ theme_override_constants/outline_size = 5
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.6)
 theme_override_constants/shadow_offset_y = 3
 theme_override_fonts/font = ExtResource("2_font_lilita")
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 22
 text = "EQUIPPED ✓"
 clip_text = true
 
 [node name="ActionButton" type="Button" parent="RootMargin/MainVBox/DrawerPanel/DrawerMargin/DrawerVBox/ActionButtonsHBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 72)
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 size_flags_horizontal = 3
 focus_mode = 0
@@ -524,7 +507,7 @@ theme_override_constants/outline_size = 5
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.6)
 theme_override_constants/shadow_offset_y = 3
 theme_override_fonts/font = ExtResource("2_font_lilita")
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 22
 theme_override_styles/normal = SubResource("StyleBoxFlat_action_btn")
 text = "UPGRADE TO TIER 2: 350 COINS"
 clip_text = true

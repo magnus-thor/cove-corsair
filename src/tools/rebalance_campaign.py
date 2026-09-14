@@ -139,6 +139,7 @@ def get_chunk_sequence(lvl: int) -> list:
     C_REEF = "res://src/gameplay/chunks/chunk_reef_slalom.tscn"
     C_GUNNER = "res://src/gameplay/chunks/chunk_gunner_ambush.tscn"
     C_FINISH = "res://src/gameplay/chunks/chunk_finish_line.tscn"
+    C_FODDER = "res://src/gameplay/chunks/chunk_fodder_swarm.tscn"
     
     # Progressive sequence recipes
     if lvl == 1:
@@ -146,7 +147,7 @@ def get_chunk_sequence(lvl: int) -> list:
     elif lvl == 2:
         chunks = [C_WARMUP, C_MINE, C_REEF, C_BARRICADE, C_FINISH]
     elif lvl == 3:
-        chunks = [C_WARMUP, C_REEF, C_MINE, C_GUNNER, C_FINISH]
+        chunks = [C_WARMUP, C_REEF, C_FODDER, C_MINE, C_GUNNER, C_FINISH]
     elif lvl == 4:
         chunks = [C_WARMUP, C_MINE, C_BARRICADE, C_REEF, C_GUNNER, C_FINISH]
     elif lvl == 5:

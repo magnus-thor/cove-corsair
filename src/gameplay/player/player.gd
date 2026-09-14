@@ -67,6 +67,9 @@ const DEFAULT_SOCKET_WEAPONS: Dictionary = {
 ## Multiplier applied to shooting speed
 @export var fire_rate_multiplier: float = 1.0
 
+## Multiplier applied based on vessel tier level (+15% per tier above 1)
+@export var tier_fire_rate_multiplier: float = 1.0
+
 ## Damage bonus applied to all projectiles
 @export var base_damage_bonus: int = 0
 
@@ -337,11 +340,12 @@ func apply_tier(tier_level: int) -> void:
 		return
 	current_tier = tier_level
 	
-	# Hull Tier Decoupling: strictly scale Base Hull HP and Max Speed with Tier
+	# Hull Tier Decoupling: scale Base Hull HP, Max Speed, and Firepower with Tier
 	max_health = ship_data.max_health + (tier_level - 1)
 	current_health = max_health
 	keyboard_speed = ship_data.move_speed + (tier_level - 1) * 1.5
 	lerp_speed = keyboard_speed * 1.3
+	tier_fire_rate_multiplier = 1.0 + (tier_level - 1) * 0.15
 	health_changed.emit(current_health, max_health)
 	player_health_changed.emit(current_health, max_health)
 
@@ -510,7 +514,7 @@ func _physics_process(delta: float) -> void:
 	if is_shooting_enabled:
 		for weapon in equipped_weapons.values():
 			if is_instance_valid(weapon) and weapon.has_method("try_fire"):
-				weapon.try_fire(delta * fire_rate_multiplier)
+				weapon.try_fire(delta * fire_rate_multiplier * tier_fire_rate_multiplier)
 			
 	move_and_slide()
 

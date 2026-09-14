@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://src/gameplay/chunks/base_track_chunk.gd" id="1_chunk"]
+[ext_resource type="Script" path="res://src/gameplay/chunks/chunk_gunner_ambush.gd" id="1_chunk"]
 [ext_resource type="PackedScene" path="res://assets/models/tower-complete-small.glb" id="2_tower"]
 [ext_resource type="PackedScene" path="res://assets/models/structure-platform-dock.glb" id="3_dock"]
 [ext_resource type="PackedScene" path="res://assets/models/rocks-b.glb" id="4_rocks"]

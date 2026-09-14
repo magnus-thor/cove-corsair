@@ -313,12 +313,18 @@ func _on_primary_pressed() -> void:
 func _on_shipyard_pressed() -> void:
 	if AudioManager and AudioManager.has_method("play_sfx"):
 		AudioManager.play_sfx("gate_passes")
+	if shipyard_button:
+		shipyard_button.disabled = true
 	var shipyard_scene = preload("res://src/ui/shipyard/shipyard_ui.tscn")
 	if shipyard_scene:
 		var shipyard = shipyard_scene.instantiate() as CanvasLayer
+		visible = false
 		get_parent().add_child(shipyard)
 		if shipyard.has_signal("shipyard_closed"):
 			shipyard.shipyard_closed.connect(func():
+				visible = true
+				if shipyard_button:
+					shipyard_button.disabled = false
 				_refresh_banked_display()
 				_update_shipyard_button()
 			)

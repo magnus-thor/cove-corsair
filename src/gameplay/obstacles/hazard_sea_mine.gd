@@ -30,7 +30,7 @@ func _on_area_entered(area: Area3D) -> void:
 		die()
 
 ## Canonical damage entry point — any hit detonates the mine.
-func take_hit(amount: int = 1, source_info: String = "") -> void:
+func take_hit(_amount: int = 1, _source_info: String = "") -> void:
 	die()
 
 ## Backward-compatible bridge so existing callers (cannonball._on_hit) keep working.

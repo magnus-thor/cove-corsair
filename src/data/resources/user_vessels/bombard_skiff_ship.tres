@@ -44,5 +44,5 @@ socket_weapons = {
 }
 current_tier = 1
 upgrade_costs = Array[int]([1000, 1200, 2200])
-tier_descriptions = Array[String](["Artillery Skiff (3 HP, 1 Weapon Socket)", "Reinforced Keel (4 HP, 1 Weapon + 1 Crew Socket)", "Siege Dreadnought (5 HP, All Sockets Unlocked)"])
-tier_sockets = Array[Array]([["BowMortarMount"], ["BowMortarMount", "QuarterdeckCrew"], ["BowMortarMount", "QuarterdeckCrew", "PortRailMount", "StarboardRailMount"]])
+tier_descriptions = Array[String](["Artillery Skiff (3 HP, Siege Mortar + 1 Crew Socket)", "Reinforced Keel (4 HP, +15% Firepower, +Port Scattershot)", "Siege Dreadnought (5 HP, +30% Firepower, All Mounts Unlocked)"])
+tier_sockets = Array[Array]([["BowMortarMount", "QuarterdeckCrew"], ["BowMortarMount", "QuarterdeckCrew", "PortRailMount"], ["BowMortarMount", "QuarterdeckCrew", "PortRailMount", "StarboardRailMount"]])

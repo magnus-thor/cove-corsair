@@ -34,7 +34,7 @@ func _trigger_victory() -> void:
 	print("[FINISH LINE] Player crossed the Harbor Victory Gate! Level Complete!")
 	
 	if AudioManager:
-		AudioManager.play_sfx("boss_bell")
+		AudioManager.play_sfx("gate_passes")
 		AudioManager.play_sfx("barrel_breaks")
 		
 	_spawn_celebration_effects()

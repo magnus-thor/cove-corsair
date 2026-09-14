@@ -19,9 +19,26 @@ var _flash_tween: Tween
 func _ready() -> void:
 	add_to_group("enemies")
 	add_to_group("destructible")
+	_apply_level_tuning()
 	current_hp = max_hp
 	_update_health_bar()
 	area_entered.connect(_on_area_entered)
+
+func _apply_level_tuning() -> void:
+	var cur_lvl: int = 1
+	var gs = get_node_or_null("/root/GameState")
+	if gs and "current_level" in gs:
+		cur_lvl = int(gs.current_level)
+	if cur_lvl <= 3:
+		max_hp = 3
+		current_hp = 3
+		forward_speed = 2.8
+		steer_speed = 1.8
+	elif cur_lvl <= 6:
+		max_hp = 8
+		current_hp = 8
+		forward_speed = 5.0
+		steer_speed = 3.0
 
 func _physics_process(delta: float) -> void:
 	if _is_dead or not GameState.is_game_active:

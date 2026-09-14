@@ -34,6 +34,7 @@ var style_status_owned: StyleBoxFlat
 var style_status_locked: StyleBoxFlat
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	_init_styles()
 	if click_button:
 		click_button.pressed.connect(_on_clicked)

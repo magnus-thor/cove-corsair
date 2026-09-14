@@ -613,9 +613,9 @@ func toggle_equip_crew_active_ship(crew_id: String) -> bool:
 		
 	# If already equipped on active ship, unequip it!
 	if is_crew_equipped_on_active_ship(crew_id):
-		var ship_map = equipped_crew.get(active_vessel, {})
-		for s in ship_map.keys():
-			if ship_map[s] == crew_id:
+		var eq_map = equipped_crew.get(active_vessel, {})
+		for s in eq_map.keys():
+			if eq_map[s] == crew_id:
 				unequip_crew(active_vessel, s)
 				return true
 		return false

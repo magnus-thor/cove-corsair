@@ -53,7 +53,7 @@ func _on_area_entered(area: Area3D) -> void:
 		die()
 
 ## Canonical damage entry point (Rule 2).
-func take_hit(amount: int, source_info: String = "") -> void:
+func take_hit(amount: int, _source_info: String = "") -> void:
 	take_damage(amount)
 
 func take_damage(amount: int) -> void:

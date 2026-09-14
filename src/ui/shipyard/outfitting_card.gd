@@ -23,6 +23,7 @@ var style_badge_ammo: StyleBoxFlat
 var style_badge_plating: StyleBoxFlat
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	_init_styles()
 	if buy_button:
 		buy_button.pressed.connect(func(): buy_requested.emit(item_id))

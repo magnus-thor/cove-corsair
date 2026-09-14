@@ -25,6 +25,7 @@ var style_equipped: StyleBoxFlat
 var style_disabled: StyleBoxFlat
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	_init_styles()
 	if buy_button:
 		buy_button.pressed.connect(func(): buy_requested.emit(crew_id))
@@ -186,7 +187,7 @@ func update_card() -> void:
 				equip_button.disabled = false
 				equip_button.add_theme_stylebox_override("normal", style_equipped)
 			elif available_crew_sockets.is_empty():
-				equip_button.text = "NEED TIER 2+"
+				equip_button.text = "NO SOCKETS"
 				equip_button.disabled = true
 				equip_button.add_theme_stylebox_override("normal", style_disabled)
 				equip_button.add_theme_stylebox_override("disabled", style_disabled)

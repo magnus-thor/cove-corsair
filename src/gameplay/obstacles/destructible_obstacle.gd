@@ -119,7 +119,7 @@ func update_obstacle_visuals() -> void:
 ## Canonical damage entry point (Signal Up / Call Down Rule 2).
 ## Callers supply a source_info string so the victim can apply mitigation and so
 ## debug logs can trace damage origins without the caller needing to inspect internals.
-func take_hit(amount: int, source_info: String = "") -> void:
+func take_hit(amount: int, _source_info: String = "") -> void:
 	take_damage(amount)
 
 ## Backward-compatible bridge — existing callers (cannonball, enemy scripts) continue to work.

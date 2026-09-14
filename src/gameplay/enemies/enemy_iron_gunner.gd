@@ -23,9 +23,26 @@ var _time: float = 0.0
 func _ready() -> void:
 	add_to_group("enemies")
 	add_to_group("destructible")
+	_apply_level_tuning()
 	current_hp = max_hp
 	_update_health_bar()
 	_shoot_timer = randf_range(0.3, 0.8)
+
+func _apply_level_tuning() -> void:
+	var cur_lvl: int = 1
+	var gs = get_node_or_null("/root/GameState")
+	if gs and "current_level" in gs:
+		cur_lvl = int(gs.current_level)
+	if cur_lvl <= 3:
+		max_hp = 4
+		current_hp = 4
+		forward_speed = 1.8
+		shoot_interval = 2.4
+	elif cur_lvl <= 6:
+		max_hp = 10
+		current_hp = 10
+		forward_speed = 2.2
+		shoot_interval = 2.0
 
 func _physics_process(delta: float) -> void:
 	if _is_dead or not GameState.is_game_active:
@@ -56,8 +73,14 @@ func _fire_dual_cannons() -> void:
 		
 	AudioManager.play_sfx("cannon_shots", 0.9, 1.1, 0.0)
 	
+	var cur_lvl: int = 1
+	var gs = get_node_or_null("/root/GameState")
+	if gs and "current_level" in gs:
+		cur_lvl = int(gs.current_level)
+		
+	var offsets = [0.0] if cur_lvl <= 3 else [-0.6, 0.6]
 	var player = get_tree().get_first_node_in_group("player")
-	for offset_x in [-0.6, 0.6]:
+	for offset_x in offsets:
 		var ball = enemy_cannonball_scene.instantiate() as Area3D
 		var root = get_tree().current_scene
 		if root:

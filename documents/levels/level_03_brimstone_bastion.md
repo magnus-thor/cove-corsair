@@ -67,15 +67,15 @@ The river channel is populated with dynamic destructible obstacles, hazard empla
 
 ## 3. Enemy Vessels & Combat Mechanics
 
-Hostile craft deployed throughout this stage's chunks:
+Hostile craft deployed throughout this stage's chunks (calibrated for single-upgrade Dinghy accessibility):
 
 | Vessel Class | Type Name | HP / Profile | Speed | Behavior, Attack Patterns & Yield |
 | :--- | :--- | :--- | :--- | :--- |
-| **Light Craft** | Skeleton Rowers | 2 HP | 1.5 m/s | Slow forward advance; perfect calibration target. Drops 2 doubloons upon sinking. |
-| **Raider Skiff** | Hostile Skiff / Grave Skiff | 4-12 HP | 2.5-3.5 m/s | Agile raider craft with lateral strafing patterns to disrupt firing lanes. Drops 2-4 doubloons. |
-| **Heavy Craft** | Turtle Raft / Tide Cutter | 6-18 HP | 1.5-2.5 m/s | Armor-plated barge capable of ramming. Demands sustained stream DPS. Drops 4-6 doubloons. |
-| **Fast Striker** | Kamikaze / Brimstone Raft | 5-30 HP | 6.0-6.5 m/s | High-speed ramming craft charging directly down river. Detonates on impact. Drops 3-5 doubloons. |
-| **Specialist** | Skeleton Rowers (2 HP | High HP | Variable | Stage-specific combat vessel demanding tactical avoidance or focused burst. |
+| **Fodder Swarm** | Fodder Skiff | 1 HP | 7.5 m/s | Rapid 7-craft swarm in 2 waves; feeds directly into Fire Frenzy streaks. Drops 0 doubloons. |
+| **Light Craft** | Skeleton Rowers | 2 HP | 1.6 m/s | Steady forward advance in escort formations; perfect targets for single cannon. Drops 1-2 doubloons. |
+| **Fast Striker** | Brimstone Raft | 3 HP | 2.8 m/s | Charging ramming craft with scaled early-level approach speed and health. Detonates on impact. Drops 3 doubloons. |
+| **Heavy Craft** | Tide Cutter | 3 HP | 2.4 m/s | Armored barge with early-tier scaled HP; destroys in 3 standard cannon shots before ramming. Drops 4 doubloons. |
+| **Artillery** | Iron Gunner | 4 HP | 1.8 m/s | Armored cannon craft with single-shot centered fire and generous 2.4s interval. Drops 4 doubloons. |
 
 ---
 

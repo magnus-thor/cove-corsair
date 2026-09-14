@@ -18,8 +18,7 @@ func _ready() -> void:
 	print("\n==========================================================")
 	print("  TESTING TRAIL3D RIBBON & SEA MINE EXPLOSION COORDINATES")
 	print("==========================================================\n")
-	
-	await _run_all_tests()
+	_run_all_tests()
 	
 	print("\n==========================================================")
 	print("  TEST RESULTS: %d / %d PASSED" % [passed_count, total_count])
@@ -33,10 +32,10 @@ func _ready() -> void:
 		get_tree().quit(1)
 
 func _run_all_tests() -> void:
-	await _test_sea_mine_explosion_coordinates()
-	await _test_trail3d_component_specs()
-	await _test_selective_trail_attachment()
-	await _test_trail_dissipation_lifecycle()
+	_test_sea_mine_explosion_coordinates()
+	_test_trail3d_component_specs()
+	_test_selective_trail_attachment()
+	_test_trail_dissipation_lifecycle()
 
 func _test_sea_mine_explosion_coordinates() -> void:
 	print("--- 1. Sea Mine Explosion World Coordinates ---")

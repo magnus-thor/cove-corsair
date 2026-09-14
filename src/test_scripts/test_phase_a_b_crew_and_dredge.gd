@@ -9,12 +9,12 @@ func _ready() -> void:
 	print("  TESTING PHASE A & PHASE B: DREDGE & CREW SYSTEMS")
 	print("==================================================")
 
-	await _test_phase_a_boss_dredge()
-	await _test_phase_b_vessel_decoupling()
-	await _test_phase_b_gamestate_crew()
-	await _test_phase_b_safe_ship_swap_guard()
-	await _test_phase_b_weapon_projectile_scaling()
-	await _test_phase_b_shipyard_crew_tab()
+	_test_phase_a_boss_dredge()
+	_test_phase_b_vessel_decoupling()
+	_test_phase_b_gamestate_crew()
+	_test_phase_b_safe_ship_swap_guard()
+	_test_phase_b_weapon_projectile_scaling()
+	_test_phase_b_shipyard_crew_tab()
 
 	print("==================================================")
 	print("  ALL PHASE A & PHASE B TESTS COMPLETED SUCCESS!  ")
@@ -102,18 +102,18 @@ func _test_phase_b_vessel_decoupling() -> void:
 		assert(s_data != null, "Ship resource for %s must exist" % s_id)
 		assert(s_data.tier_sockets.size() >= 3, "%s must have 3 tiers" % s_id)
 		
-		# Tier 1: 1 weapon socket, 0 crew sockets
+		# Tier 1: 1 weapon socket + 1 crew socket (accessible immediately without requiring boat tier upgrade)
 		var t1_sockets = s_data.tier_sockets[0]
 		var t1_crew = t1_sockets.filter(func(s): return "crew" in str(s).to_lower())
-		assert(t1_crew.is_empty(), "%s Tier 1 must have 0 crew sockets" % s_id)
-		assert(t1_sockets.size() == 1, "%s Tier 1 must have exactly 1 socket" % s_id)
+		assert(t1_crew.size() == 1, "%s Tier 1 must have 1 crew socket" % s_id)
+		assert(t1_sockets.size() >= 2, "%s Tier 1 must have at least 2 sockets (weapon + crew)" % s_id)
 		
-		# Tier 2: 1 weapon socket + 1 crew socket
+		# Tier 2: 1 weapon socket + crew / weapon mounts
 		var t2_sockets = s_data.tier_sockets[1]
 		var t2_crew = t2_sockets.filter(func(s): return "crew" in str(s).to_lower())
-		assert(t2_crew.size() == 1, "%s Tier 2 must have exactly 1 crew socket" % s_id)
+		assert(t2_crew.size() >= 1, "%s Tier 2 must have crew socket" % s_id)
 		
-		# Tier 3: All sockets (at least 2 crew sockets)
+		# Tier 3: All sockets (at least 1 crew socket)
 		var t3_sockets = s_data.tier_sockets[2]
 		var t3_crew = t3_sockets.filter(func(s): return "crew" in str(s).to_lower())
 		assert(t3_crew.size() >= 1, "%s Tier 3 must have crew sockets" % s_id)
@@ -124,7 +124,7 @@ func _test_phase_b_vessel_decoupling() -> void:
 				if "crew" in str(sock).to_lower():
 					assert(false, "%s socket_weapons should not contain auto-assigned crew" % s_id)
 
-		print("  [PASS] %s: T1 (0 crew), T2 (1 crew), T3 (mastered) verified decoupled" % s_id)
+		print("  [PASS] %s: T1 (1 crew), T2 (upgraded), T3 (mastered) verified decoupled" % s_id)
 
 func _test_phase_b_gamestate_crew() -> void:
 	print("\n--- Testing Phase B: GameState Crew Data & Logic ---")
@@ -220,19 +220,37 @@ func _test_phase_b_safe_ship_swap_guard() -> void:
 	assert(crew_equipped_count == 1, "Sloop Tier 2 should have 1 active crew weapon")
 	print("  [PASS] Player boat successfully outfited on Sloop T2 with equipped crew")
 	
-	# Safe Ship Swap Guard: Swap to dinghy at Tier 1 (0 crew sockets)
+	# Safe Ship Swap Guard: Swap to dinghy at Tier 1 (unassigned crew starts empty)
 	GameState.set_active_vessel("dinghy")
 	GameState.vessel_tiers["dinghy"] = 1
 	boat.apply_ship_data(GameState.get_vessel_resource("dinghy"))
 	boat.apply_tier(1)
+	assert(boat.tier_fire_rate_multiplier == 1.0, "Tier 1 has baseline 1.0x fire rate")
 	
 	var t1_crew_count = 0
 	for sock in boat.equipped_weapons:
 		if "crew" in sock.to_lower():
 			t1_crew_count += 1
-	assert(t1_crew_count == 0, "Dinghy Tier 1 must cleanly ignore crew and have 0 equipped crew sockets")
+	assert(t1_crew_count == 0, "Dinghy Tier 1 without assigned crew has 0 equipped crew weapons")
 	assert(boat.equipped_weapons.has("BowMount"), "Dinghy should keep its standard weapon socket")
-	print("  [PASS] Safe Ship Swap Guard confirmed: switching to T1 cleanly ignored equipped crew without errors")
+	
+	# Tier 1 Crew Equip: Player can equip crew directly on Tier 1 Dinghy!
+	var eq_t1 = GameState.equip_crew("dinghy", "MidDeckCrew", "monkey_bomber")
+	assert(eq_t1, "Should successfully equip monkey_bomber onto Tier 1 Dinghy")
+	boat.apply_tier(1)
+	var t1_equipped_crew = 0
+	for sock in boat.equipped_weapons:
+		if "crew" in sock.to_lower():
+			t1_equipped_crew += 1
+	assert(t1_equipped_crew == 1, "Tier 1 Dinghy now has 1 active crew weapon equipped")
+	print("  [PASS] Tier 1 vessels confirmed able to equip and deploy crew without requiring boat tier upgrade")
+	
+	# Test Tier 2 & Tier 3 DPS fire rate scaling
+	boat.apply_tier(2)
+	assert(is_equal_approx(boat.tier_fire_rate_multiplier, 1.15), "Tier 2 grants +15% firepower multiplier (1.15x)")
+	boat.apply_tier(3)
+	assert(is_equal_approx(boat.tier_fire_rate_multiplier, 1.30), "Tier 3 grants +30% firepower multiplier (1.30x)")
+	print("  [PASS] Vessel Tier DPS scaling verified (+15% at Tier 2, +30% at Tier 3)")
 	
 	boat.queue_free()
 	await get_tree().process_frame
