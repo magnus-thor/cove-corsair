@@ -900,6 +900,31 @@ func add_follower_ships(amount: int) -> void:
 		add_follower_boats(to_add)
 		if has_method("spawn_floating_text_at_position"):
 			spawn_floating_text_at_position("+%d Ships!" % to_add, Color(0.1, 0.9, 1.0))
+	elif current_health < max_health:
+		current_health = min(max_health, current_health + 1)
+		health_changed.emit(current_health, max_health)
+		player_health_changed.emit(current_health, max_health)
+		if has_method("spawn_floating_text_at_position"):
+			spawn_floating_text_at_position("+HULL REPAIR!", Color(0.2, 1.0, 0.4))
+
+func trigger_armada_overdrive() -> void:
+	# 1. Fill fleet to max
+	var needed = 4 - follower_boats.size()
+	if needed > 0:
+		add_follower_boats(needed)
+	# 2. Fully repair hull
+	if current_health < max_health:
+		current_health = max_health
+		health_changed.emit(current_health, max_health)
+		player_health_changed.emit(current_health, max_health)
+	# 3. Temporary Overdrive fire rate boost
+	fire_rate_multiplier = 2.0
+	var timer = get_tree().create_timer(6.0)
+	timer.timeout.connect(func(): fire_rate_multiplier = 1.0)
+	# 4. Audiovisual feedback
+	AudioManager.play_sfx("coin_pickup", 1.3, 1.5)
+	if has_method("spawn_floating_text_at_position"):
+		spawn_floating_text_at_position("★ ARMADA OVERDRIVE! ★", Color(1.0, 0.85, 0.1))
 
 func get_fleet_offsets(size: int) -> Array[Vector3]:
 	match size:

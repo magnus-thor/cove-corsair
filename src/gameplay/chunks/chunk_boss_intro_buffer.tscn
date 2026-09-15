@@ -53,11 +53,18 @@ obstacle_type = 0
 hp = 1
 
 [node name="MultiplierGate" type="Area3D" parent="Entities" groups=["multiplier_gate"] instance=ExtResource("10_gate")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -24)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 0, -24)
 script = ExtResource("11_gate_script")
-value = 1
-custom_text = "+1"
+value = 25
+custom_text = "+25"
 gate_action = "add_fleet_1"
+
+[node name="EnemyMob_Center" type="Area3D" parent="Entities" groups=["destructible", "enemies"] instance=ExtResource("12_mob")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0.1, -28)
+script = ExtResource("13_mob_script")
+max_hp = 2
+current_hp = 2
+forward_speed = 1.8
 
 [node name="EnemyMob_Scout" type="Area3D" parent="Entities" groups=["destructible", "enemies"] instance=ExtResource("12_mob")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 0.1, -30)

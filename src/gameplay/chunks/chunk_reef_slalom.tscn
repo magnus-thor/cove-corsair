@@ -52,9 +52,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -24)
 [node name="IronGunner_Guard" type="Area3D" parent="Entities" unique_id=9823116 groups=["destructible", "enemies"] instance=ExtResource("7_gunner")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0.1, -38)
 
+[node name="Enemy_Skiff_Center" type="Area3D" parent="Entities" unique_id=9823118 groups=["destructible", "enemies"] instance=ExtResource("6_cutter")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0.1, -42)
+
 [node name="Gate_Modest" type="Area3D" parent="Entities" unique_id=9823117 groups=["multiplier_gate"] instance=ExtResource("10_gate")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -44)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 0, -44)
 script = ExtResource("11_gate_script")
-value = 1
-custom_text = "+1"
+value = 15
+custom_text = "+15"
 gate_action = "add_fleet_1"

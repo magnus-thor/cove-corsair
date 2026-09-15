@@ -24,7 +24,7 @@ func _ready() -> void:
 		get_tree().quit(1)
 
 func test_multiplier_gate_shootable() -> bool:
-	print("\n[TEST 1] Testing Shootable Multiplier Gate...")
+	print("\n[TEST 1] Testing Shootable Multiplier Gate (1-100 Scale)...")
 	var gate_scene = load("res://src/gameplay/obstacles/multiplier_gate.tscn") as PackedScene
 	if not gate_scene:
 		printerr("Failed to load multiplier_gate.tscn")
@@ -32,32 +32,42 @@ func test_multiplier_gate_shootable() -> bool:
 		
 	var gate = gate_scene.instantiate() as MultiplierGate
 	add_child(gate)
-	gate.value = 1
-	gate.custom_text = "+1"
+	gate.value = 10
+	gate.custom_text = "+10"
 	gate.update_visuals()
 	
-	if gate.value != 1:
+	if gate.value != 10:
 		printerr("Initial gate value mismatch: %d" % gate.value)
 		return false
 		
-	# Shoot the gate 3 times
+	# Shoot the gate 3 times (each shot +5)
 	gate.on_shot_hit()
-	if gate.value != 2:
-		printerr("Gate value after 1st shot should be 2, got %d" % gate.value)
+	if gate.value != 15:
+		printerr("Gate value after 1st shot should be 15, got %d" % gate.value)
 		return false
 		
 	gate.on_shot_hit()
 	gate.on_shot_hit()
-	if gate.value != 4:
-		printerr("Gate value after 3 shots should be 4, got %d" % gate.value)
+	if gate.value != 25:
+		printerr("Gate value after 3 shots should be 25, got %d" % gate.value)
 		return false
 		
 	var label = gate.get_node_or_null("Visuals/Label3D") as Label3D
-	if not label or label.text != "+4":
+	if not label or label.text != "+25":
 		printerr("Gate Label3D text mismatch: %s" % (label.text if label else "null"))
 		return false
+
+	# Rapid pump to 100 MAX
+	for i in range(16):
+		gate.on_shot_hit()
+	if gate.value != 100:
+		printerr("Gate value after pump should be capped at 100, got %d" % gate.value)
+		return false
+	if label.text != "★ 100 MAX ★":
+		printerr("Gate Label3D at 100 should be '★ 100 MAX ★', got %s" % label.text)
+		return false
 		
-	print("  [PASS] Shootable Multiplier Gate incremented from +1 to +4 with visual update.")
+	print("  [PASS] Shootable Multiplier Gate incremented from +10 to +25 and maxed at 100 with dynamic visuals.")
 	gate.queue_free()
 	return true
 

@@ -63,8 +63,22 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, 0.05, -34)
 script = ExtResource("9_ejvrq")
 
 [node name="MultiplierGate" type="Area3D" parent="Entities" unique_id=1807101691 groups=["multiplier_gate"] instance=ExtResource("12_obb7d")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -42)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 0, -42)
 script = ExtResource("13_352l0")
-value = 1
-custom_text = "+1"
+value = 10
+custom_text = "+10"
 gate_action = "add_fleet_1"
+
+[node name="EnemyMob_Lane1" type="Area3D" parent="Entities" unique_id=67668439 groups=["destructible", "enemies"] instance=ExtResource("10_lll5g")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 0.1, -40)
+script = ExtResource("11_xc064")
+max_hp = 2
+current_hp = 2
+forward_speed = 1.5
+
+[node name="EnemyMob_Lane2" type="Area3D" parent="Entities" unique_id=67668440 groups=["destructible", "enemies"] instance=ExtResource("10_lll5g")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 0.1, -46)
+script = ExtResource("11_xc064")
+max_hp = 2
+current_hp = 2
+forward_speed = 1.5

@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/lane_objects/Floating Multiplier Gate Arch.png" id="2_arch_tex"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_gate"]
-size = Vector3(3.8, 3.2, 0.8)
+size = Vector3(3.6, 3.2, 0.8)
 
 [node name="MultiplierGate" type="Area3D" groups=["multiplier_gate"]]
 script = ExtResource("1_gate_script")
@@ -25,8 +25,17 @@ texture = ExtResource("2_arch_tex")
 [node name="Label3D" type="Label3D" parent="Visuals"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1, 0.05)
 pixel_size = 0.015
-text = "+3"
+text = "+10"
 font_size = 64
-outline_size = 12
+outline_size = 14
 outline_modulate = Color(0, 0, 0, 1)
 modulate = Color(0.2, 0.85, 1, 1)
+
+[node name="TagLabel3D" type="Label3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0.05)
+pixel_size = 0.011
+text = "SHOOT FOR FLEET!"
+font_size = 40
+outline_size = 10
+outline_modulate = Color(0, 0, 0, 1)
+modulate = Color(0.2, 0.95, 1, 0.9)

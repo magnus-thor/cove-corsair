@@ -57,11 +57,18 @@ obstacle_type = 0
 metadata/spawns_chest = true
 
 [node name="MultiplierGate" type="Area3D" parent="Entities" unique_id=1864665149 groups=["multiplier_gate"] instance=ExtResource("10_mxap3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -38)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 0, -38)
 script = ExtResource("11_h1ubg")
-value = 2
-custom_text = "+2"
+value = 20
+custom_text = "+20"
 gate_action = "add_fleet_2"
+
+[node name="EnemyMob_Center" type="Area3D" parent="Entities" unique_id=2125398789 groups=["destructible", "enemies"] instance=ExtResource("4_qdvtt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0.1, -44)
+script = ExtResource("5_41l2j")
+max_hp = 2
+current_hp = 2
+forward_speed = 1.8
 
 [node name="EnemyMob_RowerLeft" type="Area3D" parent="Entities" unique_id=2125398780 groups=["destructible", "enemies"] instance=ExtResource("4_qdvtt")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2, 0.1, -48)

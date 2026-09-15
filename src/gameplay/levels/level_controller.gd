@@ -403,14 +403,19 @@ func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> vo
 
 		SpawnEvent.EntityType.MULTIPLIER_GATE:
 			var x_pos = clampf(event.lane_x, -3.9, 3.9)
+			if absf(x_pos) < 1.2:
+				x_pos = 2.4 if int(current_distance) % 2 == 0 else -2.4
 			if multiplier_gate_scene:
 				var gate = multiplier_gate_scene.instantiate() as Area3D
 				gate.name = "MultiplierGate_%.1fm" % current_distance
 				add_child(gate)
 				gate.global_position = Vector3(x_pos, 0.0, z_spawn)
-				var text_val = "+%d" % event.gate_value if event.gate_type == SpawnEvent.GateType.FLEET_SUMMON else ("x%d" % event.gate_value)
+				var gate_val = event.gate_value
+				if gate_val <= 6:
+					gate_val = gate_val * 10
+				var text_val = "+%d" % gate_val if event.gate_type == SpawnEvent.GateType.FLEET_SUMMON else ("x%d" % gate_val)
 				if "value" in gate:
-					gate.value = event.gate_value
+					gate.value = gate_val
 				if "custom_text" in gate:
 					gate.custom_text = text_val
 				if gate.has_method("update_visuals"):
@@ -514,10 +519,15 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 				add_child(gate)
 				var x_norm  = float(event.get("x", 0.0))
 				var x_world = clampf(normalized_to_world_x(x_norm), -3.9, 3.9)
+				if absf(x_world) < 1.2:
+					x_world = 2.4 if int(current_distance) % 2 == 0 else -2.4
 				gate.global_position = Vector3(x_world, 0.0, z_spawn)
-				var gate_val    = int(event.get("value", 1))
+				var raw_val     = int(event.get("value", 1))
+				var gate_val    = raw_val * 10 if raw_val <= 6 else raw_val
 				var gate_text   = str(event.get("text", "+%d" % gate_val))
-				var gate_action = str(event.get("action", "add_fleet_1" if gate_val == 1 else "add_fleet_2"))
+				if gate_text.begins_with("+") and gate_text.substr(1).to_int() <= 6:
+					gate_text = "+%d" % gate_val
+				var gate_action = str(event.get("action", "add_fleet_1" if raw_val <= 1 else "add_fleet_2"))
 				if "custom_text" in gate: gate.custom_text = gate_text
 				if "gate_action"  in gate: gate.gate_action  = gate_action
 				if "value"        in gate: gate.value         = gate_val
