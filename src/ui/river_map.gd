@@ -497,6 +497,12 @@ func _pulse_active_aura(aura: Control) -> void:
 	t.tween_property(aura, "modulate:a", 0.85, 0.01)
 	aura.set_meta("pulse_tween", t)
 
+const VESSEL_CROP_REGIONS: Dictionary = {
+	"dinghy": Rect2(1006, 136, 804, 1355),
+	"sloop": Rect2(1112, 186, 592, 1301),
+	"ironclad": Rect2(228, 92, 1075, 2588),
+}
+
 func _setup_mini_vessel() -> void:
 	if not mini_vessel or not mini_vessel_icon:
 		return
@@ -508,7 +514,13 @@ func _setup_mini_vessel() -> void:
 		if ResourceLoader.exists(p_tex):
 			var t = ResourceLoader.load(p_tex) as Texture2D
 			if t:
-				mini_vessel_icon.texture = t
+				if VESSEL_CROP_REGIONS.has(active_id):
+					var atlas = AtlasTexture.new()
+					atlas.atlas = t
+					atlas.region = VESSEL_CROP_REGIONS[active_id]
+					mini_vessel_icon.texture = atlas
+				else:
+					mini_vessel_icon.texture = t
 				tex_loaded = true
 				
 	if not tex_loaded:
@@ -522,9 +534,10 @@ func _start_vessel_idle_bob() -> void:
 	if vessel_bob_tween and vessel_bob_tween.is_valid():
 		vessel_bob_tween.kill()
 		
+	var base_y: float = mini_vessel_icon.position.y
 	vessel_bob_tween = create_tween().set_loops()
-	vessel_bob_tween.tween_property(mini_vessel_icon, "position:y", -6.0, 1.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	vessel_bob_tween.tween_property(mini_vessel_icon, "position:y", 2.0, 1.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	vessel_bob_tween.tween_property(mini_vessel_icon, "position:y", base_y - 6.0, 1.2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	vessel_bob_tween.tween_property(mini_vessel_icon, "position:y", base_y + 4.0, 1.2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 func _handle_initial_presentation() -> void:
 	# ScrollContainer Frame-0 Guard: wait for 15,000px content height to be fully measured
@@ -537,12 +550,24 @@ func _handle_initial_presentation() -> void:
 		_focus_on_level(active_lvl, false)
 		var target_pos = _get_node_dock_pos(active_lvl)
 		mini_vessel.position = target_pos
+		mini_vessel.rotation = _get_node_water_rotation(active_lvl)
 
 func _get_node_dock_pos(lvl: int) -> Vector2:
 	if MILESTONES.has(lvl):
-		# Position miniature vessel slightly offset near the milestone node
-		return MILESTONES[lvl]["pos"] + Vector2(75, 45)
+		# Position vessel on the river water at the milestone waypoint
+		return MILESTONES[lvl]["pos"]
 	return Vector2(360, 14500)
+
+func _get_node_water_rotation(lvl: int) -> float:
+	if river_curve and MILESTONES.has(lvl):
+		var pos = MILESTONES[lvl]["pos"]
+		var offset = river_curve.get_closest_offset(pos)
+		var pt1 = river_curve.sample_baked(offset)
+		var pt2 = river_curve.sample_baked(minf(offset + 6.0, river_curve.get_baked_length()))
+		var dir = (pt2 - pt1).normalized()
+		if dir.length_squared() > 0.01:
+			return dir.angle() + PI/2
+	return 0.0
 
 func _focus_on_level(lvl: int, animate: bool = true, duration: float = 0.8) -> void:
 	if not scroll_container or not MILESTONES.has(lvl):
@@ -574,6 +599,10 @@ func _play_advancement_sequence() -> void:
 	var start_pos = _get_node_dock_pos(from_lvl)
 	var end_pos = _get_node_dock_pos(to_lvl)
 	mini_vessel.position = start_pos
+	mini_vessel.rotation = _get_node_water_rotation(from_lvl)
+	if vessel_bob_tween and vessel_bob_tween.is_valid():
+		vessel_bob_tween.kill()
+	mini_vessel_icon.position.y = -57.0
 	
 	# 2. Wait 0.35s before beginning the voyage
 	await get_tree().create_timer(0.35, true, false, true).timeout
@@ -603,7 +632,9 @@ func _play_advancement_sequence() -> void:
 	
 	# 4. Arrival on the newly unlocked node
 	mini_vessel.position = end_pos
-	mini_vessel.rotation = 0.0
+	mini_vessel.rotation = _get_node_water_rotation(to_lvl)
+	mini_vessel_icon.position.y = -57.0
+	_start_vessel_idle_bob()
 	
 	# Emit celebratory sound
 	AudioManager.play_sfx("coin_pickups", 1.2, 1.4, 2.5)
@@ -657,10 +688,12 @@ func _on_node_pressed(lvl: int) -> void:
 		GameState.current_level = lvl
 		level_selected.emit(lvl)
 		
-		# Move miniature vessel to selected node
+		# Move miniature vessel to selected node on the water
 		var target_pos = _get_node_dock_pos(lvl)
-		var mt = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		var target_rot = _get_node_water_rotation(lvl)
+		var mt = create_tween().set_parallel(true).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		mt.tween_property(mini_vessel, "position", target_pos, 0.4)
+		mt.tween_property(mini_vessel, "rotation", target_rot, 0.4)
 		
 		_refresh_all_node_states()
 		_show_level_popup(lvl)
