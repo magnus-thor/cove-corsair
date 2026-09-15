@@ -63,8 +63,50 @@ value = 20
 custom_text = "+20"
 gate_action = "add_fleet_2"
 
+[node name="EnemyMob_BarricadeFlankL" type="Area3D" parent="Entities" unique_id=2125398781 groups=["destructible", "enemies"] instance=ExtResource("4_qdvtt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 0.1, -14)
+script = ExtResource("5_41l2j")
+max_hp = 2
+current_hp = 2
+forward_speed = 1.8
+
+[node name="EnemyMob_BarricadeFlankR" type="Area3D" parent="Entities" unique_id=2125398782 groups=["destructible", "enemies"] instance=ExtResource("4_qdvtt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 0.1, -14)
+script = ExtResource("5_41l2j")
+max_hp = 2
+current_hp = 2
+forward_speed = 1.8
+
+[node name="EnemyMob_BarricadeMidL" type="Area3D" parent="Entities" unique_id=2125398783 groups=["destructible", "enemies"] instance=ExtResource("4_qdvtt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2, 0.1, -28)
+script = ExtResource("5_41l2j")
+max_hp = 2
+current_hp = 2
+forward_speed = 1.8
+
+[node name="EnemyMob_BarricadeMidR" type="Area3D" parent="Entities" unique_id=2125398784 groups=["destructible", "enemies"] instance=ExtResource("4_qdvtt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0.1, -32)
+script = ExtResource("5_41l2j")
+max_hp = 2
+current_hp = 2
+forward_speed = 1.8
+
 [node name="EnemyMob_Center" type="Area3D" parent="Entities" unique_id=2125398789 groups=["destructible", "enemies"] instance=ExtResource("4_qdvtt")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0.1, -44)
+script = ExtResource("5_41l2j")
+max_hp = 2
+current_hp = 2
+forward_speed = 1.8
+
+[node name="EnemyMob_RearL" type="Area3D" parent="Entities" unique_id=2125398785 groups=["destructible", "enemies"] instance=ExtResource("4_qdvtt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0, 0.1, -46)
+script = ExtResource("5_41l2j")
+max_hp = 2
+current_hp = 2
+forward_speed = 1.8
+
+[node name="EnemyMob_RearR" type="Area3D" parent="Entities" unique_id=2125398786 groups=["destructible", "enemies"] instance=ExtResource("4_qdvtt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0, 0.1, -46)
 script = ExtResource("5_41l2j")
 max_hp = 2
 current_hp = 2

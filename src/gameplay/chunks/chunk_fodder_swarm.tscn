@@ -23,17 +23,23 @@ transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 9.5, 0, -32)
 
 [node name="Entities" type="Node3D" parent="."]
 
-# --- Wave 1 (Staggered V formation at Z = -14) ---
+# --- Wave 1 (Expanded V formation at Z = -10 to -16) ---
+[node name="Fodder_W1_OutL" type="Area3D" parent="Entities" groups=["destructible", "enemies", "fodder"] instance=ExtResource("3_fodder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.0, 0.1, -10)
+
 [node name="Fodder_W1_L" type="Area3D" parent="Entities" groups=["destructible", "enemies", "fodder"] instance=ExtResource("3_fodder")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8, 0.1, -12)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0.1, -12)
 
 [node name="Fodder_W1_C" type="Area3D" parent="Entities" groups=["destructible", "enemies", "fodder"] instance=ExtResource("3_fodder")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0.1, -15)
 
 [node name="Fodder_W1_R" type="Area3D" parent="Entities" groups=["destructible", "enemies", "fodder"] instance=ExtResource("3_fodder")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, 0.1, -12)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.1, -12)
 
-# --- Wave 2 (Dense 5-skiff chevron at Z = -26) ---
+[node name="Fodder_W1_OutR" type="Area3D" parent="Entities" groups=["destructible", "enemies", "fodder"] instance=ExtResource("3_fodder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.0, 0.1, -10)
+
+# --- Wave 2 (Double chevron at Z = -24 to -31) ---
 [node name="Fodder_W2_FarLeft" type="Area3D" parent="Entities" groups=["destructible", "enemies", "fodder"] instance=ExtResource("3_fodder")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.4, 0.1, -24)
 
@@ -49,9 +55,21 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.7, 0.1, -27)
 [node name="Fodder_W2_FarRight" type="Area3D" parent="Entities" groups=["destructible", "enemies", "fodder"] instance=ExtResource("3_fodder")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.4, 0.1, -24)
 
-# --- Wave 3 (4-skiff wide blockade at Z = -38) ---
+[node name="Fodder_W2_RearL" type="Area3D" parent="Entities" groups=["destructible", "enemies", "fodder"] instance=ExtResource("3_fodder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2, 0.1, -31)
+
+[node name="Fodder_W2_RearC" type="Area3D" parent="Entities" groups=["destructible", "enemies", "fodder"] instance=ExtResource("3_fodder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0.1, -32)
+
+[node name="Fodder_W2_RearR" type="Area3D" parent="Entities" groups=["destructible", "enemies", "fodder"] instance=ExtResource("3_fodder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0.1, -31)
+
+# --- Wave 3 (Wide swarm blockade at Z = -36 to -44) ---
+[node name="Fodder_W3_OutL" type="Area3D" parent="Entities" groups=["destructible", "enemies", "fodder"] instance=ExtResource("3_fodder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8, 0.1, -36)
+
 [node name="Fodder_W3_L2" type="Area3D" parent="Entities" groups=["destructible", "enemies", "fodder"] instance=ExtResource("3_fodder")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6, 0.1, -38)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 0.1, -38)
 
 [node name="Fodder_W3_L1" type="Area3D" parent="Entities" groups=["destructible", "enemies", "fodder"] instance=ExtResource("3_fodder")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9, 0.1, -39)
@@ -60,4 +78,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9, 0.1, -39)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 0.1, -39)
 
 [node name="Fodder_W3_R2" type="Area3D" parent="Entities" groups=["destructible", "enemies", "fodder"] instance=ExtResource("3_fodder")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 0.1, -38)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 0.1, -38)
+
+[node name="Fodder_W3_OutR" type="Area3D" parent="Entities" groups=["destructible", "enemies", "fodder"] instance=ExtResource("3_fodder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8, 0.1, -36)
+
+[node name="Fodder_W3_TailL" type="Area3D" parent="Entities" groups=["destructible", "enemies", "fodder"] instance=ExtResource("3_fodder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 0.1, -44)
+
+[node name="Fodder_W3_TailR" type="Area3D" parent="Entities" groups=["destructible", "enemies", "fodder"] instance=ExtResource("3_fodder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6, 0.1, -44)

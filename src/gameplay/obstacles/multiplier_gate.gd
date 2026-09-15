@@ -31,6 +31,7 @@ var _processed_cannonballs: Dictionary = {}
 func _ready() -> void:
 	add_to_group("multiplier_gate")
 	area_entered.connect(_on_area_entered)
+	body_entered.connect(_on_body_entered)
 	value = clamp(value, 1, 100)
 		
 	# Apply water calibration offset, pixel size, and scale
@@ -43,6 +44,79 @@ func _ready() -> void:
 		
 	_clean_shadow_nodes(self)
 	update_visuals()
+
+func _on_body_entered(body: Node3D) -> void:
+	if not is_active:
+		return
+	var is_player = body.is_in_group("player") or body is PlayerSwerve or (body.get_parent() and body.get_parent().is_in_group("player"))
+	if is_player:
+		_trigger_gate_collect(body)
+
+func _on_area_entered(area: Area3D) -> void:
+	if not is_active:
+		return
+
+	# Handle cannonball shooting gate to increment multiplier
+	if area.is_in_group("cannonballs") and not area.is_in_group("enemy_projectiles"):
+		on_shot_hit(area)
+		return
+		
+	var is_player = area.name == "CollisionArea" or area.is_in_group("player") or (area.get_parent() and area.get_parent().is_in_group("player"))
+	if is_player:
+		_trigger_gate_collect(area)
+
+func _trigger_gate_collect(node: Node) -> void:
+	if not is_active:
+		return
+	is_active = false
+	AudioManager.play_sfx("gate_passes", 1.1, 1.3)
+	
+	# Determine value to add (fallback to custom_text parsing)
+	var final_value = value
+	if not custom_text.is_empty() and custom_text != "★ 100 MAX ★":
+		var clean_text = custom_text.replace(" Ships", "").replace(" Ship", "").replace(" ships", "").replace(" ship", "").strip_edges()
+		var num = clean_text.to_int()
+		if num != 0:
+			final_value = abs(num)
+			
+	# Handle choice group deactivation
+	if not choice_group.is_empty():
+		var gates = get_tree().get_nodes_in_group("multiplier_gate")
+		for gate in gates:
+			if gate is MultiplierGate and gate.choice_group == choice_group and gate != self:
+				gate.is_active = false
+				var t = gate.create_tween().set_parallel(true)
+				t.tween_property(gate, "modulate:a", 0.0, 0.25)
+				t.chain().tween_callback(gate.queue_free)
+				
+	# Find the player node
+	var player_node: Node = null
+	if node is PlayerSwerve or (node.is_in_group("player") and not node.is_in_group("follower")):
+		player_node = node
+	elif node.get_parent() and (node.get_parent() is PlayerSwerve or node.get_parent().is_in_group("player")):
+		player_node = node.get_parent()
+	else:
+		player_node = get_tree().get_first_node_in_group("player")
+		
+	# Balanced fleet reward: 1 gate gives +1 ship (+2 if maxed to 100), never full armada in 1 gate!
+	var ships_to_add = 2 if final_value >= 100 else 1
+	var doubloons_to_add = 150 if final_value >= 100 else int(round(final_value * 1.5))
+	
+	GameState.doubloons += doubloons_to_add
+	if player_node:
+		if "doubloons" in player_node:
+			player_node.doubloons += doubloons_to_add
+		if player_node.has_signal("doubloons_changed"):
+			player_node.doubloons_changed.emit(GameState.doubloons)
+		if player_node.has_method("add_follower_ships"):
+			player_node.add_follower_ships(ships_to_add)
+		if final_value >= 100 and player_node.has_method("trigger_armada_overdrive"):
+			player_node.trigger_armada_overdrive()
+		if player_node.has_method("spawn_floating_text_at_position"):
+			var msg = "+%d SLOOP ESCORT!" % ships_to_add if final_value < 100 else "★ 100 MAX! +2 ESCORTS! ★"
+			player_node.spawn_floating_text_at_position(msg, Color(0.2, 0.95, 1.0))
+		
+	_play_disappear_animation()
 
 func on_shot_hit(_cannonball: Node = null) -> void:
 	if not is_active:
@@ -148,69 +222,6 @@ func update_visuals() -> void:
 		else:
 			tag_label_3d.text = "SHOOT FOR FLEET & GOLD"
 			tag_label_3d.modulate = Color(0.3, 0.9, 1.0)
-
-func _on_area_entered(area: Area3D) -> void:
-	if not is_active:
-		return
-
-	# Handle cannonball shooting gate to increment multiplier
-	if area.is_in_group("cannonballs") and not area.is_in_group("enemy_projectiles"):
-		on_shot_hit(area)
-		return
-		
-	var is_player = area.name == "CollisionArea" or area.is_in_group("player") or (area.get_parent() and area.get_parent().is_in_group("player"))
-	if not is_player:
-		return
-		
-	is_active = false
-	AudioManager.play_sfx("gate_passes")
-	
-	# Determine value to add (fallback to custom_text parsing)
-	var final_value = value
-	if not custom_text.is_empty() and custom_text != "★ 100 MAX ★":
-		var clean_text = custom_text.replace(" Ships", "").replace(" Ship", "").replace(" ships", "").replace(" ship", "").strip_edges()
-		var num = clean_text.to_int()
-		if num != 0:
-			final_value = abs(num)
-			
-	# Handle choice group deactivation
-	if not choice_group.is_empty():
-		var gates = get_tree().get_nodes_in_group("multiplier_gate")
-		for gate in gates:
-			if gate is MultiplierGate and gate.choice_group == choice_group and gate != self:
-				gate.is_active = false
-				var t = gate.create_tween().set_parallel(true)
-				t.tween_property(gate, "modulate:a", 0.0, 0.25)
-				t.chain().tween_callback(gate.queue_free)
-				
-	# Find the player node
-	var player_node = null
-	if area.is_in_group("player") and not area.name == "CollisionArea":
-		player_node = area
-	elif area.get_parent() and area.get_parent().is_in_group("player"):
-		player_node = area.get_parent()
-	else:
-		player_node = get_tree().get_first_node_in_group("player")
-		
-	# Calculate rewards based on 1-100 progression
-	var ships_to_add = clamp(int(ceil(float(final_value) / 25.0)), 1, 4)
-	var doubloons_to_add = 250 if final_value >= 100 else (final_value * 2)
-	
-	GameState.doubloons += doubloons_to_add
-	if player_node:
-		if "doubloons" in player_node:
-			player_node.doubloons += doubloons_to_add
-		if player_node.has_signal("doubloons_changed"):
-			player_node.doubloons_changed.emit(GameState.doubloons)
-		if player_node.has_method("add_follower_ships"):
-			player_node.add_follower_ships(ships_to_add)
-		if final_value >= 100 and player_node.has_method("trigger_armada_overdrive"):
-			player_node.trigger_armada_overdrive()
-		if player_node.has_method("spawn_floating_text_at_position"):
-			var msg = "+%d Gold! +%d Fleet!" % [doubloons_to_add, ships_to_add] if final_value < 100 else "★ 100 MAX! +%d Gold! ★" % doubloons_to_add
-			player_node.spawn_floating_text_at_position(msg, Color(1.0, 0.85, 0.1))
-		
-	_play_disappear_animation()
 
 func _play_disappear_animation() -> void:
 	# Disable collision immediately

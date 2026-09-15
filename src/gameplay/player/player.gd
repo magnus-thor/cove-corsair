@@ -908,10 +908,9 @@ func add_follower_ships(amount: int) -> void:
 			spawn_floating_text_at_position("+HULL REPAIR!", Color(0.2, 1.0, 0.4))
 
 func trigger_armada_overdrive() -> void:
-	# 1. Fill fleet to max
-	var needed = 4 - follower_boats.size()
-	if needed > 0:
-		add_follower_boats(needed)
+	# 1. Add at most 1 bonus escort if under cap (no instant full armada in 1 gate)
+	if follower_boats.size() < 4:
+		add_follower_boat()
 	# 2. Fully repair hull
 	if current_health < max_health:
 		current_health = max_health
