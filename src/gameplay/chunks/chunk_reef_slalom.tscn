@@ -40,14 +40,25 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0.05, -10)
 script = ExtResource("5_barrel_script")
 obstacle_type = 2
 
+[node name="TideCutter_LeadL" type="Area3D" parent="Entities" unique_id=9823120 groups=["destructible", "enemies"] instance=ExtResource("6_cutter")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 0.1, -14)
+
 [node name="SlalomBarrel_2" type="Area3D" parent="Entities" unique_id=9823111 groups=["destructible"] instance=ExtResource("4_barrel")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.05, -18)
 script = ExtResource("5_barrel_script")
 obstacle_type = 2
 
+[node name="TideCutter_LeadR" type="Area3D" parent="Entities" unique_id=9823121 groups=["destructible", "enemies"] instance=ExtResource("6_cutter")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 0.1, -20)
+
 [node name="TideCutter_Flank" type="Area3D" parent="Entities" unique_id=9823112 groups=["destructible", "enemies"] instance=ExtResource("6_cutter")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -24)
 
+[node name="TideCutter_MidL" type="Area3D" parent="Entities" unique_id=9823122 groups=["destructible", "enemies"] instance=ExtResource("6_cutter")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2, 0.1, -28)
+
+[node name="TideCutter_MidC" type="Area3D" parent="Entities" unique_id=9823123 groups=["destructible", "enemies"] instance=ExtResource("6_cutter")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.1, -32)
 
 [node name="IronGunner_Guard" type="Area3D" parent="Entities" unique_id=9823116 groups=["destructible", "enemies"] instance=ExtResource("7_gunner")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0.1, -38)
@@ -61,3 +72,9 @@ script = ExtResource("11_gate_script")
 value = 15
 custom_text = "+15"
 gate_action = "add_fleet_1"
+
+[node name="TideCutter_RearL" type="Area3D" parent="Entities" unique_id=9823124 groups=["destructible", "enemies"] instance=ExtResource("6_cutter")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 0.1, -46)
+
+[node name="TideCutter_RearR" type="Area3D" parent="Entities" unique_id=9823125 groups=["destructible", "enemies"] instance=ExtResource("6_cutter")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 0.1, -48)

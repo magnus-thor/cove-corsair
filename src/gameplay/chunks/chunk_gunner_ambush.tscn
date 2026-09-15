@@ -35,8 +35,17 @@ transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 10.5, 0, -22)
 [node name="IronGunner_Left" type="Area3D" parent="Entities" unique_id=9834109 groups=["destructible", "enemies"] instance=ExtResource("5_gunner")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0.1, -12)
 
+[node name="BrimstoneRaft_Scout" type="Area3D" parent="Entities" unique_id=9834114 groups=["destructible", "enemies"] instance=ExtResource("6_raft")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0.1, -16)
+
 [node name="IronGunner_Right" type="Area3D" parent="Entities" unique_id=9834110 groups=["destructible", "enemies"] instance=ExtResource("5_gunner")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.1, -24)
+
+[node name="BrimstoneRaft_MidL" type="Area3D" parent="Entities" unique_id=9834115 groups=["destructible", "enemies"] instance=ExtResource("6_raft")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 0.1, -26)
+
+[node name="BrimstoneRaft_MidR" type="Area3D" parent="Entities" unique_id=9834116 groups=["destructible", "enemies"] instance=ExtResource("6_raft")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 0.1, -30)
 
 [node name="BrimstoneRaft_Charge" type="Area3D" parent="Entities" unique_id=9834111 groups=["destructible", "enemies"] instance=ExtResource("6_raft")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -34)
@@ -48,3 +57,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0, 0, -38)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 0.05, -38)
 script = ExtResource("9_barrel_script")
 obstacle_type = 2
+
+[node name="BrimstoneRaft_Rear" type="Area3D" parent="Entities" unique_id=9834117 groups=["destructible", "enemies"] instance=ExtResource("6_raft")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.1, -44)

@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" path="res://assets/models/rocks-a.glb" id="3_l67yq"]
 [ext_resource type="PackedScene" path="res://src/gameplay/obstacles/hazard_sea_mine.tscn" id="4_ggj8v"]
 [ext_resource type="Script" path="res://src/gameplay/obstacles/hazard_sea_mine.gd" id="5_k704k"]
+[ext_resource type="PackedScene" path="res://src/gameplay/enemies/enemy_fodder_skiff.tscn" id="6_fodder"]
 [ext_resource type="Script" path="res://src/gameplay/chunks/chest_spawn_marker.gd" id="8_yo1pm"]
 
 [node name="MineGauntlet" type="Node3D" unique_id=1486664142]
@@ -74,3 +75,21 @@ chest_value = 15
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.4, 0.05, -40)
 script = ExtResource("8_yo1pm")
 chest_value = 20
+
+[node name="Fodder_MineLane1" type="Area3D" parent="Entities" groups=["destructible", "enemies", "fodder"] instance=ExtResource("6_fodder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 0.1, -14)
+
+[node name="Fodder_MineLane2L" type="Area3D" parent="Entities" groups=["destructible", "enemies", "fodder"] instance=ExtResource("6_fodder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2, 0.1, -26)
+
+[node name="Fodder_MineLane2R" type="Area3D" parent="Entities" groups=["destructible", "enemies", "fodder"] instance=ExtResource("6_fodder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, 0.1, -26)
+
+[node name="Fodder_MineLane3" type="Area3D" parent="Entities" groups=["destructible", "enemies", "fodder"] instance=ExtResource("6_fodder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 0.1, -38)
+
+[node name="Fodder_MineLane4L" type="Area3D" parent="Entities" groups=["destructible", "enemies", "fodder"] instance=ExtResource("6_fodder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.0, 0.1, -48)
+
+[node name="Fodder_MineLane4R" type="Area3D" parent="Entities" groups=["destructible", "enemies", "fodder"] instance=ExtResource("6_fodder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.0, 0.1, -48)
