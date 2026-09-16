@@ -161,7 +161,10 @@ func collect_coin(_player_ref: Node = null) -> void:
 		# NOTE: Doubloons are currency only — they do NOT award XP.
 		# XP is awarded solely on enemy/obstacle kills via die().
 		
-	AudioManager.play_sfx("coin_pickups")
+	if AudioManager and AudioManager.has_method("play_coin_pickup_scaled"):
+		AudioManager.play_coin_pickup_scaled()
+	elif AudioManager:
+		AudioManager.play_sfx("coin_pickups")
 	_spawn_pickup_vfx()
 	queue_free()
 

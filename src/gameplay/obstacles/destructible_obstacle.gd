@@ -138,6 +138,9 @@ func take_damage(amount: int) -> void:
 			fct.global_position = global_position + Vector3(randf_range(-0.5, 0.5), 1.2, randf_range(-0.5, 0.5))
 			fct.setup("-" + str(amount), Color(1.0, 0.3, 0.3))
 			
+	# Sensory Polish: 3D & Sprite Hit Flash
+	HitFlashComponent.flash_node(self, 0.065)
+
 	# NOTE: XP is awarded only on kill (in die()), not per hit, to prevent XP runaway.
 	if hp <= 0:
 		die()
@@ -164,6 +167,8 @@ func die() -> void:
 	var explosion_pos = global_position
 	if obstacle_type == ObstacleType.SEA_MINE:
 		explosion_pos.y = 0.05
+		if VFXManager and VFXManager.has_method("hit_stop"):
+			VFXManager.hit_stop(0.05)
 		AudioManager.play_sfx("sfx_mine_detonate")
 		if VFXManager and VFXManager.has_method("spawn_mine_explosion"):
 			VFXManager.spawn_mine_explosion(explosion_pos)
@@ -172,6 +177,9 @@ func die() -> void:
 		else:
 			_spawn_explosion()
 	else:
+		if is_in_group("barricade") or obstacle_type == ObstacleType.WOODEN_BARREL:
+			if VFXManager and VFXManager.has_method("spawn_wood_debris"):
+				VFXManager.spawn_wood_debris(explosion_pos)
 		_spawn_explosion()
 	
 	# Doubloons / Chest drop logic:

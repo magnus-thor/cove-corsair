@@ -425,6 +425,8 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 		fire_scattershot(proj_dir, world_container, proj_scene)
 	elif is_mortar:
 		AudioManager.play_sfx("sfx_mortar_fire")
+		if not is_hostile and player and player.has_method("apply_firing_recoil"):
+			player.apply_firing_recoil(3.5, true)
 		if camera and camera.has_method("add_trauma"):
 			camera.add_trauma(0.25)
 			
@@ -467,6 +469,8 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 				ball.damage += player.base_damage_bonus
 	else:
 		AudioManager.play_sfx("cannon_shots")
+		if not is_hostile and player and player.has_method("apply_firing_recoil"):
+			player.apply_firing_recoil(1.8, false)
 		if camera and camera.has_method("add_trauma"):
 			camera.add_trauma(0.08, 0.35)
 			
@@ -518,6 +522,11 @@ func fire_scattershot(proj_dir: Vector3 = Vector3.ZERO, world_container: Node = 
 
 	# Play sfx_scattershot ONCE per volley and trigger lateral camera jitter trauma
 	AudioManager.play_sfx("sfx_scattershot")
+	var is_hostile = _is_hostile_vessel()
+	if not is_hostile:
+		var p = get_tree().get_first_node_in_group("player")
+		if p and p.has_method("apply_firing_recoil"):
+			p.apply_firing_recoil(2.2, false)
 	var camera = get_tree().get_first_node_in_group("game_camera")
 	if camera and camera.has_method("add_trauma"):
 		camera.add_trauma(0.15, 0.35)

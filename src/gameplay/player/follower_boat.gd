@@ -91,6 +91,14 @@ func _ready() -> void:
 				bow.add_child(weapon_instance)
 				bow.scale = Vector3.ONE * sf
 
+	# Attach stern hydrodynamic water wake
+	var wake_scene = preload("res://src/gameplay/vfx/boat_wake.tscn")
+	if wake_scene:
+		var wake = wake_scene.instantiate()
+		add_child(wake)
+		wake.position = Vector3(0, 0.02, 0.8)
+		wake.scale = Vector3(0.65, 0.65, 0.65) * sf
+
 func set_target_offset(offset: Vector3) -> void:
 	target_offset = offset
 
@@ -165,6 +173,8 @@ func _on_area_entered(area: Area3D) -> void:
 
 
 func destroy_follower() -> void:
+	if VFXManager and VFXManager.has_method("spawn_wood_debris"):
+		VFXManager.spawn_wood_debris(global_position)
 	var player = get_tree().get_first_node_in_group("player")
 	if player and player.has_method("remove_follower"):
 		player.remove_follower(self)

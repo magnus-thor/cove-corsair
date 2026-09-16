@@ -50,8 +50,21 @@ var music_tween: Tween = null
 
 var sfx_players: Array[AudioStreamPlayer] = []
 const POOL_SIZE: int = 24
-
 var _sfx_pool_index: int = 0
+
+var sfx_players_3d: Array[AudioStreamPlayer3D] = []
+const POOL_SIZE_3D: int = 16
+var _sfx_3d_pool_index: int = 0
+
+# Chromatic coin pickup escalation
+var _coin_streak: int = 0
+var _last_coin_time: float = 0.0
+const COIN_STREAK_WINDOW: float = 0.75
+const COIN_PITCH_STEPS: Array[float] = [1.0, 1.06, 1.125, 1.19, 1.26, 1.335, 1.415, 1.50]
+
+# Low HP adrenaline audio tension
+var _low_hp_active: bool = false
+var _lpf_effect_idx: int = -1
 
 func _init() -> void:
 	if instance == null:
@@ -68,6 +81,8 @@ func _ready() -> void:
 	_setup_buses()
 	_setup_music_players()
 	_setup_sfx_pool()
+	_setup_sfx_3d_pool()
+	_setup_low_hp_filter()
 	_scan_and_load_sfx()
 
 func _setup_buses() -> void:
@@ -139,6 +154,37 @@ func _setup_sfx_pool() -> void:
 		player.bus = sfx_bus_name
 		add_child(player)
 		sfx_players.append(player)
+
+func _setup_sfx_3d_pool() -> void:
+	var sfx_bus_idx = AudioServer.get_bus_index("SFX")
+	var sfx_bus_name = "SFX" if sfx_bus_idx != -1 else "Master"
+	sfx_players_3d.clear()
+	for i in range(POOL_SIZE_3D):
+		var player = AudioStreamPlayer3D.new()
+		player.name = "SFXPlayer3D_%02d" % i
+		player.process_mode = Node.PROCESS_MODE_ALWAYS
+		player.bus = sfx_bus_name
+		player.max_distance = 60.0
+		player.unit_size = 10.0
+		player.attenuation_model = AudioStreamPlayer3D.ATTENUATION_INVERSE_DISTANCE
+		add_child(player)
+		sfx_players_3d.append(player)
+
+func _setup_low_hp_filter() -> void:
+	var master_idx = AudioServer.get_bus_index("Master")
+	if master_idx != -1:
+		for i in range(AudioServer.get_bus_effect_count(master_idx)):
+			var eff = AudioServer.get_bus_effect(master_idx, i)
+			if eff is AudioEffectLowPassFilter:
+				_lpf_effect_idx = i
+				AudioServer.set_bus_effect_enabled(master_idx, i, false)
+				return
+		var lpf = AudioEffectLowPassFilter.new()
+		lpf.cutoff_hz = 950.0
+		lpf.resonance = 0.5
+		AudioServer.add_bus_effect(master_idx, lpf)
+		_lpf_effect_idx = AudioServer.get_bus_effect_count(master_idx) - 1
+		AudioServer.set_bus_effect_enabled(master_idx, _lpf_effect_idx, false)
 
 func _load_streams_from_dir(dir_path: String, filter_substring: String = "") -> Array[AudioStream]:
 	var results: Array[AudioStream] = []
@@ -260,6 +306,70 @@ func play_sfx(category: String, min_pitch: float = 0.93, max_pitch: float = 1.07
 		target_player.pitch_scale = randf_range(min_pitch, max_pitch)
 		target_player.volume_db = final_volume
 		target_player.play()
+
+## Play a positional 3D sound effect with spatialization and pitch jitter
+func play_sfx_3d(category: String, global_pos: Vector3, min_pitch: float = 0.93, max_pitch: float = 1.07, volume_db: float = 0.0) -> void:
+	var actual_category = category
+	if category == "cannon_fire":
+		actual_category = "cannon_shots"
+	elif category == "explosion":
+		actual_category = "barrel_breaks"
+	elif category == "barricade_timber_smash":
+		actual_category = "sfx_wood_smash"
+	elif category == "contact_sea_mine_explosion":
+		actual_category = "sfx_mine_detonate"
+	elif category == "scattershot_carronade_volley":
+		actual_category = "sfx_scattershot"
+
+	if not sfx_library.has(actual_category):
+		return
+
+	var streams: Array = sfx_library[actual_category]
+	if streams.is_empty():
+		return
+
+	var stream: AudioStream = streams.pick_random()
+	if not stream:
+		return
+
+	var target_player: AudioStreamPlayer3D = null
+	for player in sfx_players_3d:
+		if not player.playing:
+			target_player = player
+			break
+
+	if target_player == null and not sfx_players_3d.is_empty():
+		target_player = sfx_players_3d[_sfx_3d_pool_index]
+		_sfx_3d_pool_index = (_sfx_3d_pool_index + 1) % sfx_players_3d.size()
+
+	if target_player:
+		target_player.global_position = global_pos
+		target_player.stream = stream
+		target_player.pitch_scale = randf_range(min_pitch, max_pitch)
+		target_player.volume_db = volume_db
+		target_player.play()
+
+## Play coin pickup with escalating musical pitch on consecutive collections
+func play_coin_pickup_scaled(volume_db: float = 0.0) -> void:
+	var now = Time.get_ticks_msec() / 1000.0
+	if now - _last_coin_time < COIN_STREAK_WINDOW:
+		_coin_streak = min(_coin_streak + 1, COIN_PITCH_STEPS.size() - 1)
+	else:
+		_coin_streak = 0
+	_last_coin_time = now
+	var pitch = COIN_PITCH_STEPS[_coin_streak]
+	play_sfx("coin_pickups", pitch - 0.015, pitch + 0.015, volume_db)
+
+## Engages or disengages low-HP adrenaline muffled audio tension
+func set_low_hp_tension(is_low: bool) -> void:
+	if _low_hp_active == is_low:
+		return
+	_low_hp_active = is_low
+	var master_idx = AudioServer.get_bus_index("Master")
+	if master_idx != -1 and _lpf_effect_idx != -1:
+		AudioServer.set_bus_effect_enabled(master_idx, _lpf_effect_idx, is_low)
+	if is_low:
+		play_sfx("barrel_hits", 0.6, 0.7, 3.0)
 
 ## Dynamic Biome Music Crossfade with Redundant Biome Guard
 func crossfade_music(track_key_or_path: String, duration: float = 1.0) -> void:

@@ -59,6 +59,15 @@ func _ready() -> void:
 		
 	_update_health_bar()
 	_time = randf_range(0.0, TAU)
+	
+	# Attach stern hydrodynamic water wake
+	var wake_scene = preload("res://src/gameplay/vfx/boat_wake.tscn")
+	if wake_scene:
+		var wake = wake_scene.instantiate()
+		add_child(wake)
+		wake.position = Vector3(0, 0.02, -0.9)
+		wake.rotation_degrees = Vector3(0, 180, 0)
+		wake.scale = Vector3(0.7, 0.7, 0.7)
 
 func apply_enemy_data(data: EnemyData) -> void:
 	if not data:
@@ -234,14 +243,7 @@ func take_damage(amount: int) -> void:
 		die()
 
 func _flash_white() -> void:
-	if not enemy_sprite:
-		return
-	if _flash_tween and _flash_tween.is_valid():
-		_flash_tween.kill()
-		
-	_flash_tween = create_tween()
-	_flash_tween.tween_property(enemy_sprite, "modulate", Color(2.5, 2.5, 2.5, 1.0), 0.06)
-	_flash_tween.tween_property(enemy_sprite, "modulate", Color.WHITE, 0.1)
+	HitFlashComponent.flash_node(self, 0.065)
 
 func _update_health_bar() -> void:
 	if health_bar_progress:
@@ -259,6 +261,10 @@ func die() -> void:
 	if _is_dead:
 		return
 	_is_dead = true
+
+	# Trigger arcade hit stop on heavy/elite vessels
+	if max_hp >= 4 and VFXManager and VFXManager.has_method("hit_stop"):
+		VFXManager.hit_stop(0.045)
 	
 	if mob_type == "turtle_raft" or (enemy_data and "turtle" in enemy_data.resource_path.to_lower()):
 		if VFXManager:

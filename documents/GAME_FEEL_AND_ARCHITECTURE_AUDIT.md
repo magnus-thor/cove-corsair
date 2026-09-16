@@ -108,34 +108,34 @@ Below is the prioritized, actionable checklist organized into three phases.
 ### Phase 1: High-Impact Game Feel & "Juice" (Sensory Polish)
 *These enhancements directly elevate the moment-to-moment game feel without altering core game loop architecture.*
 
-- [ ] **1.1 Universal 3D Mesh Hit Flash (`HitFlashComponent`)**
+- [x] **1.1 Universal 3D Mesh Hit Flash (`HitFlashComponent`)**
   - Implement a reusable component supporting both `MeshInstance3D` (using unshaded white material override for 0.06s) and `Sprite3D` (modulate overshoot).
   - Attach to player boat visuals (`BoatMesh`), enemy models, boss components, and destructible obstacles.
-- [ ] **1.2 Arcade Hit Stop (Micro-Freeze Frame)**
+- [x] **1.2 Arcade Hit Stop (Micro-Freeze Frame)**
   - Implement a global `HitStop` utility (e.g. `hit_stop(duration_sec: float = 0.045)` using `Engine.time_scale = 0.05`).
   - Trigger on: elite enemy deaths, sea mine detonations, boss weak-point breaks, and player heavy collisions.
-- [ ] **1.3 Ship Firing Recoil & Impact Shudder**
+- [x] **1.3 Ship Firing Recoil & Impact Shudder**
   - Add hull pitch/recoil to `player.gd`: when cannons fire, apply a brief backward impulse (`rotation_degrees.x += 1.5`, smoothly decaying).
   - Mortar launches trigger a heavier bow-dip and camera trauma pulse.
   - Taking a hit applies a sudden lateral shudder (directional tilt + damped oscillation) to simulate hull impact.
-- [ ] **1.4 Hydrodynamic Water Feedback & Wakes**
+- [x] **1.4 Hydrodynamic Water Feedback & Wakes**
   - Attach `boat_wake.tscn` to follower escort boats and enemy vessels so all craft feel anchored to the water.
   - Add dynamic bow spray particles to the player vessel that scale emission based on horizontal swerve velocity (`x_velocity`).
-- [ ] **1.5 Audio Spatialization & Feedback Loops**
+- [x] **1.5 Audio Spatialization & Feedback Loops**
   - Implement `play_sfx_3d(stream_key: String, global_pos: Vector3, min_pitch: float, max_pitch: float)` in `AudioManager.gd`.
   - Add chromatic pitch escalation to doubloon collection: rapid coin pickups step up in pitch (1.0 -> 1.06 -> 1.12 -> 1.18 -> 1.25) before resetting.
   - Diversify impact sounds: separate sound profiles for wood smash, iron ricochet, water plume, and gate ringing.
   - Implement low-HP audio tension: engage an AudioServer low-pass filter bus or heartbeat audio cue when `current_health == 1`.
-- [ ] **1.6 Vessel Damage States (Hull Distress VFX)**
+- [x] **1.6 Vessel Damage States (Hull Distress VFX)**
   - Add trailing smoke particles to the player vessel:
     - 2/3 HP: faint gray wisps.
     - 1/3 HP: thick black smoke plume and orange embers.
-- [ ] **1.7 Projectile Surface Impact Decoupling**
+- [x] **1.7 Projectile Surface Impact Decoupling**
   - When cannonballs expire or hit:
     - Water hit -> spawn vertical geyser + concentric ripple shockwave.
     - Wood hit -> spawn bursting splinters with gravity (`vfx_wood_splinter.tscn`).
     - Iron/Armored hit -> spawn bright sparks.
-- [ ] **1.8 Overdrive & Frenzy Sensory Celebration**
+- [x] **1.8 Overdrive & Frenzy Sensory Celebration**
   - When **Fire Frenzy** or **Armada Overdrive** activates:
     - Add subtle golden/fiery edge vignette distortion.
     - Enhance weapon muzzle flash brightness during the buff duration.

@@ -103,6 +103,13 @@ var hit_invulnerability_timer: float = 0.0
 var ram_absorb_charges_remaining: int = 1
 var fire_frenzy_timer: float = 0.0
 
+# Game Feel & Juice Dynamics (Phase 1)
+var _recoil_pitch: float = 0.0
+var _shudder_timer: float = 0.0
+var _shudder_roll: float = 0.0
+var _bow_spray_particles: CPUParticles3D = null
+var _hull_smoke_particles: CPUParticles3D = null
+
 @export var is_shooting_enabled: bool = false
 @export var end_game_ui_scene: PackedScene = preload("res://src/ui/end_game_ui.tscn")
 
@@ -122,6 +129,9 @@ func _ready() -> void:
 	var init_hp = get_node_or_null("Hardpoints")
 	if init_hp:
 		init_hp.rotation_degrees.y = 0.0
+
+	_setup_hydrodynamic_particles()
+	_setup_hull_smoke()
 	
 	# Dynamically construct collision area to detect overlapping Area3D obstacles
 	var detection_area = Area3D.new()
@@ -491,14 +501,26 @@ func _physics_process(delta: float) -> void:
 	rotation_degrees.z = lerp(rotation_degrees.z, target_roll_deg, yaw_lerp_speed * delta)
 	rotation_degrees.y = lerp(rotation_degrees.y, target_yaw_deg, yaw_lerp_speed * delta)
 	
-	# 5. Floating / Bobbing on water
+	# 5. Floating / Bobbing on water + Firing Recoil + Impact Shudder
 	float_time += delta * bob_frequency
 	var hover_height = lerp(min_hover_height, max_hover_height, (sin(float_time) + 1.0) * 0.5)
+
+	# Smoothly decay firing recoil pitch back to neutral
+	_recoil_pitch = lerpf(_recoil_pitch, 0.0, delta * 9.0)
+
+	# Process violent kinetic impact shudder
+	if _shudder_timer > 0.0:
+		_shudder_timer -= delta
+		var shudder_prog = clampf(_shudder_timer / 0.25, 0.0, 1.0)
+		_shudder_roll = sin(_shudder_timer * 50.0) * shudder_prog * 6.5
+	else:
+		_shudder_roll = 0.0
+
 	if visuals:
 		visuals.position.y = hover_height
-		visuals.rotation_degrees.x = sin(float_time * 1.5) * 2.0
+		visuals.rotation_degrees.x = (sin(float_time * 1.5) * 2.0) + _recoil_pitch
 		visuals.rotation_degrees.y = 0.0
-		visuals.rotation_degrees.z = 0.0
+		visuals.rotation_degrees.z = _shudder_roll
 		
 		var hardpoints = get_node_or_null("Hardpoints")
 		if hardpoints:
@@ -508,7 +530,17 @@ func _physics_process(delta: float) -> void:
 			hardpoints.position.y = visuals.position.y
 			hardpoints.rotation_degrees.x = visuals.rotation_degrees.x
 			hardpoints.rotation_degrees.y = 0.0
-			hardpoints.rotation_degrees.z = 0.0
+			hardpoints.rotation_degrees.z = visuals.rotation_degrees.z
+
+	# Dynamic Hydrodynamic Bow Spray scaling with horizontal swerve velocity
+	if _bow_spray_particles:
+		var swerve_ratio = clampf(abs(x_velocity) / 3.5, 0.0, 1.0)
+		if swerve_ratio > 0.15:
+			_bow_spray_particles.emitting = true
+			_bow_spray_particles.initial_velocity_min = 1.4 * swerve_ratio
+			_bow_spray_particles.initial_velocity_max = 3.2 * swerve_ratio
+		else:
+			_bow_spray_particles.emitting = false
 		
 	# 6. Automatic periodic cannon shooting
 	if is_shooting_enabled:
@@ -580,6 +612,20 @@ func take_hit(amount: int = 1, source_info: String = "") -> void:
 	var camera = get_tree().get_first_node_in_group("game_camera")
 	if camera and camera.has_method("add_trauma"):
 		camera.add_trauma(0.55)
+
+	# Sensory Polish: 3D Hit Flash & Kinetic Hull Shudder
+	_shudder_timer = 0.25
+	if visuals:
+		HitFlashComponent.flash_node(visuals, 0.065)
+	_update_hull_distress_smoke()
+	
+	if current_health <= 1 and current_health > 0:
+		if AudioManager and AudioManager.has_method("set_low_hp_tension"):
+			AudioManager.set_low_hp_tension(true)
+	elif current_health <= 0:
+		if AudioManager and AudioManager.has_method("set_low_hp_tension"):
+			AudioManager.set_low_hp_tension(false)
+
 	print("[PLAYER HIT] Vessel took %d dmg from '%s' | HP: %d/%d | Fleet: %d" % [amount, source_info, current_health, max_health, follower_boats.size() + 1])
 	if current_health <= 0:
 		print("[FATAL DAMAGE] Killed by: %s | Damage: %d | Remaining HP: %d" % [source_info, amount, current_health])
@@ -692,6 +738,12 @@ func game_over(victory: bool) -> void:
 		return
 	is_game_over = true
 	is_shooting_enabled = false
+	if AudioManager and AudioManager.has_method("set_low_hp_tension"):
+		AudioManager.set_low_hp_tension(false)
+	if _hull_smoke_particles:
+		_hull_smoke_particles.emitting = false
+	if _bow_spray_particles:
+		_bow_spray_particles.emitting = false
 	
 	if not victory:
 		player_sunk.emit()
@@ -904,6 +956,9 @@ func add_follower_ships(amount: int) -> void:
 		current_health = min(max_health, current_health + 1)
 		health_changed.emit(current_health, max_health)
 		player_health_changed.emit(current_health, max_health)
+		_update_hull_distress_smoke()
+		if current_health > 1 and AudioManager and AudioManager.has_method("set_low_hp_tension"):
+			AudioManager.set_low_hp_tension(false)
 		if has_method("spawn_floating_text_at_position"):
 			spawn_floating_text_at_position("+HULL REPAIR!", Color(0.2, 1.0, 0.4))
 
@@ -916,6 +971,9 @@ func trigger_armada_overdrive() -> void:
 		current_health = max_health
 		health_changed.emit(current_health, max_health)
 		player_health_changed.emit(current_health, max_health)
+		_update_hull_distress_smoke()
+		if AudioManager and AudioManager.has_method("set_low_hp_tension"):
+			AudioManager.set_low_hp_tension(false)
 	# 3. Temporary Overdrive fire rate boost
 	fire_rate_multiplier = 2.0
 	var timer = get_tree().create_timer(6.0)
@@ -924,6 +982,92 @@ func trigger_armada_overdrive() -> void:
 	AudioManager.play_sfx("coin_pickup", 1.3, 1.5)
 	if has_method("spawn_floating_text_at_position"):
 		spawn_floating_text_at_position("★ ARMADA OVERDRIVE! ★", Color(1.0, 0.85, 0.1))
+
+## Firing recoil kick applied to the player vessel hull
+func apply_firing_recoil(impulse_degrees: float = 1.8, is_mortar: bool = false) -> void:
+	_recoil_pitch = clampf(_recoil_pitch + impulse_degrees, -4.0, 7.0)
+	if is_mortar:
+		var camera = get_tree().get_first_node_in_group("game_camera")
+		if camera and camera.has_method("add_trauma"):
+			camera.add_trauma(0.16)
+
+func _setup_hydrodynamic_particles() -> void:
+	if _bow_spray_particles == null:
+		_bow_spray_particles = CPUParticles3D.new()
+		_bow_spray_particles.name = "BowSprayVFX"
+		_bow_spray_particles.amount = 14
+		_bow_spray_particles.lifetime = 0.35
+		_bow_spray_particles.explosiveness = 0.0
+		_bow_spray_particles.randomness = 0.4
+		_bow_spray_particles.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+		_bow_spray_particles.emission_box_extents = Vector3(0.6, 0.05, 0.2)
+		_bow_spray_particles.direction = Vector3(0, 0.7, -0.7)
+		_bow_spray_particles.spread = 45.0
+		_bow_spray_particles.gravity = Vector3(0, -9.8, 0)
+		_bow_spray_particles.initial_velocity_min = 1.5
+		_bow_spray_particles.initial_velocity_max = 3.2
+		var spray_mat = StandardMaterial3D.new()
+		spray_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		spray_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		spray_mat.albedo_color = Color(0.92, 0.97, 1.0, 0.6)
+		var qm = QuadMesh.new()
+		qm.size = Vector2(0.2, 0.2)
+		qm.material = spray_mat
+		_bow_spray_particles.mesh = qm
+		add_child(_bow_spray_particles)
+		_bow_spray_particles.position = Vector3(0, 0.04, -1.25)
+		_bow_spray_particles.emitting = false
+
+func _setup_hull_smoke() -> void:
+	if _hull_smoke_particles == null:
+		_hull_smoke_particles = CPUParticles3D.new()
+		_hull_smoke_particles.name = "HullDistressSmoke"
+		_hull_smoke_particles.amount = 20
+		_hull_smoke_particles.lifetime = 0.75
+		_hull_smoke_particles.randomness = 0.3
+		_hull_smoke_particles.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+		_hull_smoke_particles.emission_box_extents = Vector3(0.25, 0.1, 0.4)
+		_hull_smoke_particles.direction = Vector3(0, 1.0, 0.4)
+		_hull_smoke_particles.spread = 35.0
+		_hull_smoke_particles.gravity = Vector3(0, 0.9, 0)
+		_hull_smoke_particles.initial_velocity_min = 0.6
+		_hull_smoke_particles.initial_velocity_max = 1.4
+		var smoke_mat = StandardMaterial3D.new()
+		smoke_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		smoke_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		smoke_mat.albedo_color = Color(0.25, 0.25, 0.25, 0.4)
+		var qm = QuadMesh.new()
+		qm.size = Vector2(0.32, 0.32)
+		qm.material = smoke_mat
+		_hull_smoke_particles.mesh = qm
+		if visuals:
+			visuals.add_child(_hull_smoke_particles)
+		else:
+			add_child(_hull_smoke_particles)
+		_hull_smoke_particles.position = Vector3(0, 0.45, 0.35)
+		_hull_smoke_particles.emitting = false
+
+func _update_hull_distress_smoke() -> void:
+	if not _hull_smoke_particles:
+		_setup_hull_smoke()
+	if not _hull_smoke_particles:
+		return
+	if is_game_over:
+		_hull_smoke_particles.emitting = false
+		return
+	var hp_ratio = float(current_health) / float(max(1, max_health))
+	if hp_ratio > 0.67:
+		_hull_smoke_particles.emitting = false
+	elif hp_ratio > 0.34:
+		_hull_smoke_particles.emitting = true
+		_hull_smoke_particles.amount = 8
+		if _hull_smoke_particles.mesh and _hull_smoke_particles.mesh.material:
+			(_hull_smoke_particles.mesh.material as StandardMaterial3D).albedo_color = Color(0.6, 0.6, 0.6, 0.35)
+	else:
+		_hull_smoke_particles.emitting = true
+		_hull_smoke_particles.amount = 22
+		if _hull_smoke_particles.mesh and _hull_smoke_particles.mesh.material:
+			(_hull_smoke_particles.mesh.material as StandardMaterial3D).albedo_color = Color(0.12, 0.12, 0.12, 0.8)
 
 func get_fleet_offsets(size: int) -> Array[Vector3]:
 	match size:

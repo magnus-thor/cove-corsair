@@ -35,6 +35,12 @@ func _ready() -> void:
 		boss_health_panel.visible = false
 		boss_health_panel.modulate.a = 0.0
 		
+	# Instantiate celebratory Fire Frenzy / Overdrive vignette
+	var vignette_scene = preload("res://src/ui/hud/frenzy_vignette.tscn")
+	if vignette_scene:
+		var vig = vignette_scene.instantiate()
+		add_child(vig)
+
 	# Connect to GameState Autoload signals
 	if Engine.has_singleton("GameState") or get_node_or_null("/root/GameState"):
 		GameState.doubloons_changed.connect(_on_doubloons_changed)

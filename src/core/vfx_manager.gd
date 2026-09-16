@@ -3,6 +3,7 @@ extends Node
 ## Global VFX Spawner managing mobile-optimized combat particles and impacts.
 
 const SCENE_WOOD_SPLINTER: PackedScene = preload("res://src/vfx/vfx_wood_splinter.tscn")
+const SCENE_IRON_SPARKS: PackedScene = preload("res://src/vfx/vfx_iron_sparks.tscn")
 const SCENE_MORTAR_GEYSER: PackedScene = preload("res://src/vfx/vfx_mortar_geyser.tscn")
 const SCENE_MINE_EXPLOSION: PackedScene = preload("res://src/vfx/vfx_mine_explosion.tscn")
 const SCENE_COIN_BURST: PackedScene = preload("res://src/vfx/vfx_coin_burst.tscn")
@@ -114,3 +115,25 @@ func spawn_explosion(world_pos: Vector3) -> Node3D:
 ## Spawns fountain burst of golden coin particles erupting upward upon chest collection.
 func spawn_coin_burst(world_pos: Vector3) -> Node3D:
 	return _spawn_effect(SCENE_COIN_BURST, world_pos, 0.7)
+
+## Spawns fiery metal spark burst upon hitting armored vessels or obstacles.
+func spawn_iron_sparks(world_pos: Vector3) -> Node3D:
+	return _spawn_effect(SCENE_IRON_SPARKS, world_pos, 0.35)
+
+var _is_hit_stopping: bool = false
+
+## Arcade micro-freeze frame (hit stop) to give impacts crunch.
+## Uses ignore_time_scale so the freeze duration is in unscaled wall-clock time.
+func hit_stop(duration_sec: float = 0.045, time_scale: float = 0.05) -> void:
+	if _is_hit_stopping:
+		return
+	var tree = get_tree()
+	if not tree:
+		return
+	_is_hit_stopping = true
+	Engine.time_scale = clampf(time_scale, 0.01, 1.0)
+	var timer = tree.create_timer(duration_sec, true, false, true)
+	timer.timeout.connect(func():
+		Engine.time_scale = 1.0
+		_is_hit_stopping = false
+	)

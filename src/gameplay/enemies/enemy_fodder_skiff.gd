@@ -27,6 +27,15 @@ func _ready() -> void:
 	current_hp = max_hp
 	doubloons_drop = 0
 	area_entered.connect(_on_area_entered)
+	
+	# Attach stern hydrodynamic water wake
+	var wake_scene = preload("res://src/gameplay/vfx/boat_wake.tscn")
+	if wake_scene:
+		var wake = wake_scene.instantiate()
+		add_child(wake)
+		wake.position = Vector3(0, 0.02, -0.6)
+		wake.rotation_degrees = Vector3(0, 180, 0)
+		wake.scale = Vector3(0.5, 0.5, 0.5)
 
 func _physics_process(delta: float) -> void:
 	if _is_dead or not GameState.is_game_active:
@@ -65,13 +74,7 @@ func take_damage(amount: int) -> void:
 		die()
 
 func _flash() -> void:
-	if not sprite_node:
-		return
-	if _flash_tween and _flash_tween.is_valid():
-		_flash_tween.kill()
-	_flash_tween = create_tween()
-	_flash_tween.tween_property(sprite_node, "modulate", Color(2.5, 2.5, 1.2, 1.0), 0.05)
-	_flash_tween.tween_property(sprite_node, "modulate", Color(1.0, 1.0, 1.0, 1.0), 0.08)
+	HitFlashComponent.flash_node(self, 0.065)
 
 func die() -> void:
 	if _is_dead:

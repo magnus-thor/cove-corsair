@@ -544,7 +544,21 @@ func _on_hit(target: Node) -> void:
 			elif target.get_parent() and "is_barrage_active" in target.get_parent():
 				target.get_parent().is_barrage_active = false
 
-		AudioManager.play_sfx("barrel_hits")
+		# Diversified tactile surface impact feedback:
+		var is_wood = is_barricade or target.is_in_group("wood") or ("barrel" in target.name.to_lower()) or ("skiff" in target.name.to_lower())
+		var is_metal = target.is_in_group("iron") or target.is_in_group("metal") or target.is_in_group("boss") or ("ironclad" in target.name.to_lower()) or ("war_barge" in target.name.to_lower())
+
+		if is_wood:
+			AudioManager.play_sfx("sfx_wood_smash", 0.95, 1.15)
+			if VFXManager and VFXManager.has_method("spawn_wood_debris"):
+				VFXManager.spawn_wood_debris(global_position)
+		elif is_metal:
+			AudioManager.play_sfx("barrel_hits", 1.15, 1.35)
+			if VFXManager and VFXManager.has_method("spawn_iron_sparks"):
+				VFXManager.spawn_iron_sparks(global_position)
+		else:
+			AudioManager.play_sfx("barrel_hits")
+
 		# Rule 2 — Call Down: projectile calls take_hit / take_damage on the victim.
 		# Projectile NEVER reads victim position, health state, or spawns victim VFX.
 		if target.has_method("take_hit"):
@@ -565,6 +579,8 @@ func _on_hit(target: Node) -> void:
 		queue_free()
 
 func _spawn_splash(at_water_level: bool = false) -> void:
+	if at_water_level and VFXManager and VFXManager.has_method("spawn_mortar_splash"):
+		VFXManager.spawn_mortar_splash(global_position)
 	if hit_splash_scene:
 		var splash = hit_splash_scene.instantiate() as Node3D
 		var splash_pos = global_position
