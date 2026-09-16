@@ -751,8 +751,8 @@ func game_over(victory: bool) -> void:
 		var dist = GameState.distance_traveled
 		GameState.bank_run_doubloons(0)
 		run_failed.emit(coins, dist)
-		if GameState.has_signal("run_failed"):
-			GameState.run_failed.emit(coins, dist)
+		EventBus.run_failed.emit(coins, dist)
+		EventBus.player_sunk.emit()
 			
 		var level_ctrl = get_tree().get_first_node_in_group("level_controller")
 		if level_ctrl and level_ctrl.has_method("handle_player_defeat"):

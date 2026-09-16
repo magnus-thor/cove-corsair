@@ -74,21 +74,28 @@ func _physics_process(delta: float) -> void:
 func _update_label_visuals() -> void:
 	if not hp_label:
 		return
-	hp_label.text = str(hp)
-	if hp <= 5:
+	var cur := health_component._current_health if health_component else hp
+	var mx := health_component.max_health if health_component else hp
+	hp_label.text = str(cur)
+	if cur <= 5:
 		hp_label.modulate = Color(0.2, 1.0, 0.2) # green  – almost dead
-	elif hp <= 25:
+	elif cur <= int(mx * 0.5):
 		hp_label.modulate = Color(1.0, 0.8, 0.2) # orange – half health
 	else:
 		hp_label.modulate = Color(1.0, 0.2, 0.2) # red    – full health
 
-## Canonical damage entry point (Rule 2). Delegates to take_damage so label stays in sync.
-func take_hit(amount: int, _source_info: String = "") -> void:
-	take_damage(amount)
+## Ammo-aware damage entry point (SSOT Rule C).
+## BarricadeSegment is the Single Source of Truth for its battering_shot vulnerability.
+## Cannonball.gd calls take_hit(damage, ammo_id) and stops — no multipliers in the projectile.
+func take_hit(amount: int, source_info: String = "") -> void:
+	var actual := amount
+	if source_info == "battering_shot":
+		actual *= 2 # Barricades splinter under battering fire
+	super.take_hit(actual, source_info)
+	_update_label_visuals()
 
 func take_damage(amount: int) -> void:
-	super.take_damage(amount)
-	_update_label_visuals()
+	take_hit(amount, "")
 
 func die() -> void:
 	if _is_destroyed:

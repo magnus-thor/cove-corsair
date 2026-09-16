@@ -17,7 +17,6 @@ extends Area3D
 			_apply_mob_type_fallback()
 
 @export var max_hp: int = 3
-@export var current_hp: int = 3
 @export var forward_speed: float = 2.0
 @export var doubloons_drop: int = 2
 
@@ -38,6 +37,7 @@ extends Area3D
 @onready var health_bar_viewport: SubViewport = get_node_or_null("HealthBarViewport")
 @onready var health_bar_progress: ProgressBar = get_node_or_null("HealthBarViewport/HealthBarControl/ProgressBar")
 @onready var health_bar_sprite: Sprite3D = get_node_or_null("HealthBarSprite")
+@onready var health_component: HealthComponent = get_node_or_null("HealthComponent")
 
 var _flash_tween: Tween
 var _time: float = 0.0
@@ -45,12 +45,30 @@ var _is_dead: bool = false
 var _current_base_y: float = 1.25
 var shoot_cooldown_timer: float = 0.0
 
+## Read-only passthrough for legacy current_hp reads (e.g. hazard_sea_mine.gd).
+var current_hp: int:
+	get:
+		return health_component._current_health if health_component else max_hp
+
 func _ready() -> void:
 	_clean_shadow_nodes(self)
 	add_to_group("enemies")
 	add_to_group("destructible")
 	
 	area_entered.connect(_on_area_entered)
+	
+	# Wire HealthComponent (Blueprint 1)
+	if health_component:
+		health_component.died.connect(die)
+		health_component.health_changed.connect(_on_health_changed)
+	else:
+		var hc := HealthComponent.new()
+		hc.name = "HealthComponent"
+		hc.max_health = max_hp
+		add_child(hc)
+		health_component = hc
+		health_component.died.connect(die)
+		health_component.health_changed.connect(_on_health_changed)
 	
 	if enemy_data:
 		apply_enemy_data(enemy_data)
@@ -74,10 +92,13 @@ func apply_enemy_data(data: EnemyData) -> void:
 		return
 		
 	max_hp = data.max_hp
-	current_hp = data.max_hp
 	forward_speed = data.forward_speed
 	doubloons_drop = data.doubloon_drop_count
 	_current_base_y = data.y_offset
+	
+	# Sync HealthComponent with EnemyData values
+	if health_component:
+		health_component.reset(max_hp)
 	
 	if enemy_sprite:
 		enemy_sprite.texture = data.sprite_texture
@@ -223,12 +244,23 @@ func _on_area_entered(area: Area3D) -> void:
 func take_damage(amount: int) -> void:
 	if _is_dead:
 		return
-		
-	current_hp = max(0, current_hp - amount)
-	_update_health_bar()
-	_flash_white()
-	
-	# Spawn floating combat text
+	if health_component:
+		health_component.take_damage(amount, "")
+		if not _is_dead:
+			_flash_white()
+		_spawn_damage_text(amount)
+
+## take_hit is the canonical entry point (SSOT Rule C).
+func take_hit(amount: int, source_info: String = "") -> void:
+	if _is_dead:
+		return
+	if health_component:
+		health_component.take_damage(amount, source_info)
+		if not _is_dead:
+			_flash_white()
+		_spawn_damage_text(amount)
+
+func _spawn_damage_text(amount: int) -> void:
 	var ft_script = load("res://src/gameplay/vfx/floating_text.gd")
 	if ft_script:
 		var fct = ft_script.new()
@@ -237,21 +269,22 @@ func take_damage(amount: int) -> void:
 			root.add_child(fct)
 			fct.global_position = global_position + Vector3(randf_range(-0.5, 0.5), 1.2, randf_range(-0.5, 0.5))
 			fct.setup("-" + str(amount), Color(1.0, 0.3, 0.3))
-			
-	# NOTE: XP is awarded only on kill (in die()), not per hit, to prevent XP runaway.
-	if current_hp <= 0:
-		die()
+
+func _on_health_changed(current: int, max_val: int) -> void:
+	_update_health_bar()
 
 func _flash_white() -> void:
 	HitFlashComponent.flash_node(self, 0.065)
 
 func _update_health_bar() -> void:
+	var cur = health_component._current_health if health_component else max_hp
+	var mx = health_component.max_health if health_component else max_hp
 	if health_bar_progress:
-		health_bar_progress.max_value = max_hp
-		health_bar_progress.value = current_hp
+		health_bar_progress.max_value = mx
+		health_bar_progress.value = cur
 		
 		# Color lerp: Green -> Yellow -> Red
-		var ratio = float(current_hp) / float(max_hp) if max_hp > 0 else 0.0
+		var ratio = float(cur) / float(mx) if mx > 0 else 0.0
 		if ratio > 0.5:
 			health_bar_progress.modulate = Color(0.2, 0.9, 0.3).lerp(Color(1.0, 0.85, 0.1), (1.0 - ratio) * 2.0)
 		else:

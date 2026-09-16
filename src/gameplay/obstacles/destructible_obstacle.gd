@@ -10,8 +10,12 @@ enum ObstacleType { WOODEN_BARREL, FUSE_BARREL, RUNE_BARREL, SEA_MINE, CORAL_REE
 ## never pushes directly into the player or other peers.
 signal obstacle_destroyed(obstacle_type: ObstacleType, world_pos: Vector3)
 
-## Visual obstacle HP
-@export var hp: int = 1
+## Visual obstacle HP (exported for editor convenience; SSOT is HealthComponent).
+@export var hp: int = 1:
+	set(val):
+		hp = val
+		if health_component:
+			health_component.reset(hp)
 @export var obstacle_type: ObstacleType = ObstacleType.WOODEN_BARREL:
 	set(val):
 		obstacle_type = val
@@ -34,12 +38,26 @@ signal obstacle_destroyed(obstacle_type: ObstacleType, world_pos: Vector3)
 
 @onready var obstacle_sprite: Sprite3D = get_node_or_null("ObstacleSprite") as Sprite3D
 @onready var barrel_model: Node3D = get_node_or_null("BarrelModel")
+@onready var health_component: HealthComponent = get_node_or_null("HealthComponent")
 
 var _is_destroyed: bool = false
 
 func _ready() -> void:
 	_clean_shadow_nodes(self)
 	update_obstacle_visuals()
+	
+	# Wire HealthComponent (Blueprint 1)
+	if health_component:
+		health_component.max_health = hp
+		health_component.reset()
+		health_component.died.connect(die)
+	else:
+		var hc := HealthComponent.new()
+		hc.name = "HealthComponent"
+		hc.max_health = hp
+		add_child(hc)
+		health_component = hc
+		health_component.died.connect(die)
 
 func _physics_process(delta: float) -> void:
 	if _is_destroyed or not GameState.is_game_active:
@@ -117,33 +135,27 @@ func update_obstacle_visuals() -> void:
 		rotation_degrees = rot_deg
 
 ## Canonical damage entry point (Signal Up / Call Down Rule 2).
-## Callers supply a source_info string so the victim can apply mitigation and so
-## debug logs can trace damage origins without the caller needing to inspect internals.
-func take_hit(amount: int, _source_info: String = "") -> void:
-	take_damage(amount)
-
-## Backward-compatible bridge — existing callers (cannonball, enemy scripts) continue to work.
-func take_damage(amount: int) -> void:
+## Ammo-aware overrides go in subclasses (e.g. barricade takes 2x from battering_shot).
+func take_hit(amount: int, source_info: String = "") -> void:
 	if _is_destroyed:
 		return
-	hp -= amount
-	
-	# Spawn floating combat text
-	var ft_script = load("res://src/gameplay/vfx/floating_text.gd")
-	if ft_script:
-		var fct = ft_script.new()
-		var root = get_tree().current_scene
-		if root:
-			root.add_child(fct)
-			fct.global_position = global_position + Vector3(randf_range(-0.5, 0.5), 1.2, randf_range(-0.5, 0.5))
-			fct.setup("-" + str(amount), Color(1.0, 0.3, 0.3))
-			
-	# Sensory Polish: 3D & Sprite Hit Flash
-	HitFlashComponent.flash_node(self, 0.065)
+	if health_component:
+		health_component.take_damage(amount, source_info)
+		# Sensory Polish: 3D & Sprite Hit Flash
+		HitFlashComponent.flash_node(self, 0.065)
+		# Spawn floating combat text
+		var ft_script = load("res://src/gameplay/vfx/floating_text.gd")
+		if ft_script:
+			var fct = ft_script.new()
+			var root = get_tree().current_scene
+			if root:
+				root.add_child(fct)
+				fct.global_position = global_position + Vector3(randf_range(-0.5, 0.5), 1.2, randf_range(-0.5, 0.5))
+				fct.setup("-" + str(amount), Color(1.0, 0.3, 0.3))
 
-	# NOTE: XP is awarded only on kill (in die()), not per hit, to prevent XP runaway.
-	if hp <= 0:
-		die()
+## Backward-compatible bridge — existing callers continue to work.
+func take_damage(amount: int) -> void:
+	take_hit(amount, "")
 
 func die() -> void:
 	if _is_destroyed:

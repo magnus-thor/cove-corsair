@@ -50,7 +50,7 @@ func _trigger_victory() -> void:
 	
 	# Small delay for fireworks before victory settlement
 	get_tree().create_timer(1.2, true, false, true).timeout.connect(func():
-		GameState.level_completed.emit(GameState.doubloons, GameState.targets_destroyed)
+		EventBus.level_completed.emit(GameState.doubloons, GameState.targets_destroyed)
 	)
 
 func _spawn_celebration_effects() -> void:

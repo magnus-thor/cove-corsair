@@ -79,8 +79,8 @@ func _ready() -> void:
 			if child is Sprite3D:
 				child.pixel_size = 0.0021
 	
-	GameState.boss_spawned_event.emit("The Phantom Dredge", max_hp)
-	GameState.boss_health_changed.emit(current_hp, max_hp)
+	EventBus.boss_spawned_event.emit("The Phantom Dredge", max_hp)
+	EventBus.boss_health_changed.emit(current_hp, max_hp)
 
 
 func _physics_process(delta: float) -> void:
@@ -412,6 +412,16 @@ func _spawn_bayou_adds(lane_x_override: float = NAN, type_choice: int = -1) -> v
 		cutter.current_hp = cutter.max_hp
 		cutter.forward_speed = 5.0
 
+## Ammo-aware damage entry point (SSOT Rule C).
+## The Phantom Dredge is the Single Source of Truth for how it reacts to
+## different ammo types. Callers (cannonball.gd) simply call take_hit(damage, ammo_id).
+func take_hit(amount: int, ammo_id: String = "") -> void:
+	var actual_damage := amount
+	if ammo_id == "spectral_salt":
+		actual_damage = int(round(amount * 1.5))
+		interrupt_channel() # Spectral salt disrupts barrage channelling (victim decides)
+	take_damage(actual_damage)
+
 func take_damage(amount: int) -> void:
 	if _is_defeated or current_state == State.SUBMERGED or not is_arena_active:
 		return
@@ -419,7 +429,7 @@ func take_damage(amount: int) -> void:
 	current_hp = max(0, current_hp - amount)
 
 	print("[BOSS HIT] The Phantom Dredge took %d damage | HP: %d/%d" % [amount, current_hp, max_hp])
-	GameState.boss_health_changed.emit(current_hp, max_hp)
+	EventBus.boss_health_changed.emit(current_hp, max_hp)
 	_flash_boss()
 	
 	var ft_script = load("res://src/gameplay/vfx/floating_text.gd")
@@ -511,7 +521,7 @@ func boss_defeat() -> void:
 	tween.tween_callback(func():
 		GameState.is_game_active = false
 		GameState.unlock_next_level()
-		GameState.level_completed.emit(GameState.doubloons, GameState.targets_destroyed)
+		EventBus.level_completed.emit(GameState.doubloons, GameState.targets_destroyed)
 		queue_free()
 	)
 

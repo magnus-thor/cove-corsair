@@ -538,7 +538,6 @@ func fire_scattershot(proj_dir: Vector3 = Vector3.ZERO, world_container: Node = 
 		else:
 			scene_to_use = preload("res://src/gameplay/projectiles/scattershot_pellet.tscn")
 
-	var is_hostile = _is_hostile_vessel()
 	var default_fwd = Vector3(0, 0, 1) if is_hostile else Vector3(0, 0, -1)
 
 	var spawn_pos = muzzle_point.global_position

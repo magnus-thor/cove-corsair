@@ -42,8 +42,7 @@ func take_damage(amount: int) -> void:
 		return
 	current_hp = max(0, current_hp - amount)
 	print("[BOSS HIT] Captain Bone-Beard took %d damage | HP: %d/%d" % [amount, current_hp, max_hp])
-	if GameState.has_signal("boss_health_changed"):
-		GameState.boss_health_changed.emit(current_hp, max_hp)
+	EventBus.boss_health_changed.emit(current_hp, max_hp)
 	_flash_red()
 	_update_health_bar()
 	if current_hp <= 0:
@@ -79,10 +78,8 @@ func _ready() -> void:
 	area_entered.connect(_on_area_entered)
 	
 	GameState.boss_spawned = true
-	if GameState.has_signal("boss_spawned_event"):
-		GameState.boss_spawned_event.emit("Captain Bone-Beard", max_hp)
-	if GameState.has_signal("boss_health_changed"):
-		GameState.boss_health_changed.emit(current_hp, max_hp)
+	EventBus.boss_spawned_event.emit("Captain Bone-Beard", max_hp)
+	EventBus.boss_health_changed.emit(current_hp, max_hp)
 	
 	var player = get_tree().get_first_node_in_group("player")
 	var player_z = player.global_position.z if player else 0.0
@@ -237,7 +234,7 @@ func boss_defeat() -> void:
 	)
 	tween.tween_interval(1.5)
 	tween.tween_callback(func():
-		GameState.level_completed.emit(GameState.doubloons, GameState.targets_destroyed)
+		EventBus.level_completed.emit(GameState.doubloons, GameState.targets_destroyed)
 		queue_free()
 	)
 

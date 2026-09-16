@@ -1,10 +1,24 @@
 extends Node
 
 ## Global GameState / ScoreManager Autoload for Cove Corsair
+##
+## Owns persistent player/run data and economy-tier signals.
+## Cross-boundary lifecycle events (level_completed, boss_spawned, player_sunk,
+## run_failed, distance_target_reached) have been migrated to EventBus.
 
+# Economy & UI signals — tightly coupled to GameState data, stay here.
 signal doubloons_changed(new_amount: int)
 signal multiplier_changed(new_multiplier: float, mode: String)
 signal progress_changed(current_distance: float, total_distance: float)
+signal active_vessel_changed(vessel_id: String)
+signal crew_unlocked(crew_id: String, level: int)
+signal crew_equipped(ship_id: String, socket_name: String, crew_id: String)
+signal outfitting_unlocked(item_id: String)
+signal outfitting_equipped(ship_id: String, category: String, item_id: String)
+signal fire_frenzy_triggered(duration: float)
+
+# Legacy cross-boundary lifecycle signals (retained for backward compatibility).
+# Canonical cross-boundary events route through EventBus.
 @warning_ignore("unused_signal")
 signal distance_target_reached
 @warning_ignore("unused_signal")
@@ -15,12 +29,6 @@ signal campaign_completed(total_doubloons: int, total_targets: int)
 signal boss_spawned_event(boss_name: String, max_val: int)
 @warning_ignore("unused_signal")
 signal boss_health_changed(current: int, max_val: int)
-signal active_vessel_changed(vessel_id: String)
-signal crew_unlocked(crew_id: String, level: int)
-signal crew_equipped(ship_id: String, socket_name: String, crew_id: String)
-signal outfitting_unlocked(item_id: String)
-signal outfitting_equipped(ship_id: String, category: String, item_id: String)
-signal fire_frenzy_triggered(duration: float)
 @warning_ignore("unused_signal")
 signal run_failed(coins_collected: int, distance_reached: float)
 
@@ -368,10 +376,91 @@ const LEVEL_SHIPS: Dictionary = {
 	45: "res://src/data/resources/user_vessels/ironclad_ship.tres" # Bone-Beard Final Throne
 }
 
+var _bridging_event: bool = false
+
 func _ready() -> void:
 	load_game()
 	apply_audio_settings()
 	set_performance_mode(false)
+	_setup_event_bus_bridges()
+
+func _setup_event_bus_bridges() -> void:
+	if not EventBus:
+		return
+	# EventBus -> GameState (for legacy listeners attached to GameState)
+	EventBus.level_completed.connect(func(d: int, t: int):
+		if not _bridging_event:
+			_bridging_event = true
+			level_completed.emit(d, t)
+			_bridging_event = false
+	)
+	EventBus.campaign_completed.connect(func(d: int, t: int):
+		if not _bridging_event:
+			_bridging_event = true
+			campaign_completed.emit(d, t)
+			_bridging_event = false
+	)
+	EventBus.boss_spawned_event.connect(func(n: String, m: int):
+		if not _bridging_event:
+			_bridging_event = true
+			boss_spawned_event.emit(n, m)
+			_bridging_event = false
+	)
+	EventBus.boss_health_changed.connect(func(c: int, m: int):
+		if not _bridging_event:
+			_bridging_event = true
+			boss_health_changed.emit(c, m)
+			_bridging_event = false
+	)
+	EventBus.distance_target_reached.connect(func():
+		if not _bridging_event:
+			_bridging_event = true
+			distance_target_reached.emit()
+			_bridging_event = false
+	)
+	EventBus.run_failed.connect(func(c: int, d: float):
+		if not _bridging_event:
+			_bridging_event = true
+			run_failed.emit(c, d)
+			_bridging_event = false
+	)
+	# GameState -> EventBus (for legacy emitters calling GameState.<signal>.emit)
+	level_completed.connect(func(d: int, t: int):
+		if not _bridging_event:
+			_bridging_event = true
+			EventBus.level_completed.emit(d, t)
+			_bridging_event = false
+	)
+	campaign_completed.connect(func(d: int, t: int):
+		if not _bridging_event:
+			_bridging_event = true
+			EventBus.campaign_completed.emit(d, t)
+			_bridging_event = false
+	)
+	boss_spawned_event.connect(func(n: String, m: int):
+		if not _bridging_event:
+			_bridging_event = true
+			EventBus.boss_spawned_event.emit(n, m)
+			_bridging_event = false
+	)
+	boss_health_changed.connect(func(c: int, m: int):
+		if not _bridging_event:
+			_bridging_event = true
+			EventBus.boss_health_changed.emit(c, m)
+			_bridging_event = false
+	)
+	distance_target_reached.connect(func():
+		if not _bridging_event:
+			_bridging_event = true
+			EventBus.distance_target_reached.emit()
+			_bridging_event = false
+	)
+	run_failed.connect(func(c: int, d: float):
+		if not _bridging_event:
+			_bridging_event = true
+			EventBus.run_failed.emit(c, d)
+			_bridging_event = false
+	)
 
 func set_performance_mode(is_gameplay: bool) -> void:
 	if is_gameplay:

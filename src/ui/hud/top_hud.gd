@@ -41,13 +41,16 @@ func _ready() -> void:
 		var vig = vignette_scene.instantiate()
 		add_child(vig)
 
-	# Connect to GameState Autoload signals
+	# Connect to GameState for economy signals (stay in GameState)
 	if Engine.has_singleton("GameState") or get_node_or_null("/root/GameState"):
 		GameState.doubloons_changed.connect(_on_doubloons_changed)
 		GameState.multiplier_changed.connect(_on_multiplier_changed)
 		GameState.progress_changed.connect(_on_progress_changed)
-		GameState.boss_spawned_event.connect(_on_boss_spawned)
-		GameState.boss_health_changed.connect(_on_boss_health_changed)
+		
+	# Connect to EventBus for cross-boundary boss lifecycle events
+	if get_node_or_null("/root/EventBus"):
+		EventBus.boss_spawned_event.connect(_on_boss_spawned)
+		EventBus.boss_health_changed.connect(_on_boss_health_changed)
 		
 		# Set initial state
 		_displayed_gold = GameState.doubloons

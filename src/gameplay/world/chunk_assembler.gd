@@ -279,8 +279,7 @@ func _on_boss_arena_reached(boss_chunk: BaseTrackChunk) -> void:
 	var gs = _get_game_state()
 	if gs:
 		gs.boss_spawned = true
-		if gs.has_signal("distance_target_reached"):
-			gs.distance_target_reached.emit()
+		EventBus.distance_target_reached.emit()
 		
 		# Lock player progress to completion distance
 		distance_traveled = total_track_distance

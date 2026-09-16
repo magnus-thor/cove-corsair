@@ -7,6 +7,9 @@ signal mine_detonated(world_pos: Vector3)
 
 @export var explosion_scene: PackedScene = preload("res://src/vfx/vfx_mine_explosion.tscn")
 
+## Blast radius for Area3D-based AoE damage (replaces the legacy group loop).
+@export var blast_radius: float = 3.0
+
 func _ready() -> void:
 	obstacle_type = ObstacleType.SEA_MINE
 	super._ready()
@@ -17,16 +20,14 @@ func _ready() -> void:
 func _on_area_entered(area: Area3D) -> void:
 	if _is_destroyed:
 		return
-	if area.is_in_group("player") or area.is_in_group("follower") or area.is_in_group("cannonballs") or area.is_in_group("enemies"):
-		if area.is_in_group("enemies") and not area.is_in_group("boss"):
-			if area.has_method("take_hit"):
-				area.take_hit(20, "sea_mine_collision")
-			elif area.has_method("take_damage"):
-				area.take_damage(20)
-			elif "current_hp" in area:
-				area.current_hp -= 20
-				if area.current_hp <= 0 and area.has_method("die"):
-					area.die()
+	# Any contact from player, followers, or cannonballs detonates the mine.
+	# Enemy contacts that collide mid-lane also trigger detonation (but not bosses).
+	if area.is_in_group("player") or area.is_in_group("follower") or area.is_in_group("cannonballs"):
+		die()
+	elif area.is_in_group("enemies") and not area.is_in_group("boss"):
+		# Mine caught in enemy lane — detonate and deal blast damage to that enemy via take_hit
+		if area.has_method("take_hit"):
+			area.take_hit(20, "sea_mine_collision")
 		die()
 
 ## Canonical damage entry point — any hit detonates the mine.
@@ -44,7 +45,7 @@ func die() -> void:
 	explosion_pos.y = 0.05
 	_is_destroyed = true
 
-	# Rule 4 — Immediate collider shutdown: prevent ghost contacts after detonation.
+	# Rule D — Immediate collider shutdown: prevent ghost contacts after detonation.
 	collision_layer = 0
 	collision_mask = 0
 	for child in get_children():
@@ -67,38 +68,47 @@ func die() -> void:
 			root.add_child(vfx)
 		vfx.global_position = explosion_pos
 
+	if VFXManager and VFXManager.has_method("hit_stop"):
+		VFXManager.hit_stop(0.05)
 	AudioManager.play_sfx("sfx_mine_detonate")
+
+	# ── Rule C (SSOT): Area3D overlap scan replaces get_nodes_in_group loop. ─────────────────────
+	# We query this Area3D's overlapping areas immediately before monitoring is disabled.
+	# Each hit target handles its own damage response — no direct property mutation here.
+	_apply_blast_damage(explosion_pos)
+
+	doubloons_drop = 0 # Mine is a hazard and does not drop gold
+
+	# Rule B — Signal Up: broadcast past-tense event.
+	mine_detonated.emit(explosion_pos)
 	
-	# Rule 2 — Call Down: the mine calls player.take_hit; player owns its own response
-	# (camera shake, i-frames, lateral drift — all handled inside player.take_hit).
-	# We never write to player.target_x or player.position directly.
+	# Safe removal
+	queue_free()
+
+## Applies blast-radius damage using the mine's own overlapping areas.
+## This replaces the legacy get_nodes_in_group() loop and duck-typed current_hp mutations.
+func _apply_blast_damage(explosion_pos: Vector3) -> void:
+	# Player proximity check (player uses take_hit directly as it has no Hurtbox3D yet)
 	var player = get_tree().get_first_node_in_group("player")
 	if player and is_instance_valid(player):
 		var dist = explosion_pos.distance_to(player.global_position)
 		if dist < 2.8:
 			if player.has_method("take_hit"):
-				player.take_hit(1, "sea_mine_knockback")
+				player.take_hit(1, "sea_mine_explosion")
 			elif player.has_method("leak_threat"):
 				player.leak_threat(self)
 
-	# Detonate / damage any nearby enemy vessels in explosion radius.
-	# Rule 2 — Call Down: each enemy owns its own health; mine calls take_hit and stops there.
-	for enemy in get_tree().get_nodes_in_group("enemies"):
-		if is_instance_valid(enemy) and not enemy.is_in_group("boss") and not enemy.is_queued_for_deletion():
-			if explosion_pos.distance_to(enemy.global_position) < 3.0:
-				if enemy.has_method("take_hit"):
-					enemy.take_hit(20, "sea_mine_explosion")
-				elif enemy.has_method("take_damage"):
-					enemy.take_damage(20)
-				elif "current_hp" in enemy:
-					enemy.current_hp -= 20
-					if enemy.current_hp <= 0 and enemy.has_method("die"):
-						enemy.die()
-	
-	doubloons_drop = 0 # Mine is a hazard and does not drop gold
+	# Enemy blast damage via already-overlapping areas (no tree scan needed)
+	for area in get_overlapping_areas():
+		if not is_instance_valid(area) or area.is_in_group("boss") or area.is_in_group("player"):
+			continue
+		if area.is_in_group("enemies") or area.is_in_group("destructible"):
+			var dist = explosion_pos.distance_to((area as Node3D).global_position)
+			if dist <= blast_radius:
+				if area is Hurtbox3D:
+					(area as Hurtbox3D).take_hit(20, "sea_mine_explosion")
+				elif area.has_method("take_hit"):
+					area.take_hit(20, "sea_mine_explosion")
+				elif area.has_method("take_damage"):
+					area.take_damage(20)
 
-	# Rule 1 — Signal Up: broadcast past-tense event.
-	mine_detonated.emit(explosion_pos)
-	
-	# Safe removal
-	queue_free()

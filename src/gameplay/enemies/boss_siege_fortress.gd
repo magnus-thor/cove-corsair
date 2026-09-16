@@ -71,8 +71,8 @@ func _ready() -> void:
 		boss_sprite.rotation_degrees = Vector3.ZERO
 		_base_mesh_scale = boss_sprite.scale
 	
-	GameState.boss_spawned_event.emit("The Siege Fortress", max_hp)
-	GameState.boss_health_changed.emit(current_hp, max_hp)
+	EventBus.boss_spawned_event.emit("The Siege Fortress", max_hp)
+	EventBus.boss_health_changed.emit(current_hp, max_hp)
 
 func _physics_process(delta: float) -> void:
 	if _is_defeated or current_state == State.DYING:
@@ -337,7 +337,7 @@ func damage_component(comp_name: String, amount: int, _from_bow: bool = false) -
 			if hp_port_turret > 0:
 				hp_port_turret = max(0, hp_port_turret - amount)
 				current_hp = max(0, current_hp - amount)
-				GameState.boss_health_changed.emit(current_hp, max_hp)
+				EventBus.boss_health_changed.emit(current_hp, max_hp)
 				_flash_node(port_turret_node)
 				if hp_port_turret <= 0:
 					_destroy_subpart(port_turret_node)
@@ -348,7 +348,7 @@ func damage_component(comp_name: String, amount: int, _from_bow: bool = false) -
 			if hp_starboard_turret > 0:
 				hp_starboard_turret = max(0, hp_starboard_turret - amount)
 				current_hp = max(0, current_hp - amount)
-				GameState.boss_health_changed.emit(current_hp, max_hp)
+				EventBus.boss_health_changed.emit(current_hp, max_hp)
 				_flash_node(starboard_turret_node)
 				if hp_starboard_turret <= 0:
 					_destroy_subpart(starboard_turret_node)
@@ -359,7 +359,7 @@ func damage_component(comp_name: String, amount: int, _from_bow: bool = false) -
 			if hp_prow_ram > 0:
 				hp_prow_ram = max(0, hp_prow_ram - amount)
 				current_hp = max(0, current_hp - amount)
-				GameState.boss_health_changed.emit(current_hp, max_hp)
+				EventBus.boss_health_changed.emit(current_hp, max_hp)
 				_flash_node(prow_ram_node)
 				if hp_prow_ram <= 0:
 					_destroy_subpart(prow_ram_node)
@@ -372,7 +372,7 @@ func damage_component(comp_name: String, amount: int, _from_bow: bool = false) -
 			var actual_dmg = int(amount * mult)
 			hp_furnace_core = max(0, hp_furnace_core - actual_dmg)
 			current_hp = max(0, current_hp - actual_dmg)
-			GameState.boss_health_changed.emit(current_hp, max_hp)
+			EventBus.boss_health_changed.emit(current_hp, max_hp)
 			_flash_node(furnace_core_node)
 			_flash_boss_main()
 			
@@ -466,9 +466,9 @@ func boss_defeat() -> void:
 	tween.tween_callback(func():
 		GameState.is_game_active = false
 		GameState.unlock_next_level()
-		# Emit campaign completion signal!
-		GameState.campaign_completed.emit(GameState.doubloons, GameState.targets_destroyed)
-		GameState.level_completed.emit(GameState.doubloons, GameState.targets_destroyed)
+		# Emit campaign completion and level complete on EventBus (cross-boundary, Rule B).
+		EventBus.campaign_completed.emit(GameState.doubloons, GameState.targets_destroyed)
+		EventBus.level_completed.emit(GameState.doubloons, GameState.targets_destroyed)
 		queue_free()
 	)
 

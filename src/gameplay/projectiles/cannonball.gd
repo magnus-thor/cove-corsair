@@ -528,39 +528,26 @@ func _on_hit(target: Node) -> void:
 			])
 		
 		var hit_damage = damage
-		var is_barricade = target.is_in_group("barricade") or (target.get_parent() and target.get_parent().is_in_group("barricade")) or ("barricade" in target.name.to_lower())
-		if ammo_id == "battering_shot" and is_barricade:
-			hit_damage *= 2
 
-		var is_spectral = target.is_in_group("ghost") or target.is_in_group("spectral") or (target.get_parent() and (target.get_parent().is_in_group("ghost") or target.get_parent().is_in_group("spectral"))) or ("grave" in target.name.to_lower()) or ("phantom" in target.name.to_lower()) or ("ghost" in target.name.to_lower()) or ("dredge" in target.name.to_lower()) or target.is_in_group("boss")
-		if ammo_id == "spectral_salt" and is_spectral:
-			hit_damage = int(round(hit_damage * 1.5))
-			if target.has_method("interrupt_channel"):
-				target.interrupt_channel()
-			elif target.get_parent() and target.get_parent().has_method("interrupt_channel"):
-				target.get_parent().interrupt_channel()
-			elif "is_barrage_active" in target:
-				target.is_barrage_active = false
-			elif target.get_parent() and "is_barrage_active" in target.get_parent():
-				target.get_parent().is_barrage_active = false
+		# ── Diversified tactile surface impact feedback (attacker-side sensory, not SSOT violation) ───
+		# These detect *surface material* for audio/VFX — NOT victim health state.
+		var is_barricade_surface = target.is_in_group("barricade") or (target.get_parent() and target.get_parent().is_in_group("barricade")) or ("barricade" in target.name.to_lower())
+		var is_metal_surface = target.is_in_group("iron") or target.is_in_group("metal") or target.is_in_group("boss") or ("ironclad" in target.name.to_lower()) or ("war_barge" in target.name.to_lower())
 
-		# Diversified tactile surface impact feedback:
-		var is_wood = is_barricade or target.is_in_group("wood") or ("barrel" in target.name.to_lower()) or ("skiff" in target.name.to_lower())
-		var is_metal = target.is_in_group("iron") or target.is_in_group("metal") or target.is_in_group("boss") or ("ironclad" in target.name.to_lower()) or ("war_barge" in target.name.to_lower())
-
-		if is_wood:
+		if is_barricade_surface:
 			AudioManager.play_sfx("sfx_wood_smash", 0.95, 1.15)
 			if VFXManager and VFXManager.has_method("spawn_wood_debris"):
 				VFXManager.spawn_wood_debris(global_position)
-		elif is_metal:
+		elif is_metal_surface:
 			AudioManager.play_sfx("barrel_hits", 1.15, 1.35)
 			if VFXManager and VFXManager.has_method("spawn_iron_sparks"):
 				VFXManager.spawn_iron_sparks(global_position)
 		else:
 			AudioManager.play_sfx("barrel_hits")
 
-		# Rule 2 — Call Down: projectile calls take_hit / take_damage on the victim.
-		# Projectile NEVER reads victim position, health state, or spawns victim VFX.
+		# ── Rule C: SSOT — projectile calls take_hit(damage, ammo_id) and stops. ────────────────────
+		# Victims (BarricadeSegment, BossPhantomDredge, etc.) apply their own ammo-type
+		# vulnerabilities inside their take_hit() overrides. No multipliers here.
 		if target.has_method("take_hit"):
 			target.take_hit(hit_damage, ammo_id)
 		elif target.has_method("take_damage"):

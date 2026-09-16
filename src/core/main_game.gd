@@ -150,7 +150,9 @@ func _setup_victory_screen() -> void:
 		victory_screen = victory_screen_scene.instantiate() as VictoryScreen
 		add_child(victory_screen)
 		
-	if GameState.has_signal("level_completed") and not GameState.level_completed.is_connected(_on_level_completed):
+	if EventBus and not EventBus.level_completed.is_connected(_on_level_completed):
+		EventBus.level_completed.connect(_on_level_completed)
+	elif GameState.has_signal("level_completed") and not GameState.level_completed.is_connected(_on_level_completed):
 		GameState.level_completed.connect(_on_level_completed)
 
 func _on_level_completed(_doubloons: int, _targets: int) -> void:

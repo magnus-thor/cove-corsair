@@ -8,7 +8,6 @@ extends Area3D
 signal vessel_died(world_pos: Vector3)
 
 @export var max_hp: int = 1
-@export var current_hp: int = 1
 @export var forward_speed: float = 7.5
 @export var doubloons_drop: int = 0
 
@@ -16,17 +15,36 @@ signal vessel_died(world_pos: Vector3)
 
 @onready var sprite_node: Sprite3D = get_node_or_null("Sprite3D")
 @onready var collision_shape: CollisionShape3D = get_node_or_null("CollisionShape3D")
+@onready var health_component: HealthComponent = get_node_or_null("HealthComponent")
 
 var _is_dead: bool = false
 var _flash_tween: Tween
+
+## Read-only passthrough to HealthComponent for legacy compatibility.
+var current_hp: int:
+	get:
+		return health_component._current_health if health_component else max_hp
 
 func _ready() -> void:
 	add_to_group("enemies")
 	add_to_group("destructible")
 	add_to_group("fodder")
-	current_hp = max_hp
 	doubloons_drop = 0
 	area_entered.connect(_on_area_entered)
+	
+	# Wire HealthComponent (Blueprint 1)
+	if health_component:
+		health_component.max_health = max_hp
+		health_component.reset()
+		health_component.died.connect(die)
+	else:
+		# Fallback: create one at runtime if scene doesn't have the node yet
+		var hc := HealthComponent.new()
+		hc.name = "HealthComponent"
+		hc.max_health = max_hp
+		add_child(hc)
+		health_component = hc
+		health_component.died.connect(die)
 	
 	# Attach stern hydrodynamic water wake
 	var wake_scene = preload("res://src/gameplay/vfx/boat_wake.tscn")
@@ -62,16 +80,16 @@ func _on_area_entered(area: Area3D) -> void:
 		die()
 
 ## Canonical damage entry point (Rule 2).
-func take_hit(amount: int, _source_info: String = "") -> void:
-	take_damage(amount)
-
-func take_damage(amount: int) -> void:
+func take_hit(amount: int, source_info: String = "") -> void:
 	if _is_dead:
 		return
-	current_hp = max(0, current_hp - amount)
-	_flash()
-	if current_hp <= 0:
-		die()
+	if health_component:
+		health_component.take_damage(amount, source_info)
+		if not _is_dead:
+			_flash()
+
+func take_damage(amount: int) -> void:
+	take_hit(amount, "")
 
 func _flash() -> void:
 	HitFlashComponent.flash_node(self, 0.065)

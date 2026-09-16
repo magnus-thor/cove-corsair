@@ -26,8 +26,11 @@ func _ready() -> void:
 	GameState.doubloons_changed.connect(_on_doubloons_changed)
 	GameState.multiplier_changed.connect(_on_multiplier_changed)
 	GameState.progress_changed.connect(_on_progress_changed)
-	GameState.boss_spawned_event.connect(_on_boss_spawned)
-	GameState.boss_health_changed.connect(_on_boss_health_changed)
+	
+	# Boss lifecycle events now come from EventBus (cross-boundary, Rule B)
+	if get_node_or_null("/root/EventBus"):
+		EventBus.boss_spawned_event.connect(_on_boss_spawned)
+		EventBus.boss_health_changed.connect(_on_boss_health_changed)
 	
 	# Set initial state
 	_displayed_gold = GameState.doubloons

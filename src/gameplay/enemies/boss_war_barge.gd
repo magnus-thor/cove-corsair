@@ -101,9 +101,9 @@ func _ready() -> void:
 			boss_sprite.pixel_size = 0.0021
 		_base_mesh_scale = boss_sprite.scale
 	
-	# Initial UI Trigger
-	GameState.boss_spawned_event.emit("Captain Ironjaw's War-Barge", max_hp)
-	GameState.boss_health_changed.emit(current_hp, max_hp)
+	# Initial UI Trigger — emitted on EventBus (cross-boundary, Rule B)
+	EventBus.boss_spawned_event.emit("Captain Ironjaw's War-Barge", max_hp)
+	EventBus.boss_health_changed.emit(current_hp, max_hp)
 
 	
 	if left_cannon_node: left_cannon_node.position = Vector3(-2.0, 0.5, 0.5)
@@ -579,7 +579,7 @@ func take_damage(amount: int) -> void:
 		
 	current_hp = max(0, current_hp - actual_damage)
 	print("[BOSS HIT] Captain Ironjaw's War-Barge took %d damage | HP: %d/%d" % [actual_damage, current_hp, max_hp])
-	GameState.boss_health_changed.emit(current_hp, max_hp)
+	EventBus.boss_health_changed.emit(current_hp, max_hp)
 	_flash_boss_main()
 	
 	if current_hp <= 0:
@@ -677,7 +677,7 @@ func boss_defeat() -> void:
 	tween.tween_interval(1.8)
 	tween.tween_callback(func():
 		GameState.is_game_active = false
-		GameState.level_completed.emit(GameState.doubloons, GameState.targets_destroyed)
+		EventBus.level_completed.emit(GameState.doubloons, GameState.targets_destroyed)
 		queue_free()
 	)
 

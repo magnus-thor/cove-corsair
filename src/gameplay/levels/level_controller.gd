@@ -96,6 +96,7 @@ func handle_player_defeat(coins_collected: int, distance_reached: float) -> void
 		
 	base_scroll_speed = 0.0
 	run_failed.emit(coins_collected, distance_reached)
+	EventBus.run_failed.emit(coins_collected, distance_reached)
 	
 	# 2. Wait for deceleration, then display Defeat Settlement Screen
 	await get_tree().create_timer(0.45, true, false, true).timeout
@@ -845,7 +846,7 @@ func _spawn_boss() -> void:
 		return
 	is_boss_spawned = true
 	GameState.boss_spawned = true
-	GameState.distance_target_reached.emit()
+	EventBus.distance_target_reached.emit()
 
 	var player   = get_tree().get_first_node_in_group("player")
 	var player_z = player.global_position.z if player else 0.0

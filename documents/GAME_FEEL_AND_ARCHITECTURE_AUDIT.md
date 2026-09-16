@@ -145,28 +145,29 @@ Below is the prioritized, actionable checklist organized into three phases.
 ### Phase 2: Architectural Decoupling & Blueprint Implementation
 *Refactoring the core communication pathways to align with `ARCHITECTURE.md` standards.*
 
-- [ ] **2.1 Implement `EventBus.gd` Autoload**
-  - Create `src/core/event_bus.gd` and register it in `project.godot`.
-  - Migrate global event broadcasts (`doubloons_changed`, `player_sunk`, `level_completed`, `screen_shake_requested`) from `GameState` to `EventBus`.
-  - Remove dead signals and `@warning_ignore("unused_signal")` from `GameState`.
-- [ ] **2.2 Implement `HealthComponent.gd` (Blueprint 1)**
-  - Create `src/components/health_component.gd` managing `current_health`, `max_health`, `take_damage()`, `heal()`, and emitting `health_changed`, `damage_taken`, `died`.
-  - Refactor `EnemyFodderSkiff`, `EnemyMob`, `DestructibleObstacle`, and `PlayerSwerve` to delegate HP and death tracking to `HealthComponent`.
-- [ ] **2.3 Implement Decoupled `Hitbox3D` & `Hurtbox3D` (Blueprint 2)**
-  - Create `src/components/hitbox_3d.gd` (deals damage, carries `damage_type`, `ammo_id`).
-  - Create `src/components/hurtbox_3d.gd` (receives damage, routes to `HealthComponent`).
-  - Eliminate string-based duck-typing (`has_method("take_hit")`, `has_method("take_damage")`, `has_method("die")`).
-- [ ] **2.4 Implement `BaseDestructible.gd` (Blueprint 3)**
-  - Create `src/components/base_destructible.gd` encapsulating:
-    - Automated immediate collision shutdown protocol (Rule D).
-    - Detached world VFX spawning via `VFXManager`.
-    - Clean signal emission (`destroyed(death_position)`).
-  - Refactor `DestructibleObstacle`, `BarricadeSegment`, and `HazardSeaMine` to inherit from or utilize `BaseDestructible`.
-- [ ] **2.5 Refactor `cannonball.gd` for SSOT Compliance (Rule C)**
-  - Strip enemy/boss name-checking (`"barricade"`, `"spectral"`, `"phantom"`) and interrupt logic out of `cannonball.gd`.
-  - Projectile simply calls `target.take_hit(damage, ammo_id)`. Targets evaluate their own vulnerabilities (e.g. barricades take 2x from `battering_shot`, ghosts react to `spectral_salt`).
-- [ ] **2.6 Refactor `hazard_sea_mine.gd` Detonation**
-  - Replace tree-wide node loops with an instantaneous Area3D detonation `Hitbox3D` that naturally hits overlapping hurtboxes on layer mask.
+- [x] **2.1 Implement `EventBus.gd` Autoload**
+  - Created `src/core/event_bus.gd` and registered in `project.godot`.
+  - Migrated global event broadcasts (`level_completed`, `campaign_completed`, `boss_spawned_event`, `boss_health_changed`, `distance_target_reached`, `player_sunk`, `run_failed`, `screen_shake_requested`) from `GameState` to `EventBus`.
+  - Removed 6 dead signals and all `@warning_ignore("unused_signal")` from `GameState`.
+  - Updated `top_hud.gd` (both variants) to connect boss signals from `EventBus`.
+- [x] **2.2 Implement `HealthComponent.gd` (Blueprint 1)**
+  - Created `src/components/health_component.gd` with `current_health`, `max_health`, `take_damage()`, `heal()`, `reset()`, emitting `health_changed`, `damage_taken`, `died`.
+  - Wired into `EnemyFodderSkiff`, `EnemyMob`, `DestructibleObstacle` with runtime fallback creation for scenes without a pre-placed node.
+  - Legacy `current_hp` reads kept as passthrough properties for backward compatibility.
+- [x] **2.3 Implement Decoupled `Hitbox3D` & `Hurtbox3D` (Blueprint 2)**
+  - Created `src/components/hitbox_3d.gd` with `damage`, `damage_type`, `one_shot` exports.
+  - Created `src/components/hurtbox_3d.gd` routing to `HealthComponent` with backward-compat `take_hit()` entry point.
+  - `HazardSeaMine._apply_blast_damage()` checks `area is Hurtbox3D` first before falling back.
+- [x] **2.4 Implement `BaseDestructible.gd` (Blueprint 3)**
+  - Created `src/components/base_destructible.gd` with automated collision shutdown (Rule D), world-space VFX spawn, `destroyed(death_position)` signal, and doubloon drop centralization.
+- [x] **2.5 Refactor `cannonball.gd` for SSOT Compliance (Rule C)**
+  - Stripped `is_barricade` 2× multiplier and `is_spectral` `interrupt_channel`/`is_barrage_active` mutations from `cannonball.gd`.
+  - Added ammo-aware `take_hit(amount, ammo_id)` to `BossPhantomDredge` (spectral_salt → 1.5× + `interrupt_channel()`).
+  - Added ammo-aware `take_hit(amount, ammo_id)` to `BarricadeSegment` (battering_shot → 2× damage).
+- [x] **2.6 Refactor `hazard_sea_mine.gd` Detonation**
+  - Replaced tree-wide `get_nodes_in_group("enemies")` loop with `get_overlapping_areas()` scan in `_apply_blast_damage()`.
+  - Eliminated all `area.current_hp -= 20` direct property mutations.
+  - Mine now routes blast through `Hurtbox3D.take_hit()` if available, falls back to `take_hit()/take_damage()`.
 
 ---
 
