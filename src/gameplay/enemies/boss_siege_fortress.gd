@@ -45,7 +45,7 @@ var _flash_tweens: Dictionary = {}
 @export var iron_gunner_scene: PackedScene = preload("res://src/gameplay/enemies/enemy_iron_gunner.tscn")
 @export var brimstone_raft_scene: PackedScene = preload("res://src/gameplay/enemies/enemy_brimstone_raft.tscn")
 @export var doubloon_scene: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
-@export var explosion_scene: PackedScene = preload("res://src/gameplay/vfx/barrel_explosion.tscn")
+@export var explosion_scene: PackedScene = preload("res://src/vfx/barrel_explosion.tscn")
 
 @onready var boss_sprite: Node3D = get_node_or_null("BossMesh") if get_node_or_null("BossMesh") else get_node_or_null("BossSprite")
 @onready var port_turret_node: Node3D = $PortTurret

@@ -34,7 +34,7 @@ const TRAIL_3D_SCENE: PackedScene = preload("res://src/vfx/trail_3d.tscn")
 var _trail = null
 
 ## Hit splash VFX to spawn on impact or expiration
-@export var hit_splash_scene: PackedScene = preload("res://src/gameplay/vfx/hit_splash.tscn")
+@export var hit_splash_scene: PackedScene = preload("res://src/vfx/hit_splash.tscn")
 
 ## Custom ammo data assigned at initialization (optional)
 var ammo_data: AmmoData:

@@ -1,6 +1,6 @@
 extends Node
 
-const TelegraphSpectralGeyserScript = preload("res://src/gameplay/vfx/telegraph_spectral_geyser.gd")
+const TelegraphSpectralGeyserScript = preload("res://src/vfx/telegraph_spectral_geyser.gd")
 const AttachedWeaponScript = preload("res://src/gameplay/player/attached_weapon.gd")
 const CannonballScript = preload("res://src/gameplay/projectiles/cannonball.gd")
 
@@ -25,7 +25,7 @@ func _test_phase_a_boss_dredge() -> void:
 	print("\n--- Testing Phase A: Phantom Dredge Boss & Telegraph ---")
 	
 	# 1. Telegraph Scene Verification
-	var tele_scene = load("res://src/gameplay/vfx/telegraph_spectral_geyser.tscn") as PackedScene
+	var tele_scene = load("res://src/vfx/telegraph_spectral_geyser.tscn") as PackedScene
 	assert(tele_scene != null, "Telegraph scene must exist")
 	var tele = tele_scene.instantiate()
 	add_child(tele)

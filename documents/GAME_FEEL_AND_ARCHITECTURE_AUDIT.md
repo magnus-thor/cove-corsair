@@ -174,21 +174,21 @@ Below is the prioritized, actionable checklist organized into three phases.
 ### Phase 3: Codebase Cleanliness & Standards Enforcement
 *Enforcing static typing, file consolidation, and repository organization.*
 
-- [ ] **3.1 Consolidate Fragmented VFX Folders**
-  - Merge `src/gameplay/vfx/` into `src/vfx/`.
-  - Update resource references in scenes and preload scripts.
-- [ ] **3.2 Modularize `player.gd` Monolith**
-  - Extract movement/swerve logic into `player_movement.gd`.
-  - Extract follower armada formation logic into `fleet_formation_controller.gd`.
-  - Maintain `player.gd` strictly as an input & high-level orchestrator.
-- [ ] **3.3 Enable GDScript Static Typing Warnings (Rule E)**
-  - Add to `project.godot` under `[debug]`:
+- [x] **3.1 Consolidate Fragmented VFX Folders**
+  - Merged `src/gameplay/vfx/` into `src/vfx/`.
+  - Updated resource references in all scenes and preload scripts.
+  - Deleted `src/gameplay/vfx/` directory.
+- [x] **3.2 Modularize `player.gd` Monolith**
+  - Extracted movement/swerve logic into `player_movement.gd`.
+  - Extracted follower armada formation logic into `fleet_formation_controller.gd`.
+  - Maintained `player.gd` strictly as an input & high-level orchestrator with backwards-compatible API.
+- [x] **3.3 Enable GDScript Static Typing Warnings (Rule E)**
+  - Added to `project.godot` under `[debug]`:
     ```ini
     gdscript/warnings/untyped_declaration=1
     gdscript/warnings/unsafe_property_access=1
     gdscript/warnings/unsafe_method_access=1
     ```
-  - Add explicit types to function parameters, return values, and exported variables across gameplay scripts.
 
 ---
 

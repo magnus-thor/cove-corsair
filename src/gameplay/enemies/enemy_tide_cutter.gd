@@ -8,7 +8,7 @@ extends Area3D
 @export var doubloons_drop: int = 4
 
 @export var doubloon_scene: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
-@export var explosion_scene: PackedScene = preload("res://src/gameplay/vfx/barrel_explosion.tscn")
+@export var explosion_scene: PackedScene = preload("res://src/vfx/barrel_explosion.tscn")
 
 @onready var sprite_node: Sprite3D = get_node_or_null("Sprite3D")
 @onready var collision_shape: CollisionShape3D = get_node_or_null("CollisionShape3D")
@@ -85,7 +85,7 @@ func take_damage(amount: int) -> void:
 	_update_health_bar()
 	_flash()
 	
-	var ft_script = load("res://src/gameplay/vfx/floating_text.gd")
+	var ft_script = load("res://src/vfx/floating_text.gd")
 	if ft_script:
 		var fct = ft_script.new()
 		var root = get_tree().current_scene

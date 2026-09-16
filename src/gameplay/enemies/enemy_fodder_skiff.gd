@@ -11,7 +11,7 @@ signal vessel_died(world_pos: Vector3)
 @export var forward_speed: float = 7.5
 @export var doubloons_drop: int = 0
 
-@export var explosion_scene: PackedScene = preload("res://src/gameplay/vfx/barrel_explosion.tscn")
+@export var explosion_scene: PackedScene = preload("res://src/vfx/barrel_explosion.tscn")
 
 @onready var sprite_node: Sprite3D = get_node_or_null("Sprite3D")
 @onready var collision_shape: CollisionShape3D = get_node_or_null("CollisionShape3D")
@@ -47,7 +47,7 @@ func _ready() -> void:
 		health_component.died.connect(die)
 	
 	# Attach stern hydrodynamic water wake
-	var wake_scene = preload("res://src/gameplay/vfx/boat_wake.tscn")
+	var wake_scene = preload("res://src/vfx/boat_wake.tscn")
 	if wake_scene:
 		var wake = wake_scene.instantiate()
 		add_child(wake)

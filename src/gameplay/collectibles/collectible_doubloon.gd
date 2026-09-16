@@ -19,7 +19,7 @@ extends Area3D
 @export var magnet_pull_speed: float = 22.0
 
 ## VFX scene spawned upon pickup
-@export var pickup_vfx_scene: PackedScene = preload("res://src/gameplay/vfx/coin_pickup_vfx.tscn")
+@export var pickup_vfx_scene: PackedScene = preload("res://src/vfx/coin_pickup_vfx.tscn")
 
 @onready var visual_container: Node3D = $Visuals
 

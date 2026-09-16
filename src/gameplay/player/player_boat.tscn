@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://src/gameplay/player/player.gd" id="1_script"]
 [ext_resource type="Resource" path="res://src/data/resources/user_vessels/dinghy_ship.tres" id="2_ship_data"]
 [ext_resource type="PackedScene" uid="uid://dqvdevegruw8w" path="res://assets/models/user/vessels/dinghy.glb" id="3_dinghy_mesh"]
-[ext_resource type="PackedScene" path="res://src/gameplay/vfx/boat_wake.tscn" id="4_wake"]
+[ext_resource type="PackedScene" path="res://src/vfx/boat_wake.tscn" id="4_wake"]
 [ext_resource type="ArrayMesh" path="res://assets/models/user/vessels/dinghy_cockpit_mask.tres" id="5_cockpit_mask"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_boat"]

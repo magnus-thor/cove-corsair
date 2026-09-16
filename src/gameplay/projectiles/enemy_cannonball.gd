@@ -137,7 +137,7 @@ func _on_hit(target: Node) -> void:
 				elif player.has_method("take_hit"):
 					player.take_hit(1, "enemy_cannonball")
 						
-		var splash_scene = preload("res://src/gameplay/vfx/hit_splash.tscn")
+		var splash_scene = preload("res://src/vfx/hit_splash.tscn")
 		if splash_scene:
 			var splash = splash_scene.instantiate() as Node3D
 			var root = get_tree().current_scene

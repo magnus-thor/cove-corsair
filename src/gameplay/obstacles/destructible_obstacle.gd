@@ -32,7 +32,7 @@ signal obstacle_destroyed(obstacle_type: ObstacleType, world_pos: Vector3)
 @export var coral_reef_tex: Texture2D = preload("res://assets/sprites/lane_objects/Indestructible Coral Reef.png")
 
 ## Barrel destruction explosion VFX to spawn when destroyed
-@export var barrel_explosion_scene: PackedScene = preload("res://src/gameplay/vfx/barrel_explosion.tscn")
+@export var barrel_explosion_scene: PackedScene = preload("res://src/vfx/barrel_explosion.tscn")
 
 @export var forward_speed: float = 0.0
 
@@ -144,7 +144,7 @@ func take_hit(amount: int, source_info: String = "") -> void:
 		# Sensory Polish: 3D & Sprite Hit Flash
 		HitFlashComponent.flash_node(self, 0.065)
 		# Spawn floating combat text
-		var ft_script = load("res://src/gameplay/vfx/floating_text.gd")
+		var ft_script = load("res://src/vfx/floating_text.gd")
 		if ft_script:
 			var fct = ft_script.new()
 			var root = get_tree().current_scene
@@ -248,7 +248,7 @@ func _apply_explosion_damage() -> void:
 	var dmg = 2
 	
 	# Spawn floating "+BOOM" text
-	var ft_script = load("res://src/gameplay/vfx/floating_text.gd")
+	var ft_script = load("res://src/vfx/floating_text.gd")
 	if ft_script:
 		var fct = ft_script.new()
 		var root = get_tree().current_scene

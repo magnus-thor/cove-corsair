@@ -29,7 +29,7 @@ extends Area3D
 
 ## Prefabs
 @export var doubloon_scene: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
-@export var barrel_explosion_scene: PackedScene = preload("res://src/gameplay/vfx/barrel_explosion.tscn")
+@export var barrel_explosion_scene: PackedScene = preload("res://src/vfx/barrel_explosion.tscn")
 @export var enemy_cannonball_scene: PackedScene = preload("res://src/gameplay/projectiles/enemy_cannonball.tscn")
 
 @onready var enemy_sprite: Sprite3D = $EnemySprite
@@ -79,7 +79,7 @@ func _ready() -> void:
 	_time = randf_range(0.0, TAU)
 	
 	# Attach stern hydrodynamic water wake
-	var wake_scene = preload("res://src/gameplay/vfx/boat_wake.tscn")
+	var wake_scene = preload("res://src/vfx/boat_wake.tscn")
 	if wake_scene:
 		var wake = wake_scene.instantiate()
 		add_child(wake)
@@ -261,7 +261,7 @@ func take_hit(amount: int, source_info: String = "") -> void:
 		_spawn_damage_text(amount)
 
 func _spawn_damage_text(amount: int) -> void:
-	var ft_script = load("res://src/gameplay/vfx/floating_text.gd")
+	var ft_script = load("res://src/vfx/floating_text.gd")
 	if ft_script:
 		var fct = ft_script.new()
 		var root = get_tree().current_scene

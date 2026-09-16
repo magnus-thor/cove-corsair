@@ -40,23 +40,6 @@ const DEFAULT_SOCKET_WEAPONS: Dictionary = {
 
 ## Width of the river channel boundaries.
 @export var river_width: float = 12.0
-## Half-width of the playable lane. Strictly bounds swerve to prevent steering into sand banks.
-@export var playable_half_width: float = 4.8
-
-## Touch/drag input sensitivity scaling factor.
-@export var sensitivity: float = 0.015
-
-## Keyboard movement speed in units per second.
-@export var keyboard_speed: float = 15.0
-
-## Interpolation speed for the horizontal translation. Higher values make the swerve more immediate.
-@export var lerp_speed: float = 12.0
-
-## Configurable floating and bobbing parameters
-@export var bob_frequency: float = 2.2
-@export var min_hover_height: float = 0.04
-@export var max_hover_height: float = 0.08
-@export var yaw_lerp_speed: float = 10.0
 
 ## The active ship tier
 @export var current_tier: int = 1
@@ -78,10 +61,9 @@ const DEFAULT_SOCKET_WEAPONS: Dictionary = {
 
 @onready var visuals: Node3D = $BoatVisuals
 
-var dragging: bool = false
-var target_x: float = 0.0
-var half_width: float = 0.0
-var float_time: float = 0.0
+# ── Module references (added as children in _ready) ────────────────────────
+var _movement: PlayerMovement = null
+var _fleet: FleetFormationController = null
 
 var max_health: int = 3
 var current_health: int = 3
@@ -90,7 +72,9 @@ var current_health: int = 3
 
 var equipped_weapons: Dictionary = {}
 @export var follower_scene: PackedScene = preload("res://src/gameplay/player/follower_boat.tscn")
-var follower_boats: Array[Node3D] = []
+var follower_boats: Array[Node3D]:
+	get:
+		return _fleet.get_followers() if _fleet else []
 var active_reef_overlaps: int = 0
 var scraping_timer: float = 0.0
 var speed_multiplier: float = 1.0
@@ -103,10 +87,7 @@ var hit_invulnerability_timer: float = 0.0
 var ram_absorb_charges_remaining: int = 1
 var fire_frenzy_timer: float = 0.0
 
-# Game Feel & Juice Dynamics (Phase 1)
-var _recoil_pitch: float = 0.0
-var _shudder_timer: float = 0.0
-var _shudder_roll: float = 0.0
+# Game Feel & Juice Dynamics (Phase 1) — particles owned here; recoil/shudder delegated to _movement
 var _bow_spray_particles: CPUParticles3D = null
 var _hull_smoke_particles: CPUParticles3D = null
 
@@ -122,8 +103,20 @@ var _hull_smoke_particles: CPUParticles3D = null
 func _ready() -> void:
 	_clean_shadow_nodes(self)
 	add_to_group("player")
-	target_x = global_position.x
-	half_width = playable_half_width if playable_half_width > 0.0 else (river_width / 2.0)
+
+	# Instantiate PlayerMovement module
+	_movement = PlayerMovement.new()
+	_movement.name = "PlayerMovement"
+	add_child(_movement)
+	_movement.setup(self, visuals)
+
+	# Instantiate FleetFormationController module
+	_fleet = FleetFormationController.new()
+	_fleet.name = "FleetFormationController"
+	_fleet.follower_scene = follower_scene
+	add_child(_fleet)
+	_fleet.setup(self)
+
 	if visuals:
 		visuals.rotation_degrees.y = 0.0
 	var init_hp = get_node_or_null("Hardpoints")
@@ -205,8 +198,8 @@ func apply_ship_data(data: ShipData) -> void:
 	current_health = data.max_health
 	if "fire_rate" in data:
 		shoot_cooldown = data.fire_rate
-	keyboard_speed = data.move_speed
-	lerp_speed = data.move_speed * 1.3
+	if _movement:
+		_movement.sync_from_ship_data(data.move_speed, data.move_speed * 1.3)
 	
 	if visuals:
 		var boat_mesh = visuals.get_node_or_null("BoatMesh")
@@ -353,9 +346,10 @@ func apply_tier(tier_level: int) -> void:
 	# Hull Tier Decoupling: scale Base Hull HP, Max Speed, and Firepower with Tier
 	max_health = ship_data.max_health + (tier_level - 1)
 	current_health = max_health
-	keyboard_speed = ship_data.move_speed + (tier_level - 1) * 1.5
-	lerp_speed = keyboard_speed * 1.3
+	var tier_speed: float = ship_data.move_speed + (tier_level - 1) * 1.5
 	tier_fire_rate_multiplier = 1.0 + (tier_level - 1) * 0.15
+	if _movement:
+		_movement.sync_from_ship_data(tier_speed, tier_speed * 1.3)
 	health_changed.emit(current_health, max_health)
 	player_health_changed.emit(current_health, max_health)
 
@@ -407,18 +401,8 @@ func apply_tier(tier_level: int) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if is_game_over:
 		return
-		
-	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_LEFT:
-			dragging = event.pressed
-	elif event is InputEventScreenTouch:
-		dragging = event.pressed
-	elif event is InputEventMouseMotion and dragging:
-		target_x += event.relative.x * sensitivity
-		target_x = clamp(target_x, -half_width, half_width)
-	elif event is InputEventScreenDrag:
-		target_x += event.relative.x * sensitivity
-		target_x = clamp(target_x, -half_width, half_width)
+	if _movement:
+		_movement.process_input(event)
 
 func _physics_process(delta: float) -> void:
 	if hit_invulnerability_timer > 0.0:
@@ -431,11 +415,11 @@ func _physics_process(delta: float) -> void:
 
 	if is_game_over:
 		return
-		
+
 	if is_calibration_mode:
 		_process_calibration_controls(delta)
 		return
-		
+
 	# Manage reef slow, scraping SFX, and wake spray
 	if active_reef_overlaps > 0:
 		speed_multiplier = 0.5
@@ -443,8 +427,7 @@ func _physics_process(delta: float) -> void:
 		if scraping_timer >= 0.25:
 			scraping_timer = 0.0
 			AudioManager.play_sfx("barrel_hits", 1.15, 1.35, -8.0) # Scrape sound
-			# Spawn water spray
-			var spray_scene = preload("res://src/gameplay/vfx/boat_wake.tscn")
+			var spray_scene = preload("res://src/vfx/boat_wake.tscn")
 			if spray_scene:
 				var spray = spray_scene.instantiate() as GPUParticles3D
 				get_parent().add_child(spray)
@@ -458,71 +441,39 @@ func _physics_process(delta: float) -> void:
 
 	# NOTE: distance tracking is owned solely by LevelController._physics_process.
 	# Do NOT call GameState.update_distance() here — it causes double-counting.
-		
+
 	if not GameState.is_game_active:
-		# Floating / Bobbing on water in calm harbor (facing forward upriver towards the horizon)
-		float_time += delta * bob_frequency
-		var idle_hover_height = lerp(min_hover_height, max_hover_height, (sin(float_time) + 1.0) * 0.5)
-		if visuals:
-			visuals.position.y = idle_hover_height
-			visuals.rotation_degrees.x = sin(float_time * 1.5) * 2.0
-			visuals.rotation_degrees.y = sin(float_time * 0.7) * 2.0
-			visuals.rotation_degrees.z = sin(float_time * 1.1) * 1.5
-			
-			var hardpoints = get_node_or_null("Hardpoints")
-			if hardpoints:
-				hardpoints.visible = false
-				hardpoints.position.y = visuals.position.y
-				hardpoints.rotation_degrees.x = visuals.rotation_degrees.x
-				hardpoints.rotation_degrees.y = visuals.rotation_degrees.y
-				hardpoints.rotation_degrees.z = visuals.rotation_degrees.z
+		# Idle bobbing in harbor — delegated to PlayerMovement
+		if _movement:
+			var idle_h: float = _movement.tick_idle(delta)
+			if visuals:
+				visuals.position.y = idle_h
+				visuals.rotation_degrees.x = sin(_movement.float_time * 1.5) * 2.0
+				visuals.rotation_degrees.y = sin(_movement.float_time * 0.7) * 2.0
+				visuals.rotation_degrees.z = sin(_movement.float_time * 1.1) * 1.5
+
+				var hardpoints: Node3D = get_node_or_null("Hardpoints")
+				if hardpoints:
+					hardpoints.visible = false
+					hardpoints.position.y = visuals.position.y
+					hardpoints.rotation_degrees.x = visuals.rotation_degrees.x
+					hardpoints.rotation_degrees.y = visuals.rotation_degrees.y
+					hardpoints.rotation_degrees.z = visuals.rotation_degrees.z
 		return
 
-	# 2. Keyboard fallback controls
-	var input_dir: float = 0.0
-	if Input.is_action_pressed("ui_left") or Input.is_key_pressed(KEY_A):
-		input_dir -= 1.0
-	if Input.is_action_pressed("ui_right") or Input.is_key_pressed(KEY_D):
-		input_dir += 1.0
-		
-	if input_dir != 0.0:
-		target_x += input_dir * keyboard_speed * speed_multiplier * delta
-		target_x = clamp(target_x, -half_width, half_width)
-		
-	# 3. Smooth swerve horizontal interpolation
-	var previous_x = position.x
-	position.x = lerp(position.x, target_x, lerp_speed * speed_multiplier * delta)
-	position.x = clamp(position.x, -half_width, half_width)
-	var x_velocity = (position.x - previous_x) / delta if delta > 0.0 else 0.0
-	
-	# 4. Dynamic Roll and Yaw Banking
-	var target_roll_deg = -clamp(x_velocity * 0.9, -15.0, 15.0)
-	var target_yaw_deg = -clamp(x_velocity * 0.45, -8.0, 8.0)
-	rotation_degrees.z = lerp(rotation_degrees.z, target_roll_deg, yaw_lerp_speed * delta)
-	rotation_degrees.y = lerp(rotation_degrees.y, target_yaw_deg, yaw_lerp_speed * delta)
-	
-	# 5. Floating / Bobbing on water + Firing Recoil + Impact Shudder
-	float_time += delta * bob_frequency
-	var hover_height = lerp(min_hover_height, max_hover_height, (sin(float_time) + 1.0) * 0.5)
-
-	# Smoothly decay firing recoil pitch back to neutral
-	_recoil_pitch = lerpf(_recoil_pitch, 0.0, delta * 9.0)
-
-	# Process violent kinetic impact shudder
-	if _shudder_timer > 0.0:
-		_shudder_timer -= delta
-		var shudder_prog = clampf(_shudder_timer / 0.25, 0.0, 1.0)
-		_shudder_roll = sin(_shudder_timer * 50.0) * shudder_prog * 6.5
-	else:
-		_shudder_roll = 0.0
+	# Delegate movement + banking + bobbing + recoil + shudder to PlayerMovement
+	var hover_height: float = _movement.min_hover_height if _movement else 0.04
+	if _movement:
+		hover_height = _movement.tick(delta, speed_multiplier)
 
 	if visuals:
 		visuals.position.y = hover_height
-		visuals.rotation_degrees.x = (sin(float_time * 1.5) * 2.0) + _recoil_pitch
-		visuals.rotation_degrees.y = 0.0
-		visuals.rotation_degrees.z = _shudder_roll
-		
-		var hardpoints = get_node_or_null("Hardpoints")
+		if _movement:
+			visuals.rotation_degrees.x = (sin(_movement.float_time * 1.5) * 2.0) + _movement.get_recoil_pitch()
+			visuals.rotation_degrees.y = 0.0
+			visuals.rotation_degrees.z = _movement.get_shudder_roll()
+
+		var hardpoints: Node3D = get_node_or_null("Hardpoints")
 		if hardpoints:
 			hardpoints.visible = true
 			hardpoints.position.x = visuals.position.x
@@ -533,21 +484,21 @@ func _physics_process(delta: float) -> void:
 			hardpoints.rotation_degrees.z = visuals.rotation_degrees.z
 
 	# Dynamic Hydrodynamic Bow Spray scaling with horizontal swerve velocity
-	if _bow_spray_particles:
-		var swerve_ratio = clampf(abs(x_velocity) / 3.5, 0.0, 1.0)
+	if _bow_spray_particles and _movement:
+		var swerve_ratio: float = clampf(abs(_movement.x_velocity) / 3.5, 0.0, 1.0)
 		if swerve_ratio > 0.15:
 			_bow_spray_particles.emitting = true
 			_bow_spray_particles.initial_velocity_min = 1.4 * swerve_ratio
 			_bow_spray_particles.initial_velocity_max = 3.2 * swerve_ratio
 		else:
 			_bow_spray_particles.emitting = false
-		
-	# 6. Automatic periodic cannon shooting
+
+	# Automatic periodic cannon shooting
 	if is_shooting_enabled:
 		for weapon in equipped_weapons.values():
 			if is_instance_valid(weapon) and weapon.has_method("try_fire"):
 				weapon.try_fire(delta * fire_rate_multiplier * tier_fire_rate_multiplier)
-			
+
 	move_and_slide()
 
 
@@ -568,7 +519,7 @@ func add_evolution_xp(_amount: float) -> void:
 	pass
 
 func spawn_floating_text_at_position(text_val: String, color_val: Color) -> void:
-	var ft_script = load("res://src/gameplay/vfx/floating_text.gd")
+	var ft_script = load("res://src/vfx/floating_text.gd")
 	if ft_script:
 		var fct = ft_script.new()
 		var root = get_tree().current_scene
@@ -587,7 +538,7 @@ func _on_fire_frenzy_triggered(duration: float) -> void:
 
 func damage_fleet(amount: int = 1, source_info: String = "poison_mortar_geyser") -> void:
 	GameState.record_hit()
-	if not follower_boats.is_empty():
+	if _fleet and _fleet.get_follower_count() > 0:
 		leak_threat(null)
 	else:
 		take_hit(amount, source_info)
@@ -614,7 +565,8 @@ func take_hit(amount: int = 1, source_info: String = "") -> void:
 		camera.add_trauma(0.55)
 
 	# Sensory Polish: 3D Hit Flash & Kinetic Hull Shudder
-	_shudder_timer = 0.25
+	if _movement:
+		_movement.apply_shudder()
 	if visuals:
 		HitFlashComponent.flash_node(visuals, 0.065)
 	_update_hull_distress_smoke()
@@ -626,7 +578,7 @@ func take_hit(amount: int = 1, source_info: String = "") -> void:
 		if AudioManager and AudioManager.has_method("set_low_hp_tension"):
 			AudioManager.set_low_hp_tension(false)
 
-	print("[PLAYER HIT] Vessel took %d dmg from '%s' | HP: %d/%d | Fleet: %d" % [amount, source_info, current_health, max_health, follower_boats.size() + 1])
+	print("[PLAYER HIT] Vessel took %d dmg from '%s' | HP: %d/%d | Fleet: %d" % [amount, source_info, current_health, max_health, (_fleet.get_follower_count() if _fleet else 0) + 1])
 	if current_health <= 0:
 		print("[FATAL DAMAGE] Killed by: %s | Damage: %d | Remaining HP: %d" % [source_info, amount, current_health])
 	health_changed.emit(current_health, max_health)
@@ -783,7 +735,8 @@ func _process_calibration_controls(delta: float) -> void:
 
 func _setup_calibration_mode() -> void:
 	position = Vector3.ZERO
-	target_x = 0.0
+	if _movement:
+		_movement.target_x = 0.0
 
 func clear_all_weapons() -> void:
 	clear_weapons()
@@ -864,37 +817,20 @@ func upgrade_crew() -> void:
 		spawn_floating_text_at_position("CREW FIRE RATE +25%!", Color(0.2, 1.0, 0.4))
 
 func add_follower_boat() -> void:
-	if follower_boats.size() >= 4:
-		return # strictly cap fleet size at 5 ships (1 player + 4 followers)
-	if not follower_scene:
-		return
-	var follower = follower_scene.instantiate() as Node3D
-	var parent = get_parent()
-	if parent:
-		parent.add_child(follower)
-		follower.global_position = global_position
-		follower.global_transform.basis = global_transform.basis
-		follower_boats.append(follower)
-		_update_follower_positions()
+	if _fleet:
+		_fleet.add_follower()
 
 func add_follower_boats(amount: int) -> void:
-	var can_add = 4 - follower_boats.size()
-	var to_add = min(amount, can_add)
-	for i in range(to_add):
-		add_follower_boat()
+	if _fleet:
+		_fleet.add_followers(amount)
 
 func multiply_follower_boats(multiplier: float) -> void:
-	var current_total = follower_boats.size() + 1
-	var new_total = int(round(current_total * multiplier))
-	new_total = min(new_total, 5)
-	var extra_needed = new_total - current_total
-	if extra_needed > 0:
-		add_follower_boats(extra_needed)
+	if _fleet:
+		_fleet.multiply_followers(multiplier)
 
 func remove_follower(follower: Node3D) -> void:
-	if follower in follower_boats:
-		follower_boats.erase(follower)
-		_update_follower_positions()
+	if _fleet:
+		_fleet.remove_follower(follower)
 
 func leak_threat(_threat_node: Node3D) -> void:
 	if is_game_over or not GameState.is_game_active:
@@ -916,20 +852,19 @@ func leak_threat(_threat_node: Node3D) -> void:
 	AudioManager.play_sfx("barrel_hits")
 	
 	# 4. Explode the outermost follower boat or damage player
-	if not follower_boats.is_empty():
-		var follower = follower_boats.back() # Outermost follower boat
-		if is_instance_valid(follower):
-			var spawn_pos = follower.global_position
+	var last_follower: Node3D = _fleet.get_last_follower() if _fleet else null
+	if last_follower and is_instance_valid(last_follower):
+		var spawn_pos: Vector3 = last_follower.global_position
 			
 			# Spawn water splashes
-			var splash_scene = preload("res://src/gameplay/vfx/hit_splash.tscn")
+			var splash_scene = preload("res://src/vfx/hit_splash.tscn")
 			if splash_scene:
 				var splash = splash_scene.instantiate() as Node3D
 				get_parent().add_child(splash)
 				splash.global_position = spawn_pos
 				
 			# Spawn bold floating label "-1 FLEET" at its position
-			var ft_script = load("res://src/gameplay/vfx/floating_text.gd")
+			var ft_script = load("res://src/vfx/floating_text.gd")
 			if ft_script:
 				var fct = ft_script.new()
 				var root = get_tree().current_scene
@@ -938,7 +873,7 @@ func leak_threat(_threat_node: Node3D) -> void:
 					fct.global_position = spawn_pos + Vector3(0.0, 1.5, 0.0)
 					fct.setup("-1 FLEET", Color(1.0, 0.1, 0.1))
 			
-			follower.destroy_follower()
+			last_follower.destroy_follower()
 	else:
 		# If no followers exist, inflict 1 point of Hull damage to the player.
 		# Spawn the floating label first so it's visible even if game_over fires.
@@ -946,12 +881,12 @@ func leak_threat(_threat_node: Node3D) -> void:
 		take_hit(1, "leak_threat")
 
 func add_follower_ships(amount: int) -> void:
-	var can_add = 4 - follower_boats.size()
-	var to_add = min(amount, can_add)
+	var can_add: int = FleetFormationController.MAX_FOLLOWERS - (_fleet.get_follower_count() if _fleet else 0)
+	var to_add: int = min(amount, can_add)
 	if to_add > 0:
-		add_follower_boats(to_add)
-		if has_method("spawn_floating_text_at_position"):
-			spawn_floating_text_at_position("+%d Ships!" % to_add, Color(0.1, 0.9, 1.0))
+		if _fleet:
+			_fleet.add_followers(to_add)
+		spawn_floating_text_at_position("+%d Ships!" % to_add, Color(0.1, 0.9, 1.0))
 	elif current_health < max_health:
 		current_health = min(max_health, current_health + 1)
 		health_changed.emit(current_health, max_health)
@@ -959,13 +894,12 @@ func add_follower_ships(amount: int) -> void:
 		_update_hull_distress_smoke()
 		if current_health > 1 and AudioManager and AudioManager.has_method("set_low_hp_tension"):
 			AudioManager.set_low_hp_tension(false)
-		if has_method("spawn_floating_text_at_position"):
-			spawn_floating_text_at_position("+HULL REPAIR!", Color(0.2, 1.0, 0.4))
+		spawn_floating_text_at_position("+HULL REPAIR!", Color(0.2, 1.0, 0.4))
 
 func trigger_armada_overdrive() -> void:
-	# 1. Add at most 1 bonus escort if under cap (no instant full armada in 1 gate)
-	if follower_boats.size() < 4:
-		add_follower_boat()
+	# 1. Add at most 1 bonus escort if under cap
+	if _fleet and _fleet.get_follower_count() < FleetFormationController.MAX_FOLLOWERS:
+		_fleet.add_follower()
 	# 2. Fully repair hull
 	if current_health < max_health:
 		current_health = max_health
@@ -980,14 +914,14 @@ func trigger_armada_overdrive() -> void:
 	timer.timeout.connect(func(): fire_rate_multiplier = 1.0)
 	# 4. Audiovisual feedback
 	AudioManager.play_sfx("coin_pickup", 1.3, 1.5)
-	if has_method("spawn_floating_text_at_position"):
-		spawn_floating_text_at_position("★ ARMADA OVERDRIVE! ★", Color(1.0, 0.85, 0.1))
+	spawn_floating_text_at_position("★ ARMADA OVERDRIVE! ★", Color(1.0, 0.85, 0.1))
 
 ## Firing recoil kick applied to the player vessel hull
 func apply_firing_recoil(impulse_degrees: float = 1.8, is_mortar: bool = false) -> void:
-	_recoil_pitch = clampf(_recoil_pitch + impulse_degrees, -4.0, 7.0)
+	if _movement:
+		_movement.apply_recoil(impulse_degrees)
 	if is_mortar:
-		var camera = get_tree().get_first_node_in_group("game_camera")
+		var camera: Node = get_tree().get_first_node_in_group("game_camera")
 		if camera and camera.has_method("add_trauma"):
 			camera.add_trauma(0.16)
 
@@ -1070,66 +1004,14 @@ func _update_hull_distress_smoke() -> void:
 			(_hull_smoke_particles.mesh.material as StandardMaterial3D).albedo_color = Color(0.12, 0.12, 0.12, 0.8)
 
 func get_fleet_offsets(size: int) -> Array[Vector3]:
-	match size:
-		1:
-			return [Vector3(0.0, 0.0, 0.0)]
-		2:
-			return [Vector3(-0.55, 0.0, 0.2), Vector3(0.55, 0.0, 0.2)]
-		3:
-			return [Vector3(0.0, 0.0, -0.35), Vector3(-0.65, 0.0, 0.35), Vector3(0.65, 0.0, 0.35)]
-		4:
-			return [Vector3(0.0, 0.0, -0.45), Vector3(-0.75, 0.0, 0.0), Vector3(0.75, 0.0, 0.0), Vector3(0.0, 0.0, 0.45)]
-		5:
-			return [Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, -0.55), Vector3(-0.75, 0.0, 0.0), Vector3(0.75, 0.0, 0.0), Vector3(0.0, 0.0, 0.55)]
-		_:
-			return [Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, -0.55), Vector3(-0.75, 0.0, 0.0), Vector3(0.75, 0.0, 0.0), Vector3(0.0, 0.0, 0.55)]
+	return _fleet.get_fleet_offsets(size) if _fleet else []
 
 func get_fleet_scale_factor(size: int) -> float:
-	match size:
-		1: return 1.0
-		2: return 0.80
-		3: return 0.68
-		4: return 0.58
-		5: return 0.50
-		_: return 0.50
+	return _fleet.get_fleet_scale_factor(size) if _fleet else 1.0
 
 func _update_follower_positions() -> void:
-	var size = follower_boats.size() + 1
-	var offsets = get_fleet_offsets(size)
-	var target_sf = get_fleet_scale_factor(size)
-	
-	var tween = create_tween().set_parallel(true)
-	
-	if visuals:
-		tween.tween_property(visuals, "position:x", offsets[0].x, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-		tween.tween_property(visuals, "position:z", offsets[0].z, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-		
-		var sprite = visuals.get_node_or_null("BoatSprite") as Sprite3D
-		if sprite:
-			tween.tween_property(sprite, "scale", Vector3.ONE * target_sf, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-			
-	var hardpoints = get_node_or_null("Hardpoints")
-	if hardpoints:
-		tween.tween_property(hardpoints, "position:x", offsets[0].x, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-		tween.tween_property(hardpoints, "position:z", offsets[0].z, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-		tween.tween_property(hardpoints, "scale", Vector3.ONE * target_sf, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-		
-	var body_col = get_node_or_null("CollisionShape3D") as CollisionShape3D
-	if body_col:
-		tween.tween_property(body_col, "scale", Vector3.ONE * target_sf, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-		
-	var area_col = get_node_or_null("CollisionArea/CollisionShape3D") as CollisionShape3D
-	if area_col:
-		tween.tween_property(area_col, "scale", Vector3.ONE * target_sf, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-			
-	for i in range(follower_boats.size()):
-		var follower = follower_boats[i]
-		if is_instance_valid(follower):
-			var f_offset = offsets[i + 1]
-			if follower.has_method("set_target_offset"):
-				follower.set_target_offset(f_offset)
-			if follower.has_method("tween_scale"):
-				follower.tween_scale(target_sf, 0.4)
+	if _fleet:
+		_fleet.update_formation()
 
 func _clean_shadow_nodes(node: Node) -> void:
 	if not node:

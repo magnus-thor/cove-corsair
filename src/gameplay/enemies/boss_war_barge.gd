@@ -29,7 +29,7 @@ var is_barrage_active: bool = false
 @export var powder_keg_scene: PackedScene = preload("res://src/gameplay/obstacles/destructible_barrel.tscn")
 @export var sea_mine_scene: PackedScene = preload("res://src/gameplay/obstacles/hazard_sea_mine.tscn")
 @export var doubloon_scene: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
-@export var explosion_scene: PackedScene = preload("res://src/gameplay/vfx/barrel_explosion.tscn")
+@export var explosion_scene: PackedScene = preload("res://src/vfx/barrel_explosion.tscn")
 @export var enemy_mob_scene: PackedScene = preload("res://src/gameplay/enemies/enemy_mob.tscn")
 
 @onready var left_cannon_node: Node3D = $LeftCannon

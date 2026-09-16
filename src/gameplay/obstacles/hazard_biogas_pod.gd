@@ -67,7 +67,7 @@ func explode_corrosive_cloud() -> void:
 	AudioManager.play_sfx("water_splashes", 0.7, 0.9, 1.0)
 	
 	# Spawn Floating Alert
-	var ft_script = load("res://src/gameplay/vfx/floating_text.gd")
+	var ft_script = load("res://src/vfx/floating_text.gd")
 	if ft_script:
 		var fct = ft_script.new()
 		var root = get_tree().current_scene

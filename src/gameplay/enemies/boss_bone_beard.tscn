@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://src/gameplay/enemies/boss_bone_beard.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://v00jmx7xnglw" path="res://assets/models/enemy/vessels/captain_bone-beard’s_twin_frigate.glb" id="2_frigate_mesh"]
 [ext_resource type="PackedScene" path="res://src/gameplay/collectibles/collectible_doubloon.tscn" id="3_doubloon"]
-[ext_resource type="PackedScene" path="res://src/gameplay/vfx/barrel_explosion.tscn" id="4_explosion"]
+[ext_resource type="PackedScene" path="res://src/vfx/barrel_explosion.tscn" id="4_explosion"]
 [ext_resource type="PackedScene" path="res://src/gameplay/obstacles/destructible_barrel.tscn" id="5_keg"]
 [ext_resource type="PackedScene" path="res://src/gameplay/projectiles/boss_projectile_twin_cannon_salvo.tscn" id="6_salvo"]
 

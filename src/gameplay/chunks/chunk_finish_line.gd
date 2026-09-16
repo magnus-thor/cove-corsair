@@ -2,7 +2,7 @@ class_name ChunkFinishLine
 extends BaseTrackChunk
 
 @export var doubloon_scene: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
-@export var explosion_scene: PackedScene = preload("res://src/gameplay/vfx/barrel_explosion.tscn")
+@export var explosion_scene: PackedScene = preload("res://src/vfx/barrel_explosion.tscn")
 
 @onready var finish_trigger: Area3D = get_node_or_null("FinishTrigger")
 

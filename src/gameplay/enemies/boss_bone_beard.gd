@@ -14,7 +14,7 @@ enum State { APPROACHING, COMBAT, DYING }
 @export var max_active_adds: int = 2
 
 @export var doubloon_scene: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
-@export var explosion_scene: PackedScene = preload("res://src/gameplay/vfx/barrel_explosion.tscn")
+@export var explosion_scene: PackedScene = preload("res://src/vfx/barrel_explosion.tscn")
 @export var powder_keg_scene: PackedScene = preload("res://src/gameplay/obstacles/destructible_barrel.tscn")
 @export var twin_salvo_scene: PackedScene = preload("res://src/gameplay/projectiles/boss_projectile_twin_cannon_salvo.tscn")
 

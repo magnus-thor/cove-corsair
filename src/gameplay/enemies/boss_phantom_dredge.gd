@@ -40,8 +40,8 @@ var _flash_tween: Tween
 @export var tide_cutter_scene: PackedScene = preload("res://src/gameplay/enemies/enemy_tide_cutter.tscn")
 @export var biogas_pod_scene: PackedScene = preload("res://src/gameplay/obstacles/hazard_biogas_pod.tscn")
 @export var doubloon_scene: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
-@export var explosion_scene: PackedScene = preload("res://src/gameplay/vfx/barrel_explosion.tscn")
-@export var telegraph_geyser_scene: PackedScene = preload("res://src/gameplay/vfx/telegraph_spectral_geyser.tscn")
+@export var explosion_scene: PackedScene = preload("res://src/vfx/barrel_explosion.tscn")
+@export var telegraph_geyser_scene: PackedScene = preload("res://src/vfx/telegraph_spectral_geyser.tscn")
 
 @onready var visual_container: Node3D = get_node_or_null("VisualContainer") if get_node_or_null("VisualContainer") else get_node_or_null("BossSprite")
 @onready var hit_box: Area3D = $HitBox
@@ -432,7 +432,7 @@ func take_damage(amount: int) -> void:
 	EventBus.boss_health_changed.emit(current_hp, max_hp)
 	_flash_boss()
 	
-	var ft_script = load("res://src/gameplay/vfx/floating_text.gd")
+	var ft_script = load("res://src/vfx/floating_text.gd")
 	if ft_script:
 		var fct = ft_script.new()
 		var root = get_tree().current_scene

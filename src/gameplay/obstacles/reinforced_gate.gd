@@ -55,7 +55,7 @@ func _physics_process(_delta: float) -> void:
 
 func collapse_gate() -> void:
 	_collapsed = true
-	var explosion_scene = preload("res://src/gameplay/vfx/barrel_explosion.tscn")
+	var explosion_scene = preload("res://src/vfx/barrel_explosion.tscn")
 	for child in get_children():
 		if is_instance_valid(child) and child != lock_segment:
 			if explosion_scene:

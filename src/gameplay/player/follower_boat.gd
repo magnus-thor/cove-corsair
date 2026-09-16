@@ -92,7 +92,7 @@ func _ready() -> void:
 				bow.scale = Vector3.ONE * sf
 
 	# Attach stern hydrodynamic water wake
-	var wake_scene = preload("res://src/gameplay/vfx/boat_wake.tscn")
+	var wake_scene = preload("res://src/vfx/boat_wake.tscn")
 	if wake_scene:
 		var wake = wake_scene.instantiate()
 		add_child(wake)
