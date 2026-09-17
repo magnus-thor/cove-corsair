@@ -439,28 +439,25 @@ func _fire_warning_shot() -> void:
 	
 	if enemy_cannonball_scene:
 		AudioManager.play_sfx("cannon_shots", 0.9, 1.1)
-		var ball := enemy_cannonball_scene.instantiate() as Area3D
-		var root := get_tree().current_scene
-		if root:
+		var ball := enemy_cannonball_scene.instantiate() as EnemyCannonball
+		var root: Node = get_tree().current_scene
+		if root and ball:
 			root.add_child(ball)
-		ball.global_position = spawn_pos
-		ball.rotation = rotation
-		
-		var player := get_tree().get_first_node_in_group("player")
-		var fire_dir := Vector3(0, 0, 1)
-		if player and is_instance_valid(player):
-			var to_player: Vector3 = (player.global_position - ball.global_position)
-			to_player.y = 0.0
-			if to_player.length_squared() > 0.01:
-				fire_dir = to_player.normalized()
-				if fire_dir.z < 0.1:
-					fire_dir.z = 0.4
-					fire_dir = fire_dir.normalized()
-		if ball.has_method("setup"):
+			ball.global_position = spawn_pos
+			ball.rotation = rotation
+			
+			var player := get_tree().get_first_node_in_group("player") as Node3D
+			var fire_dir := Vector3(0, 0, 1)
+			if player and is_instance_valid(player):
+				var to_player: Vector3 = (player.global_position - ball.global_position)
+				to_player.y = 0.0
+				if to_player.length_squared() > 0.01:
+					fire_dir = to_player.normalized()
+					if fire_dir.z < 0.1:
+						fire_dir.z = 0.4
+						fire_dir = fire_dir.normalized()
 			ball.setup(fire_dir, null, null)
-		if "direction" in ball:
 			ball.direction = fire_dir
-		if "speed" in ball:
 			ball.speed = 18.0
 
 func _fire_cannon_volley() -> void:

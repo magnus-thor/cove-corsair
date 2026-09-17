@@ -22,7 +22,6 @@ var current_phase: int = 1
 var combat_time: float = 0.0
 var _target_z: float = -18.0
 var _weave_time: float = 0.0
-var _attack_timer: float = 0.0
 var _submerge_timer: float = 0.0
 var _submerge_duration: float = 3.2
 var _minion_timer: float = 0.0

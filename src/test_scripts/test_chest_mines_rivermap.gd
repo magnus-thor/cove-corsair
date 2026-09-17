@@ -1,3 +1,9 @@
+@tool
+# Turn off untyped warnings specifically for test harnesses:
+@warning_ignore("untyped_declaration")
+@warning_ignore("unsafe_property_access")
+@warning_ignore("unsafe_method_access")
+@warning_ignore("unsafe_cast")
 extends Node3D
 
 const ChestPickupScript = preload("res://src/gameplay/collectibles/chest_pickup.gd")

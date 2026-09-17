@@ -928,7 +928,7 @@ func apply_firing_recoil(impulse_degrees: float = 1.8, is_mortar: bool = false) 
 	if is_mortar:
 		var camera: Node = get_tree().get_first_node_in_group("game_camera")
 		if camera and camera.has_method("add_trauma"):
-			camera.add_trauma(0.16)
+			camera.call("add_trauma", 0.16)
 
 func _setup_hydrodynamic_particles() -> void:
 	if _bow_spray_particles == null:
@@ -1034,10 +1034,11 @@ func _clean_shadow_nodes(node: Node) -> void:
 			return
 			
 	if node is MeshInstance3D:
+		var mi := node as MeshInstance3D
 		if "shadow" in lower_name or "plane" in lower_name or "billboard" in lower_name or "card" in lower_name:
-			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-			node.visible = false
-			node.queue_free()
+			mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			mi.visible = false
+			mi.queue_free()
 			return
 			
 	for child in node.get_children():

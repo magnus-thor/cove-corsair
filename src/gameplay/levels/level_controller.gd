@@ -121,8 +121,8 @@ func setup_active_queue() -> void:
 			if te != null:
 				active_queue.append(te)
 		active_queue.sort_custom(func(a: Variant, b: Variant) -> bool:
-			var da: float = float(a.trigger_distance if "trigger_distance" in a else a.get("distance", 0.0))
-			var db: float = float(b.trigger_distance if "trigger_distance" in b else b.get("distance", 0.0))
+			var da: float = float(a.trigger_distance if "trigger_distance" in a else (a["distance"] if (a is Dictionary and "distance" in a) else 0.0))
+			var db: float = float(b.trigger_distance if "trigger_distance" in b else (b["distance"] if (b is Dictionary and "distance" in b) else 0.0))
 			return da < db
 		)
 	elif "wave_events" in level_data and not (level_data.get("wave_events") as Array).is_empty():
@@ -134,11 +134,11 @@ func setup_active_queue() -> void:
 	# Suppress multiplier gates on the final 30% immediately preceding boss encounter (buffer zone)
 	var gate_suppression_dist := 250.0 * 0.70 # 175.0m
 	active_queue = active_queue.filter(func(ev: Variant) -> bool:
-		var dist: float = float(ev.trigger_distance if "trigger_distance" in ev else ev.get("distance", 0.0))
+		var dist: float = float(ev.trigger_distance if "trigger_distance" in ev else (ev["distance"] if (ev is Dictionary and "distance" in ev) else 0.0))
 		var is_gate := false
 		if ev is SpawnEvent and ev.entity_type == SpawnEvent.EntityType.MULTIPLIER_GATE:
 			is_gate = true
-		elif typeof(ev) == TYPE_DICTIONARY and ev.get("type", "") == "gate":
+		elif ev is Dictionary and str(ev.get("type", "")) == "gate":
 			is_gate = true
 		if is_gate and dist >= gate_suppression_dist:
 			print("[LEVEL CONTROLLER] Suppressed multiplier gate at %.1fm (final 30%% before boss)" % dist)
@@ -287,7 +287,7 @@ func _physics_process(delta: float) -> void:
 	# ── Deterministic wave event dispatch ─────────────────────────────────────
 	while not active_queue.is_empty():
 		var first: Variant = active_queue[0]
-		var dist: float = first.trigger_distance if "trigger_distance" in first else float(first.get("distance", 0.0))
+		var dist: float = first.trigger_distance if "trigger_distance" in first else float(first["distance"] if (first is Dictionary and "distance" in first) else 0.0)
 		if current_distance >= dist:
 			var event: Variant = active_queue.pop_front()
 			if event is SpawnEvent or (typeof(event) == TYPE_DICTIONARY and "entity_type" in event):
@@ -533,7 +533,7 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 				gate.custom_text = gate_text
 				gate.gate_action = gate_action
 				gate.value = gate_val
-				gate.operation = 0  # ADD
+				gate.operation = MultiplierGate.OperationType.ADD
 				print("[GATE] Spawned +", gate_val, " gate at ", current_distance, "m")
 
 		# ── Biogas Pod (Level 2) ──────────────────────────────────────────────
@@ -875,11 +875,12 @@ func _spawn_boss() -> void:
 				boss.set("max_hp", b_hp)
 				boss.set("current_hp", b_hp)
 			if boss is BossSiegeFortress:
+				var sf := boss as BossSiegeFortress
 				var scale_factor: float = float(b_hp) / 800.0
-				boss.hp_port_turret = int(round(150.0 * scale_factor))
-				boss.hp_starboard_turret = int(round(150.0 * scale_factor))
-				boss.hp_prow_ram = int(round(150.0 * scale_factor))
-				boss.hp_furnace_core = b_hp - (boss.hp_port_turret + boss.hp_starboard_turret + boss.hp_prow_ram)
+				sf.hp_port_turret = int(round(150.0 * scale_factor))
+				sf.hp_starboard_turret = int(round(150.0 * scale_factor))
+				sf.hp_prow_ram = int(round(150.0 * scale_factor))
+				sf.hp_furnace_core = b_hp - (sf.hp_port_turret + sf.hp_starboard_turret + sf.hp_prow_ram)
 		var main_root := get_tree().current_scene
 		if main_root:
 			main_root.add_child(boss)

@@ -22,7 +22,7 @@ signal off_screen(segment: TrackSegment)
 var level_config_data: Dictionary = {}
 
 func _ready() -> void:
-	var notifier = get_node_or_null("VisibleOnScreenNotifier3D") as VisibleOnScreenNotifier3D
+	var notifier: VisibleOnScreenNotifier3D = get_node_or_null("VisibleOnScreenNotifier3D") as VisibleOnScreenNotifier3D
 	if notifier:
 		notifier.screen_exited.connect(_on_screen_exited)
 	
@@ -55,7 +55,7 @@ func recycle_segment() -> void:
 ## Clean up all obstacle and enemy nodes from this segment
 func clear_obstacles() -> void:
 	if obstacles_container:
-		for child in obstacles_container.get_children():
+		for child: Node in obstacles_container.get_children():
 			obstacles_container.remove_child(child)
 			child.queue_free()
 
@@ -70,32 +70,32 @@ func spawn_obstacles() -> void:
 	if GameState.current_level in [1, 2, 3, 4, 5, 6] or level_config_data.get("is_scripted", false) or GameState.get_current_level_resource() != null:
 		return
 		
-	var player = get_tree().get_first_node_in_group("player")
-	if player and "is_calibration_mode" in player and player.is_calibration_mode:
+	var player: Node3D = get_tree().get_first_node_in_group("player") as Node3D
+	if player and "is_calibration_mode" in player and player.get("is_calibration_mode") == true:
 		return
 		
-	var player_z = player.global_position.z if player else 0.0
-	var min_safe_z = player_z - 45.0 # Never spawn within 45m ahead of the player vessel
+	var player_z: float = player.global_position.z if player else 0.0
+	var min_safe_z: float = player_z - 45.0 # Never spawn within 45m ahead of the player vessel
 		
-	var level_idx = int(level_config_data.get("level_index", 1))
+	var level_idx: int = int(level_config_data.get("level_index", 1))
 	var rarities: Array = level_config_data.get("obstacle_rarities_allowed", ["common"])
 	var is_boss: bool = level_config_data.get("is_boss_level", false) == true
 	
 	# Determine barrel count based on level index and boss status
-	var count = randi_range(2, 2 + int(level_idx / 3.0))
+	var count: int = randi_range(2, 2 + int(level_idx / 3.0))
 	if is_boss:
 		count += 1
 		
-	var base_min_hp = 2 + int(level_idx * 0.5)
-	var base_max_hp = 3 + level_idx
+	var base_min_hp: int = 2 + int(level_idx * 0.5)
+	var base_max_hp: int = 3 + level_idx
 	
-	for i in range(count):
-		var rand_z = -randf_range(5.0, segment_length - 5.0)
-		var world_z = global_position.z + rand_z
+	for i: int in range(count):
+		var rand_z: float = -randf_range(5.0, segment_length - 5.0)
+		var world_z: float = global_position.z + rand_z
 		if world_z > min_safe_z:
 			continue # Enforce minimum safe distance from player vessel
 			
-		var barrel = barrel_prefab.instantiate() as Area3D
+		var barrel: Area3D = barrel_prefab.instantiate() as Area3D
 		if not barrel:
 			continue
 			
@@ -103,88 +103,89 @@ func spawn_obstacles() -> void:
 		
 		# Boss Level Special Handling for first obstacle
 		if is_boss and i == 0:
-			barrel.hp = 12 + level_idx * 2
+			barrel.set("hp", 12 + level_idx * 2)
 			barrel.scale = Vector3(1.75, 1.75, 1.75)
 			barrel.position = Vector3(0.0, 0.0, -30.0)
 			if "obstacle_type" in barrel:
-				barrel.obstacle_type = DestructibleObstacle.ObstacleType.CORAL_REEF
+				barrel.set("obstacle_type", DestructibleObstacle.ObstacleType.CORAL_REEF)
 			continue
 			
 		# Regular / Rare barrel generation
-		var hp_mult = 1.0
+		var hp_mult: float = 1.0
 		if "rare" in rarities and randf() < 0.25:
 			hp_mult = 2.0
 		elif "normal" in rarities and randf() < 0.40:
 			hp_mult = 1.5
 			
-		barrel.hp = int(randi_range(base_min_hp, base_max_hp) * hp_mult)
+		barrel.set("hp", int(randi_range(base_min_hp, base_max_hp) * hp_mult))
 		
 		# Pick obstacle visual variant based on HP and rarity
 		if "obstacle_type" in barrel:
-			if barrel.hp >= 8:
-				barrel.obstacle_type = DestructibleObstacle.ObstacleType.CORAL_REEF
-			elif barrel.hp >= 6:
-				barrel.obstacle_type = DestructibleObstacle.ObstacleType.RUNE_BARREL
-			elif barrel.hp >= 4:
-				barrel.obstacle_type = DestructibleObstacle.ObstacleType.FUSE_BARREL
+			var b_hp: int = int(barrel.get("hp"))
+			if b_hp >= 8:
+				barrel.set("obstacle_type", DestructibleObstacle.ObstacleType.CORAL_REEF)
+			elif b_hp >= 6:
+				barrel.set("obstacle_type", DestructibleObstacle.ObstacleType.RUNE_BARREL)
+			elif b_hp >= 4:
+				barrel.set("obstacle_type", DestructibleObstacle.ObstacleType.FUSE_BARREL)
 			elif randf() < 0.2:
-				barrel.obstacle_type = DestructibleObstacle.ObstacleType.SEA_MINE
+				barrel.set("obstacle_type", DestructibleObstacle.ObstacleType.SEA_MINE)
 			else:
-				barrel.obstacle_type = DestructibleObstacle.ObstacleType.WOODEN_BARREL
+				barrel.set("obstacle_type", DestructibleObstacle.ObstacleType.WOODEN_BARREL)
 				
-		var lane_x = randf_range(-4.5, 4.5)
+		var lane_x: float = randf_range(-4.5, 4.5)
 		barrel.position = Vector3(lane_x, 0.0, rand_z)
 
 	# Dynamic enemy mob spawning based on level difficulty
-	var enemy_mob_count = 0
+	var enemy_mob_count: int = 0
 	if level_idx >= 2:
 		enemy_mob_count = randi_range(1, 2)
 	if level_idx >= 5:
 		enemy_mob_count = randi_range(2, 3)
 		
-	var enemy_types = ["skeleton_rower"]
+	var enemy_types: Array[String] = ["skeleton_rower"]
 	if level_idx >= 3:
 		enemy_types.append("goblin_skiff")
 	if level_idx >= 5:
 		enemy_types.append("turtle_raft")
 
-	var enemy_res_map = {
+	var enemy_res_map: Dictionary = {
 		"skeleton_rower": "res://src/data/resources/enemy_vessels/skeleton_rower.tres",
 		"raider_skiff": "res://src/data/resources/enemy_vessels/raider_skiff.tres",
 		"goblin_skiff": "res://src/data/resources/enemy_vessels/raider_skiff.tres",
 		"turtle_raft": "res://src/data/resources/enemy_vessels/turtle_raft.tres"
 	}
 		
-	for e in range(enemy_mob_count):
-		var rand_z = -randf_range(8.0, segment_length - 8.0)
-		var world_z = global_position.z + rand_z
+	for e: int in range(enemy_mob_count):
+		var rand_z: float = -randf_range(8.0, segment_length - 8.0)
+		var world_z: float = global_position.z + rand_z
 		if world_z > min_safe_z:
 			continue # Enforce minimum safe distance from player vessel
 			
 		if enemy_mob_prefab:
-			var enemy = enemy_mob_prefab.instantiate() as Area3D
+			var enemy: Area3D = enemy_mob_prefab.instantiate() as Area3D
 			if enemy:
 				obstacles_container.add_child(enemy)
-				var chosen_type = enemy_types.pick_random()
+				var chosen_type: String = enemy_types.pick_random()
 				if enemy_res_map.has(chosen_type):
-					var res = load(enemy_res_map[chosen_type]) as EnemyData
+					var res: EnemyData = load(enemy_res_map[chosen_type]) as EnemyData
 					if res and enemy.has_method("apply_enemy_data"):
-						enemy.apply_enemy_data(res)
+						enemy.call("apply_enemy_data", res)
 				elif "mob_type" in enemy:
-					enemy.mob_type = chosen_type
+					enemy.set("mob_type", chosen_type)
 				
-				var lane_x = randf_range(-3.8, 3.8)
+				var lane_x: float = randf_range(-3.8, 3.8)
 				enemy.position = Vector3(lane_x, 0.0, rand_z)
 
 ## Spawns Multiplier Gates on this segment according to level config frequency
 func spawn_gates() -> void:
-	var gates_container = get_node_or_null("Gates")
+	var gates_container: Node3D = get_node_or_null("Gates") as Node3D
 	if not gates_container:
 		gates_container = Node3D.new()
 		gates_container.name = "Gates"
 		add_child(gates_container)
 		
-	for child in gates_container.get_children():
+	for child: Node in gates_container.get_children():
 		gates_container.remove_child(child)
 		child.queue_free()
 
@@ -192,11 +193,11 @@ func spawn_gates() -> void:
 ## Each zone may spawn a sand/rock shoal base (with optional palm), plus a dock
 ## ruin accent prop (30 % chance) to create an organic, jagged shoreline.
 func spawn_scenery() -> void:
-	var scenery_container = get_node_or_null("Scenery")
+	var scenery_container: Node3D = get_node_or_null("Scenery") as Node3D
 	if not scenery_container:
 		return
 		
-	for child in scenery_container.get_children():
+	for child: Node in scenery_container.get_children():
 		scenery_container.remove_child(child)
 		child.queue_free()
 
@@ -211,14 +212,14 @@ func spawn_scenery() -> void:
 		"res://assets/models/structure.glb",
 	]
 
-	var zones := [
+	var zones: Array[Vector2] = [
 		Vector2(-40.0, -32.5),
 		Vector2(-32.5, -25.0),
 		Vector2(-25.0, -17.5),
 		Vector2(-17.5, -10.0)
 	]
 	
-	for zone in zones:
+	for zone: Vector2 in zones:
 		var shore := randi() % 3
 		if shore == 0:
 			continue
@@ -236,7 +237,7 @@ func spawn_scenery() -> void:
 		
 		# ── Shoal base (sand island or rock cluster) ──────────────────────────
 		var base_path := sand_island_path if randf() < 0.5 else rock_island_path
-		var base_scene := load(base_path)
+		var base_scene: PackedScene = load(base_path) as PackedScene
 		if base_scene:
 			var base_inst := base_scene.instantiate() as Node3D
 			scenery_container.add_child(base_inst)
@@ -248,7 +249,7 @@ func spawn_scenery() -> void:
 			# Palm on shoal (60 % chance)
 			if randf() < 0.6:
 				var palm_path := palm_straight_path if randf() < 0.5 else palm_bend_path
-				var palm_scene := load(palm_path)
+				var palm_scene: PackedScene = load(palm_path) as PackedScene
 				if palm_scene:
 					var palm_inst := palm_scene.instantiate() as Node3D
 					base_inst.add_child(palm_inst)
@@ -263,7 +264,7 @@ func spawn_scenery() -> void:
 		# ── Dock ruins accent prop (30 % chance) ──────────────────────────────
 		if randf() < 0.30:
 			var ruin_path: String = dock_ruin_paths[randi() % dock_ruin_paths.size()]
-			var ruin_scene := load(ruin_path)
+			var ruin_scene: PackedScene = load(ruin_path) as PackedScene
 			if ruin_scene:
 				var ruin_inst := ruin_scene.instantiate() as Node3D
 				scenery_container.add_child(ruin_inst)
@@ -278,11 +279,12 @@ func _clean_shadow_nodes(node: Node) -> void:
 	if not node:
 		return
 		
-	if node is MeshInstance3D or node is Sprite3D or node is GeometryInstance3D:
-		node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	if node is GeometryInstance3D:
+		var geom := node as GeometryInstance3D
+		geom.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		
-	var lower_name = node.name.to_lower()
-	var is_shadow_node = false
+	var lower_name: String = node.name.to_lower()
+	var is_shadow_node: bool = false
 	if "shadow" in lower_name or "decal" in lower_name or "projector" in lower_name or "card" in lower_name or "oblate" in lower_name or "shadow_sphere" in lower_name or "sphere_shadow" in lower_name or "quad" in lower_name or "dark" in lower_name:
 		is_shadow_node = true
 		
@@ -290,7 +292,7 @@ func _clean_shadow_nodes(node: Node) -> void:
 		node.queue_free()
 		return
 			
-	for child in node.get_children():
+	for child: Node in node.get_children():
 		_clean_shadow_nodes(child)
 
 # ── Navigable corridor clearance enforcement ──────────────────────────────────

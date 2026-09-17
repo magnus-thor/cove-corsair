@@ -44,7 +44,11 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if not GameState.is_game_active or get_tree().paused:
 		return
-	if event.is_action_pressed("ui_cancel") or (event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_P):
+	var is_p_pressed: bool = false
+	if event is InputEventKey:
+		var key_ev := event as InputEventKey
+		is_p_pressed = key_ev.pressed and not key_ev.echo and key_ev.keycode == KEY_P
+	if event.is_action_pressed("ui_cancel") or is_p_pressed:
 		get_viewport().set_input_as_handled()
 		_on_pause_button_pressed()
 
@@ -53,9 +57,9 @@ func _on_pause_button_pressed() -> void:
 		return
 	if AudioManager and AudioManager.has_method("play_sfx"):
 		AudioManager.play_sfx("gate_passes")
-	var pause_scene := preload("res://src/ui/pause_menu.tscn")
+	var pause_scene: PackedScene = preload("res://src/ui/pause_menu.tscn")
 	if pause_scene:
-		var pause_menu := pause_scene.instantiate()
+		var pause_menu: Node = pause_scene.instantiate()
 		get_parent().add_child(pause_menu)
 
 func _on_boss_spawned(boss_name: String, max_hp: int) -> void:
@@ -66,7 +70,7 @@ func _on_boss_spawned(boss_name: String, max_hp: int) -> void:
 	if level_progress_bar:
 		level_progress_bar.max_value = max_hp
 		level_progress_bar.value = max_hp
-		var red_fill := StyleBoxFlat.new()
+		var red_fill: StyleBoxFlat = StyleBoxFlat.new()
 		red_fill.bg_color = Color(0.95, 0.15, 0.15)
 		red_fill.corner_radius_top_left = 7
 		red_fill.corner_radius_top_right = 7
@@ -101,12 +105,12 @@ func _on_doubloons_changed(new_amount: int) -> void:
 	# Punch scale on gold panel
 	if gold_container:
 		gold_container.pivot_offset = gold_container.size * 0.5
-		var scale_tween := create_tween().set_parallel(false)
+		var scale_tween: Tween = create_tween().set_parallel(false)
 		scale_tween.tween_property(gold_container, "scale", Vector2(1.2, 1.2), 0.08).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		scale_tween.tween_property(gold_container, "scale", Vector2.ONE, 0.15).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
 		
 	# Smooth count-up / count-down tween
-	var start_gold := _displayed_gold
+	var start_gold: int = _displayed_gold
 	_gold_tween.tween_method(func(val: int) -> void:
 		_displayed_gold = val
 		gold_label.text = str(val)
@@ -127,8 +131,8 @@ func _on_multiplier_changed(val: float, mode: String) -> void:
 func _update_multiplier_text(val: float, mode: String) -> void:
 	if not multiplier_label:
 		return
-	var prefix := "+" if mode == "+" else "x"
-	var val_str := str(int(val)) if val == int(val) else "%.1f" % val
+	var prefix: String = "+" if mode == "+" else "x"
+	var val_str: String = str(int(val)) if val == int(val) else "%.1f" % val
 	multiplier_label.text = prefix + val_str
 
 func _on_progress_changed(current: float, total: float) -> void:

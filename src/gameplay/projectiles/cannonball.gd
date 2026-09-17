@@ -68,7 +68,8 @@ func attach_fire_trail() -> void:
 
 func _detach_trail() -> void:
 	if _trail and is_instance_valid(_trail):
-		_trail.detach_and_fade()
+		if _trail.has_method("detach_and_fade"):
+			_trail.call("detach_and_fade")
 		_trail = null
 
 func _check_and_attach_fire_trail() -> void:

@@ -404,14 +404,14 @@ func _create_milestone_button(lvl: int, data: Dictionary) -> Control:
 	var hit_style := StyleBoxFlat.new()
 	hit_style.bg_color = Color(1.0, 1.0, 1.0, 0.005)
 	hit_style.set_corner_radius_all(48)
-	for state in ["normal", "hover", "pressed", "focus", "disabled"]:
+	for state: String in ["normal", "hover", "pressed", "focus", "disabled"]:
 		btn.add_theme_stylebox_override(state, hit_style)
 
 	btn.pressed.connect(func() -> void: _on_node_pressed(lvl))
 	container.add_child(btn)
 
 	# Safeguard: ensure every non-button child/descendant ignores mouse clicks
-	for child in container.get_children():
+	for child: Node in container.get_children():
 		if child != btn:
 			_set_mouse_filter_recursive(child, Control.MOUSE_FILTER_IGNORE)
 	btn.move_to_front()
@@ -420,8 +420,9 @@ func _create_milestone_button(lvl: int, data: Dictionary) -> Control:
 
 static func _set_mouse_filter_recursive(node: Node, filter_mode: Control.MouseFilter) -> void:
 	if node is Control:
-		node.mouse_filter = filter_mode
-	for child in node.get_children():
+		var ctrl := node as Control
+		ctrl.mouse_filter = filter_mode
+	for child: Node in node.get_children():
 		_set_mouse_filter_recursive(child, filter_mode)
 
 func _refresh_all_node_states() -> void:
@@ -509,7 +510,8 @@ func _setup_mini_vessel() -> void:
 	var active_id := GameState.active_vessel
 	var tex_loaded := false
 	if active_id in GameState.VESSEL_CATALOG:
-		var p_tex: String = str(GameState.VESSEL_CATALOG[active_id].get("preview_texture", ""))
+		var v_dict: Dictionary = GameState.VESSEL_CATALOG[active_id] as Dictionary
+		var p_tex: String = str(v_dict.get("preview_texture", ""))
 		if ResourceLoader.exists(p_tex):
 			var t := ResourceLoader.load(p_tex) as Texture2D
 			if t:
@@ -755,7 +757,7 @@ func _show_level_popup(lvl: int) -> void:
 		if data["is_boss"]:
 			popup_boss_tag.visible = true
 			if popup_boss_label:
-				popup_boss_label.text = "☠ %s" % data["boss_name"].to_upper()
+				popup_boss_label.text = "☠ %s" % str(data["boss_name"]).to_upper()
 		else:
 			popup_boss_tag.visible = false
 			

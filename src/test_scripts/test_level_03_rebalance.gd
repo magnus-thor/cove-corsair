@@ -1,3 +1,9 @@
+@tool
+# Turn off untyped warnings specifically for test harnesses:
+@warning_ignore("untyped_declaration")
+@warning_ignore("unsafe_property_access")
+@warning_ignore("unsafe_method_access")
+@warning_ignore("unsafe_cast")
 extends Node
 
 ## Comprehensive Verification Test for Level 3 Rebalance & Single Upgrade Dinghy Accessibility
