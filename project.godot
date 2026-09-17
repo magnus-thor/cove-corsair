@@ -25,6 +25,12 @@ AudioManager="*res://src/core/audio_manager.gd"
 GameState="*res://src/core/game_state.gd"
 VFXManager="*res://src/core/vfx_manager.gd"
 
+[debug]
+
+gdscript/warnings/untyped_declaration=1
+gdscript/warnings/unsafe_property_access=1
+gdscript/warnings/unsafe_method_access=1
+
 [display]
 
 window/size/viewport_width=720
@@ -45,9 +51,3 @@ renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 textures/vram_compression/import_etc2_astc=true
 environment/defaults/default_clear_color=Color(0.53, 0.81, 0.98, 1)
-
-[debug]
-
-gdscript/warnings/untyped_declaration=1
-gdscript/warnings/unsafe_property_access=1
-gdscript/warnings/unsafe_method_access=1

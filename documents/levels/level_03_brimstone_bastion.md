@@ -1,8 +1,8 @@
 ---
 level_id: 3
-level_title: "Level 3: Serpent's Reach (Swarm Threat)"
+level_title: "Level 3: Serpent's Reach (Gunner Skirmish)"
 biome_name: "tropical"
-base_scroll_speed: 6.8
+base_scroll_speed: 7.0
 completion_doubloon_reward: 72
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_03.tres"

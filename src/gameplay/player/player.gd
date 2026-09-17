@@ -612,22 +612,26 @@ func _on_area_entered(area: Area3D) -> void:
 				return
 
 			if hit_invulnerability_timer > 0.0:
-				# Collision damage already applied this burst; damage barricade segment without re-damaging hull
-				if area.has_method("take_hit"):
-					area.take_hit(5, "barricade_graze")
+				# Collision damage already applied this burst; break barricade segment without re-damaging hull
+				if area.has_method("die"):
+					area.die()
+				elif area.has_method("take_hit"):
+					area.take_hit(20, "barricade_graze")
 				elif area.has_method("take_damage"):
-					area.take_damage(5)
+					area.take_damage(20)
 				return
 			
 			hit_invulnerability_timer = 0.5
 			AudioManager.play_sfx("sfx_wood_smash")
-			take_hit(3, "Collision with Barricade")
-			if area.has_method("take_hit"):
-				area.take_hit(5, "player_vessel_ram")
-			elif area.has_method("take_damage"):
-				area.take_damage(5)
-			elif area.has_method("die"):
+			var cur_lvl: int = GameState.current_level if GameState else 1
+			var barricade_dmg = 1 if cur_lvl <= 3 else 2
+			take_hit(barricade_dmg, "Collision with Barricade")
+			if area.has_method("die"):
 				area.die()
+			elif area.has_method("take_hit"):
+				area.take_hit(20, "player_vessel_ram")
+			elif area.has_method("take_damage"):
+				area.take_damage(20)
 			return
 
 		var is_sea_mine = area is HazardSeaMine or (area is DestructibleObstacle and area.obstacle_type == DestructibleObstacle.ObstacleType.SEA_MINE) or ("mine" in area.name.to_lower()) or area.is_in_group("sea_mine")
@@ -855,25 +859,25 @@ func leak_threat(_threat_node: Node3D) -> void:
 	var last_follower: Node3D = _fleet.get_last_follower() if _fleet else null
 	if last_follower and is_instance_valid(last_follower):
 		var spawn_pos: Vector3 = last_follower.global_position
+		
+		# Spawn water splashes
+		var splash_scene = preload("res://src/vfx/hit_splash.tscn")
+		if splash_scene:
+			var splash = splash_scene.instantiate() as Node3D
+			get_parent().add_child(splash)
+			splash.global_position = spawn_pos
 			
-			# Spawn water splashes
-			var splash_scene = preload("res://src/vfx/hit_splash.tscn")
-			if splash_scene:
-				var splash = splash_scene.instantiate() as Node3D
-				get_parent().add_child(splash)
-				splash.global_position = spawn_pos
-				
-			# Spawn bold floating label "-1 FLEET" at its position
-			var ft_script = load("res://src/vfx/floating_text.gd")
-			if ft_script:
-				var fct = ft_script.new()
-				var root = get_tree().current_scene
-				if root:
-					root.add_child(fct)
-					fct.global_position = spawn_pos + Vector3(0.0, 1.5, 0.0)
-					fct.setup("-1 FLEET", Color(1.0, 0.1, 0.1))
-			
-			last_follower.destroy_follower()
+		# Spawn bold floating label "-1 FLEET" at its position
+		var ft_script = load("res://src/vfx/floating_text.gd")
+		if ft_script:
+			var fct = ft_script.new()
+			var root = get_tree().current_scene
+			if root:
+				root.add_child(fct)
+				fct.global_position = spawn_pos + Vector3(0.0, 1.5, 0.0)
+				fct.setup("-1 FLEET", Color(1.0, 0.1, 0.1))
+		
+		last_follower.destroy_follower()
 	else:
 		# If no followers exist, inflict 1 point of Hull damage to the player.
 		# Spawn the floating label first so it's visible even if game_over fires.

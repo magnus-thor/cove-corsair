@@ -51,48 +51,24 @@ script = ExtResource("9_ejvrq")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0.05, -20)
 script = ExtResource("9_ejvrq")
 
-[node name="EnemyMob_WarmupFirst" type="Area3D" parent="Entities" unique_id=67668435 groups=["destructible", "enemies"] instance=ExtResource("10_lll5g")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6, 0.1, -30)
-script = ExtResource("11_xc064")
-max_hp = 2
-current_hp = 2
-forward_speed = 1.4
-
-[node name="EnemyMob_WarmupMidCenter" type="Area3D" parent="Entities" unique_id=67668438 groups=["destructible", "enemies"] instance=ExtResource("10_lll5g")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0.1, -35)
-script = ExtResource("11_xc064")
-max_hp = 2
-current_hp = 2
-forward_speed = 1.4
+[node name="Barrel_MidCenter" type="Area3D" parent="Entities" unique_id=67668438 groups=["destructible"] instance=ExtResource("8_v8m1i")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0.05, -28)
+script = ExtResource("9_ejvrq")
 
 [node name="Barrel_MidRight" type="Area3D" parent="Entities" unique_id=210401242 groups=["destructible"] instance=ExtResource("8_v8m1i")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 0.05, -36)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 0.05, -34)
 script = ExtResource("9_ejvrq")
 
 [node name="MultiplierGate" type="Area3D" parent="Entities" unique_id=1807101691 groups=["multiplier_gate"] instance=ExtResource("12_obb7d")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 0, -40)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 0, -38)
 script = ExtResource("13_352l0")
 value = 10
 custom_text = "+10"
 gate_action = "add_fleet_1"
 
-[node name="EnemyMob_Lane1" type="Area3D" parent="Entities" unique_id=67668439 groups=["destructible", "enemies"] instance=ExtResource("10_lll5g")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 0.1, -44)
+[node name="EnemyMob_PracticeSkiff" type="Area3D" parent="Entities" unique_id=67668439 groups=["destructible", "enemies"] instance=ExtResource("10_lll5g")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 0.1, -45)
 script = ExtResource("11_xc064")
 max_hp = 2
 current_hp = 2
-forward_speed = 1.5
-
-[node name="EnemyMob_Lane2" type="Area3D" parent="Entities" unique_id=67668440 groups=["destructible", "enemies"] instance=ExtResource("10_lll5g")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.1, -46)
-script = ExtResource("11_xc064")
-max_hp = 2
-current_hp = 2
-forward_speed = 1.5
-
-[node name="EnemyMob_WarmupLaneFarR" type="Area3D" parent="Entities" unique_id=67668433 groups=["destructible", "enemies"] instance=ExtResource("10_lll5g")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, 0.1, -48)
-script = ExtResource("11_xc064")
-max_hp = 2
-current_hp = 2
-forward_speed = 1.5
+forward_speed = 1.0

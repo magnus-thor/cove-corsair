@@ -11,11 +11,17 @@ enum ObstacleType { WOODEN_BARREL, FUSE_BARREL, RUNE_BARREL, SEA_MINE, CORAL_REE
 signal obstacle_destroyed(obstacle_type: ObstacleType, world_pos: Vector3)
 
 ## Visual obstacle HP (exported for editor convenience; SSOT is HealthComponent).
-@export var hp: int = 1:
+var _base_hp: int = 1
+
+@export var hp: int:
 	set(val):
-		hp = val
+		_base_hp = val
 		if health_component:
-			health_component.reset(hp)
+			health_component.reset(val)
+	get:
+		if health_component:
+			return health_component.current_health
+		return _base_hp
 @export var obstacle_type: ObstacleType = ObstacleType.WOODEN_BARREL:
 	set(val):
 		obstacle_type = val
@@ -161,6 +167,8 @@ func die() -> void:
 	if _is_destroyed:
 		return
 	_is_destroyed = true
+	if health_component and not health_component.is_dead:
+		health_component.take_damage(health_component.current_health)
 
 	# Rule 4 — Immediate collider shutdown: prevent ghost collisions on the corpse frame.
 	collision_layer = 0

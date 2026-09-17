@@ -2,7 +2,7 @@
 level_id: 15
 level_title: "Level 15: The Siege Fortress (Boss Threat)"
 biome_name: "pirate_citadel"
-base_scroll_speed: 8.2
+base_scroll_speed: 8.6
 completion_doubloon_reward: 459
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_15.tres"

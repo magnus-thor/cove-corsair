@@ -187,9 +187,9 @@ func assemble_level(data: LevelData = null) -> void:
 						active_chunks.append(buffer_instance)
 						print("[CHUNK ASSEMBLER] Inserted 50m buffer chunk before boss: %s" % buffer_instance.name)
 			
-		# If this is the starting chunk (index 0), enforce safe clearance runway (>= 24.0m) from player start
+		# If this is the starting chunk (index 0), enforce safe clearance runway (>= 35.0m) from player start
 		if active_chunks.is_empty():
-			_enforce_start_clearance_in_chunk(chunk_instance, 24.0)
+			_enforce_start_clearance_in_chunk(chunk_instance, 35.0)
 
 		add_child(chunk_instance)
 		chunk_instance.position = Vector3(0.0, 0.0, current_z_offset)
@@ -313,8 +313,8 @@ func _suppress_gates_in_chunk_final_portion(chunk: BaseTrackChunk, portion: floa
 					child.get_parent().remove_child(child)
 				child.queue_free()
 
-## Enforces a safe clearance runway at the start of a level so no hazards/mines appear dangerously close to the vessel.
-func _enforce_start_clearance_in_chunk(chunk: BaseTrackChunk, min_clearance: float = 24.0) -> void:
+## Enforces a safe clearance runway at the start of a level so no hazards, mines, or hostile vessels appear dangerously close to the player.
+func _enforce_start_clearance_in_chunk(chunk: BaseTrackChunk, min_clearance: float = 35.0) -> void:
 	if not chunk or not is_instance_valid(chunk):
 		return
 	var entities = chunk.find_child("Entities", true, false)
@@ -324,8 +324,9 @@ func _enforce_start_clearance_in_chunk(chunk: BaseTrackChunk, min_clearance: flo
 		if not is_instance_valid(child):
 			continue
 		var is_hazard = child is HazardSeaMine or child is HazardThermalGeyser or child.is_in_group("hazards") or child.name.to_lower().contains("mine")
-		if is_hazard and child.position.z > -min_clearance:
-			print("[CHUNK ASSEMBLER] Suppressed early hazard '%s' at Z=%.1fm in starting chunk (< %.1fm clearance)" % [child.name, child.position.z, min_clearance])
+		var is_enemy = child.is_in_group("enemies") or child is EnemyMob or child.name.to_lower().contains("enemy") or child.name.to_lower().contains("fodder") or child.name.to_lower().contains("skiff") or child.name.to_lower().contains("rower")
+		if (is_hazard or is_enemy) and child.position.z > -min_clearance:
+			print("[CHUNK ASSEMBLER] Suppressed early hostile/hazard '%s' at Z=%.1fm in starting chunk (< %.1fm clearance)" % [child.name, child.position.z, min_clearance])
 			if child.get_parent():
 				child.get_parent().remove_child(child)
 			child.queue_free()

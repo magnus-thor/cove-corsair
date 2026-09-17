@@ -1,8 +1,8 @@
 ---
 level_id: 2
-level_title: "Level 2: Palm Shallows (Hazard Nav)"
+level_title: "Level 2: Palm Shallows (Armada Build)"
 biome_name: "tropical"
-base_scroll_speed: 6.6
+base_scroll_speed: 6.8
 completion_doubloon_reward: 58
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_02.tres"

@@ -2,7 +2,7 @@
 level_id: 29
 level_title: "Level 29: Voodoo Crossing (Swarm Threat)"
 biome_name: "pirate_citadel"
-base_scroll_speed: 10.0
+base_scroll_speed: 10.2
 completion_doubloon_reward: 423
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_29.tres"

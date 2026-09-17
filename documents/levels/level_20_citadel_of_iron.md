@@ -2,7 +2,7 @@
 level_id: 20
 level_title: "Level 20: Captain Bone-Beard (Boss Threat)"
 biome_name: "brimstone_bastion"
-base_scroll_speed: 8.9
+base_scroll_speed: 9.2
 completion_doubloon_reward: 572
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_20.tres"

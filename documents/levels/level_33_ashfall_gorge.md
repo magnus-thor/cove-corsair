@@ -2,7 +2,7 @@
 level_id: 33
 level_title: "Level 33: Ashfall Gorge (Swarm Threat)"
 biome_name: "tropical"
-base_scroll_speed: 10.5
+base_scroll_speed: 10.7
 completion_doubloon_reward: 477
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_33.tres"

@@ -4,7 +4,9 @@ extends DestructibleObstacle
 var hp_label: Label3D
 
 static func get_tier_hp(level: int) -> int:
-	if level <= 3:
+	if level <= 1:
+		return 1
+	elif level <= 3:
 		return 2
 	elif level <= 10:
 		return 6
@@ -14,6 +16,7 @@ static func get_tier_hp(level: int) -> int:
 		return 20
 
 func _ready() -> void:
+	super._ready()
 	doubloons_drop = 1
 	add_to_group("destructible")
 	add_to_group("barricade")
@@ -64,11 +67,10 @@ func _physics_process(delta: float) -> void:
 	# Barricade slats are static river wall components.
 	# When the player shoots a gap and steers through, the remaining intact slats
 	# must NEVER inflict leak_threat damage.
-	# The parent chunk cleans up at +30m behind the camera; as a fallback,
-	# slats clean up if they drift > 35m behind the player.
+	# Despawn once safely behind the player camera (+12m)
 	var player = get_tree().get_first_node_in_group("player")
 	var player_z = player.global_position.z if player else 0.0
-	if global_position.z > (player_z + 35.0):
+	if global_position.z > (player_z + 12.0):
 		queue_free()
 
 func _update_label_visuals() -> void:
@@ -107,7 +109,18 @@ func die() -> void:
 		col.set_deferred("disabled", true)
 	set_deferred("monitoring", false)
 	set_deferred("monitorable", false)
-	if VFXManager:
+	
+	# Instantly hide 3D mesh and labels so slat visibly vanishes on death frame
+	var log_mesh = get_node_or_null("LogMesh")
+	if log_mesh:
+		log_mesh.visible = false
+	if hp_label:
+		hp_label.visible = false
+	var obstacle_sprite = get_node_or_null("ObstacleSprite")
+	if obstacle_sprite:
+		obstacle_sprite.visible = false
+		
+	if VFXManager and VFXManager.has_method("spawn_wood_debris"):
 		VFXManager.spawn_wood_debris(global_position)
 	AudioManager.play_sfx("sfx_wood_smash")
 	super()

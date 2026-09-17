@@ -2,7 +2,7 @@
 level_id: 16
 level_title: "Level 16: The Iron Wall (Hazard Nav)"
 biome_name: "brimstone_bastion"
-base_scroll_speed: 8.4
+base_scroll_speed: 8.7
 completion_doubloon_reward: 248
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_16.tres"

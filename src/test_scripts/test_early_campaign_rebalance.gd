@@ -48,18 +48,30 @@ func test_barricade_tier_hp_scaling() -> void:
 	assert_test(wall_scene != null, "barricade_wall.tscn loaded")
 	assert_test(seg_scene != null, "barricade_segment.tscn loaded")
 
-	# 1. Tier 1 (Levels 1-3): Slat HP = 2
+	# 1. Tier 1 (Level 1: Slat HP = 1, 4 slats with center gap; Levels 2-3: Slat HP = 2, 5 slats)
 	GameState.current_level = 1
 	var wall_l1 = wall_scene.instantiate() as BarricadeWall
 	add_child(wall_l1)
 	var slats_l1 = _get_slats(wall_l1)
-	assert_test(slats_l1.size() > 0, "Level 1 BarricadeWall spawned %d slats" % slats_l1.size())
-	var all_l1_slats_hp2 = true
+	assert_test(slats_l1.size() == 4, "Level 1 BarricadeWall spawned 4 slats (leaving center gap open)")
+	var all_l1_slats_hp1 = true
 	for s in slats_l1:
-		if s.hp != 2:
-			all_l1_slats_hp2 = false
-	assert_test(all_l1_slats_hp2, "Level 1 BarricadeWall slats all have HP = 2 (breaks in 2 standard shots)")
+		if s.hp != 1:
+			all_l1_slats_hp1 = false
+	assert_test(all_l1_slats_hp1, "Level 1 BarricadeWall slats all have HP = 1 (breaks in 1 standard shot)")
 	wall_l1.queue_free()
+
+	GameState.current_level = 2
+	var wall_l2 = wall_scene.instantiate() as BarricadeWall
+	add_child(wall_l2)
+	var slats_l2 = _get_slats(wall_l2)
+	assert_test(slats_l2.size() == 5, "Level 2 BarricadeWall spawned 5 slats")
+	var all_l2_slats_hp2 = true
+	for s in slats_l2:
+		if s.hp != 2:
+			all_l2_slats_hp2 = false
+	assert_test(all_l2_slats_hp2, "Level 2 BarricadeWall slats all have HP = 2")
+	wall_l2.queue_free()
 
 	# 2. Tier 2 (Levels 4-10): Slat HP = 6
 	GameState.current_level = 4
@@ -131,7 +143,7 @@ func test_barricade_tier_hp_scaling() -> void:
 	GameState.current_level = 1
 	var slat_standalone_l1 = seg_scene.instantiate() as BarricadeSegment
 	add_child(slat_standalone_l1)
-	assert_test(slat_standalone_l1.hp == 2, "Standalone BarricadeSegment on Level 1 scales to HP = 2")
+	assert_test(slat_standalone_l1.hp == 1, "Standalone BarricadeSegment on Level 1 scales to HP = 1")
 	slat_standalone_l1.queue_free()
 
 	GameState.current_level = 4
@@ -145,56 +157,60 @@ func test_level_1_properties_and_chunks() -> void:
 	var l1 = load("res://src/data/resources/levels/level_01.tres") as LevelData
 	assert_test(l1 != null, "level_01.tres loaded successfully")
 	assert_test(l1.base_scroll_speed == 6.5, "Level 1 base_scroll_speed is 6.5 m/s (gentle, readable pace)")
-	
-	var l1_smugglers = load("res://src/data/resources/levels/level_01_smugglers_run.tres") as LevelData
-	assert_test(l1_smugglers != null, "level_01_smugglers_run.tres loaded successfully")
-	assert_test(l1_smugglers.base_scroll_speed == 6.5, "level_01_smugglers_run.tres base_scroll_speed is 6.5 m/s")
+	assert_test(l1.chunk_scenes.size() == 4, "Level 1 has 4 chunks for a welcoming intro (200m)")
 
 func test_chunk_barricade_siege_buffer_and_pickups() -> void:
 	print("\n--- TEST 3: Safe Buffer Zones & Early Level Pickups ---")
 	var chunk_scene = load("res://src/gameplay/chunks/chunk_barricade_siege.tscn") as PackedScene
 	assert_test(chunk_scene != null, "chunk_barricade_siege.tscn loaded")
 
-	var chunk = chunk_scene.instantiate() as BaseTrackChunk
-	var barricade = chunk.find_child("BarricadeWall", true, false) as BarricadeWall
-	assert_test(barricade != null, "BarricadeWall found in chunk")
-	var barricade_z = barricade.position.z
+	# 1. Higher Levels (Level 4): verify runtime safe buffer zone enforcement (>= 25m behind barricade)
+	GameState.current_level = 4
+	var chunk_l4 = chunk_scene.instantiate() as BaseTrackChunk
+	add_child(chunk_l4)
+	var barricade_l4 = chunk_l4.find_child("BarricadeWall", true, false) as BarricadeWall
+	assert_test(barricade_l4 != null, "BarricadeWall found in chunk")
+	var b_z_l4 = barricade_l4.position.z
 	
-	# Inspect raw enemy skiffs in Entities
-	var entities = chunk.get_node("Entities")
-	var raw_skiffs: Array[Node] = []
-	for c in entities.get_children():
-		if c is Area3D and c.position.z < barricade_z and c.is_in_group("enemies"):
-			raw_skiffs.append(c)
+	var trailing_l4: Array[Node] = []
+	for c in chunk_l4.get_node("Entities").get_children():
+		if c is Area3D and c.position.z < b_z_l4 and c.is_in_group("enemies"):
+			trailing_l4.append(c)
 			
-	assert_test(raw_skiffs.size() >= 2, "Trailing enemy skiffs exist behind barricade in chunk scene")
-	for skiff in raw_skiffs:
-		var buffer_distance = absf(skiff.position.z - barricade_z)
+	assert_test(trailing_l4.size() >= 2, "Trailing enemy skiffs exist behind barricade in Level 4")
+	for skiff in trailing_l4:
+		var buffer_distance = absf(skiff.position.z - b_z_l4)
 		assert_test(buffer_distance >= 25.0, "Enemy skiff at Z=%.1fm maintains >= 25.0m buffer behind barricade (actual: %.1fm)" % [skiff.position.z, buffer_distance])
+	chunk_l4.queue_free()
 
-	# Now add to scene tree with GameState.current_level = 1 to test runtime early-level tuning
+	# 2. Level 1: verify early-level replacement (peaceful runway / recovery pickups)
 	GameState.current_level = 1
-	add_child(chunk)
+	var chunk_l1 = chunk_scene.instantiate() as BaseTrackChunk
+	add_child(chunk_l1)
+	var barricade_l1 = chunk_l1.find_child("BarricadeWall", true, false) as BarricadeWall
+	var b_z_l1 = barricade_l1.position.z
 
 	# Verify: in Level 1, no 30 HP Turtle Rafts exist
 	var has_turtle_30 = false
-	for c in chunk.get_node("Entities").get_children():
+	for c in chunk_l1.get_node("Entities").get_children():
 		if c is Area3D and "max_hp" in c and c.max_hp >= 25 and not c.is_in_group("barricade"):
 			has_turtle_30 = true
 	assert_test(not has_turtle_30, "Level 1 does NOT spawn fortified 30 HP Turtle Rafts")
 
 	# Verify: in Level 1, trailing enemy skiffs are replaced with recovery pickups
-	var trailing_enemies: Array[Node] = []
-	for c in chunk.get_node("Entities").get_children():
-		if c is Area3D and c.position.z < barricade_z and c.is_in_group("enemies"):
-			trailing_enemies.append(c)
-	assert_test(trailing_enemies.is_empty(), "Level 1 trailing enemies behind barricade replaced with recovery pickups (0 hostile skiffs)")
+	var trailing_l1: Array[Node] = []
+	for c in chunk_l1.get_node("Entities").get_children():
+		if c is Area3D and c.position.z < b_z_l1 and c.is_in_group("enemies"):
+			trailing_l1.append(c)
+	assert_test(trailing_l1.is_empty(), "Level 1 trailing enemies behind barricade replaced with recovery pickups (0 hostile skiffs)")
 
-	chunk.queue_free()
+	chunk_l1.queue_free()
 
 func test_live_dinghy_cannon_shatter_level_1() -> void:
 	print("\n--- TEST 4: Live Dinghy Cannon vs Level 1 Barricade ---")
 	GameState.current_level = 1
+	GameState.active_vessel = "dinghy"
+	GameState.vessel_tiers["dinghy"] = 1
 	GameState.is_game_active = true
 	GameState.targets_destroyed = 0
 	
@@ -203,25 +219,20 @@ func test_live_dinghy_cannon_shatter_level_1() -> void:
 	add_child(player)
 	var dinghy_data = load("res://src/data/resources/user_vessels/dinghy_ship.tres") as ShipData
 	player.apply_ship_data(dinghy_data)
-	assert_test(player.current_health == 2, "Dinghy hull HP is 2")
+	assert_test(player.current_health == 3, "Dinghy hull HP is 3 (forgiving starter health)")
 	
 	# Instantiate a Level 1 BarricadeSegment
 	var slat_scene = load("res://src/gameplay/obstacles/barricade_segment.tscn") as PackedScene
 	var slat = slat_scene.instantiate() as BarricadeSegment
 	add_child(slat)
 	slat.global_position = Vector3(0.0, 0.5, -10.0)
-	assert_test(slat.hp == 2, "Level 1 Barricade slat starts at 2 HP")
+	assert_test(slat.hp == 1, "Level 1 Barricade slat starts at 1 HP")
 
-	# Shot 1: 1 standard cannon damage
-	slat.take_damage(1)
-	assert_test(slat.hp == 1, "Barricade slat HP is 1 after first cannon hit")
-	assert_test(not slat._is_destroyed, "Barricade slat survives 1st shot")
-
-	# Shot 2: 1 standard cannon damage -> shatters!
+	# Shot 1: 1 standard cannon damage -> shatters cleanly in 1 hit!
 	var initial_destroyed = GameState.targets_destroyed
 	slat.take_damage(1)
-	assert_test(slat.hp <= 0, "Barricade slat HP is 0 after second cannon hit")
-	assert_test(slat._is_destroyed, "Barricade slat shatters completely on 2nd hit")
+	assert_test(slat.hp <= 0, "Barricade slat HP is 0 after first cannon hit")
+	assert_test(slat._is_destroyed, "Barricade slat shatters completely on 1st hit")
 	assert_test(GameState.targets_destroyed > initial_destroyed, "targets_destroyed incremented on barricade shatter")
 
 	player.queue_free()

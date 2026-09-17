@@ -1,21 +1,19 @@
 [gd_resource type="Resource" script_class="LevelData" format=3]
 
 [ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_warmup.tscn" id="chunk_1"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_fodder_swarm.tscn" id="chunk_2"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_reef_slalom.tscn" id="chunk_2"]
 [ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_barricade_siege.tscn" id="chunk_3"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_reef_slalom.tscn" id="chunk_4"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_vanguard_climax.tscn" id="chunk_5"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_finish_line.tscn" id="chunk_6"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_finish_line.tscn" id="chunk_4"]
 [ext_resource type="Texture2D" path="res://assets/textures/horizon_smugglers_run.png" id="ext_horizon"]
 [ext_resource type="Script" path="res://src/data/resources/level_data.gd" id="ext_script"]
 
 [resource]
 script = ExtResource("ext_script")
 level_id = 1
-level_title = "Level 1: Smuggler's Run (Swarm Threat)"
+level_title = "Level 1: Smuggler's Run (Intro)"
 biome_name = "tropical"
 base_scroll_speed = 6.5
-chunk_scenes = Array[PackedScene]([ExtResource("chunk_1"), ExtResource("chunk_2"), ExtResource("chunk_3"), ExtResource("chunk_4"), ExtResource("chunk_2"), ExtResource("chunk_3"), ExtResource("chunk_5"), ExtResource("chunk_6")])
+chunk_scenes = Array[PackedScene]([ExtResource("chunk_1"), ExtResource("chunk_2"), ExtResource("chunk_3"), ExtResource("chunk_4")])
 completion_doubloon_reward = 45
 horizon_texture = ExtResource("ext_horizon")
 water_albedo = Color(0.08, 0.58, 0.82, 0.88)

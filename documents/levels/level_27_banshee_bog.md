@@ -2,7 +2,7 @@
 level_id: 27
 level_title: "Level 27: Banshee Bog (Swarm Threat)"
 biome_name: "pirate_citadel"
-base_scroll_speed: 9.8
+base_scroll_speed: 10.0
 completion_doubloon_reward: 396
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_27.tres"

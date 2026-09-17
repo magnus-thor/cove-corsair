@@ -2,7 +2,7 @@
 level_id: 17
 level_title: "Level 17: Murkwater Run (Swarm Threat)"
 biome_name: "brimstone_bastion"
-base_scroll_speed: 8.5
+base_scroll_speed: 8.8
 completion_doubloon_reward: 261
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_17.tres"

@@ -131,7 +131,15 @@ def get_boss_chunk(lvl: int) -> str:
 
 def get_level_title(lvl: int) -> str:
     base = LEVEL_TITLES.get(lvl, f"Level {lvl}: Expedition {lvl}")
-    if lvl % 5 == 0:
+    if lvl == 1:
+        return f"{base} (Intro)"
+    elif lvl == 2:
+        return f"{base} (Armada Build)"
+    elif lvl == 3:
+        return f"{base} (Gunner Skirmish)"
+    elif lvl == 4:
+        return f"{base} (Hazard Gauntlet)"
+    elif lvl % 5 == 0:
         return f"{base} (Boss Threat)"
     elif lvl % 2 == 1:
         return f"{base} (Swarm Threat)"
@@ -139,8 +147,6 @@ def get_level_title(lvl: int) -> str:
         return f"{base} (Hazard Nav)"
 
 def get_chunk_sequence(lvl: int) -> list:
-    is_boss = (lvl % 5 == 0)
-    
     # Base chunk pools
     C_WARMUP = "res://src/gameplay/chunks/chunk_warmup.tscn"
     C_MINE = "res://src/gameplay/chunks/chunk_mine_gauntlet.tscn"
@@ -151,11 +157,30 @@ def get_chunk_sequence(lvl: int) -> list:
     C_CLIMAX = "res://src/gameplay/chunks/chunk_vanguard_climax.tscn"
     C_FINISH = "res://src/gameplay/chunks/chunk_finish_line.tscn"
 
+    # Specific handcrafted pacing for early campaign levels (Levels 1-5):
+    if lvl == 1:
+        # Level 1: Gentle Introduction & Navigation (4 chunks: Warmup -> Reef Slalom -> Barricade -> Finish Line)
+        return [C_WARMUP, C_REEF, C_BARRICADE, C_FINISH]
+    elif lvl == 2:
+        # Level 2: Sea Mines & Armada Multiplier (5 chunks: Warmup -> Mine Gauntlet -> Fodder Swarm -> Barricade -> Finish Line)
+        return [C_WARMUP, C_MINE, C_FODDER, C_BARRICADE, C_FINISH]
+    elif lvl == 3:
+        # Level 3: Gunner Skirmish & Reefs (5 chunks: Reef Slalom -> Gunner Ambush -> Mine Gauntlet -> Vanguard Climax -> Finish Line)
+        # Direct reef start - no warmup dock!
+        return [C_REEF, C_GUNNER, C_MINE, C_CLIMAX, C_FINISH]
+    elif lvl == 4:
+        # Level 4: Combined Hazard Gauntlet (6 chunks: Mine Gauntlet -> Barricade Siege -> Reef Slalom -> Fodder Swarm -> Vanguard Climax -> Finish Line)
+        # Direct minefield start!
+        return [C_MINE, C_BARRICADE, C_REEF, C_FODDER, C_CLIMAX, C_FINISH]
+    elif lvl == 5:
+        # Level 5: Captain Ironjaw Milestone Boss
+        boss_chunk = get_boss_chunk(lvl)
+        return [C_WARMUP, C_REEF, C_MINE, C_BARRICADE, C_GUNNER, boss_chunk]
+
+    is_boss = (lvl % 5 == 0)
     if is_boss:
         boss_chunk = get_boss_chunk(lvl)
-        if lvl == 5:
-            return [C_WARMUP, C_REEF, C_MINE, C_BARRICADE, C_GUNNER, boss_chunk]
-        elif lvl <= 15:
+        if lvl <= 15:
             return [C_WARMUP, C_MINE, C_REEF, C_BARRICADE, C_FODDER, C_GUNNER, boss_chunk]
         elif lvl <= 30:
             return [C_WARMUP, C_REEF, C_MINE, C_BARRICADE, C_FODDER, C_GUNNER, C_BARRICADE, boss_chunk]
@@ -196,8 +221,18 @@ def get_chunk_sequence(lvl: int) -> list:
     return [C_WARMUP] + mid_chunks + [C_CLIMAX, C_FINISH]
 
 def calculate_speed(lvl: int) -> float:
-    # 6.5 m/s at L1 up to 12.0 m/s at L45
-    return round(6.5 + (lvl - 1) * (5.5 / 44.0), 1)
+    if lvl == 1:
+        return 6.5
+    elif lvl == 2:
+        return 6.8
+    elif lvl == 3:
+        return 7.0
+    elif lvl == 4:
+        return 7.3
+    elif lvl == 5:
+        return 7.5
+    # 7.5 m/s at L5 up to 12.0 m/s at L45
+    return round(7.5 + (lvl - 5) * (4.5 / 40.0), 1)
 
 def calculate_reward(lvl: int) -> int:
     is_boss = (lvl % 5 == 0)

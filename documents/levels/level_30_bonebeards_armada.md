@@ -2,7 +2,7 @@
 level_id: 30
 level_title: "Level 30: Bonebeard's Armada (Boss Threat)"
 biome_name: "pirate_citadel"
-base_scroll_speed: 10.1
+base_scroll_speed: 10.3
 completion_doubloon_reward: 796
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_30.tres"

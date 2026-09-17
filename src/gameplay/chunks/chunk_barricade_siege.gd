@@ -81,12 +81,17 @@ func _replace_front_hazard_with_pickup(entities: Node, enemy: Node, cur_level: i
 	entities.remove_child(enemy)
 	enemy.queue_free()
 	
+	# In Level 1, shift front pickups to the channel margins (|X| >= 3.6m) so the center channel to the barricade is wide open
+	var barrel_x = pos.x
+	if cur_level <= 1 and absf(barrel_x) < 3.2:
+		barrel_x = -3.8 if barrel_x <= 0.0 else 3.8
+	
 	# Spawn a wooden barrel pickup that drops doubloons when destroyed
 	if BARREL_SCENE:
 		var barrel = BARREL_SCENE.instantiate() as Area3D
 		entities.add_child(barrel)
 		barrel.add_to_group("destructible")
-		barrel.position = Vector3(pos.x, 0.05, pos.z)
+		barrel.position = Vector3(barrel_x, 0.05, pos.z)
 		barrel.hp = 1
 		barrel.doubloons_drop = doubloons_amount
 		barrel.obstacle_type = DestructibleObstacle.ObstacleType.WOODEN_BARREL

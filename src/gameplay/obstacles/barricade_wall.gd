@@ -8,7 +8,9 @@ extends Node3D
 var level_override: int = -1
 
 static func get_tier_hp(level: int) -> int:
-	if level <= 3:
+	if level <= 1:
+		return 1
+	elif level <= 3:
 		return 2
 	elif level <= 10:
 		return 6
@@ -40,7 +42,8 @@ func _ready() -> void:
 	var tier_hp = get_tier_hp(cur_level)
 	
 	# Scale barricade slat HP dynamically based on Campaign Tier:
-	# Levels 1 to 3: Slat HP = 2 (starter Dinghy destroys a slat in 2 direct cannon shots).
+	# Level 1: Slat HP = 1 (1 cannon shot breaks it cleanly) with natural center navigation gap
+	# Levels 2 to 3: Slat HP = 2 (starter Dinghy destroys a slat in 2 direct cannon shots).
 	# Levels 4 to 10: Slat HP = 6 (requires 5-6 shots or upgraded vessel fire).
 	# Levels 11 to 25: Slat HP = 12.
 	# Levels 26+: Slat HP = 20 (late-game fortified siege walls).
@@ -50,8 +53,13 @@ func _ready() -> void:
 	elif cur_level >= 26:
 		default_slat_hp = 20
 		
-	for i in range(x_points.size()):
-		var x_norm = x_points[i]
+	# In Level 1, leave an open center channel (gap at x = 0.0)
+	var active_points: Array = x_points.duplicate()
+	if cur_level <= 1 and active_points.has(0.0):
+		active_points.erase(0.0)
+		
+	for i in range(active_points.size()):
+		var x_norm = active_points[i]
 		if segment_prefab:
 			var segment = segment_prefab.instantiate() as BarricadeSegment
 			var seg_hp = default_slat_hp

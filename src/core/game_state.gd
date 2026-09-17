@@ -113,11 +113,11 @@ const VESSEL_CATALOG: Dictionary = {
 		"purchase_price": 0,
 		"tier_prices": { 2: 250, 3: 1000 },
 		"tier_descriptions": {
-			1: "Standard Hull & Bow Chaser",
-			2: "Reinforced Hull (3 HP, 1 Weapon + 1 Crew Socket)",
-			3: "Masterwork Hull (4 HP, 1 Weapon + 2 Crew Sockets)"
+			1: "Standard Hull (3 HP, 1 Cannon + 1 Crew Socket)",
+			2: "Reinforced Hull (4 HP, +15% Firepower, +1 Crew Socket)",
+			3: "Masterwork Hull (5 HP, +30% Firepower, All Sockets Unlocked)"
 		},
-		"base_hp": 2,
+		"base_hp": 3,
 		"base_speed": 12.0,
 		"fire_rate": 0.20,
 		"preview_texture": "res://assets/sprites/user_vessels/The Dinghy.png"
