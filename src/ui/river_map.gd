@@ -60,17 +60,17 @@ func _ready() -> void:
 static func _build_milestones() -> Dictionary:
 	var dict: Dictionary = {}
 	for lvl in range(1, 46):
-		var t = float(lvl - 1) / 44.0
-		var node_y = lerpf(14500.0, 500.0, t)
-		var node_x = 360.0
+		var t := float(lvl - 1) / 44.0
+		var node_y := lerpf(14500.0, 500.0, t)
+		var node_x := 360.0
 		if lvl == 1 or lvl == 45:
 			node_x = 360.0
 		else:
 			node_x = 360.0 + sin((lvl - 1) * 0.72) * 170.0
 		
-		var is_boss = (lvl % 5 == 0)
-		var boss_type = ""
-		var boss_name = ""
+		var is_boss := (lvl % 5 == 0)
+		var boss_type := ""
+		var boss_name := ""
 		
 		if is_boss:
 			match lvl:
@@ -102,9 +102,9 @@ static func _build_milestones() -> Dictionary:
 					boss_type = "final_boss"
 					boss_name = "Captain Bone-Beard"
 		
-		var lvl_title = "EXPEDITION %02d" % lvl
-		var biome_desc = "Tropical Reef" if lvl <= 15 else ("Murky Bayou" if lvl <= 30 else "Volcanic Brimstone")
-		var target_dist = 200 + (lvl * 25)
+		var lvl_title := "EXPEDITION %02d" % lvl
+		var biome_desc := "Tropical Reef" if lvl <= 15 else ("Murky Bayou" if lvl <= 30 else "Volcanic Brimstone")
+		var target_dist := 200 + (lvl * 25)
 		
 		dict[lvl] = {
 			"name": lvl_title,
@@ -122,9 +122,9 @@ func _init_milestones_data() -> void:
 		MILESTONES = _build_milestones()
 	for lvl in range(1, 46):
 		if GameState.LEVEL_RESOURCES.has(lvl):
-			var res_path = GameState.LEVEL_RESOURCES[lvl]
+			var res_path: String = str(GameState.LEVEL_RESOURCES[lvl])
 			if ResourceLoader.exists(res_path):
-				var res = load(res_path) as LevelData
+				var res := load(res_path) as LevelData
 				if res:
 					MILESTONES[lvl]["name"] = res.level_title.replace("Level %d: " % lvl, "").to_upper()
 					MILESTONES[lvl]["target_dist"] = (res.chunk_scenes.size() - 1) * 50
@@ -145,14 +145,14 @@ func _setup_river_spline() -> void:
 	points.append(Vector2(360, 200)) # Final anchorage peak
 	
 	for i in range(points.size()):
-		var p = points[i]
-		var in_tangent = Vector2.ZERO
-		var out_tangent = Vector2.ZERO
+		var p := points[i]
+		var in_tangent := Vector2.ZERO
+		var out_tangent := Vector2.ZERO
 		
 		if i > 0 and i < points.size() - 1:
-			var prev_p = points[i - 1]
-			var next_p = points[i + 1]
-			var diff = (next_p - prev_p) * 0.28
+			var prev_p := points[i - 1]
+			var next_p := points[i + 1]
+			var diff := (next_p - prev_p) * 0.28
 			in_tangent = -diff
 			out_tangent = diff
 		elif i == 0:
@@ -172,12 +172,12 @@ func _setup_river_path_draw() -> void:
 		river_path_layer.draw.connect(_on_river_path_draw)
 
 func _on_terrain_draw() -> void:
-	var canvas_rect = Rect2(Vector2.ZERO, Vector2(720, 15000))
+	var canvas_rect := Rect2(Vector2.ZERO, Vector2(720, 15000))
 	# Lush vintage pirate chart background
 	terrain_layer.draw_rect(canvas_rect, Color(0.93, 0.88, 0.77, 1.0), true)
 	
 	# Decorative map grid & nautical borders
-	var line_color = Color(0.82, 0.75, 0.62, 0.45)
+	var line_color := Color(0.82, 0.75, 0.62, 0.45)
 	for y in range(100, 14950, 200):
 		terrain_layer.draw_line(Vector2(40, y), Vector2(680, y), line_color, 1.5)
 	for x in range(120, 680, 120):
@@ -192,7 +192,7 @@ func _on_terrain_draw() -> void:
 	terrain_layer.draw_rect(Rect2(0, 0, 720, 5000), Color(0.75, 0.2, 0.1, 0.13), true)
 
 func _on_river_path_draw() -> void:
-	var baked = river_curve.get_baked_points()
+	var baked := river_curve.get_baked_points()
 	if baked.size() < 2:
 		return
 		
@@ -208,11 +208,11 @@ func _on_river_path_draw() -> void:
 	river_path_layer.draw_dashed_line(baked[0], baked[baked.size() - 1], Color(0.95, 0.95, 0.80, 0.65), 5.0, 14.0, true)
 
 	# Stepping stone waypoints along the baked curve
-	var total_len = river_curve.get_baked_length()
-	var step = 45.0
-	var cur = step
+	var total_len := river_curve.get_baked_length()
+	var step := 45.0
+	var cur := step
 	while cur < total_len - 30.0:
-		var pt = river_curve.sample_baked(cur)
+		var pt := river_curve.sample_baked(cur)
 		river_path_layer.draw_circle(pt, 4.0, Color(0.96, 0.88, 0.55, 0.6))
 		cur += step
 
@@ -221,16 +221,16 @@ func _build_milestone_nodes() -> void:
 		child.queue_free()
 	node_controls.clear()
 	
-	for lvl in MILESTONES.keys():
-		var data = MILESTONES[lvl]
-		var node_btn = _create_milestone_button(lvl, data)
+	for lvl: int in MILESTONES.keys():
+		var data: Dictionary = MILESTONES[lvl] as Dictionary
+		var node_btn := _create_milestone_button(lvl, data)
 		nodes_layer.add_child(node_btn)
 		node_controls[lvl] = node_btn
 		
 	_refresh_all_node_states()
 
 func _create_milestone_button(lvl: int, data: Dictionary) -> Control:
-	var container = Control.new()
+	var container := Control.new()
 	container.name = "Node_%d" % lvl
 	container.position = data["pos"]
 	container.custom_minimum_size = Vector2(160, 160)
@@ -239,12 +239,12 @@ func _create_milestone_button(lvl: int, data: Dictionary) -> Control:
 	container.mouse_filter = Control.MOUSE_FILTER_PASS
 	
 	# Pulsing active circular aura (behind button)
-	var aura = Panel.new()
+	var aura := Panel.new()
 	aura.name = "ActiveAura"
 	aura.custom_minimum_size = Vector2(136, 136)
 	aura.position = Vector2(12, 12)
 	aura.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var aura_style = StyleBoxFlat.new()
+	var aura_style := StyleBoxFlat.new()
 	aura_style.set_corner_radius_all(68)
 	aura_style.bg_color = Color(1.0, 0.82, 0.2, 0.22)
 	aura_style.set_border_width_all(3)
@@ -257,7 +257,7 @@ func _create_milestone_button(lvl: int, data: Dictionary) -> Control:
 	container.add_child(aura)
 	
 	# Node Disc Background Panel
-	var disc_panel = Panel.new()
+	var disc_panel := Panel.new()
 	disc_panel.name = "DiscPanel"
 	disc_panel.custom_minimum_size = Vector2(96, 96)
 	disc_panel.position = Vector2(32, 32)
@@ -265,7 +265,7 @@ func _create_milestone_button(lvl: int, data: Dictionary) -> Control:
 	container.add_child(disc_panel)
 	
 	# Level Number Label (inside disc)
-	var num_label = Label.new()
+	var num_label := Label.new()
 	num_label.name = "NumLabel"
 	num_label.custom_minimum_size = Vector2(96, 96)
 	num_label.position = Vector2(32, 32)
@@ -278,7 +278,7 @@ func _create_milestone_button(lvl: int, data: Dictionary) -> Control:
 	container.add_child(num_label)
 	
 	# Status Badge (Brass Checkmark for completed, Padlock for locked)
-	var status_icon = TextureRect.new()
+	var status_icon := TextureRect.new()
 	status_icon.name = "StatusIcon"
 	status_icon.custom_minimum_size = Vector2(44, 44)
 	status_icon.position = Vector2(58, 20)
@@ -289,23 +289,23 @@ func _create_milestone_button(lvl: int, data: Dictionary) -> Control:
 	
 	# Boss Banner Ribbon for Milestone Bosses (5, 10, 15, 20, 25, 30, 35, 40, 45)
 	if data.get("is_boss", false):
-		var boss_type = data.get("boss_type", "")
-		var boss_banner = PanelContainer.new()
+		var boss_type: String = str(data.get("boss_type", ""))
+		var boss_banner := PanelContainer.new()
 		boss_banner.name = "BossBanner"
 		boss_banner.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		
-		var banner_w = 220 if boss_type == "final_boss" else 200
-		var banner_h = 38 if boss_type == "final_boss" else 34
+		var banner_w := 220 if boss_type == "final_boss" else 200
+		var banner_h := 38 if boss_type == "final_boss" else 34
 		boss_banner.position = Vector2(80 - (banner_w * 0.5), -20)
 		boss_banner.custom_minimum_size = Vector2(banner_w, banner_h)
 		
-		var banner_style = StyleBoxFlat.new()
+		var banner_style := StyleBoxFlat.new()
 		banner_style.set_corner_radius_all(12)
 		banner_style.shadow_size = 6
 		banner_style.shadow_offset = Vector2(0, 2)
 		
-		var label_text = "BOSS"
-		var skull_mod = Color.WHITE
+		var label_text := "BOSS"
+		var skull_mod := Color.WHITE
 		
 		match boss_type:
 			"phantom_dredge":
@@ -348,12 +348,12 @@ func _create_milestone_button(lvl: int, data: Dictionary) -> Control:
 				
 		boss_banner.add_theme_stylebox_override("panel", banner_style)
 		
-		var hbox = HBoxContainer.new()
+		var hbox := HBoxContainer.new()
 		hbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		hbox.add_theme_constant_override("separation", 6)
 		hbox.alignment = BoxContainer.ALIGNMENT_CENTER
 		
-		var skull = TextureRect.new()
+		var skull := TextureRect.new()
 		skull.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		skull.custom_minimum_size = Vector2(22, 22)
 		skull.texture = ICON_SKULL
@@ -362,7 +362,7 @@ func _create_milestone_button(lvl: int, data: Dictionary) -> Control:
 		skull.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		hbox.add_child(skull)
 		
-		var b_lbl = Label.new()
+		var b_lbl := Label.new()
 		b_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		b_lbl.text = label_text
 		b_lbl.add_theme_font_override("font", FONT_LILITA)
@@ -374,7 +374,7 @@ func _create_milestone_button(lvl: int, data: Dictionary) -> Control:
 		container.add_child(boss_banner)
 		
 	# Expedition Name Label (Parchment title beneath node)
-	var title_lbl = Label.new()
+	var title_lbl := Label.new()
 	title_lbl.name = "TitleLabel"
 	title_lbl.position = Vector2(-40, 126)
 	title_lbl.custom_minimum_size = Vector2(240, 28)
@@ -390,7 +390,7 @@ func _create_milestone_button(lvl: int, data: Dictionary) -> Control:
 	container.add_child(title_lbl)
 
 	# Clickable Milestone Button covering the entire 96x96 circle interior
-	var btn = Button.new()
+	var btn := Button.new()
 	btn.name = "TouchButton"
 	btn.position = Vector2(32, 32)
 	btn.size = Vector2(96, 96)
@@ -401,13 +401,13 @@ func _create_milestone_button(lvl: int, data: Dictionary) -> Control:
 	btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	btn.focus_mode = Control.FOCUS_NONE
 
-	var hit_style = StyleBoxFlat.new()
+	var hit_style := StyleBoxFlat.new()
 	hit_style.bg_color = Color(1.0, 1.0, 1.0, 0.005)
 	hit_style.set_corner_radius_all(48)
 	for state in ["normal", "hover", "pressed", "focus", "disabled"]:
 		btn.add_theme_stylebox_override(state, hit_style)
 
-	btn.pressed.connect(func(): _on_node_pressed(lvl))
+	btn.pressed.connect(func() -> void: _on_node_pressed(lvl))
 	container.add_child(btn)
 
 	# Safeguard: ensure every non-button child/descendant ignores mouse clicks
@@ -425,11 +425,10 @@ static func _set_mouse_filter_recursive(node: Node, filter_mode: Control.MouseFi
 		_set_mouse_filter_recursive(child, filter_mode)
 
 func _refresh_all_node_states() -> void:
-	var unlocked_max = GameState.highest_unlocked_level
-	var _selected = GameState.current_selected_level
+	var unlocked_max := GameState.highest_unlocked_level
 	
-	for lvl in MILESTONES.keys():
-		var container = node_controls.get(lvl)
+	for lvl: int in MILESTONES.keys():
+		var container := node_controls.get(lvl) as Control
 		if not container:
 			continue
 			
@@ -438,7 +437,7 @@ func _refresh_all_node_states() -> void:
 		var status_icon: TextureRect = container.get_node("StatusIcon")
 		var active_aura: Control = container.get_node("ActiveAura")
 		
-		var disc_style = StyleBoxFlat.new()
+		var disc_style := StyleBoxFlat.new()
 		disc_style.set_corner_radius_all(48)
 		disc_style.shadow_size = 6
 		disc_style.shadow_offset = Vector2(0, 4)
@@ -490,7 +489,7 @@ func _pulse_active_aura(aura: Control) -> void:
 
 	aura.scale = Vector2(0.92, 0.92)
 	aura.modulate.a = 0.85
-	var t = create_tween().set_loops()
+	var t := create_tween().set_loops()
 	t.tween_property(aura, "scale", Vector2(1.28, 1.28), 0.85).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	t.parallel().tween_property(aura, "modulate:a", 0.05, 0.85).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	t.tween_property(aura, "scale", Vector2(0.92, 0.92), 0.01)
@@ -507,15 +506,15 @@ func _setup_mini_vessel() -> void:
 	if not mini_vessel or not mini_vessel_icon:
 		return
 		
-	var active_id = GameState.active_vessel
-	var tex_loaded = false
+	var active_id := GameState.active_vessel
+	var tex_loaded := false
 	if active_id in GameState.VESSEL_CATALOG:
-		var p_tex = GameState.VESSEL_CATALOG[active_id].get("preview_texture", "")
+		var p_tex: String = str(GameState.VESSEL_CATALOG[active_id].get("preview_texture", ""))
 		if ResourceLoader.exists(p_tex):
-			var t = ResourceLoader.load(p_tex) as Texture2D
+			var t := ResourceLoader.load(p_tex) as Texture2D
 			if t:
 				if VESSEL_CROP_REGIONS.has(active_id):
-					var atlas = AtlasTexture.new()
+					var atlas := AtlasTexture.new()
 					atlas.atlas = t
 					atlas.region = VESSEL_CROP_REGIONS[active_id]
 					mini_vessel_icon.texture = atlas
@@ -543,12 +542,12 @@ func _handle_initial_presentation() -> void:
 	# ScrollContainer Frame-0 Guard: wait for 15,000px content height to be fully measured
 	await get_tree().process_frame
 	
-	var active_lvl = clamp(GameState.current_selected_level, 1, 45)
+	var active_lvl: int = clampi(GameState.current_selected_level, 1, 45)
 	if GameState.just_cleared_level:
 		_play_advancement_sequence()
 	else:
 		_focus_on_level(active_lvl, false)
-		var target_pos = _get_node_dock_pos(active_lvl)
+		var target_pos := _get_node_dock_pos(active_lvl)
 		mini_vessel.position = target_pos
 		mini_vessel.rotation = _get_node_water_rotation(active_lvl)
 
@@ -560,11 +559,11 @@ func _get_node_dock_pos(lvl: int) -> Vector2:
 
 func _get_node_water_rotation(lvl: int) -> float:
 	if river_curve and MILESTONES.has(lvl):
-		var pos = MILESTONES[lvl]["pos"]
-		var offset = river_curve.get_closest_offset(pos)
-		var pt1 = river_curve.sample_baked(offset)
-		var pt2 = river_curve.sample_baked(minf(offset + 6.0, river_curve.get_baked_length()))
-		var dir = (pt2 - pt1).normalized()
+		var pos: Vector2 = MILESTONES[lvl]["pos"]
+		var offset := river_curve.get_closest_offset(pos)
+		var pt1 := river_curve.sample_baked(offset)
+		var pt2 := river_curve.sample_baked(minf(offset + 6.0, river_curve.get_baked_length()))
+		var dir := (pt2 - pt1).normalized()
 		if dir.length_squared() > 0.01:
 			return dir.angle() + PI/2
 	return 0.0
@@ -573,31 +572,31 @@ func _focus_on_level(lvl: int, animate: bool = true, duration: float = 0.8) -> v
 	if not scroll_container or not MILESTONES.has(lvl):
 		return
 		
-	var node_y = MILESTONES[lvl]["pos"].y
-	var viewport_h = scroll_container.size.y
+	var node_y: float = MILESTONES[lvl]["pos"].y
+	var viewport_h := scroll_container.size.y
 	if viewport_h <= 0:
 		viewport_h = 1000.0
-	var canvas_h = map_canvas.custom_minimum_size.y if map_canvas else 15000.0
-	var target_scroll = clamp(int(node_y - viewport_h * 0.5), 0, int(canvas_h - viewport_h))
+	var canvas_h := map_canvas.custom_minimum_size.y if map_canvas else 15000.0
+	var target_scroll: int = clampi(int(node_y - viewport_h * 0.5), 0, int(canvas_h - viewport_h))
 	
 	if animate:
-		var st = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		var st := create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		st.tween_property(scroll_container, "scroll_vertical", target_scroll, duration)
 	else:
 		scroll_container.scroll_vertical = target_scroll
 
 func _play_advancement_sequence() -> void:
 	is_animating_travel = true
-	var from_lvl = clamp(GameState.last_cleared_level, 1, 45)
-	var to_lvl = clamp(GameState.highest_unlocked_level, 1, 45)
+	var from_lvl: int = clampi(GameState.last_cleared_level, 1, 45)
+	var to_lvl: int = clampi(GameState.highest_unlocked_level, 1, 45)
 	
 	if from_lvl == to_lvl and to_lvl > 1:
 		from_lvl = to_lvl - 1
 		
 	# 1. Place camera and vessel at the just-cleared node
 	_focus_on_level(from_lvl, false)
-	var start_pos = _get_node_dock_pos(from_lvl)
-	var end_pos = _get_node_dock_pos(to_lvl)
+	var start_pos := _get_node_dock_pos(from_lvl)
+	var end_pos := _get_node_dock_pos(to_lvl)
 	mini_vessel.position = start_pos
 	mini_vessel.rotation = _get_node_water_rotation(from_lvl)
 	if vessel_bob_tween and vessel_bob_tween.is_valid():
@@ -608,21 +607,21 @@ func _play_advancement_sequence() -> void:
 	await get_tree().create_timer(0.35, true, false, true).timeout
 	
 	# Sample offsets along spline
-	var from_offset = river_curve.get_closest_offset(start_pos)
-	var to_offset = river_curve.get_closest_offset(end_pos)
+	var from_offset := river_curve.get_closest_offset(start_pos)
+	var to_offset := river_curve.get_closest_offset(end_pos)
 	
 	# Play water cruise SFX
 	AudioManager.play_sfx("water_splashes", 0.95, 1.05)
 	
 	# 3. Tween camera scroll and vessel along river spline over 1.2 seconds
-	var travel_duration = 1.2
+	var travel_duration := 1.2
 	_focus_on_level(to_lvl, true, travel_duration)
 	
-	var travel_tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	travel_tween.tween_method(func(offset: float):
-		var pt = river_curve.sample_baked(offset)
-		var next_pt = river_curve.sample_baked(offset + 6.0)
-		var dir = (next_pt - pt).normalized()
+	var travel_tween := create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	travel_tween.tween_method(func(offset: float) -> void:
+		var pt := river_curve.sample_baked(offset)
+		var next_pt := river_curve.sample_baked(offset + 6.0)
+		var dir := (next_pt - pt).normalized()
 		mini_vessel.position = pt
 		if dir.length_squared() > 0.01:
 			mini_vessel.rotation = lerp_angle(mini_vessel.rotation, dir.angle() + PI/2, 0.25)
@@ -659,21 +658,21 @@ func _trigger_unlock_burst(lvl: int) -> void:
 	if not unlock_vfx or not MILESTONES.has(lvl):
 		return
 		
-	var pos = MILESTONES[lvl]["pos"] + Vector2(80, 80)
+	var pos: Vector2 = MILESTONES[lvl]["pos"] + Vector2(80, 80)
 	unlock_vfx.position = pos
 	unlock_vfx.visible = true
 	unlock_vfx.scale = Vector2(0.2, 0.2)
 	unlock_vfx.modulate.a = 1.0
 	
 	# Shockwave punch animation
-	var vt = create_tween().set_parallel(true).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	var vt := create_tween().set_parallel(true).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	vt.tween_property(unlock_vfx, "scale", Vector2(1.8, 1.8), 0.6)
 	vt.tween_property(unlock_vfx, "modulate:a", 0.0, 0.7)
 	
 	# Scale punch on target node
-	var container = node_controls.get(lvl)
+	var container := node_controls.get(lvl) as Control
 	if container:
-		var node_t = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		var node_t := create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		container.scale = Vector2(1.35, 1.35)
 		node_t.tween_property(container, "scale", Vector2.ONE, 0.45)
 
@@ -681,7 +680,7 @@ func _on_node_pressed(lvl: int) -> void:
 	if is_animating_travel:
 		return
 		
-	var unlocked_max = GameState.highest_unlocked_level
+	var unlocked_max := GameState.highest_unlocked_level
 	if lvl <= unlocked_max:
 		AudioManager.play_sfx("gate_passes", 1.0, 1.1)
 		GameState.current_selected_level = lvl
@@ -689,9 +688,9 @@ func _on_node_pressed(lvl: int) -> void:
 		level_selected.emit(lvl)
 		
 		# Move miniature vessel to selected node on the water
-		var target_pos = _get_node_dock_pos(lvl)
-		var target_rot = _get_node_water_rotation(lvl)
-		var mt = create_tween().set_parallel(true).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		var target_pos := _get_node_dock_pos(lvl)
+		var target_rot := _get_node_water_rotation(lvl)
+		var mt := create_tween().set_parallel(true).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		mt.tween_property(mini_vessel, "position", target_pos, 0.4)
 		mt.tween_property(mini_vessel, "rotation", target_rot, 0.4)
 		
@@ -700,10 +699,10 @@ func _on_node_pressed(lvl: int) -> void:
 	else:
 		# Locked node: shake padlock with rattle sound
 		AudioManager.play_sfx("barrel_hits", 1.2, 1.4)
-		var container = node_controls.get(lvl)
+		var container := node_controls.get(lvl) as Control
 		if container:
-			var shake_t = create_tween()
-			var orig_x = container.position.x
+			var shake_t := create_tween()
+			var orig_x: float = container.position.x
 			shake_t.tween_property(container, "position:x", orig_x - 8.0, 0.06)
 			shake_t.tween_property(container, "position:x", orig_x + 8.0, 0.06)
 			shake_t.tween_property(container, "position:x", orig_x - 4.0, 0.06)
@@ -716,7 +715,7 @@ func _on_node_pressed(lvl: int) -> void:
 func _setup_popup() -> void:
 	if popup_scrim:
 		popup_scrim.visible = false
-		popup_scrim.gui_input.connect(func(event: InputEvent):
+		popup_scrim.gui_input.connect(func(event: InputEvent) -> void:
 			if event is InputEventMouseButton and event.pressed:
 				_close_level_popup()
 		)
@@ -732,7 +731,7 @@ func _show_level_popup(lvl: int) -> void:
 		return
 		
 	popup_selected_level = lvl
-	var data = MILESTONES[lvl]
+	var data: Dictionary = MILESTONES[lvl] as Dictionary
 	
 	if popup_num:
 		popup_num.text = "EXPEDITION %02d" % lvl
@@ -742,9 +741,9 @@ func _show_level_popup(lvl: int) -> void:
 		popup_biome.text = "%s  •  Target: %dm" % [data["biome"], data["target_dist"]]
 		
 	if popup_score:
-		var best = GameState.level_high_scores.get(lvl, 0)
-		var stars = GameState.level_stars.get(lvl, 0)
-		var stars_str = ""
+		var best: int = int(GameState.level_high_scores.get(lvl, 0))
+		var stars: int = int(GameState.level_stars.get(lvl, 0))
+		var stars_str := ""
 		for i in range(3):
 			stars_str += "★" if i < stars else "☆"
 		if best > 0:
@@ -764,7 +763,7 @@ func _show_level_popup(lvl: int) -> void:
 	popup_panel.scale = Vector2(0.8, 0.8)
 	popup_panel.modulate.a = 0.0
 	
-	var pt = create_tween().set_parallel(true).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	var pt := create_tween().set_parallel(true).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	pt.tween_property(popup_panel, "scale", Vector2.ONE, 0.35)
 	pt.tween_property(popup_panel, "modulate:a", 1.0, 0.25)
 
@@ -773,7 +772,7 @@ func _close_level_popup() -> void:
 		return
 		
 	AudioManager.play_sfx("gate_passes", 0.9, 1.0)
-	var pt = create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	var pt := create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
 	pt.tween_property(popup_panel, "scale", Vector2(0.85, 0.85), 0.2)
 	pt.tween_property(popup_panel, "modulate:a", 0.0, 0.2)
 	
@@ -786,9 +785,9 @@ func _on_set_sail_pressed() -> void:
 	sail_requested.emit(popup_selected_level)
 
 func _format_number(val: int) -> String:
-	var s = str(abs(val))
-	var res = ""
-	var count = 0
+	var s := str(abs(val))
+	var res := ""
+	var count := 0
 	for i in range(s.length() - 1, -1, -1):
 		res = s[i] + res
 		count += 1

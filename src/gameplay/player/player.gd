@@ -119,7 +119,7 @@ func _ready() -> void:
 
 	if visuals:
 		visuals.rotation_degrees.y = 0.0
-	var init_hp = get_node_or_null("Hardpoints")
+	var init_hp := get_node_or_null("Hardpoints") as Node3D
 	if init_hp:
 		init_hp.rotation_degrees.y = 0.0
 
@@ -127,12 +127,12 @@ func _ready() -> void:
 	_setup_hull_smoke()
 	
 	# Dynamically construct collision area to detect overlapping Area3D obstacles
-	var detection_area = Area3D.new()
+	var detection_area := Area3D.new()
 	detection_area.name = "CollisionArea"
 	add_child(detection_area)
 	
-	var col_shape = CollisionShape3D.new()
-	var box_shape = BoxShape3D.new()
+	var col_shape := CollisionShape3D.new()
+	var box_shape := BoxShape3D.new()
 	box_shape.size = Vector3(1.6, 1.4, 2.8)
 	col_shape.shape = box_shape
 	detection_area.add_child(col_shape)
@@ -141,7 +141,7 @@ func _ready() -> void:
 	detection_area.area_entered.connect(_on_area_entered)
 	
 	# Dynamically construct MagnetArea to attract Layer 4 Collectibles
-	var magnet_area = get_node_or_null("MagnetArea") as Area3D
+	var magnet_area := get_node_or_null("MagnetArea") as Area3D
 	if not magnet_area:
 		magnet_area = Area3D.new()
 		magnet_area.name = "MagnetArea"
@@ -152,12 +152,12 @@ func _ready() -> void:
 	magnet_area.monitoring = true
 	magnet_area.monitorable = false
 
-	var mag_shape = magnet_area.get_node_or_null("CollisionShape3D") as CollisionShape3D
+	var mag_shape := magnet_area.get_node_or_null("CollisionShape3D") as CollisionShape3D
 	if not mag_shape:
 		mag_shape = CollisionShape3D.new()
 		magnet_area.add_child(mag_shape)
 
-	var sphere = SphereShape3D.new()
+	var sphere := SphereShape3D.new()
 	sphere.radius = 4.5
 	mag_shape.shape = sphere
 	mag_shape.position = Vector3(0, 0.5, 0)
@@ -172,7 +172,7 @@ func _ready() -> void:
 	
 	ram_absorb_charges_remaining = 1
 	
-	var level_ship = GameState.get_current_ship_resource() if GameState.has_method("get_current_ship_resource") else null
+	var level_ship := GameState.get_current_ship_resource() if GameState.has_method("get_current_ship_resource") else null
 	if level_ship:
 		ship_data = level_ship
 		
@@ -185,7 +185,7 @@ func _ready() -> void:
 		_setup_calibration_mode()
 
 func _on_active_vessel_changed(v_id: String) -> void:
-	var ship = GameState.get_vessel_resource(v_id)
+	var ship := GameState.get_vessel_resource(v_id)
 	if ship:
 		apply_ship_data(ship)
 
@@ -202,22 +202,22 @@ func apply_ship_data(data: ShipData) -> void:
 		_movement.sync_from_ship_data(data.move_speed, data.move_speed * 1.3)
 	
 	if visuals:
-		var boat_mesh = visuals.get_node_or_null("BoatMesh")
-		var sprite = visuals.get_node_or_null("BoatSprite") as Sprite3D
+		var boat_mesh := visuals.get_node_or_null("BoatMesh") as Node3D
+		var sprite := visuals.get_node_or_null("BoatSprite") as Sprite3D
 
 		# Determine whether this vessel has a 3D model assigned
 		var model_to_load: PackedScene = null
 		if "model_scene" in data and data.model_scene:
 			model_to_load = data.model_scene
 		elif data.ship_id == "dinghy":
-			var dinghy_glb = "res://assets/models/user/vessels/dinghy.glb"
+			var dinghy_glb := "res://assets/models/user/vessels/dinghy.glb"
 			if ResourceLoader.exists(dinghy_glb):
-				model_to_load = load(dinghy_glb)
+				model_to_load = load(dinghy_glb) as PackedScene
 
 		if model_to_load:
 			if sprite:
 				sprite.visible = false
-			var is_same_model = false
+			var is_same_model := false
 			if boat_mesh:
 				if boat_mesh.has_meta("model_source") and boat_mesh.get_meta("model_source") == model_to_load:
 					is_same_model = true
@@ -231,19 +231,20 @@ func apply_ship_data(data: ShipData) -> void:
 				boat_mesh = null
 
 			if not boat_mesh:
-				boat_mesh = model_to_load.instantiate()
-				boat_mesh.name = "BoatMesh"
-				boat_mesh.set_meta("model_source", model_to_load)
-				visuals.add_child(boat_mesh)
+				boat_mesh = model_to_load.instantiate() as Node3D
+				if boat_mesh:
+					boat_mesh.name = "BoatMesh"
+					boat_mesh.set_meta("model_source", model_to_load)
+					visuals.add_child(boat_mesh)
 
 			if boat_mesh:
 				boat_mesh.visible = true
 				boat_mesh.position = Vector3(0, data.y_offset if "y_offset" in data else 0.0, 0)
 				boat_mesh.rotation_degrees = data.rotation_degrees if ("rotation_degrees" in data and data.rotation_degrees != Vector3.ZERO) else Vector3.ZERO
-				var sc = data.scale if ("scale" in data and data.scale != Vector3.ZERO) else Vector3.ONE
+				var sc := data.scale if ("scale" in data and data.scale != Vector3.ZERO) else Vector3.ONE
 				boat_mesh.scale = sc
 				if data.ship_id == "dinghy" and not boat_mesh.has_node("CockpitWaterMask"):
-					var mask = MeshInstance3D.new()
+					var mask := MeshInstance3D.new()
 					mask.name = "CockpitWaterMask"
 					mask.mesh = preload("res://assets/models/user/vessels/dinghy_cockpit_mask.tres")
 					boat_mesh.add_child(mask)
@@ -257,18 +258,18 @@ func apply_ship_data(data: ShipData) -> void:
 			sprite.visible = true
 			sprite.texture = data.sprite_texture
 			sprite.pixel_size = data.pixel_size
-			var rot = data.rotation_degrees if ("rotation_degrees" in data and data.rotation_degrees != Vector3.ZERO) else Vector3(player_pitch_deg, 0, 0)
+			var rot := data.rotation_degrees if ("rotation_degrees" in data and data.rotation_degrees != Vector3.ZERO) else Vector3(player_pitch_deg, 0, 0)
 			sprite.rotation_degrees = rot
 			sprite.position = Vector3(0, data.y_offset if "y_offset" in data else 0.485, 0)
-			var sc = data.scale if ("scale" in data and data.scale != Vector3.ZERO) else Vector3.ONE
+			var sc := data.scale if ("scale" in data and data.scale != Vector3.ZERO) else Vector3.ONE
 			sprite.scale = sc
 			sprite.billboard = BaseMaterial3D.BILLBOARD_DISABLED
 			sprite.alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
 	
 	# Update main character collision shape
-	var body_col = get_node_or_null("CollisionShape3D") as CollisionShape3D
+	var body_col := get_node_or_null("CollisionShape3D") as CollisionShape3D
 	if body_col:
-		var box = body_col.shape as BoxShape3D
+		var box := body_col.shape as BoxShape3D
 		if not box:
 			box = BoxShape3D.new()
 			body_col.shape = box
@@ -276,9 +277,9 @@ func apply_ship_data(data: ShipData) -> void:
 		body_col.position = Vector3(0, data.collision_size.y * 0.5, 0)
 		
 	# Update detection area collision shape
-	var area_col = get_node_or_null("CollisionArea/CollisionShape3D") as CollisionShape3D
+	var area_col := get_node_or_null("CollisionArea/CollisionShape3D") as CollisionShape3D
 	if area_col:
-		var area_box = area_col.shape as BoxShape3D
+		var area_box := area_col.shape as BoxShape3D
 		if not area_box:
 			area_box = BoxShape3D.new()
 			area_col.shape = area_box
@@ -286,47 +287,46 @@ func apply_ship_data(data: ShipData) -> void:
 		area_col.position = Vector3(0, (data.collision_size.y + 0.2) * 0.5, 0)
 		
 	# Update boat wake position based on collision_size
-	var wake = get_node_or_null("BoatWake") as Node3D
+	var wake := get_node_or_null("BoatWake") as Node3D
 	if wake and "collision_size" in data:
-		var wake_z = data.collision_size.z * 0.5 - 0.1
+		var wake_z := data.collision_size.z * 0.5 - 0.1
 		wake.position = Vector3(0, 0.02, max(1.2, wake_z))
 		
 	# Position and rotate all children under $Hardpoints according to data.hardpoint_offsets and data.hardpoint_rotations
-	var hardpoints = get_node_or_null("Hardpoints")
+	var hardpoints := get_node_or_null("Hardpoints") as Node3D
 	if hardpoints:
 		# Prune any sockets that are not defined in the active ship's ship_data resource
-		for socket in hardpoints.get_children():
+		for socket: Node in hardpoints.get_children():
 			if not data.hardpoint_offsets.has(socket.name):
 				hardpoints.remove_child(socket)
 				socket.queue_free()
 				
-		for s_name in data.hardpoint_offsets.keys():
-			var s_node = hardpoints.get_node_or_null(s_name)
+		for s_name: String in data.hardpoint_offsets.keys():
+			var s_node := hardpoints.get_node_or_null(s_name) as Node3D
 			if not s_node:
 				s_node = Node3D.new()
 				s_node.name = s_name
 				hardpoints.add_child(s_node)
 
-		for socket in hardpoints.get_children():
+		for socket: Node in hardpoints.get_children():
 			if socket is Node3D:
-				var s_name = socket.name
+				var sock3d := socket as Node3D
+				var s_name := sock3d.name
 				if data.hardpoint_offsets.has(s_name):
-					socket.position = data.hardpoint_offsets[s_name]
+					sock3d.position = data.hardpoint_offsets[s_name]
 				elif "y_offset" in data:
-					socket.position.y = data.y_offset - 0.57735 * socket.position.z
+					sock3d.position.y = data.y_offset - 0.57735 * sock3d.position.z
 					
 				if data.hardpoint_rotations.has(s_name):
-					var rot = data.hardpoint_rotations[s_name]
-					if rot is Vector3:
-						socket.rotation_degrees = rot
+					var rot: Vector3 = data.hardpoint_rotations[s_name]
+					sock3d.rotation_degrees = rot
 
 				if data.hardpoint_scales.has(s_name):
-					var sc = data.hardpoint_scales[s_name]
-					if sc is Vector3:
-						socket.scale = sc
+					var sc: Vector3 = data.hardpoint_scales[s_name]
+					sock3d.scale = sc
 						
 				# Wipe any existing weapons inside sockets
-				for child in socket.get_children():
+				for child: Node in sock3d.get_children():
 					child.queue_free()
 		
 		equipped_weapons.clear()
@@ -361,11 +361,11 @@ func apply_tier(tier_level: int) -> void:
 
 	# Filter weapons_map directly against active_sockets, decoupling crew throwers
 	var filtered_map: Dictionary = {}
-	for s in active_sockets:
-		var s_lower = str(s).to_lower()
+	for s: String in active_sockets:
+		var s_lower := str(s).to_lower()
 		if "crew" in s_lower:
 			# Crew sockets start empty unless equipped by the player in GameState
-			var equipped_cid = GameState.get_equipped_crew(ship_data.ship_id, str(s)) if GameState else ""
+			var equipped_cid := GameState.get_equipped_crew(ship_data.ship_id, str(s)) if GameState else ""
 			if equipped_cid != "" and GameState and GameState.CREW_CATALOG.has(equipped_cid):
 				filtered_map[s] = GameState.CREW_CATALOG[equipped_cid]["resource_path"]
 		elif weapons_map.has(s):
@@ -374,25 +374,26 @@ func apply_tier(tier_level: int) -> void:
 
 	# Safe Ship Swap Guard: Remove any currently equipped weapons whose sockets are no longer in this tier
 	var sockets_to_remove: Array[String] = []
-	for s in equipped_weapons.keys():
+	for s: String in equipped_weapons.keys():
 		if not weapons_map.has(s):
 			sockets_to_remove.append(s)
-	for s in sockets_to_remove:
-		if is_instance_valid(equipped_weapons[s]):
-			equipped_weapons[s].queue_free()
+	for s: String in sockets_to_remove:
+		var node_w := equipped_weapons[s] as Node
+		if is_instance_valid(node_w):
+			node_w.queue_free()
 		equipped_weapons.erase(s)
 
-	for socket_name in weapons_map:
-		var val = weapons_map[socket_name]
+	for socket_name: String in weapons_map:
+		var val: Variant = weapons_map[socket_name]
 		var w_data: WeaponData = null
 		if val is String:
 			w_data = load(val) as WeaponData
 		elif val is WeaponData:
 			w_data = val
 		if w_data:
-			var s_lower = str(socket_name).to_lower()
-			var c_id = ""
-			var c_lvl = 1
+			var s_lower := str(socket_name).to_lower()
+			var c_id := ""
+			var c_lvl := 1
 			if "crew" in s_lower and GameState:
 				c_id = GameState.get_equipped_crew(ship_data.ship_id, str(socket_name))
 				c_lvl = GameState.get_crew_level(c_id)
@@ -427,13 +428,13 @@ func _physics_process(delta: float) -> void:
 		if scraping_timer >= 0.25:
 			scraping_timer = 0.0
 			AudioManager.play_sfx("barrel_hits", 1.15, 1.35, -8.0) # Scrape sound
-			var spray_scene = preload("res://src/vfx/boat_wake.tscn")
+			var spray_scene := preload("res://src/vfx/boat_wake.tscn")
 			if spray_scene:
-				var spray = spray_scene.instantiate() as GPUParticles3D
+				var spray := spray_scene.instantiate() as GPUParticles3D
 				get_parent().add_child(spray)
 				spray.global_position = global_position + Vector3(randf_range(-0.5, 0.5), 0.1, randf_range(-0.5, 0.5))
 				spray.emitting = true
-				var t = create_tween()
+				var t := create_tween()
 				t.tween_interval(1.0)
 				t.tween_callback(spray.queue_free)
 	else:
@@ -495,16 +496,16 @@ func _physics_process(delta: float) -> void:
 
 	# Automatic periodic cannon shooting
 	if is_shooting_enabled:
-		for weapon in equipped_weapons.values():
+		for weapon: Node in equipped_weapons.values():
 			if is_instance_valid(weapon) and weapon.has_method("try_fire"):
-				weapon.try_fire(delta * fire_rate_multiplier * tier_fire_rate_multiplier)
+				weapon.call("try_fire", delta * fire_rate_multiplier * tier_fire_rate_multiplier)
 
 	move_and_slide()
 
 
 func _on_magnet_area_entered(area: Area3D) -> void:
 	if area and area.is_in_group("doubloons") and area.has_method("attract_to"):
-		area.attract_to(self)
+		area.call("attract_to", self)
 
 func upgrade_ship(amount: int = 1) -> void:
 	score += amount
@@ -519,14 +520,15 @@ func add_evolution_xp(_amount: float) -> void:
 	pass
 
 func spawn_floating_text_at_position(text_val: String, color_val: Color) -> void:
-	var ft_script = load("res://src/vfx/floating_text.gd")
+	var ft_script := load("res://src/vfx/floating_text.gd") as GDScript
 	if ft_script:
-		var fct = ft_script.new()
-		var root = get_tree().current_scene
-		if root:
+		var fct: Node3D = ft_script.new() as Node3D
+		var root := get_tree().current_scene
+		if root and fct:
 			root.add_child(fct)
 			fct.global_position = global_position + Vector3(randf_range(-0.5, 0.5), 1.5, randf_range(-0.5, 0.5))
-			fct.setup(text_val, color_val)
+			if fct.has_method("setup"):
+				fct.call("setup", text_val, color_val)
 
 
 
@@ -545,8 +547,8 @@ func damage_fleet(amount: int = 1, source_info: String = "poison_mortar_geyser")
 
 func take_hit(amount: int = 1, source_info: String = "") -> void:
 	# Plating damage mitigation
-	var active_plating = GameState.get_active_plating() if GameState else "none"
-	var s_lower = source_info.to_lower()
+	var active_plating := GameState.get_active_plating() if GameState else "none"
+	var s_lower := source_info.to_lower()
 	if active_plating == "spectral_ward" and ("spectral" in s_lower or "geyser" in s_lower or "mortar" in s_lower or "poison" in s_lower or "ghost" in s_lower):
 		amount = max(1, int(round(amount * 0.4))) # -60% geyser/spectral damage
 	elif active_plating == "brimstone_fireproof" and ("brimstone" in s_lower or "fire" in s_lower or "magma" in s_lower or "lava" in s_lower or "flame" in s_lower):
@@ -560,9 +562,9 @@ func take_hit(amount: int = 1, source_info: String = "") -> void:
 	if source_info != "leak_threat":
 		GameState.record_hit()
 	current_health = max(0, current_health - amount)
-	var camera = get_tree().get_first_node_in_group("game_camera")
+	var camera := get_tree().get_first_node_in_group("game_camera")
 	if camera and camera.has_method("add_trauma"):
-		camera.add_trauma(0.55)
+		camera.call("add_trauma", 0.55)
 
 	# Sensory Polish: 3D Hit Flash & Kinetic Hull Shudder
 	if _movement:
@@ -595,7 +597,7 @@ func _on_area_entered(area: Area3D) -> void:
 		return
 		
 	if area.is_in_group("destructible") or area.is_in_group("enemies") or area.is_in_group("boss"):
-		var is_barricade = area is BarricadeSegment or area.is_in_group("barricade") or (area.get_parent() and area.get_parent().is_in_group("barricade"))
+		var is_barricade := area is BarricadeSegment or area.is_in_group("barricade") or (area.get_parent() and area.get_parent().is_in_group("barricade"))
 		
 		if is_barricade:
 			if GameState and GameState.get_active_plating() == "spiked_iron_prow" and ram_absorb_charges_remaining > 0:
@@ -604,37 +606,37 @@ func _on_area_entered(area: Area3D) -> void:
 				spawn_floating_text_at_position("🛡️ PROW RAM ABSORBED!", Color(0.3, 0.9, 1.0))
 				AudioManager.play_sfx("sfx_wood_smash", 0.9, 1.1)
 				if area.has_method("take_hit"):
-					area.take_hit(20, "spiked_prow_ram")
+					area.call("take_hit", 20, "spiked_prow_ram")
 				elif area.has_method("take_damage"):
-					area.take_damage(20)
+					area.call("take_damage", 20)
 				elif area.has_method("die"):
-					area.die()
+					area.call("die")
 				return
 
 			if hit_invulnerability_timer > 0.0:
 				# Collision damage already applied this burst; break barricade segment without re-damaging hull
 				if area.has_method("die"):
-					area.die()
+					area.call("die")
 				elif area.has_method("take_hit"):
-					area.take_hit(20, "barricade_graze")
+					area.call("take_hit", 20, "barricade_graze")
 				elif area.has_method("take_damage"):
-					area.take_damage(20)
+					area.call("take_damage", 20)
 				return
 			
 			hit_invulnerability_timer = 0.5
 			AudioManager.play_sfx("sfx_wood_smash")
 			var cur_lvl: int = GameState.current_level if GameState else 1
-			var barricade_dmg = 1 if cur_lvl <= 3 else 2
+			var barricade_dmg := 1 if cur_lvl <= 3 else 2
 			take_hit(barricade_dmg, "Collision with Barricade")
 			if area.has_method("die"):
-				area.die()
+				area.call("die")
 			elif area.has_method("take_hit"):
-				area.take_hit(20, "player_vessel_ram")
+				area.call("take_hit", 20, "player_vessel_ram")
 			elif area.has_method("take_damage"):
-				area.take_damage(20)
+				area.call("take_damage", 20)
 			return
 
-		var is_sea_mine = area is HazardSeaMine or (area is DestructibleObstacle and area.obstacle_type == DestructibleObstacle.ObstacleType.SEA_MINE) or ("mine" in area.name.to_lower()) or area.is_in_group("sea_mine")
+		var is_sea_mine: bool = area is HazardSeaMine or (area is DestructibleObstacle and (area as DestructibleObstacle).obstacle_type == DestructibleObstacle.ObstacleType.SEA_MINE) or ("mine" in area.name.to_lower()) or area.is_in_group("sea_mine")
 		if is_sea_mine:
 			if GameState and GameState.get_active_plating() == "spiked_iron_prow" and ram_absorb_charges_remaining > 0:
 				ram_absorb_charges_remaining -= 1
@@ -642,7 +644,7 @@ func _on_area_entered(area: Area3D) -> void:
 				spawn_floating_text_at_position("🛡️ PROW RAM ABSORBED!", Color(0.3, 0.9, 1.0))
 				AudioManager.play_sfx("sfx_mine_detonate", 0.8, 1.0)
 				if area.has_method("die"):
-					area.die()
+					area.call("die")
 				else:
 					area.queue_free()
 				return
@@ -650,7 +652,7 @@ func _on_area_entered(area: Area3D) -> void:
 			# Let mine.die() handle its own explosion VFX at the mine's position.
 			# take_hit() will check i-frames internally.
 			if area.has_method("die"):
-				area.die()
+				area.call("die")
 			else:
 				area.queue_free()
 			take_hit(1, "Collision with Sea Mine")
@@ -662,11 +664,11 @@ func _on_area_entered(area: Area3D) -> void:
 			spawn_floating_text_at_position("🛡️ PROW RAM ABSORBED!", Color(0.3, 0.9, 1.0))
 			AudioManager.play_sfx("barrel_breaks", 0.9, 1.1)
 			if area.has_method("take_hit"):
-				area.take_hit(10, "spiked_prow_ram")
+				area.call("take_hit", 10, "spiked_prow_ram")
 			elif area.has_method("take_damage"):
-				area.take_damage(10)
+				area.call("take_damage", 10)
 			elif area.has_method("die"):
-				area.die()
+				area.call("die")
 			else:
 				area.queue_free()
 			return
@@ -676,15 +678,15 @@ func _on_area_entered(area: Area3D) -> void:
 			
 		if area.is_in_group("boss") or (area.get_parent() and area.get_parent().is_in_group("boss")):
 			if area.has_method("take_hit"):
-				area.take_hit(5, "player_vessel_ram")
+				area.call("take_hit", 5, "player_vessel_ram")
 			elif area.has_method("take_damage"):
-				area.take_damage(5)
+				area.call("take_damage", 5)
 		elif area.has_method("die"):
-			area.die()
+			area.call("die")
 		elif area.has_method("take_hit"):
-			area.take_hit(5, "player_vessel_ram")
+			area.call("take_hit", 5, "player_vessel_ram")
 		elif area.has_method("take_damage"):
-			area.take_damage(5)
+			area.call("take_damage", 5)
 		else:
 			area.queue_free()
 
@@ -703,39 +705,39 @@ func game_over(victory: bool) -> void:
 	
 	if not victory:
 		player_sunk.emit()
-		var coins = GameState.run_doubloons
-		var dist = GameState.distance_traveled
+		var coins := GameState.run_doubloons
+		var dist := GameState.distance_traveled
 		GameState.bank_run_doubloons(0)
 		run_failed.emit(coins, dist)
 		EventBus.run_failed.emit(coins, dist)
 		EventBus.player_sunk.emit()
 			
-		var level_ctrl = get_tree().get_first_node_in_group("level_controller")
+		var level_ctrl := get_tree().get_first_node_in_group("level_controller")
 		if level_ctrl and level_ctrl.has_method("handle_player_defeat"):
-			level_ctrl.handle_player_defeat(coins, dist)
+			level_ctrl.call("handle_player_defeat", coins, dist)
 			return
 
 		get_tree().paused = true
-		var settlement_scene = preload("res://src/ui/settlement_screen.tscn")
+		var settlement_scene := preload("res://src/ui/settlement_screen.tscn")
 		if settlement_scene:
-			var ui = settlement_scene.instantiate()
+			var ui := settlement_scene.instantiate()
 			get_parent().add_child(ui)
 			if ui.has_method("show_defeat"):
-				ui.show_defeat(coins, dist, GameState.doubloons)
+				ui.call("show_defeat", coins, dist, GameState.doubloons)
 				return
 				
 	get_tree().paused = true
 	if end_game_ui_scene:
-		var ui = end_game_ui_scene.instantiate()
+		var ui := end_game_ui_scene.instantiate()
 		get_parent().add_child(ui)
 		if ui.has_method("set_result"):
-			ui.set_result(victory, score)
+			ui.call("set_result", victory, score)
 
 func _process_calibration_controls(delta: float) -> void:
 	if is_shooting_enabled:
-		for weapon in equipped_weapons.values():
+		for weapon: Node in equipped_weapons.values():
 			if is_instance_valid(weapon) and weapon.has_method("try_fire"):
-				weapon.try_fire(delta)
+				weapon.call("try_fire", delta)
 
 func _setup_calibration_mode() -> void:
 	position = Vector3.ZERO
@@ -749,10 +751,10 @@ func equip_weapon_to_socket(socket_name: String, weapon_data: WeaponData, crew_i
 	if ship_data and not ship_data.hardpoint_offsets.has(socket_name):
 		return # strictly forbid sockets not defined in ship_data
 		
-	var hardpoints = get_node_or_null("Hardpoints")
+	var hardpoints := get_node_or_null("Hardpoints") as Node3D
 	if not hardpoints:
 		return
-	var socket = hardpoints.get_node_or_null(socket_name)
+	var socket := hardpoints.get_node_or_null(socket_name) as Node3D
 	if not socket:
 		socket = Node3D.new()
 		socket.name = socket_name
@@ -760,24 +762,22 @@ func equip_weapon_to_socket(socket_name: String, weapon_data: WeaponData, crew_i
 		if ship_data and ship_data.hardpoint_offsets.has(socket_name):
 			socket.position = ship_data.hardpoint_offsets[socket_name]
 		if ship_data and ship_data.hardpoint_rotations.has(socket_name):
-			var rot = ship_data.hardpoint_rotations[socket_name]
-			if rot is Vector3:
-				socket.rotation_degrees = rot
+			var rot: Vector3 = ship_data.hardpoint_rotations[socket_name]
+			socket.rotation_degrees = rot
 		if ship_data and ship_data.hardpoint_scales.has(socket_name):
-			var sc = ship_data.hardpoint_scales[socket_name]
-			if sc is Vector3:
-				socket.scale = sc
+			var sc: Vector3 = ship_data.hardpoint_scales[socket_name]
+			socket.scale = sc
 		
 	if equipped_weapons.has(socket_name):
-		var old_weapon = equipped_weapons[socket_name]
+		var old_weapon: Node = equipped_weapons[socket_name]
 		if is_instance_valid(old_weapon):
-			if old_weapon.weapon_data == weapon_data and ("crew_level" in old_weapon and old_weapon.crew_level == crew_level):
+			if old_weapon.get("weapon_data") == weapon_data and ("crew_level" in old_weapon and old_weapon.get("crew_level") == crew_level):
 				return # Weapon already active and firing seamlessly
 			old_weapon.queue_free()
 		equipped_weapons.erase(socket_name)
 		
-	var attached_weapon_scene = load("res://src/gameplay/player/attached_weapon.tscn")
-	var weapon_instance = attached_weapon_scene.instantiate() as AttachedWeapon
+	var attached_weapon_scene := load("res://src/gameplay/player/attached_weapon.tscn") as PackedScene
+	var weapon_instance := attached_weapon_scene.instantiate() as AttachedWeapon
 	if "crew_id" in weapon_instance:
 		weapon_instance.crew_id = crew_id
 	if "crew_level" in weapon_instance:
@@ -789,19 +789,19 @@ func equip_weapon_to_socket(socket_name: String, weapon_data: WeaponData, crew_i
 	socket.add_child(weapon_instance)
 	equipped_weapons[socket_name] = weapon_instance
 	
-	var sprite = weapon_instance.get_node_or_null("Sprite3D") as Sprite3D
+	var sprite := weapon_instance.get_node_or_null("Sprite3D") as Sprite3D
 	if sprite:
 		sprite.scale = Vector3.ZERO
-		var tween = create_tween()
+		var tween := create_tween()
 		tween.tween_property(sprite, "scale", Vector3.ONE, 0.4).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
 
 func clear_weapons() -> void:
-	for weapon in equipped_weapons.values():
+	for weapon: Node in equipped_weapons.values():
 		if is_instance_valid(weapon):
 			weapon.queue_free()
 	equipped_weapons.clear()
 	
-	var hardpoints = get_node_or_null("Hardpoints")
+	var hardpoints := get_node_or_null("Hardpoints")
 	if hardpoints:
 		for socket in hardpoints.get_children():
 			for child in socket.get_children():
@@ -809,11 +809,11 @@ func clear_weapons() -> void:
 
 func upgrade_crew() -> void:
 	if ship_data and ship_data.hardpoint_offsets.has("MidDeckCrew") and (not equipped_weapons.has("MidDeckCrew") or not is_instance_valid(equipped_weapons["MidDeckCrew"])):
-		var monkey_res = load("res://src/data/resources/user_crew/crew_monkey_bomber.tres")
+		var monkey_res := load("res://src/data/resources/user_crew/crew_monkey_bomber.tres")
 		equip_weapon_to_socket("MidDeckCrew", monkey_res)
 		spawn_floating_text_at_position("MONKEY BOMBER JOINED!", Color(0.2, 1.0, 0.4))
 	elif ship_data and ship_data.hardpoint_offsets.has("AftDeckCrew") and (not equipped_weapons.has("AftDeckCrew") or not is_instance_valid(equipped_weapons["AftDeckCrew"])):
-		var skeleton_res = load("res://src/data/resources/user_crew/crew_skeleton_tosser.tres")
+		var skeleton_res := load("res://src/data/resources/user_crew/crew_skeleton_tosser.tres")
 		equip_weapon_to_socket("AftDeckCrew", skeleton_res)
 		spawn_floating_text_at_position("SKELETON JOINED!", Color(0.2, 1.0, 0.4))
 	else:
@@ -843,14 +843,14 @@ func leak_threat(_threat_node: Node3D) -> void:
 		return
 		
 	# 1. Trigger a 0.2s red screen-edge flash (Vignette alert)
-	var hud = get_tree().get_first_node_in_group("top_hud")
+	var hud := get_tree().get_first_node_in_group("top_hud")
 	if hud and hud.has_method("trigger_red_flash"):
-		hud.trigger_red_flash()
+		hud.call("trigger_red_flash")
 		
 	# 2. Apply camera punch shake (intensity = 0.25)
-	var camera = get_tree().get_first_node_in_group("game_camera")
+	var camera := get_tree().get_first_node_in_group("game_camera")
 	if camera and camera.has_method("shake"):
-		camera.shake(0.2, 0.25)
+		camera.call("shake", 0.2, 0.25)
 		
 	# 3. Play loud wood crunch SFX
 	AudioManager.play_sfx("barrel_hits")
@@ -861,23 +861,24 @@ func leak_threat(_threat_node: Node3D) -> void:
 		var spawn_pos: Vector3 = last_follower.global_position
 		
 		# Spawn water splashes
-		var splash_scene = preload("res://src/vfx/hit_splash.tscn")
+		var splash_scene := preload("res://src/vfx/hit_splash.tscn")
 		if splash_scene:
-			var splash = splash_scene.instantiate() as Node3D
+			var splash := splash_scene.instantiate() as Node3D
 			get_parent().add_child(splash)
 			splash.global_position = spawn_pos
 			
 		# Spawn bold floating label "-1 FLEET" at its position
-		var ft_script = load("res://src/vfx/floating_text.gd")
+		var ft_script := load("res://src/vfx/floating_text.gd") as GDScript
 		if ft_script:
-			var fct = ft_script.new()
-			var root = get_tree().current_scene
-			if root:
+			var fct: Node3D = ft_script.new() as Node3D
+			var root := get_tree().current_scene
+			if root and fct:
 				root.add_child(fct)
 				fct.global_position = spawn_pos + Vector3(0.0, 1.5, 0.0)
-				fct.setup("-1 FLEET", Color(1.0, 0.1, 0.1))
+				if fct.has_method("setup"):
+					fct.call("setup", "-1 FLEET", Color(1.0, 0.1, 0.1))
 		
-		last_follower.destroy_follower()
+		last_follower.call("destroy_follower")
 	else:
 		# If no followers exist, inflict 1 point of Hull damage to the player.
 		# Spawn the floating label first so it's visible even if game_over fires.
@@ -914,8 +915,8 @@ func trigger_armada_overdrive() -> void:
 			AudioManager.set_low_hp_tension(false)
 	# 3. Temporary Overdrive fire rate boost
 	fire_rate_multiplier = 2.0
-	var timer = get_tree().create_timer(6.0)
-	timer.timeout.connect(func(): fire_rate_multiplier = 1.0)
+	var timer := get_tree().create_timer(6.0)
+	timer.timeout.connect(func() -> void: fire_rate_multiplier = 1.0)
 	# 4. Audiovisual feedback
 	AudioManager.play_sfx("coin_pickup", 1.3, 1.5)
 	spawn_floating_text_at_position("★ ARMADA OVERDRIVE! ★", Color(1.0, 0.85, 0.1))
@@ -944,11 +945,11 @@ func _setup_hydrodynamic_particles() -> void:
 		_bow_spray_particles.gravity = Vector3(0, -9.8, 0)
 		_bow_spray_particles.initial_velocity_min = 1.5
 		_bow_spray_particles.initial_velocity_max = 3.2
-		var spray_mat = StandardMaterial3D.new()
+		var spray_mat := StandardMaterial3D.new()
 		spray_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		spray_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		spray_mat.albedo_color = Color(0.92, 0.97, 1.0, 0.6)
-		var qm = QuadMesh.new()
+		var qm := QuadMesh.new()
 		qm.size = Vector2(0.2, 0.2)
 		qm.material = spray_mat
 		_bow_spray_particles.mesh = qm
@@ -970,11 +971,11 @@ func _setup_hull_smoke() -> void:
 		_hull_smoke_particles.gravity = Vector3(0, 0.9, 0)
 		_hull_smoke_particles.initial_velocity_min = 0.6
 		_hull_smoke_particles.initial_velocity_max = 1.4
-		var smoke_mat = StandardMaterial3D.new()
+		var smoke_mat := StandardMaterial3D.new()
 		smoke_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		smoke_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		smoke_mat.albedo_color = Color(0.25, 0.25, 0.25, 0.4)
-		var qm = QuadMesh.new()
+		var qm := QuadMesh.new()
 		qm.size = Vector2(0.32, 0.32)
 		qm.material = smoke_mat
 		_hull_smoke_particles.mesh = qm
@@ -993,19 +994,21 @@ func _update_hull_distress_smoke() -> void:
 	if is_game_over:
 		_hull_smoke_particles.emitting = false
 		return
-	var hp_ratio = float(current_health) / float(max(1, max_health))
+	var hp_ratio := float(current_health) / float(max(1, max_health))
 	if hp_ratio > 0.67:
 		_hull_smoke_particles.emitting = false
 	elif hp_ratio > 0.34:
 		_hull_smoke_particles.emitting = true
 		_hull_smoke_particles.amount = 8
-		if _hull_smoke_particles.mesh and _hull_smoke_particles.mesh.material:
-			(_hull_smoke_particles.mesh.material as StandardMaterial3D).albedo_color = Color(0.6, 0.6, 0.6, 0.35)
+		var p_mesh := _hull_smoke_particles.mesh as PrimitiveMesh
+		if p_mesh and p_mesh.material is StandardMaterial3D:
+			(p_mesh.material as StandardMaterial3D).albedo_color = Color(0.6, 0.6, 0.6, 0.35)
 	else:
 		_hull_smoke_particles.emitting = true
 		_hull_smoke_particles.amount = 22
-		if _hull_smoke_particles.mesh and _hull_smoke_particles.mesh.material:
-			(_hull_smoke_particles.mesh.material as StandardMaterial3D).albedo_color = Color(0.12, 0.12, 0.12, 0.8)
+		var p_mesh := _hull_smoke_particles.mesh as PrimitiveMesh
+		if p_mesh and p_mesh.material is StandardMaterial3D:
+			(p_mesh.material as StandardMaterial3D).albedo_color = Color(0.12, 0.12, 0.12, 0.8)
 
 func get_fleet_offsets(size: int) -> Array[Vector3]:
 	return _fleet.get_fleet_offsets(size) if _fleet else []
@@ -1020,8 +1023,8 @@ func _update_follower_positions() -> void:
 func _clean_shadow_nodes(node: Node) -> void:
 	if not node:
 		return
-	var lower_name = node.name.to_lower()
-	var is_shadow_node = false
+	var lower_name := node.name.to_lower()
+	var is_shadow_node := false
 	if "shadow" in lower_name or "decal" in lower_name or "projector" in lower_name or "card" in lower_name or "oblate" in lower_name or "shadow_sphere" in lower_name or "sphere_shadow" in lower_name:
 		is_shadow_node = true
 		

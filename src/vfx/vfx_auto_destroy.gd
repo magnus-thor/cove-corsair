@@ -27,5 +27,5 @@ func _ready() -> void:
 	if not auto_destroy:
 		return
 		
-	var timer = get_tree().create_timer(max_lifetime)
+	var timer := get_tree().create_timer(max_lifetime)
 	timer.timeout.connect(queue_free)

@@ -71,14 +71,14 @@ func _physics_process(delta: float) -> void:
 	if forward_speed > 0.0:
 		global_position.z += forward_speed * delta
 		
-	var player = get_tree().get_first_node_in_group("player")
-	var player_z = player.global_position.z if player else 0.0
+	var player := get_tree().get_first_node_in_group("player") as Node3D
+	var player_z: float = player.global_position.z if player else 0.0
 	if global_position.z > (player_z + 3.0):
 		# Only active explosive hazards (fuse barrels, sea mines) deal pass-by leak damage.
 		# Barricades and loot barrels (wooden barrels, rune barrels) must NEVER deal leak damage.
 		if not is_in_group("barricade") and (obstacle_type == ObstacleType.FUSE_BARREL or obstacle_type == ObstacleType.SEA_MINE):
 			if player and player.has_method("leak_threat"):
-				player.leak_threat(self)
+				player.call("leak_threat", self)
 		queue_free()
 
 func update_obstacle_visuals() -> void:
@@ -150,14 +150,15 @@ func take_hit(amount: int, source_info: String = "") -> void:
 		# Sensory Polish: 3D & Sprite Hit Flash
 		HitFlashComponent.flash_node(self, 0.065)
 		# Spawn floating combat text
-		var ft_script = load("res://src/vfx/floating_text.gd")
+		var ft_script := load("res://src/vfx/floating_text.gd") as GDScript
 		if ft_script:
-			var fct = ft_script.new()
-			var root = get_tree().current_scene
-			if root:
+			var fct: Node3D = ft_script.new() as Node3D
+			var root := get_tree().current_scene
+			if root and fct:
 				root.add_child(fct)
 				fct.global_position = global_position + Vector3(randf_range(-0.5, 0.5), 1.2, randf_range(-0.5, 0.5))
-				fct.setup("-" + str(amount), Color(1.0, 0.3, 0.3))
+				if fct.has_method("setup"):
+					fct.call("setup", "-" + str(amount), Color(1.0, 0.3, 0.3))
 
 ## Backward-compatible bridge — existing callers continue to work.
 func take_damage(amount: int) -> void:
@@ -184,7 +185,7 @@ func die() -> void:
 		AudioManager.play_sfx("sfx_wood_smash")
 	else:
 		AudioManager.play_sfx("barrel_breaks")
-	var explosion_pos = global_position
+	var explosion_pos := global_position
 	if obstacle_type == ObstacleType.SEA_MINE:
 		explosion_pos.y = 0.05
 		if VFXManager and VFXManager.has_method("hit_stop"):
@@ -209,35 +210,37 @@ func die() -> void:
 	if obstacle_type == ObstacleType.RUNE_BARREL:
 		var cur_lvl: int = 1
 		if has_node("/root/GameState"):
-			cur_lvl = int(get_node("/root/GameState").current_level)
+			var gs: Node = get_node("/root/GameState")
+			if "current_level" in gs:
+				cur_lvl = int(gs.get("current_level"))
 		if cur_lvl >= 5:
-			var chest_scene = load("res://src/gameplay/collectibles/collectible_chest.tscn")
+			var chest_scene := load("res://src/gameplay/collectibles/collectible_chest.tscn") as PackedScene
 			if chest_scene:
-				var chest = chest_scene.instantiate() as Area3D
-				if "chest_value" in chest:
-					chest.chest_value = 50
-				var root = get_tree().current_scene
-				if root:
+				var chest := chest_scene.instantiate() as Area3D
+				if chest and "chest_value" in chest:
+					chest.set("chest_value", 50)
+				var root := get_tree().current_scene
+				if root and chest:
 					root.add_child(chest)
-				chest.global_position = Vector3(global_position.x, 0.15, global_position.z)
+					chest.global_position = Vector3(global_position.x, 0.15, global_position.z)
 		else:
 			doubloons_drop = 3
 			_spawn_doubloons()
 	else:
 		_spawn_doubloons()
 		if has_meta("spawns_chest"):
-			var chest_scene = load("res://src/gameplay/collectibles/collectible_chest.tscn")
+			var chest_scene := load("res://src/gameplay/collectibles/collectible_chest.tscn") as PackedScene
 			if chest_scene:
-				var chest = chest_scene.instantiate() as Area3D
-				var root = get_tree().current_scene
-				if root:
+				var chest := chest_scene.instantiate() as Area3D
+				var root := get_tree().current_scene
+				if root and chest:
 					root.add_child(chest)
-				chest.global_position = Vector3(global_position.x, 0.15, global_position.z)
+					chest.global_position = Vector3(global_position.x, 0.15, global_position.z)
 	
 	# Trigger camera shake on death!
-	var camera = get_tree().get_first_node_in_group("game_camera")
-	if camera and camera.has_method("shake"):
-		var intensity = 0.25 if (obstacle_type == ObstacleType.FUSE_BARREL or obstacle_type == ObstacleType.SEA_MINE) else 0.12
+	var camera := get_tree().get_first_node_in_group("game_camera") as GameCamera
+	if camera:
+		var intensity: float = 0.25 if (obstacle_type == ObstacleType.FUSE_BARREL or obstacle_type == ObstacleType.SEA_MINE) else 0.12
 		camera.shake(0.18, intensity)
 		
 	# Deal splash chain damage if explosive
@@ -252,51 +255,52 @@ func die() -> void:
 	queue_free()
 
 func _apply_explosion_damage() -> void:
-	var radius = 3.5
-	var dmg = 2
+	var radius: float = 3.5
+	var dmg: int = 2
 	
 	# Spawn floating "+BOOM" text
-	var ft_script = load("res://src/vfx/floating_text.gd")
+	var ft_script := load("res://src/vfx/floating_text.gd") as GDScript
 	if ft_script:
-		var fct = ft_script.new()
-		var root = get_tree().current_scene
-		if root:
+		var fct: Node3D = ft_script.new() as Node3D
+		var root := get_tree().current_scene
+		if root and fct:
 			root.add_child(fct)
 			fct.global_position = global_position + Vector3(0, 1.2, 0)
-			fct.setup("+BOOM", Color(1.0, 0.2, 0.1))
+			if fct.has_method("setup"):
+				fct.call("setup", "+BOOM", Color(1.0, 0.2, 0.1))
 			
 	# Trigger a punchy camera shake
-	var camera = get_tree().get_first_node_in_group("game_camera")
-	if camera and camera.has_method("shake"):
+	var camera := get_tree().get_first_node_in_group("game_camera") as GameCamera
+	if camera:
 		camera.shake(0.22, 0.25)
 		
 	var targets: Array[Node] = []
 	targets.append_array(get_tree().get_nodes_in_group("destructible"))
 	targets.append_array(get_tree().get_nodes_in_group("enemies"))
 	
-	var player = get_tree().get_first_node_in_group("player")
+	var player: Node = get_tree().get_first_node_in_group("player")
 		
 	var processed: Dictionary = {}
-	for obj in targets:
+	for obj: Node in targets:
 		if obj != null and obj != self and is_instance_valid(obj) and not processed.has(obj):
 			processed[obj] = true
 			if obj is Node3D:
-				var dist = (obj as Node3D).global_position.distance_to(global_position)
+				var dist: float = (obj as Node3D).global_position.distance_to(global_position)
 				if dist <= radius and obj.has_method("take_damage"):
-					obj.take_damage(dmg)
+					obj.call("take_damage", dmg)
 					
 	# Player uses leak_threat, not take_damage — route correctly.
-	if player and is_instance_valid(player):
-		var player_dist = (player as Node3D).global_position.distance_to(global_position)
+	if player and is_instance_valid(player) and player is Node3D:
+		var player_dist: float = (player as Node3D).global_position.distance_to(global_position)
 		if player_dist <= radius and player.has_method("leak_threat"):
-			player.leak_threat(self)
+			player.call("leak_threat", self)
 
 func _spawn_explosion() -> void:
 	if barrel_explosion_scene:
-		var vfx = barrel_explosion_scene.instantiate() as Node3D
+		var vfx := barrel_explosion_scene.instantiate() as Node3D
 		vfx.top_level = true
 		vfx.position = global_position
-		var root = get_tree().current_scene
+		var root := get_tree().current_scene
 		if root:
 			root.add_child(vfx)
 		elif get_parent():
@@ -307,35 +311,34 @@ func _spawn_doubloons() -> void:
 	if not doubloon_scene:
 		return
 		
-	var drop_count = doubloons_drop
+	var drop_count := doubloons_drop
 	if drop_count <= 0 and (obstacle_type == ObstacleType.WOODEN_BARREL or obstacle_type == ObstacleType.FUSE_BARREL or obstacle_type == ObstacleType.RUNE_BARREL):
 		drop_count = 1 if obstacle_type == ObstacleType.WOODEN_BARREL else (2 if obstacle_type == ObstacleType.FUSE_BARREL else 3)
 		
 	if drop_count <= 0:
 		return
 		
-	var spawn_parent = get_tree().current_scene
+	var spawn_parent := get_tree().current_scene
 	if not spawn_parent or spawn_parent == self:
 		spawn_parent = get_parent()
 		if spawn_parent == self or spawn_parent is DestructibleObstacle:
 			return
 		
 	for i in range(drop_count):
-		var doubloon = doubloon_scene.instantiate() as Area3D
+		var doubloon := doubloon_scene.instantiate() as CollectibleDoubloon
 		if doubloon:
 			spawn_parent.add_child(doubloon)
 			doubloon.global_position = Vector3(global_position.x, 0.05, global_position.z)
 			
 			# Radial outward scatter on X and Z
-			var scatter = Vector2(randf_range(-0.6, 0.6), randf_range(-0.6, 0.6))
-			if doubloon.has_method("_trigger_spawn_bounce"):
-				doubloon._trigger_spawn_bounce(scatter)
+			var scatter := Vector2(randf_range(-0.6, 0.6), randf_range(-0.6, 0.6))
+			doubloon._trigger_spawn_bounce(scatter)
 
 func _clean_shadow_nodes(node: Node) -> void:
 	if not node:
 		return
-	var lower_name = node.name.to_lower()
-	var is_shadow_node = false
+	var lower_name: String = str(node.name).to_lower()
+	var is_shadow_node: bool = false
 	if "shadow" in lower_name or "decal" in lower_name or "projector" in lower_name or "card" in lower_name or "oblate" in lower_name or "shadow_sphere" in lower_name or "sphere_shadow" in lower_name:
 		is_shadow_node = true
 		
@@ -345,11 +348,12 @@ func _clean_shadow_nodes(node: Node) -> void:
 			return
 			
 	if node is MeshInstance3D:
+		var mesh_node := node as MeshInstance3D
 		if "shadow" in lower_name or "plane" in lower_name or "billboard" in lower_name or "card" in lower_name:
-			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-			node.visible = false
-			node.queue_free()
+			mesh_node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			mesh_node.visible = false
+			mesh_node.queue_free()
 			return
 			
-	for child in node.get_children():
+	for child: Node in node.get_children():
 		_clean_shadow_nodes(child)

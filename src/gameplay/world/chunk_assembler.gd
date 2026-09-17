@@ -41,7 +41,7 @@ func _ready() -> void:
 ## to the river corridor (width 12.0m: X in [-6.0m, +6.0m]), along with solid bank
 ## ground planes extending outward to eliminate water outside the lane.
 func _setup_persistent_water() -> void:
-	var existing = get_tree().get_first_node_in_group("persistent_water")
+	var existing := get_tree().get_first_node_in_group("persistent_water")
 	if existing and existing is MeshInstance3D:
 		_persistent_water = existing
 		if _persistent_water.mesh is PlaneMesh:
@@ -89,9 +89,9 @@ func _setup_persistent_water() -> void:
 	_bank_mat.albedo_color = Color(0.85, 0.72, 0.48) # Warm sand/shoreline tone
 	_bank_mat.cull_mode = BaseMaterial3D.CULL_BACK
 	
-	for b_side in [-1.0, 1.0]:
+	for b_side: float in [-1.0, 1.0]:
 		var bank_name := "PersistentBank_%s" % ("Left" if b_side < 0 else "Right")
-		var existing_bank = get_tree().get_first_node_in_group("persistent_bank_%s" % ("left" if b_side < 0 else "right"))
+		var existing_bank := get_tree().get_first_node_in_group("persistent_bank_%s" % ("left" if b_side < 0 else "right"))
 		var bank_mesh: MeshInstance3D = null
 		if existing_bank and existing_bank is MeshInstance3D:
 			bank_mesh = existing_bank
@@ -116,17 +116,17 @@ func _setup_persistent_water() -> void:
 
 func update_water_color(color: Color) -> void:
 	if _persistent_water and _persistent_water.material_override:
-		var mat = _persistent_water.material_override as ShaderMaterial
+		var mat := _persistent_water.material_override as ShaderMaterial
 		if mat:
 			mat.set_shader_parameter("albedo", color)
 
 	if _bank_mat:
 		var b_name := "tropical"
 		if active_level_data:
-			if "biome_name" in active_level_data and active_level_data.biome_name != "":
-				b_name = active_level_data.biome_name
-			elif "biome" in active_level_data and active_level_data.biome != "":
-				b_name = active_level_data.biome
+			if "biome_name" in active_level_data and str(active_level_data.get("biome_name")) != "":
+				b_name = str(active_level_data.get("biome_name"))
+			elif "biome" in active_level_data and str(active_level_data.get("biome")) != "":
+				b_name = str(active_level_data.get("biome"))
 				
 		match b_name.to_lower():
 			"bayou", "black_tide_bayou":
@@ -139,9 +139,9 @@ func update_water_color(color: Color) -> void:
 ## Assembles the level dynamically from chunk_scenes in LevelData.
 func assemble_level(data: LevelData = null) -> void:
 	if data == null:
-		var initial_gs = _get_game_state()
+		var initial_gs := _get_game_state()
 		if initial_gs and initial_gs.has_method("get_current_level_resource"):
-			data = initial_gs.get_current_level_resource()
+			data = initial_gs.call("get_current_level_resource") as LevelData
 		
 	if not data:
 		push_warning("ChunkAssembler: No LevelData provided to assemble.")
@@ -167,19 +167,19 @@ func assemble_level(data: LevelData = null) -> void:
 		if scene == null:
 			continue
 			
-		var chunk_instance = scene.instantiate() as BaseTrackChunk
+		var chunk_instance := scene.instantiate() as BaseTrackChunk
 		if not chunk_instance:
 			continue
 			
 		# If transitioning into a boss chunk, ensure buffer chunk and gate suppression
 		if chunk_instance.is_boss_chunk:
 			if not active_chunks.is_empty():
-				var prev_chunk = active_chunks.back()
+				var prev_chunk: BaseTrackChunk = active_chunks.back() as BaseTrackChunk
 				_suppress_gates_in_chunk_final_portion(prev_chunk, 0.30)
 				
 				# Insert empty transition/buffer chunk if preceding chunk is not already a buffer
 				if prev_chunk.chunk_id != "boss_intro_buffer" and BOSS_BUFFER_CHUNK_SCENE:
-					var buffer_instance = BOSS_BUFFER_CHUNK_SCENE.instantiate() as BaseTrackChunk
+					var buffer_instance := BOSS_BUFFER_CHUNK_SCENE.instantiate() as BaseTrackChunk
 					if buffer_instance:
 						add_child(buffer_instance)
 						buffer_instance.position = Vector3(0.0, 0.0, current_z_offset)
@@ -193,7 +193,7 @@ func assemble_level(data: LevelData = null) -> void:
 
 		add_child(chunk_instance)
 		chunk_instance.position = Vector3(0.0, 0.0, current_z_offset)
-		var c_len = chunk_instance.CHUNK_LENGTH
+		var c_len := chunk_instance.CHUNK_LENGTH
 		current_z_offset -= c_len
 		active_chunks.append(chunk_instance)
 		
@@ -206,12 +206,12 @@ func assemble_level(data: LevelData = null) -> void:
 	if total_track_distance <= 0.0:
 		total_track_distance = maxf(50.0, active_chunks.size() * 50.0)
 		
-	var gs = _get_game_state()
+	var gs := _get_game_state()
 	if gs:
-		gs.level_distance_target = total_track_distance
-		gs.distance_traveled = 0.0
+		gs.set("level_distance_target", total_track_distance)
+		gs.set("distance_traveled", 0.0)
 		if gs.has_signal("progress_changed"):
-			gs.progress_changed.emit(0.0, total_track_distance)
+			gs.emit_signal("progress_changed", 0.0, total_track_distance)
 	
 	# Activate the first chunk immediately if it is at Z = 0
 	if not active_chunks.is_empty():
@@ -227,11 +227,12 @@ func assemble_level(data: LevelData = null) -> void:
 	])
 
 func _physics_process(delta: float) -> void:
-	var gs = _get_game_state()
-	if not gs or not gs.is_game_active or not is_assembled or is_boss_active:
+	var gs := _get_game_state()
+	var is_active: bool = (gs.get("is_game_active") == true) if (gs and "is_game_active" in gs) else false
+	if not gs or not is_active or not is_assembled or is_boss_active:
 		return
 		
-	var movement = scroll_speed * delta
+	var movement := scroll_speed * delta
 	
 	# 1. Scroll all active chunks forward along +Z
 	for chunk in active_chunks:
@@ -241,7 +242,7 @@ func _physics_process(delta: float) -> void:
 	# 2. Accumulate player forward distance
 	distance_traveled += movement
 	if gs.has_method("update_distance"):
-		gs.update_distance(movement)
+		gs.call("update_distance", movement)
 	
 	# 3. Spawner Activation: trigger chunks entering camera range
 	for chunk in active_chunks:
@@ -276,16 +277,16 @@ func _on_boss_arena_reached(boss_chunk: BaseTrackChunk) -> void:
 	is_boss_active = true
 	scroll_speed = 0.0
 	
-	var gs = _get_game_state()
+	var gs := _get_game_state()
 	if gs:
-		gs.boss_spawned = true
+		gs.set("boss_spawned", true)
 		EventBus.distance_target_reached.emit()
 		
 		# Lock player progress to completion distance
 		distance_traveled = total_track_distance
-		gs.distance_traveled = total_track_distance
+		gs.set("distance_traveled", total_track_distance)
 		if gs.has_signal("progress_changed"):
-			gs.progress_changed.emit(total_track_distance, total_track_distance)
+			gs.emit_signal("progress_changed", total_track_distance, total_track_distance)
 	
 	# Trigger boss engagement hook inside boss chunk
 	if not boss_chunk.is_active:
@@ -298,13 +299,13 @@ func _on_boss_arena_reached(boss_chunk: BaseTrackChunk) -> void:
 func _suppress_gates_in_chunk_final_portion(chunk: BaseTrackChunk, portion: float = 0.30) -> void:
 	if not chunk or not is_instance_valid(chunk):
 		return
-	var threshold_z = -chunk.CHUNK_LENGTH * (1.0 - portion) # e.g. -35.0m for 50m chunk
-	for child in chunk.find_children("*", "", true, false):
+	var threshold_z := -chunk.CHUNK_LENGTH * (1.0 - portion) # e.g. -35.0m for 50m chunk
+	for child: Node in chunk.find_children("*", "", true, false):
 		if not is_instance_valid(child):
 			continue
-		if child.is_in_group("multiplier_gate") or (child is Area3D and child.has_method("apply_multiplier")):
+		if (child.is_in_group("multiplier_gate") or (child is Area3D and child.has_method("apply_multiplier"))) and child is Node3D:
 			# Check Z relative to chunk origin
-			var rel_z = child.position.z
+			var rel_z: float = (child as Node3D).position.z
 			if rel_z <= threshold_z:
 				print("[CHUNK ASSEMBLER] Suppressing multiplier gate '%s' in final %.0f%% (Z=%.1fm <= %.1fm) of chunk %s" % [
 					child.name, portion * 100.0, rel_z, threshold_z, chunk.name
@@ -317,16 +318,16 @@ func _suppress_gates_in_chunk_final_portion(chunk: BaseTrackChunk, portion: floa
 func _enforce_start_clearance_in_chunk(chunk: BaseTrackChunk, min_clearance: float = 35.0) -> void:
 	if not chunk or not is_instance_valid(chunk):
 		return
-	var entities = chunk.find_child("Entities", true, false)
+	var entities := chunk.find_child("Entities", true, false)
 	if not entities:
 		return
-	for child in entities.get_children():
+	for child: Node in entities.get_children():
 		if not is_instance_valid(child):
 			continue
-		var is_hazard = child is HazardSeaMine or child is HazardThermalGeyser or child.is_in_group("hazards") or child.name.to_lower().contains("mine")
-		var is_enemy = child.is_in_group("enemies") or child is EnemyMob or child.name.to_lower().contains("enemy") or child.name.to_lower().contains("fodder") or child.name.to_lower().contains("skiff") or child.name.to_lower().contains("rower")
-		if (is_hazard or is_enemy) and child.position.z > -min_clearance:
-			print("[CHUNK ASSEMBLER] Suppressed early hostile/hazard '%s' at Z=%.1fm in starting chunk (< %.1fm clearance)" % [child.name, child.position.z, min_clearance])
+		var is_hazard := child is HazardSeaMine or child is HazardThermalGeyser or child.is_in_group("hazards") or child.name.to_lower().contains("mine")
+		var is_enemy := child.is_in_group("enemies") or child is EnemyMob or child.name.to_lower().contains("enemy") or child.name.to_lower().contains("fodder") or child.name.to_lower().contains("skiff") or child.name.to_lower().contains("rower")
+		if (is_hazard or is_enemy) and child is Node3D and (child as Node3D).position.z > -min_clearance:
+			print("[CHUNK ASSEMBLER] Suppressed early hostile/hazard '%s' at Z=%.1fm in starting chunk (< %.1fm clearance)" % [child.name, (child as Node3D).position.z, min_clearance])
 			if child.get_parent():
 				child.get_parent().remove_child(child)
 			child.queue_free()
@@ -338,17 +339,17 @@ func jump_to_boss() -> void:
 	for chunk in active_chunks:
 		if is_instance_valid(chunk) and chunk.is_boss_chunk:
 			# Shift all chunks forward so the boss chunk starts at Z = 0
-			var current_chunk_z = chunk.global_position.z
-			var delta_z = 0.0 - current_chunk_z
+			var current_chunk_z := chunk.global_position.z
+			var delta_z := 0.0 - current_chunk_z
 			for c in active_chunks:
 				if is_instance_valid(c):
 					c.global_position.z += delta_z
 			distance_traveled = total_track_distance
-			var gs = _get_game_state()
+			var gs := _get_game_state()
 			if gs:
-				gs.distance_traveled = total_track_distance
+				gs.set("distance_traveled", total_track_distance)
 				if gs.has_signal("progress_changed"):
-					gs.progress_changed.emit(total_track_distance, total_track_distance)
+					gs.emit_signal("progress_changed", total_track_distance, total_track_distance)
 			_on_boss_arena_reached(chunk)
 			print("[CHUNK ASSEMBLER] Jumped directly to boss chunk: %s" % chunk.name)
 			break

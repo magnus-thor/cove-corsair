@@ -17,7 +17,6 @@ const PARALLAX_RATE : float = 0.1   # fraction of scroll speed applied to UV
 
 var _mesh_instance : MeshInstance3D
 var _material      : StandardMaterial3D
-var _uv_y_offset   : float = 0.0
 
 # ── Lifecycle ─────────────────────────────────────────────────────────────────
 
@@ -65,7 +64,7 @@ func _build_quad() -> void:
 	_mesh_instance.material_override = _material
 
 func _get_scroll_speed() -> float:
-	var mgr := get_tree().get_first_node_in_group("track_manager") if get_tree() else null
+	var mgr: Node = get_tree().get_first_node_in_group("track_manager") if get_tree() else null
 	if mgr and "scroll_speed" in mgr:
-		return float(mgr.scroll_speed)
+		return float(mgr.get("scroll_speed"))
 	return 0.0

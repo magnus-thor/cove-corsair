@@ -56,15 +56,19 @@ func setup(owner_body: CharacterBody3D, visuals_node: Node3D) -> void:
 ## Forward raw input events from PlayerSwerve._unhandled_input().
 func process_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_LEFT:
-			_dragging = event.pressed
+		var mb := event as InputEventMouseButton
+		if mb.button_index == MOUSE_BUTTON_LEFT:
+			_dragging = mb.pressed
 	elif event is InputEventScreenTouch:
-		_dragging = event.pressed
+		var st := event as InputEventScreenTouch
+		_dragging = st.pressed
 	elif event is InputEventMouseMotion and _dragging:
-		target_x += event.relative.x * sensitivity
+		var mm := event as InputEventMouseMotion
+		target_x += mm.relative.x * sensitivity
 		target_x = clamp(target_x, -_half_width, _half_width)
 	elif event is InputEventScreenDrag:
-		target_x += event.relative.x * sensitivity
+		var sd := event as InputEventScreenDrag
+		target_x += sd.relative.x * sensitivity
 		target_x = clamp(target_x, -_half_width, _half_width)
 
 

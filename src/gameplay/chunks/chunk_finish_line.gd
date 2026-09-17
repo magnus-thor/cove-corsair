@@ -40,36 +40,36 @@ func _trigger_victory() -> void:
 	_spawn_celebration_effects()
 	
 	# Smoothly decelerate scrolling as vessel sails into the harbor
-	var assembler = get_tree().get_first_node_in_group("chunk_assembler")
-	var track_mgr = get_tree().get_first_node_in_group("track_manager")
-	var tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	var assembler := get_tree().get_first_node_in_group("chunk_assembler") as ChunkAssembler
+	var track_mgr := get_tree().get_first_node_in_group("track_manager") as Node3D
+	var tween: Tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	if assembler and "scroll_speed" in assembler:
 		tween.tween_property(assembler, "scroll_speed", 0.0, 1.2)
 	if track_mgr and "scroll_speed" in track_mgr:
 		tween.tween_property(track_mgr, "scroll_speed", 0.0, 1.2)
 	
 	# Small delay for fireworks before victory settlement
-	get_tree().create_timer(1.2, true, false, true).timeout.connect(func():
+	get_tree().create_timer(1.2, true, false, true).timeout.connect(func() -> void:
 		EventBus.level_completed.emit(GameState.doubloons, GameState.targets_destroyed)
 	)
 
 func _spawn_celebration_effects() -> void:
-	var root = get_tree().current_scene
-	var spawn_parent = root if root else self
+	var root: Node = get_tree().current_scene
+	var spawn_parent: Node = root if root else self
 	
 	# Spawn coin fountain & firework bursts across the gate arch
 	for i in range(12):
 		if explosion_scene:
-			var vfx = explosion_scene.instantiate() as Node3D
-			spawn_parent.add_child(vfx)
-			var offset = Vector3(randf_range(-5.0, 5.0), randf_range(2.0, 5.5), global_position.z - 34.0 + randf_range(-1.0, 1.0))
-			vfx.global_position = offset
+			var vfx := explosion_scene.instantiate() as Node3D
+			if vfx:
+				spawn_parent.add_child(vfx)
+				var offset := Vector3(randf_range(-5.0, 5.0), randf_range(2.0, 5.5), global_position.z - 34.0 + randf_range(-1.0, 1.0))
+				vfx.global_position = offset
 			
 	if doubloon_scene:
 		for d_i in range(15):
-			var d = doubloon_scene.instantiate() as Area3D
+			var d := doubloon_scene.instantiate() as CollectibleDoubloon
 			if d:
 				spawn_parent.add_child(d)
 				d.global_position = Vector3(randf_range(-4.0, 4.0), 0.2, global_position.z - 34.0)
-				if d.has_method("_trigger_spawn_bounce"):
-					d._trigger_spawn_bounce(Vector2(randf_range(-2.0, 2.0), randf_range(-2.0, 2.0)))
+				d._trigger_spawn_bounce(Vector2(randf_range(-2.0, 2.0), randf_range(-2.0, 2.0)))

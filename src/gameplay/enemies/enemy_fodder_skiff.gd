@@ -18,7 +18,6 @@ signal vessel_died(world_pos: Vector3)
 @onready var health_component: HealthComponent = get_node_or_null("HealthComponent")
 
 var _is_dead: bool = false
-var _flash_tween: Tween
 
 ## Read-only passthrough to HealthComponent for legacy compatibility.
 var current_hp: int:
@@ -47,13 +46,14 @@ func _ready() -> void:
 		health_component.died.connect(die)
 	
 	# Attach stern hydrodynamic water wake
-	var wake_scene = preload("res://src/vfx/boat_wake.tscn")
+	var wake_scene: PackedScene = preload("res://src/vfx/boat_wake.tscn")
 	if wake_scene:
-		var wake = wake_scene.instantiate()
-		add_child(wake)
-		wake.position = Vector3(0, 0.02, -0.6)
-		wake.rotation_degrees = Vector3(0, 180, 0)
-		wake.scale = Vector3(0.5, 0.5, 0.5)
+		var wake: Node3D = wake_scene.instantiate() as Node3D
+		if wake:
+			add_child(wake)
+			wake.position = Vector3(0, 0.02, -0.6)
+			wake.rotation_degrees = Vector3(0, 180, 0)
+			wake.scale = Vector3(0.5, 0.5, 0.5)
 
 func _physics_process(delta: float) -> void:
 	if _is_dead or not GameState.is_game_active:
@@ -62,11 +62,11 @@ func _physics_process(delta: float) -> void:
 	# Move steadily down-channel toward the player
 	global_position.z += forward_speed * delta
 
-	var player = get_tree().get_first_node_in_group("player")
-	var player_z = player.global_position.z if player else 0.0
+	var player := get_tree().get_first_node_in_group("player") as PlayerSwerve
+	var player_z: float = player.global_position.z if player else 0.0
 	if global_position.z > (player_z + 3.0):
 		GameState.record_mob_leaked()
-		if player and player.has_method("leak_threat"):
+		if player:
 			player.leak_threat(self)
 		queue_free()
 
@@ -74,8 +74,8 @@ func _on_area_entered(area: Area3D) -> void:
 	if _is_dead:
 		return
 	if area.is_in_group("player") or (area.get_parent() and area.get_parent().is_in_group("player")):
-		var player = get_tree().get_first_node_in_group("player")
-		if player and player.has_method("take_hit"):
+		var player := get_tree().get_first_node_in_group("player") as PlayerSwerve
+		if player:
 			player.take_hit(1, "fodder_skiff_ram")
 		die()
 
@@ -115,11 +115,11 @@ func die() -> void:
 	AudioManager.play_sfx("barrel_breaks")
 	
 	if explosion_scene:
-		var vfx = explosion_scene.instantiate() as Node3D
-		var root = get_tree().current_scene
-		if root:
+		var vfx := explosion_scene.instantiate() as Node3D
+		var root: Node = get_tree().current_scene
+		if root and vfx:
 			root.add_child(vfx)
-		vfx.global_position = global_position
+			vfx.global_position = global_position
 		
 	# Strictly award zero doubloons to maintain economy integrity
 	queue_free()

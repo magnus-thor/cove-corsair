@@ -85,7 +85,7 @@ func _on_died() -> void:
 func _spawn_doubloon_drops(death_pos: Vector3) -> void:
 	if doubloons_drop <= 0 or not doubloon_scene or not get_tree():
 		return
-	var root = get_tree().current_scene
+	var root: Node = get_tree().current_scene
 	if not root:
 		return
 	for i in range(doubloons_drop):

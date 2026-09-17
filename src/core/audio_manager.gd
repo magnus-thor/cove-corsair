@@ -88,45 +88,45 @@ func _ready() -> void:
 func _setup_buses() -> void:
 	if AudioServer.get_bus_index("BGM") == -1:
 		AudioServer.add_bus()
-		var bgm_idx = AudioServer.bus_count - 1
+		var bgm_idx := AudioServer.bus_count - 1
 		AudioServer.set_bus_name(bgm_idx, "BGM")
 		AudioServer.set_bus_send(bgm_idx, "Master")
 	if AudioServer.get_bus_index("SFX") == -1:
 		AudioServer.add_bus()
-		var sfx_idx = AudioServer.bus_count - 1
+		var sfx_idx := AudioServer.bus_count - 1
 		AudioServer.set_bus_name(sfx_idx, "SFX")
 		AudioServer.set_bus_send(sfx_idx, "Master")
 
 func set_bus_volume(bus_name: String, linear_vol: float) -> void:
-	var idx = AudioServer.get_bus_index(bus_name)
+	var idx := AudioServer.get_bus_index(bus_name)
 	if idx != -1:
-		var clamped_vol = clamp(linear_vol, 0.0001, 1.0)
-		var db_val = linear_to_db(clamped_vol) if linear_vol > 0.0001 else -80.0
+		var clamped_vol: float = clampf(linear_vol, 0.0001, 1.0)
+		var db_val: float = linear_to_db(clamped_vol) if linear_vol > 0.0001 else -80.0
 		AudioServer.set_bus_volume_db(idx, db_val)
 
 func get_bus_volume(bus_name: String) -> float:
-	var idx = AudioServer.get_bus_index(bus_name)
+	var idx := AudioServer.get_bus_index(bus_name)
 	if idx != -1:
-		var db_val = AudioServer.get_bus_volume_db(idx)
+		var db_val := AudioServer.get_bus_volume_db(idx)
 		if db_val <= -79.0:
 			return 0.0
 		return db_to_linear(db_val)
 	return 1.0
 
 func set_bus_muted(bus_name: String, muted: bool) -> void:
-	var idx = AudioServer.get_bus_index(bus_name)
+	var idx := AudioServer.get_bus_index(bus_name)
 	if idx != -1:
 		AudioServer.set_bus_mute(idx, muted)
 
 func is_bus_muted(bus_name: String) -> bool:
-	var idx = AudioServer.get_bus_index(bus_name)
+	var idx := AudioServer.get_bus_index(bus_name)
 	if idx != -1:
 		return AudioServer.is_bus_mute(idx)
 	return false
 
 func _setup_music_players() -> void:
-	var bgm_bus_idx = AudioServer.get_bus_index("BGM")
-	var bus_name = "BGM" if bgm_bus_idx != -1 else "Master"
+	var bgm_bus_idx := AudioServer.get_bus_index("BGM")
+	var bus_name := "BGM" if bgm_bus_idx != -1 else "Master"
 
 	music_player = AudioStreamPlayer.new()
 	music_player.name = "MusicPlayer_A"
@@ -143,12 +143,12 @@ func _setup_music_players() -> void:
 	current_music_player = music_player
 
 func _setup_sfx_pool() -> void:
-	var sfx_bus_idx = AudioServer.get_bus_index("SFX")
-	var sfx_bus_name = "SFX" if sfx_bus_idx != -1 else "Master"
+	var sfx_bus_idx := AudioServer.get_bus_index("SFX")
+	var sfx_bus_name := "SFX" if sfx_bus_idx != -1 else "Master"
 	
 	sfx_players.clear()
 	for i in range(POOL_SIZE):
-		var player = AudioStreamPlayer.new()
+		var player := AudioStreamPlayer.new()
 		player.name = "SFXPlayer_%02d" % i
 		player.process_mode = Node.PROCESS_MODE_ALWAYS
 		player.bus = sfx_bus_name
@@ -156,11 +156,11 @@ func _setup_sfx_pool() -> void:
 		sfx_players.append(player)
 
 func _setup_sfx_3d_pool() -> void:
-	var sfx_bus_idx = AudioServer.get_bus_index("SFX")
-	var sfx_bus_name = "SFX" if sfx_bus_idx != -1 else "Master"
+	var sfx_bus_idx := AudioServer.get_bus_index("SFX")
+	var sfx_bus_name := "SFX" if sfx_bus_idx != -1 else "Master"
 	sfx_players_3d.clear()
 	for i in range(POOL_SIZE_3D):
-		var player = AudioStreamPlayer3D.new()
+		var player := AudioStreamPlayer3D.new()
 		player.name = "SFXPlayer3D_%02d" % i
 		player.process_mode = Node.PROCESS_MODE_ALWAYS
 		player.bus = sfx_bus_name
@@ -171,15 +171,15 @@ func _setup_sfx_3d_pool() -> void:
 		sfx_players_3d.append(player)
 
 func _setup_low_hp_filter() -> void:
-	var master_idx = AudioServer.get_bus_index("Master")
+	var master_idx := AudioServer.get_bus_index("Master")
 	if master_idx != -1:
 		for i in range(AudioServer.get_bus_effect_count(master_idx)):
-			var eff = AudioServer.get_bus_effect(master_idx, i)
+			var eff := AudioServer.get_bus_effect(master_idx, i)
 			if eff is AudioEffectLowPassFilter:
 				_lpf_effect_idx = i
 				AudioServer.set_bus_effect_enabled(master_idx, i, false)
 				return
-		var lpf = AudioEffectLowPassFilter.new()
+		var lpf := AudioEffectLowPassFilter.new()
 		lpf.cutoff_hz = 950.0
 		lpf.resonance = 0.5
 		AudioServer.add_bus_effect(master_idx, lpf)
@@ -190,27 +190,27 @@ func _load_streams_from_dir(dir_path: String, filter_substring: String = "") -> 
 	var results: Array[AudioStream] = []
 	if not DirAccess.dir_exists_absolute(dir_path):
 		return results
-	var dir = DirAccess.open(dir_path)
+	var dir := DirAccess.open(dir_path)
 	if dir:
 		dir.list_dir_begin()
-		var file_name = dir.get_next()
+		var file_name := dir.get_next()
 		var loaded_paths: Dictionary = {}
 		while file_name != "":
 			if not dir.current_is_dir():
-				var clean_name = file_name
+				var clean_name := file_name
 				if clean_name.ends_with(".import"):
 					clean_name = clean_name.trim_suffix(".import")
 				elif clean_name.ends_with(".remap"):
 					clean_name = clean_name.trim_suffix(".remap")
 
 				if filter_substring == "" or filter_substring in clean_name:
-					var ext = clean_name.get_extension().to_lower()
+					var ext := clean_name.get_extension().to_lower()
 					if ext in ["wav", "mp3", "ogg"]:
-						var resource_path = dir_path.path_join(clean_name)
+						var resource_path := dir_path.path_join(clean_name)
 						if not loaded_paths.has(resource_path):
 							loaded_paths[resource_path] = true
 							if ResourceLoader.exists(resource_path):
-								var stream = ResourceLoader.load(resource_path) as AudioStream
+								var stream := ResourceLoader.load(resource_path) as AudioStream
 								if stream:
 									results.append(stream)
 			file_name = dir.get_next()
@@ -218,7 +218,7 @@ func _load_streams_from_dir(dir_path: String, filter_substring: String = "") -> 
 	return results
 
 func _scan_and_load_sfx() -> void:
-	var actual_base_path = base_sfx_path
+	var actual_base_path := base_sfx_path
 	var summary_parts: Array[String] = []
 
 	# Specific dir overrides for mapping keys
@@ -230,24 +230,25 @@ func _scan_and_load_sfx() -> void:
 		"sfx_mine_detonate": {"dir": "contact_sea_mine_explosion", "filter": ""}
 	}
 
-	for category in sfx_library.keys():
+	for category: String in sfx_library.keys():
 		sfx_library[category] = []
 		if special_mappings.has(category):
-			var info = special_mappings[category]
-			var category_dir_path = actual_base_path.path_join(info["dir"])
+			var info: Dictionary = special_mappings[category]
+			var category_dir_path := actual_base_path.path_join(info["dir"])
 			sfx_library[category] = _load_streams_from_dir(category_dir_path, info["filter"])
 		else:
-			var category_dir_path = actual_base_path.path_join(category)
+			var category_dir_path := actual_base_path.path_join(category)
 			sfx_library[category] = _load_streams_from_dir(category_dir_path, "")
 
-		summary_parts.append("%d %s" % [sfx_library[category].size(), category])
+		var cat_streams: Array = sfx_library[category] as Array
+		summary_parts.append("%d %s" % [cat_streams.size(), category])
 
 	print("AudioManager: Loaded " + ", ".join(summary_parts))
 
 ## Play a sound effect from the specified category with randomized pitch variation
 func play_sfx(category: String, min_pitch: float = 0.93, max_pitch: float = 1.07, volume_db: float = 0.0) -> void:
-	var check_category = category
-	var actual_category = category
+	var check_category := category
+	var actual_category := category
 	if category == "cannon_fire":
 		actual_category = "cannon_shots"
 	elif category == "explosion":
@@ -261,16 +262,16 @@ func play_sfx(category: String, min_pitch: float = 0.93, max_pitch: float = 1.07
 	elif category == "scattershot_carronade_volley":
 		actual_category = "sfx_scattershot"
 		
-	var current_time = Time.get_ticks_msec() / 1000.0
+	var current_time := Time.get_ticks_msec() / 1000.0
 	if sound_cooldowns.has(check_category):
-		var cooldown = sound_cooldowns[check_category]
-		var last_time = last_play_times.get(check_category, 0.0)
+		var cooldown: float = sound_cooldowns[check_category]
+		var last_time: float = last_play_times.get(check_category, 0.0)
 		if current_time - last_time < cooldown:
 			return
 		last_play_times[check_category] = current_time
 	elif sound_cooldowns.has(actual_category):
-		var cooldown = sound_cooldowns[actual_category]
-		var last_time = last_play_times.get(actual_category, 0.0)
+		var cooldown: float = sound_cooldowns[actual_category]
+		var last_time: float = last_play_times.get(actual_category, 0.0)
 		if current_time - last_time < cooldown:
 			return
 		last_play_times[actual_category] = current_time
@@ -287,7 +288,7 @@ func play_sfx(category: String, min_pitch: float = 0.93, max_pitch: float = 1.07
 	if not stream:
 		return
 
-	var final_volume = volume_db
+	var final_volume := volume_db
 	if actual_category == "barrel_hits":
 		final_volume -= 4.0
 
@@ -309,7 +310,7 @@ func play_sfx(category: String, min_pitch: float = 0.93, max_pitch: float = 1.07
 
 ## Play a positional 3D sound effect with spatialization and pitch jitter
 func play_sfx_3d(category: String, global_pos: Vector3, min_pitch: float = 0.93, max_pitch: float = 1.07, volume_db: float = 0.0) -> void:
-	var actual_category = category
+	var actual_category := category
 	if category == "cannon_fire":
 		actual_category = "cannon_shots"
 	elif category == "explosion":
@@ -351,13 +352,13 @@ func play_sfx_3d(category: String, global_pos: Vector3, min_pitch: float = 0.93,
 
 ## Play coin pickup with escalating musical pitch on consecutive collections
 func play_coin_pickup_scaled(volume_db: float = 0.0) -> void:
-	var now = Time.get_ticks_msec() / 1000.0
+	var now := Time.get_ticks_msec() / 1000.0
 	if now - _last_coin_time < COIN_STREAK_WINDOW:
 		_coin_streak = min(_coin_streak + 1, COIN_PITCH_STEPS.size() - 1)
 	else:
 		_coin_streak = 0
 	_last_coin_time = now
-	var pitch = COIN_PITCH_STEPS[_coin_streak]
+	var pitch := COIN_PITCH_STEPS[_coin_streak]
 	play_sfx("coin_pickups", pitch - 0.015, pitch + 0.015, volume_db)
 
 ## Engages or disengages low-HP adrenaline muffled audio tension
@@ -365,7 +366,7 @@ func set_low_hp_tension(is_low: bool) -> void:
 	if _low_hp_active == is_low:
 		return
 	_low_hp_active = is_low
-	var master_idx = AudioServer.get_bus_index("Master")
+	var master_idx := AudioServer.get_bus_index("Master")
 	if master_idx != -1 and _lpf_effect_idx != -1:
 		AudioServer.set_bus_effect_enabled(master_idx, _lpf_effect_idx, is_low)
 	if is_low:
@@ -373,7 +374,7 @@ func set_low_hp_tension(is_low: bool) -> void:
 
 ## Dynamic Biome Music Crossfade with Redundant Biome Guard
 func crossfade_music(track_key_or_path: String, duration: float = 1.0) -> void:
-	var target_path = track_key_or_path
+	var target_path := track_key_or_path
 	if music_library.has(track_key_or_path):
 		target_path = music_library[track_key_or_path]
 		if not ResourceLoader.exists(target_path) and track_key_or_path == "music_tropical":
@@ -387,20 +388,20 @@ func crossfade_music(track_key_or_path: String, duration: float = 1.0) -> void:
 		push_warning("AudioManager: Music file not found at %s" % target_path)
 		return
 
-	var stream = ResourceLoader.load(target_path) as AudioStream
+	var stream := ResourceLoader.load(target_path) as AudioStream
 	if not stream:
 		push_warning("AudioManager: Failed to load stream at %s" % target_path)
 		return
 
 	if stream is AudioStreamMP3:
-		stream.loop = true
+		(stream as AudioStreamMP3).loop = true
 	elif stream is AudioStreamOggVorbis:
-		stream.loop = true
+		(stream as AudioStreamOggVorbis).loop = true
 	elif stream is AudioStreamWAV:
-		stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		(stream as AudioStreamWAV).loop_mode = AudioStreamWAV.LOOP_FORWARD
 
-	var old_player = current_music_player
-	var next_player = music_player_alt if current_music_player == music_player else music_player
+	var old_player := current_music_player
+	var next_player := music_player_alt if current_music_player == music_player else music_player
 
 	next_player.stream = stream
 	next_player.volume_db = -80.0
@@ -415,7 +416,7 @@ func crossfade_music(track_key_or_path: String, duration: float = 1.0) -> void:
 
 	if old_player and old_player.playing:
 		music_tween.tween_property(old_player, "volume_db", -80.0, duration)
-		music_tween.chain().tween_callback(func(): old_player.stop())
+		music_tween.chain().tween_callback(func() -> void: old_player.stop())
 
 	current_music_player = next_player
 	music_player = next_player

@@ -23,23 +23,23 @@ func _get_effective_level() -> int:
 	if level_override > 0:
 		return level_override
 	if has_node("/root/GameState"):
-		var gs = get_node("/root/GameState")
+		var gs: Node = get_node("/root/GameState")
 		if "current_level" in gs:
-			return int(gs.current_level)
+			return int(gs.get("current_level"))
 	return 1
 
 func _ready() -> void:
 	# Clear placeholders
-	for child in get_children():
+	for child: Node in get_children():
 		child.queue_free()
 		
-	var river_width = 12.0
-	var player = get_tree().get_first_node_in_group("player")
+	var river_width: float = 12.0
+	var player: Node = get_tree().get_first_node_in_group("player")
 	if player and "river_width" in player:
-		river_width = player.river_width
+		river_width = float(player.get("river_width"))
 		
-	var cur_level = _get_effective_level()
-	var tier_hp = get_tier_hp(cur_level)
+	var cur_level: int = _get_effective_level()
+	var tier_hp: int = get_tier_hp(cur_level)
 	
 	# Scale barricade slat HP dynamically based on Campaign Tier:
 	# Level 1: Slat HP = 1 (1 cannon shot breaks it cleanly) with natural center navigation gap
@@ -47,7 +47,7 @@ func _ready() -> void:
 	# Levels 4 to 10: Slat HP = 6 (requires 5-6 shots or upgraded vessel fire).
 	# Levels 11 to 25: Slat HP = 12.
 	# Levels 26+: Slat HP = 20 (late-game fortified siege walls).
-	var default_slat_hp = tier_hp
+	var default_slat_hp: int = tier_hp
 	if cur_level > 10 and hp > 0 and hp != 20:
 		default_slat_hp = hp
 	elif cur_level >= 26:
@@ -59,14 +59,15 @@ func _ready() -> void:
 		active_points.erase(0.0)
 		
 	for i in range(active_points.size()):
-		var x_norm = active_points[i]
+		var x_norm: float = float(active_points[i])
 		if segment_prefab:
-			var segment = segment_prefab.instantiate() as BarricadeSegment
-			var seg_hp = default_slat_hp
+			var segment := segment_prefab.instantiate() as BarricadeSegment
+			var seg_hp: int = default_slat_hp
 			if cur_level > 10 and i < hp_values.size() and int(hp_values[i]) > 0:
 				seg_hp = int(hp_values[i])
-			segment.hp = seg_hp
-			add_child(segment)
-			var x_world = x_norm * (river_width / 2.0)
-			segment.position = Vector3(x_world, 0.0, 0.0)
+			if segment:
+				segment.hp = seg_hp
+				add_child(segment)
+				var x_world: float = x_norm * (river_width / 2.0)
+				segment.position = Vector3(x_world, 0.0, 0.0)
 

@@ -30,7 +30,7 @@ func setup(p_duration: float, p_radius: float = 1.6) -> void:
 func _setup_visuals() -> void:
 	# 1. Outer Ring: Crisp neon spectral border
 	if outer_ring:
-		var torus = TorusMesh.new()
+		var torus := TorusMesh.new()
 		torus.inner_radius = radius - 0.08
 		torus.outer_radius = radius
 		torus.rings = 32
@@ -46,7 +46,7 @@ func _setup_visuals() -> void:
 
 	# 2. Fill Disc: Interior fill indicator expanding from center outward
 	if fill_disc:
-		var disc = CylinderMesh.new()
+		var disc := CylinderMesh.new()
 		disc.top_radius = radius - 0.08
 		disc.bottom_radius = radius - 0.08
 		disc.height = 0.01
@@ -63,7 +63,7 @@ func _setup_visuals() -> void:
 
 	# 3. Pulse Ring: Fast warning strobe near end of countdown
 	if pulse_ring:
-		var p_torus = TorusMesh.new()
+		var p_torus := TorusMesh.new()
 		p_torus.inner_radius = radius * 0.4
 		p_torus.outer_radius = radius * 0.46
 		p_torus.rings = 24
@@ -82,25 +82,25 @@ func _physics_process(delta: float) -> void:
 		return
 		
 	_elapsed += delta
-	var progress = clampf(_elapsed / duration, 0.0, 1.0)
+	var progress := clampf(_elapsed / duration, 0.0, 1.0)
 	
 	# Expanding interior fill
 	if fill_disc:
-		var current_fill_scale = lerpf(0.02, 1.0, progress)
+		var current_fill_scale := lerpf(0.02, 1.0, progress)
 		fill_disc.scale = Vector3(current_fill_scale, 1.0, current_fill_scale)
 		if _fill_mat:
 			_fill_mat.albedo_color.a = lerpf(0.25, 0.70, progress)
 
 	# Pulse ring expands and loops
 	if pulse_ring and _pulse_mat:
-		var cycle = fmod(_elapsed * 2.5, 1.0)
-		var p_scale = lerpf(0.3, 1.0, cycle)
+		var cycle := fmod(_elapsed * 2.5, 1.0)
+		var p_scale := lerpf(0.3, 1.0, cycle)
 		pulse_ring.scale = Vector3(p_scale, 1.0, p_scale)
 		_pulse_mat.albedo_color.a = (1.0 - cycle) * 0.75
 
 	# Outer ring subtle urgency flicker as detonation nears
 	if outer_ring and _ring_mat and progress > 0.7:
-		var flash = 0.85 + sin(_elapsed * 25.0) * 0.15
+		var flash := 0.85 + sin(_elapsed * 25.0) * 0.15
 		_ring_mat.albedo_color = Color(0.15 * flash, 1.0, 0.45 * flash, 0.95)
 
 	if _elapsed >= duration:

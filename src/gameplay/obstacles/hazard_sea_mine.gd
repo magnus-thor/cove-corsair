@@ -27,7 +27,7 @@ func _on_area_entered(area: Area3D) -> void:
 	elif area.is_in_group("enemies") and not area.is_in_group("boss"):
 		# Mine caught in enemy lane — detonate and deal blast damage to that enemy via take_hit
 		if area.has_method("take_hit"):
-			area.take_hit(20, "sea_mine_collision")
+			area.call("take_hit", 20, "sea_mine_collision")
 		die()
 
 ## Canonical damage entry point — any hit detonates the mine.
@@ -41,14 +41,14 @@ func take_damage(_amount: int = 1) -> void:
 func die() -> void:
 	if _is_destroyed:
 		return
-	var explosion_pos = global_position
+	var explosion_pos: Vector3 = global_position
 	explosion_pos.y = 0.05
 	_is_destroyed = true
 
 	# Rule D — Immediate collider shutdown: prevent ghost contacts after detonation.
 	collision_layer = 0
 	collision_mask = 0
-	for child in get_children():
+	for child: Node in get_children():
 		if child is CollisionShape3D:
 			child.set_deferred("disabled", true)
 	set_deferred("monitoring", false)
@@ -60,13 +60,14 @@ func die() -> void:
 	elif VFXManager and VFXManager.has_method("spawn_explosion"):
 		VFXManager.spawn_explosion(explosion_pos)
 	elif explosion_scene:
-		var vfx = explosion_scene.instantiate() as Node3D
-		vfx.top_level = true
-		vfx.position = explosion_pos
-		var root = get_tree().current_scene if get_tree() else null
-		if root:
-			root.add_child(vfx)
-		vfx.global_position = explosion_pos
+		var vfx: Node3D = explosion_scene.instantiate() as Node3D
+		if vfx:
+			vfx.top_level = true
+			vfx.position = explosion_pos
+			var root: Node = get_tree().current_scene if get_tree() else null
+			if root:
+				root.add_child(vfx)
+			vfx.global_position = explosion_pos
 
 	if VFXManager and VFXManager.has_method("hit_stop"):
 		VFXManager.hit_stop(0.05)
@@ -89,26 +90,26 @@ func die() -> void:
 ## This replaces the legacy get_nodes_in_group() loop and duck-typed current_hp mutations.
 func _apply_blast_damage(explosion_pos: Vector3) -> void:
 	# Player proximity check (player uses take_hit directly as it has no Hurtbox3D yet)
-	var player = get_tree().get_first_node_in_group("player")
-	if player and is_instance_valid(player):
-		var dist = explosion_pos.distance_to(player.global_position)
+	var player: Node = get_tree().get_first_node_in_group("player")
+	if player and is_instance_valid(player) and player is Node3D:
+		var dist: float = explosion_pos.distance_to((player as Node3D).global_position)
 		if dist < 2.8:
 			if player.has_method("take_hit"):
-				player.take_hit(1, "sea_mine_explosion")
+				player.call("take_hit", 1, "sea_mine_explosion")
 			elif player.has_method("leak_threat"):
-				player.leak_threat(self)
+				player.call("leak_threat", self)
 
 	# Enemy blast damage via already-overlapping areas (no tree scan needed)
-	for area in get_overlapping_areas():
+	for area: Area3D in get_overlapping_areas():
 		if not is_instance_valid(area) or area.is_in_group("boss") or area.is_in_group("player"):
 			continue
 		if area.is_in_group("enemies") or area.is_in_group("destructible"):
-			var dist = explosion_pos.distance_to((area as Node3D).global_position)
+			var dist: float = explosion_pos.distance_to(area.global_position)
 			if dist <= blast_radius:
 				if area is Hurtbox3D:
 					(area as Hurtbox3D).take_hit(20, "sea_mine_explosion")
 				elif area.has_method("take_hit"):
-					area.take_hit(20, "sea_mine_explosion")
+					area.call("take_hit", 20, "sea_mine_explosion")
 				elif area.has_method("take_damage"):
-					area.take_damage(20)
+					area.call("take_damage", 20)
 

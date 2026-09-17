@@ -42,44 +42,44 @@ func setup_weapon(data: WeaponData) -> void:
 func _is_crew() -> bool:
 	if not weapon_data:
 		return false
-	if weapon_data is CrewData or (weapon_data.has_method("is_crew_member") and weapon_data.is_crew_member()):
+	if weapon_data is CrewData or (weapon_data.has_method("is_crew_member") and weapon_data.call("is_crew_member")):
 		return true
-	var w_type = weapon_data.weapon_type.to_lower()
-	var w_name = weapon_data.weapon_name.to_lower()
+	var w_type := weapon_data.weapon_type.to_lower()
+	var w_name := weapon_data.weapon_name.to_lower()
 	return (w_type == "crew_thrower" or w_type == "crew_musket" or "crew" in w_name or "monkey" in w_name or "skeleton" in w_name)
 
 func _apply_weapon_data() -> void:
 	if not weapon_data:
 		return
 	
-	var is_crew = _is_crew()
-	var w_name = weapon_data.weapon_name.to_lower()
-	var w_type = weapon_data.weapon_type.to_lower()
+	var is_crew := _is_crew()
+	var w_name := weapon_data.weapon_name.to_lower()
+	var w_type := weapon_data.weapon_type.to_lower()
 
 	if is_crew:
 		if sprite_3d:
 			sprite_3d.visible = false
 		if model_container:
 			model_container.visible = true
-			var glb_path = "res://assets/models/user/crew/monkey_crew.glb"
+			var glb_path := "res://assets/models/user/crew/monkey_crew.glb"
 			if "skeleton" in w_name or "tosser" in w_name:
 				glb_path = "res://assets/models/user/crew/skeleton_crew.glb"
 			
-			var model_mesh = model_container.get_node_or_null("CrewMesh")
+			var model_mesh: Node3D = model_container.get_node_or_null("CrewMesh") as Node3D
 			if not model_mesh or model_mesh.get_meta("glb_path", "") != glb_path:
 				for child in model_container.get_children():
 					child.queue_free()
 				if ResourceLoader.exists(glb_path):
-					var scene = load(glb_path)
+					var scene := load(glb_path) as PackedScene
 					if scene:
-						model_mesh = scene.instantiate()
+						model_mesh = scene.instantiate() as Node3D
 						model_mesh.name = "CrewMesh"
 						model_mesh.set_meta("glb_path", glb_path)
 						model_container.add_child(model_mesh)
 			
 			if model_mesh:
 				model_mesh.visible = true
-				var crew_scale = Vector3(0.525, 0.525, 0.525)
+				var crew_scale := Vector3(0.525, 0.525, 0.525)
 				if "model_scale" in weapon_data and weapon_data.model_scale != Vector3.ZERO and weapon_data.model_scale != Vector3(0.4, 0.4, 0.4):
 					crew_scale = weapon_data.model_scale * 1.5
 				model_mesh.scale = crew_scale
@@ -88,12 +88,12 @@ func _apply_weapon_data() -> void:
 			if not hop_in_done and model_container:
 				hop_in_done = true
 				model_container.scale = Vector3.ZERO
-				var tween = create_tween()
+				var tween := create_tween()
 				tween.tween_property(model_container, "scale", Vector3(1.1, 1.1, 1.1), 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 				tween.tween_property(model_container, "scale", Vector3.ONE, 0.15).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 				AudioManager.play_sfx("gate_passes")
 	else:
-		var cannon_glb = "res://assets/models/user/weapons/cannon.glb"
+		var cannon_glb := "res://assets/models/user/weapons/cannon.glb"
 		var model_to_load: PackedScene = null
 		if "model_scene" in weapon_data and weapon_data.model_scene:
 			model_to_load = weapon_data.model_scene
@@ -105,22 +105,22 @@ func _apply_weapon_data() -> void:
 				sprite_3d.visible = false
 			if model_container:
 				model_container.visible = true
-				var model_mesh = model_container.get_node_or_null("WeaponMesh")
+				var model_mesh: Node3D = model_container.get_node_or_null("WeaponMesh") as Node3D
 				if not model_mesh or model_mesh.get_meta("model_source", null) != model_to_load:
 					for child in model_container.get_children():
 						child.queue_free()
-					model_mesh = model_to_load.instantiate()
+					model_mesh = model_to_load.instantiate() as Node3D
 					model_mesh.name = "WeaponMesh"
 					model_mesh.set_meta("model_source", model_to_load)
 					model_container.add_child(model_mesh)
 				
 				if model_mesh:
 					model_mesh.visible = true
-					var m_scale = weapon_data.model_scale if ("model_scale" in weapon_data and weapon_data.model_scale != Vector3.ZERO) else Vector3(0.4, 0.4, 0.4)
+					var m_scale := weapon_data.model_scale if ("model_scale" in weapon_data and weapon_data.model_scale != Vector3.ZERO) else Vector3(0.4, 0.4, 0.4)
 					model_mesh.scale = m_scale
-					var m_rot = weapon_data.model_rotation_degrees if ("model_rotation_degrees" in weapon_data and weapon_data.model_rotation_degrees != Vector3.ZERO) else Vector3(0, 90, 0)
+					var m_rot := weapon_data.model_rotation_degrees if ("model_rotation_degrees" in weapon_data and weapon_data.model_rotation_degrees != Vector3.ZERO) else Vector3(0, 90, 0)
 					model_mesh.rotation_degrees = m_rot
-					var m_offset = weapon_data.model_offset if "model_offset" in weapon_data else Vector3(0, 0.12, 0)
+					var m_offset := weapon_data.model_offset if "model_offset" in weapon_data else Vector3(0, 0.12, 0)
 					model_mesh.position = m_offset
 		else:
 			if model_container:
@@ -170,12 +170,12 @@ func _apply_weapon_data() -> void:
 	wander_timer = randf_range(2.0, 3.5)
 	idle_timer = randf_range(0.0, TAU)
 
-	var fallback = get_node_or_null("FallbackMesh") as MeshInstance3D
+	var fallback := get_node_or_null("FallbackMesh") as MeshInstance3D
 	if weapon_data.sprite_texture == null and not is_crew:
 		if not fallback:
 			fallback = MeshInstance3D.new()
 			fallback.name = "FallbackMesh"
-			var cylinder = CylinderMesh.new()
+			var cylinder := CylinderMesh.new()
 			cylinder.height = 0.5
 			cylinder.top_radius = 0.1
 			cylinder.bottom_radius = 0.1
@@ -192,25 +192,25 @@ func _physics_process(delta: float) -> void:
 	if Engine.is_editor_hint():
 		return
 		
-	var player = get_tree().get_first_node_in_group("player")
-	if player and ("is_game_over" in player and player.is_game_over):
+	var player := get_tree().get_first_node_in_group("player")
+	if player and player.get("is_game_over") == true:
 		return
 		
 	if not weapon_data:
 		return
 		
-	var is_crew = _is_crew()
+	var is_crew := _is_crew()
 	
 	if is_crew:
 		_process_deck_idle(delta)
 		_process_targeting(delta)
 		# Smooth Y-Axis rotation aiming to face locked targets within 20.0m range
 		if current_target and is_instance_valid(current_target):
-			var m_pos = muzzle_point.global_position if muzzle_point else global_position
-			var to_target = (current_target.global_position - m_pos)
+			var m_pos := muzzle_point.global_position if muzzle_point else global_position
+			var to_target := (current_target.global_position - m_pos)
 			to_target.y = 0.0
 			if to_target.length_squared() > 0.001:
-				var target_yaw = atan2(-to_target.x, -to_target.z)
+				var target_yaw := atan2(-to_target.x, -to_target.z)
 				rotation.y = lerp_angle(rotation.y, target_yaw, 10.0 * delta)
 		else:
 			rotation.y = lerp_angle(rotation.y, deg_to_rad(weapon_data.spread_angle_deg), 5.0 * delta)
@@ -233,8 +233,8 @@ func _process_deck_idle(delta: float) -> void:
 	wander_timer -= delta
 	if wander_timer <= 0.0:
 		wander_timer = randf_range(2.0, 3.5)
-		var offset_x = randf_range(-0.12, 0.12)
-		var offset_z = randf_range(-0.08, 0.08)
+		var offset_x := randf_range(-0.12, 0.12)
+		var offset_z := randf_range(-0.08, 0.08)
 		
 		if wander_tween and wander_tween.is_running():
 			wander_tween.kill()
@@ -246,12 +246,12 @@ func _process_deck_idle(delta: float) -> void:
 
 func _process_targeting(_delta: float) -> void:
 	var is_crew: bool = _is_crew()
-	var player = get_tree().get_first_node_in_group("player")
-	var boat_z = player.global_position.z if (player and is_instance_valid(player)) else global_position.z
+	var player: Node3D = get_tree().get_first_node_in_group("player") as Node3D
+	var boat_z: float = player.global_position.z if (player and is_instance_valid(player)) else global_position.z
 	
 	# Priority 1: Active enemy mobs, destructibles, and destructible obstacles
 	var spawn_candidates: Array[Node] = []
-	for grp in ["enemies", "destructible", "destructible_obstacles", "obstacles"]:
+	for grp: String in ["enemies", "destructible", "destructible_obstacles", "obstacles"]:
 		for node in get_tree().get_nodes_in_group(grp):
 			if is_instance_valid(node) and not node.is_in_group("boss") and not (node is BossWarBarge) and not (node is BossComponentDelegate):
 				if node.has_method("take_damage") or (node.get_parent() and node.get_parent().has_method("take_damage")):
@@ -259,21 +259,22 @@ func _process_targeting(_delta: float) -> void:
 				
 	# Check other crew targets to avoid redundant targeting
 	var claimed_targets: Dictionary = {}
-	if player and "equipped_weapons" in player:
-		for w in player.equipped_weapons.values():
-			if is_instance_valid(w) and w != self and "current_target" in w and is_instance_valid(w.current_target):
-				claimed_targets[w.current_target] = true
+	if player is PlayerSwerve:
+		var swerve := player as PlayerSwerve
+		for w: Node in swerve.equipped_weapons.values():
+			if is_instance_valid(w) and w != self and "current_target" in w and is_instance_valid(w.get("current_target")):
+				claimed_targets[w.get("current_target")] = true
 
 	var best_target: Node3D = null
 	var best_unclaimed: Node3D = null
-	var min_dist = INF
-	var min_unclaimed_dist = INF
-	var max_range = 32.0
-	if "detection_range" in weapon_data and weapon_data.detection_range > 0.0:
-		max_range = weapon_data.detection_range
+	var min_dist := INF
+	var min_unclaimed_dist := INF
+	var max_range := 32.0
+	if "detection_range" in weapon_data and float(weapon_data.get("detection_range")) > 0.0:
+		max_range = float(weapon_data.get("detection_range"))
 	if is_crew:
 		max_range = min(max_range, 20.0)
-	var m_pos_ref = muzzle_point.global_position if muzzle_point else global_position
+	var m_pos_ref := muzzle_point.global_position if muzzle_point else global_position
 
 	var processed: Dictionary = {}
 	for target in spawn_candidates:
@@ -281,17 +282,17 @@ func _process_targeting(_delta: float) -> void:
 			continue
 		processed[target] = true
 		
-		var node3d = target as Node3D
+		var node3d := target as Node3D
 		if node3d.global_position.z > (boat_z - 0.2):
 			continue
 			
-		var to_target = (node3d.global_position - m_pos_ref)
+		var to_target := (node3d.global_position - m_pos_ref)
 		to_target.y = 0.0
-		var dir_norm = to_target.normalized()
+		var dir_norm := to_target.normalized()
 		if -dir_norm.z < 0.35:
 			continue
 			
-		var dist = global_position.distance_to(node3d.global_position)
+		var dist := global_position.distance_to(node3d.global_position)
 		if dist <= max_range:
 			if dist < min_dist:
 				min_dist = dist
@@ -307,33 +308,36 @@ func _process_targeting(_delta: float) -> void:
 		var boss_candidates: Array[Node] = []
 		for node in get_tree().get_nodes_in_group("boss"):
 			if is_instance_valid(node) and node is Node3D:
-				if "visible" in node and not node.visible:
+				var node3d := node as Node3D
+				if not node3d.visible:
 					continue
-				if node is BossComponentDelegate and node.boss_node:
-					var comp_name = node.component_name
-					if "hp_" + comp_name in node.boss_node and node.boss_node.get("hp_" + comp_name) <= 0:
-						continue
+				if node is BossComponentDelegate:
+					var delegate := node as BossComponentDelegate
+					if delegate.boss_node:
+						var comp_name: String = delegate.component_name
+						if "hp_" + comp_name in delegate.boss_node and delegate.boss_node.get("hp_" + comp_name) <= 0:
+							continue
 				boss_candidates.append(node)
 
 		processed.clear()
 		min_dist = INF
-		var max_boss_range = 20.0 if is_crew else 28.0
+		var max_boss_range := 20.0 if is_crew else 28.0
 		for target in boss_candidates:
 			if not is_instance_valid(target) or not target is Node3D or processed.has(target):
 				continue
 			processed[target] = true
 			
-			var node3d = target as Node3D
+			var node3d := target as Node3D
 			if node3d.global_position.z > (boat_z - 0.2):
 				continue
 				
-			var to_target = (node3d.global_position - m_pos_ref)
+			var to_target := (node3d.global_position - m_pos_ref)
 			to_target.y = 0.0
-			var dir_norm = to_target.normalized()
+			var dir_norm := to_target.normalized()
 			if -dir_norm.z < 0.35:
 				continue
 				
-			var dist = global_position.distance_to(node3d.global_position)
+			var dist := global_position.distance_to(node3d.global_position)
 			if dist <= max_boss_range and dist < min_dist:
 				min_dist = dist
 				best_target = node3d
@@ -341,8 +345,8 @@ func _process_targeting(_delta: float) -> void:
 	current_target = best_target
 	
 	if current_target and is_instance_valid(current_target):
-		var m_pos = muzzle_point.global_position if muzzle_point else global_position
-		var dir_to_target = (current_target.global_position - m_pos)
+		var m_pos := muzzle_point.global_position if muzzle_point else global_position
+		var dir_to_target := (current_target.global_position - m_pos)
 		dir_to_target.y = 0.0
 		if dir_to_target.z >= -0.2:
 			dir_to_target.z = -0.2
@@ -350,15 +354,15 @@ func _process_targeting(_delta: float) -> void:
 	else:
 		aim_direction = Vector3(0, 0, -1)
 
-func try_fire(p_projectile_scene = null, world_container = null) -> void:
+func try_fire(p_projectile_scene: Variant = null, world_container: Node = null) -> void:
 	if p_projectile_scene is float or p_projectile_scene is int:
-		var delta = float(p_projectile_scene)
+		var delta := float(p_projectile_scene)
 		if not weapon_data:
 			return
 		fire_timer += delta
 		if fire_timer >= weapon_data.fire_rate:
 			fire_timer = 0.0
-			var parent = get_tree().current_scene
+			var parent := get_tree().current_scene
 			if not parent:
 				parent = get_parent()
 			_execute_fire(self.projectile_scene, parent)
@@ -377,36 +381,36 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 	if not weapon_data or not proj_scene or not world_container or not muzzle_point:
 		return
 		
-	var is_crew = _is_crew()
-	var is_hostile = _is_hostile_vessel()
-	var default_fwd = Vector3(0, 0, 1) if is_hostile else Vector3(0, 0, -1)
+	var is_crew := _is_crew()
+	var is_hostile := _is_hostile_vessel()
+	var default_fwd := Vector3(0, 0, 1) if is_hostile else Vector3(0, 0, -1)
 	
 	if is_crew:
 		_trigger_throw_anim()
 	elif model_container and model_container.visible:
-		var recoil_tween = create_tween()
+		var recoil_tween := create_tween()
 		recoil_tween.tween_property(model_container, "position:z", 0.08, 0.04).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		recoil_tween.tween_property(model_container, "position:z", 0.0, 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 		
-	var spawn_pos = muzzle_point.global_position
+	var spawn_pos := muzzle_point.global_position
 	spawn_pos.y = max(0.48, spawn_pos.y)
 	
-	var socket_name = get_parent().name.to_lower() if get_parent() else ""
-	var from_bow = ("bow" in socket_name)
-	var is_mortar = ("mortar" in socket_name) or (weapon_data and ("mortar" in weapon_data.weapon_name.to_lower() or "mortar" in weapon_data.weapon_type.to_lower()))
+	var socket_name := get_parent().name.to_lower() if get_parent() else ""
+	var from_bow := ("bow" in socket_name)
+	var is_mortar := ("mortar" in socket_name) or (weapon_data and ("mortar" in weapon_data.weapon_name.to_lower() or "mortar" in weapon_data.weapon_type.to_lower()))
 	
 	var proj_dir: Vector3
 	if is_crew:
 		proj_dir = aim_direction if aim_direction != Vector3.ZERO else default_fwd
 	else:
-		var mount_fwd = -global_transform.basis.z if is_hostile else global_transform.basis.z
+		var mount_fwd := -global_transform.basis.z if is_hostile else global_transform.basis.z
 		mount_fwd.y = 0.0
 		if mount_fwd.length_squared() > 0.001:
 			proj_dir = mount_fwd.normalized()
 		elif weapon_data.has_method("get_firing_direction"):
 			proj_dir = weapon_data.get_firing_direction(default_fwd)
 		else:
-			var spread = deg_to_rad(weapon_data.spread_angle_deg)
+			var spread := deg_to_rad(weapon_data.spread_angle_deg)
 			proj_dir = default_fwd.rotated(Vector3.UP, spread).normalized()
 
 	if is_hostile and proj_dir.z < 0.0:
@@ -417,20 +421,20 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 		proj_dir.z = -abs(proj_dir.z)
 		proj_dir = proj_dir.normalized()
 
-	var player = get_tree().get_first_node_in_group("player")
+	var player := get_tree().get_first_node_in_group("player")
 	var is_scatter_weapon: bool = (weapon_data.get("is_scatter") == true or weapon_data.weapon_type == "scattershot" or "scatter" in weapon_data.weapon_name.to_lower())
-	var camera = get_tree().get_first_node_in_group("game_camera")
+	var camera := get_tree().get_first_node_in_group("game_camera")
 
 	if is_scatter_weapon:
 		fire_scattershot(proj_dir, world_container, proj_scene)
 	elif is_mortar:
 		AudioManager.play_sfx("sfx_mortar_fire")
 		if not is_hostile and player and player.has_method("apply_firing_recoil"):
-			player.apply_firing_recoil(3.5, true)
+			player.call("apply_firing_recoil", 3.5, true)
 		if camera and camera.has_method("add_trauma"):
-			camera.add_trauma(0.25)
+			camera.call("add_trauma", 0.25)
 			
-		var ball = proj_scene.instantiate() as Area3D
+		var ball := proj_scene.instantiate() as Cannonball
 		if ball:
 			ball.set_meta("is_mortar", true)
 			if from_bow:
@@ -438,82 +442,68 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 			if is_hostile:
 				ball.add_to_group("enemy_projectiles")
 				ball.set_meta("is_hostile", true)
-				if "is_hostile" in ball:
-					ball.is_hostile = true
+				ball.is_hostile = true
 			world_container.add_child(ball)
 			ball.top_level = true
 			ball.global_position = spawn_pos
+			ball.set_spawn_pos(spawn_pos)
 			
-			if ball.has_method("set_spawn_pos"):
-				ball.set_spawn_pos(spawn_pos)
-			
-			if "crew_id" in ball:
-				ball.crew_id = crew_id
+			ball.crew_id = crew_id
 			ball.set_meta("crew_id", crew_id)
-			if "crew_level" in ball:
-				ball.crew_level = crew_level
+			ball.crew_level = crew_level
 			ball.set_meta("crew_level", crew_level)
 			if crew_id == "skeleton_tosser" or (weapon_data and ("skeleton" in weapon_data.weapon_name.to_lower() or "fire" in weapon_data.weapon_name.to_lower() or "incendiary" in weapon_data.weapon_name.to_lower())):
 				ball.set_meta("is_incendiary", true)
 
 			if not is_hostile and GameState:
-				var a_id = GameState.get_active_ammo()
+				var a_id := GameState.get_active_ammo()
 				ball.set_meta("ammo_id", a_id)
-				if "ammo_id" in ball:
-					ball.ammo_id = a_id
+				ball.ammo_id = a_id
 
-			if ball.has_method("setup"):
-				ball.setup(proj_dir, weapon_data.default_ammo, weapon_data)
+			ball.setup(proj_dir, weapon_data.default_ammo, weapon_data)
 				
-			if player and "base_damage_bonus" in player and "damage" in ball and not is_hostile:
-				ball.damage += player.base_damage_bonus
+			if player and "base_damage_bonus" in player and not is_hostile:
+				ball.damage += int(round(float(player.get("base_damage_bonus"))))
 	else:
 		AudioManager.play_sfx("cannon_shots")
 		if not is_hostile and player and player.has_method("apply_firing_recoil"):
-			player.apply_firing_recoil(1.8, false)
+			player.call("apply_firing_recoil", 1.8, false)
 		if camera and camera.has_method("add_trauma"):
-			camera.add_trauma(0.08, 0.35)
+			camera.call("add_trauma", 0.08, 0.35)
 			
-		var ball = proj_scene.instantiate() as Area3D
+		var ball := proj_scene.instantiate() as Cannonball
 		if ball:
 			if from_bow:
 				ball.set_meta("from_bow", true)
 			if is_hostile:
 				ball.add_to_group("enemy_projectiles")
 				ball.set_meta("is_hostile", true)
-				if "is_hostile" in ball:
-					ball.is_hostile = true
+				ball.is_hostile = true
 			world_container.add_child(ball)
 			ball.top_level = true
 			ball.global_position = spawn_pos
+			ball.set_spawn_pos(spawn_pos)
 			
-			if ball.has_method("set_spawn_pos"):
-				ball.set_spawn_pos(spawn_pos)
-			
-			if "crew_id" in ball:
-				ball.crew_id = crew_id
+			ball.crew_id = crew_id
 			ball.set_meta("crew_id", crew_id)
-			if "crew_level" in ball:
-				ball.crew_level = crew_level
+			ball.crew_level = crew_level
 			ball.set_meta("crew_level", crew_level)
 			if crew_id == "skeleton_tosser" or (weapon_data and ("skeleton" in weapon_data.weapon_name.to_lower() or "fire" in weapon_data.weapon_name.to_lower() or "incendiary" in weapon_data.weapon_name.to_lower())):
 				ball.set_meta("is_incendiary", true)
 
 			if not is_hostile and GameState:
-				var a_id = GameState.get_active_ammo()
+				var a_id := GameState.get_active_ammo()
 				ball.set_meta("ammo_id", a_id)
-				if "ammo_id" in ball:
-					ball.ammo_id = a_id
+				ball.ammo_id = a_id
 
-			if ball.has_method("setup"):
-				ball.setup(proj_dir, weapon_data.default_ammo, weapon_data)
+			ball.setup(proj_dir, weapon_data.default_ammo, weapon_data)
 				
-			if player and "base_damage_bonus" in player and "damage" in ball and not is_hostile:
-				ball.damage += player.base_damage_bonus
+			if player and "base_damage_bonus" in player and not is_hostile:
+				ball.damage += int(round(float(player.get("base_damage_bonus"))))
 
-func fire_scattershot(proj_dir: Vector3 = Vector3.ZERO, world_container: Node = null, p_proj_scene: PackedScene = null) -> void:
+func fire_scattershot(_proj_dir: Vector3 = Vector3.ZERO, world_container: Node = null, p_proj_scene: PackedScene = null) -> void:
 	if not world_container:
-		var parent = get_tree().current_scene if get_tree() else null
+		var parent := get_tree().current_scene if get_tree() else null
 		if not parent:
 			parent = get_parent()
 		world_container = parent
@@ -522,74 +512,62 @@ func fire_scattershot(proj_dir: Vector3 = Vector3.ZERO, world_container: Node = 
 
 	# Play sfx_scattershot ONCE per volley and trigger lateral camera jitter trauma
 	AudioManager.play_sfx("sfx_scattershot")
-	var is_hostile = _is_hostile_vessel()
-	if not is_hostile:
-		var p = get_tree().get_first_node_in_group("player")
-		if p and p.has_method("apply_firing_recoil"):
-			p.apply_firing_recoil(2.2, false)
-	var camera = get_tree().get_first_node_in_group("game_camera")
+	var is_hostile := _is_hostile_vessel()
+	var p: Node = get_tree().get_first_node_in_group("player") if get_tree() else null
+	if not is_hostile and p and p.has_method("apply_firing_recoil"):
+		p.call("apply_firing_recoil", 2.2, false)
+	var camera := get_tree().get_first_node_in_group("game_camera")
 	if camera and camera.has_method("add_trauma"):
-		camera.add_trauma(0.15, 0.35)
+		camera.call("add_trauma", 0.15, 0.35)
 
 	var scene_to_use: PackedScene = p_proj_scene
 	if not scene_to_use:
 		if weapon_data and "projectile_scene" in weapon_data and weapon_data.projectile_scene:
 			scene_to_use = weapon_data.projectile_scene
 		else:
-			scene_to_use = preload("res://src/gameplay/projectiles/scattershot_pellet.tscn")
+			scene_to_use = self.projectile_scene
+			
+	if not scene_to_use:
+		return
 
-	var default_fwd = Vector3(0, 0, 1) if is_hostile else Vector3(0, 0, -1)
+	var pellets_count: int = 4
+	var max_spread_deg: float = 12.0
+	var socket_name := get_parent().name.to_lower() if get_parent() else ""
+	var from_bow: bool = ("bow" in socket_name)
 
-	var spawn_pos = muzzle_point.global_position
-	spawn_pos.y = max(0.48, spawn_pos.y)
+	# Read base forward direction
+	var base_forward := -global_transform.basis.z.normalized()
+	if aim_direction != Vector3.ZERO:
+		base_forward = aim_direction.normalized()
 
-	var base_dir: Vector3 = proj_dir
-	if base_dir == Vector3.ZERO:
-		var mount_fwd = -global_transform.basis.z if is_hostile else global_transform.basis.z
-		mount_fwd.y = 0.0
-		if mount_fwd.length_squared() > 0.001:
-			base_dir = mount_fwd.normalized()
-		elif weapon_data and weapon_data.has_method("get_firing_direction"):
-			base_dir = weapon_data.get_firing_direction(default_fwd)
-		else:
-			base_dir = default_fwd
-	else:
-		base_dir = base_dir.normalized()
+	var spawn_pos := muzzle_point.global_position
 
-	if is_hostile and base_dir.z < 0.0:
-		base_dir.z = abs(base_dir.z)
-		base_dir = base_dir.normalized()
+	for i in range(pellets_count):
+		# Spread evenly between -max_spread_deg and +max_spread_deg
+		var t: float = float(i) / float(pellets_count - 1)
+		var angle_offset: float = lerp(-max_spread_deg, max_spread_deg, t)
+		var angle_rad: float = deg_to_rad(angle_offset)
+		var pellet_dir := base_forward.rotated(Vector3.UP, angle_rad).normalized()
 
-	var socket_name = get_parent().name.to_lower() if get_parent() else ""
-	var from_bow = ("bow" in socket_name)
-	var player = get_tree().get_first_node_in_group("player") if get_tree() else null
-
-	var spread_angles: Array[float] = [-15.0, -7.5, 0.0, 7.5, 15.0]
-	for angle_deg in spread_angles:
-		var pellet_dir = base_dir.rotated(Vector3.UP, deg_to_rad(angle_deg)).normalized()
-
-		var pellet = scene_to_use.instantiate() as Area3D
+		var pellet := scene_to_use.instantiate() as Cannonball
 		if pellet:
 			if from_bow:
 				pellet.set_meta("from_bow", true)
 			if is_hostile:
 				pellet.add_to_group("enemy_projectiles")
 				pellet.set_meta("is_hostile", true)
-				if "is_hostile" in pellet:
-					pellet.is_hostile = true
+				pellet.is_hostile = true
 			world_container.add_child(pellet)
 			pellet.top_level = true
 			pellet.global_position = spawn_pos
-			if pellet.has_method("set_spawn_pos"):
-				pellet.set_spawn_pos(spawn_pos)
-			if pellet.has_method("setup"):
-				pellet.setup(pellet_dir, weapon_data.default_ammo if weapon_data else null, weapon_data)
+			pellet.set_spawn_pos(spawn_pos)
+			pellet.setup(pellet_dir, weapon_data.default_ammo if weapon_data else null, weapon_data)
 			if weapon_data and "projectile_lifetime" in weapon_data and weapon_data.projectile_lifetime > 0.0:
 				pellet.lifetime = weapon_data.projectile_lifetime
 			elif pellet.speed > 0.0:
 				pellet.lifetime = min(pellet.lifetime, (pellet.max_range / pellet.speed) + 0.05)
-			if player and "base_damage_bonus" in player and "damage" in pellet and not is_hostile:
-				pellet.damage += player.base_damage_bonus
+			if p and "base_damage_bonus" in p and not is_hostile:
+				pellet.damage += int(round(float(p.get("base_damage_bonus"))))
 
 func _trigger_throw_anim() -> void:
 	if model_container and model_container.visible:

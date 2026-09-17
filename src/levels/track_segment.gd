@@ -79,7 +79,7 @@ func spawn_obstacles() -> void:
 		
 	var level_idx = int(level_config_data.get("level_index", 1))
 	var rarities: Array = level_config_data.get("obstacle_rarities_allowed", ["common"])
-	var is_boss: bool = bool(level_config_data.get("is_boss_level", false))
+	var is_boss: bool = level_config_data.get("is_boss_level", false) == true
 	
 	# Determine barrel count based on level index and boss status
 	var count = randi_range(2, 2 + int(level_idx / 3.0))

@@ -26,8 +26,6 @@ enum OperationType { ADD, MULTIPLY }
 @onready var label_3d: Label3D = $Visuals/Label3D
 @onready var tag_label_3d: Label3D = get_node_or_null("Visuals/TagLabel3D") as Label3D
 
-var _processed_cannonballs: Dictionary = {}
-
 func _ready() -> void:
 	add_to_group("multiplier_gate")
 	area_entered.connect(_on_area_entered)
@@ -35,7 +33,7 @@ func _ready() -> void:
 	value = clamp(value, 1, 100)
 		
 	# Apply water calibration offset, pixel size, and scale
-	var gate_sprite = get_node_or_null("Visuals/GateSprite") as Sprite3D
+	var gate_sprite := get_node_or_null("Visuals/GateSprite") as Sprite3D
 	if gate_sprite:
 		gate_sprite.pixel_size = 0.0028
 	if visuals:
@@ -48,7 +46,7 @@ func _ready() -> void:
 func _on_body_entered(body: Node3D) -> void:
 	if not is_active:
 		return
-	var is_player = body.is_in_group("player") or body is PlayerSwerve or (body.get_parent() and body.get_parent().is_in_group("player"))
+	var is_player: bool = body.is_in_group("player") or body is PlayerSwerve or (body.get_parent() and body.get_parent().is_in_group("player"))
 	if is_player:
 		_trigger_gate_collect(body)
 
@@ -61,7 +59,7 @@ func _on_area_entered(area: Area3D) -> void:
 		on_shot_hit(area)
 		return
 		
-	var is_player = area.name == "CollisionArea" or area.is_in_group("player") or (area.get_parent() and area.get_parent().is_in_group("player"))
+	var is_player: bool = area.name == "CollisionArea" or area.is_in_group("player") or (area.get_parent() and area.get_parent().is_in_group("player"))
 	if is_player:
 		_trigger_gate_collect(area)
 
@@ -72,20 +70,20 @@ func _trigger_gate_collect(node: Node) -> void:
 	AudioManager.play_sfx("gate_passes", 1.1, 1.3)
 	
 	# Determine value to add (fallback to custom_text parsing)
-	var final_value = value
+	var final_value: int = value
 	if not custom_text.is_empty() and custom_text != "★ 100 MAX ★":
-		var clean_text = custom_text.replace(" Ships", "").replace(" Ship", "").replace(" ships", "").replace(" ship", "").strip_edges()
-		var num = clean_text.to_int()
+		var clean_text: String = custom_text.replace(" Ships", "").replace(" Ship", "").replace(" ships", "").replace(" ship", "").strip_edges()
+		var num: int = clean_text.to_int()
 		if num != 0:
 			final_value = abs(num)
 			
 	# Handle choice group deactivation
 	if not choice_group.is_empty():
-		var gates = get_tree().get_nodes_in_group("multiplier_gate")
-		for gate in gates:
-			if gate is MultiplierGate and gate.choice_group == choice_group and gate != self:
-				gate.is_active = false
-				var t = gate.create_tween().set_parallel(true)
+		var gates: Array[Node] = get_tree().get_nodes_in_group("multiplier_gate")
+		for gate: Node in gates:
+			if gate is MultiplierGate and (gate as MultiplierGate).choice_group == choice_group and gate != self:
+				(gate as MultiplierGate).is_active = false
+				var t: Tween = gate.create_tween().set_parallel(true)
 				t.tween_property(gate, "modulate:a", 0.0, 0.25)
 				t.chain().tween_callback(gate.queue_free)
 				
@@ -99,22 +97,22 @@ func _trigger_gate_collect(node: Node) -> void:
 		player_node = get_tree().get_first_node_in_group("player")
 		
 	# Balanced fleet reward: 1 gate gives +1 ship (+2 if maxed to 100), never full armada in 1 gate!
-	var ships_to_add = 2 if final_value >= 100 else 1
-	var doubloons_to_add = 150 if final_value >= 100 else int(round(final_value * 1.5))
+	var ships_to_add: int = 2 if final_value >= 100 else 1
+	var doubloons_to_add: int = 150 if final_value >= 100 else int(round(final_value * 1.5))
 	
 	GameState.doubloons += doubloons_to_add
 	if player_node:
 		if "doubloons" in player_node:
-			player_node.doubloons += doubloons_to_add
+			player_node.set("doubloons", int(player_node.get("doubloons")) + doubloons_to_add)
 		if player_node.has_signal("doubloons_changed"):
-			player_node.doubloons_changed.emit(GameState.doubloons)
+			player_node.emit_signal("doubloons_changed", GameState.doubloons)
 		if player_node.has_method("add_follower_ships"):
-			player_node.add_follower_ships(ships_to_add)
+			player_node.call("add_follower_ships", ships_to_add)
 		if final_value >= 100 and player_node.has_method("trigger_armada_overdrive"):
-			player_node.trigger_armada_overdrive()
+			player_node.call("trigger_armada_overdrive")
 		if player_node.has_method("spawn_floating_text_at_position"):
-			var msg = "+%d SLOOP ESCORT!" % ships_to_add if final_value < 100 else "★ 100 MAX! +2 ESCORTS! ★"
-			player_node.spawn_floating_text_at_position(msg, Color(0.2, 0.95, 1.0))
+			var msg: String = "+%d SLOOP ESCORT!" % ships_to_add if final_value < 100 else "★ 100 MAX! +2 ESCORTS! ★"
+			player_node.call("spawn_floating_text_at_position", msg, Color(0.2, 0.95, 1.0))
 		
 	_play_disappear_animation()
 
@@ -122,17 +120,17 @@ func on_shot_hit(_cannonball: Node = null) -> void:
 	if not is_active:
 		return
 		
-	var cur_val = value
+	var cur_val: int = value
 	if not custom_text.is_empty() and custom_text != "★ 100 MAX ★":
-		var clean_text = custom_text.replace(" Ships", "").replace(" Ship", "").replace(" ships", "").replace(" ship", "").replace("★", "").replace("MAX", "").strip_edges()
-		var num = clean_text.to_int()
+		var clean_text: String = custom_text.replace(" Ships", "").replace(" Ship", "").replace(" ships", "").replace(" ship", "").replace("★", "").replace("MAX", "").strip_edges()
+		var num: int = clean_text.to_int()
 		if num != 0:
 			cur_val = abs(num)
 			
-	var max_cap = 100
+	var max_cap: int = 100
 	if cur_val < max_cap:
-		var increment = 5
-		if _cannonball and _cannonball.get("damage") and _cannonball.damage > 1:
+		var increment: int = 5
+		if _cannonball and _cannonball.get("damage") and int(_cannonball.get("damage")) > 1:
 			increment = 10
 		cur_val = min(cur_val + increment, max_cap)
 		value = cur_val
@@ -142,21 +140,21 @@ func on_shot_hit(_cannonball: Node = null) -> void:
 			custom_text = "+%d" % cur_val
 		update_visuals()
 		
-		var pitch_scale = lerpf(1.1, 1.75, float(cur_val) / float(max_cap))
+		var pitch_scale: float = lerpf(1.1, 1.75, float(cur_val) / float(max_cap))
 		AudioManager.play_sfx("gate_passes", pitch_scale, pitch_scale + 0.15)
 		
 		if cur_val >= max_cap:
 			AudioManager.play_sfx("coin_pickup", 1.4, 1.6)
 		
 		if visuals:
-			var tween = create_tween().set_parallel(true)
-			var target_punch = Vector3(1.35, 1.35, 1.35) if cur_val < max_cap else Vector3(1.5, 1.5, 1.5)
+			var tween: Tween = create_tween().set_parallel(true)
+			var target_punch: Vector3 = Vector3(1.35, 1.35, 1.35) if cur_val < max_cap else Vector3(1.5, 1.5, 1.5)
 			visuals.scale = target_punch
 			tween.tween_property(visuals, "scale", Vector3(1.09, 1.09, 1.09), 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 			if label_3d:
-				var flash_col = Color(1.0, 1.0, 0.7) if cur_val < max_cap else Color(1.0, 1.0, 1.0)
+				var flash_col: Color = Color(1.0, 1.0, 0.7) if cur_val < max_cap else Color(1.0, 1.0, 1.0)
 				label_3d.modulate = flash_col
-				var end_col = _get_value_color(cur_val)
+				var end_col: Color = _get_value_color(cur_val)
 				tween.tween_property(label_3d, "modulate", end_col, 0.22)
 
 func _get_value_color(val: int) -> Color:
@@ -172,9 +170,9 @@ func _get_value_color(val: int) -> Color:
 		return Color(0.25, 0.85, 1.0) # Cyan Hologram
 
 func update_visuals() -> void:
-	var cur_val = value
-	var gate_sprite = get_node_or_null("Visuals/GateSprite") as Sprite3D
-	var val_color = _get_value_color(cur_val)
+	var cur_val: int = value
+	var gate_sprite := get_node_or_null("Visuals/GateSprite") as Sprite3D
+	var val_color: Color = _get_value_color(cur_val)
 	
 	if gate_sprite:
 		if cur_val >= 100:
@@ -192,8 +190,8 @@ func update_visuals() -> void:
 		if cur_val >= 100:
 			label_3d.text = "★ 100 MAX ★"
 		elif not custom_text.is_empty():
-			var clean_text = custom_text.replace(" Ships", "").replace(" Ship", "").replace(" ships", "").replace(" ship", "").strip_edges()
-			var num = clean_text.to_int()
+			var clean_text: String = custom_text.replace(" Ships", "").replace(" Ship", "").replace(" ships", "").replace(" ship", "").strip_edges()
+			var num: int = clean_text.to_int()
 			if num != 0:
 				cur_val = abs(num)
 			if num > 0 and not clean_text.begins_with("+"):
@@ -227,7 +225,7 @@ func _play_disappear_animation() -> void:
 	# Disable collision immediately
 	set_deferred("monitoring", false)
 	set_deferred("monitorable", false)
-	for child in get_children():
+	for child: Node in get_children():
 		if child is CollisionShape3D:
 			child.set_deferred("disabled", true)
 			
@@ -235,11 +233,11 @@ func _play_disappear_animation() -> void:
 		queue_free()
 		return
 		
-	var tween = create_tween().set_parallel(true)
+	var tween: Tween = create_tween().set_parallel(true)
 	tween.tween_property(visuals, "scale", Vector3(1.35, 1.35, 1.35), 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tween.tween_property(visuals, "position:y", visuals.position.y + 0.8, 0.22).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	
-	var gate_sprite = get_node_or_null("Visuals/GateSprite") as Sprite3D
+	var gate_sprite := get_node_or_null("Visuals/GateSprite") as Sprite3D
 	if gate_sprite:
 		tween.tween_property(gate_sprite, "modulate:a", 0.0, 0.22)
 	if label_3d:
@@ -252,8 +250,8 @@ func _play_disappear_animation() -> void:
 func _clean_shadow_nodes(node: Node) -> void:
 	if not node:
 		return
-	var lower_name = node.name.to_lower()
-	var is_shadow_node = false
+	var lower_name: String = str(node.name).to_lower()
+	var is_shadow_node: bool = false
 	if "shadow" in lower_name or "decal" in lower_name or "projector" in lower_name or "card" in lower_name or "oblate" in lower_name or "shadow_sphere" in lower_name or "sphere_shadow" in lower_name:
 		is_shadow_node = true
 		
@@ -263,11 +261,12 @@ func _clean_shadow_nodes(node: Node) -> void:
 			return
 			
 	if node is MeshInstance3D:
+		var mesh_node := node as MeshInstance3D
 		if "shadow" in lower_name or "plane" in lower_name or "billboard" in lower_name or "card" in lower_name:
-			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-			node.visible = false
-			node.queue_free()
+			mesh_node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			mesh_node.visible = false
+			mesh_node.queue_free()
 			return
 			
-	for child in node.get_children():
+	for child: Node in node.get_children():
 		_clean_shadow_nodes(child)

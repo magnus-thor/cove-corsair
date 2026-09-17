@@ -55,9 +55,9 @@ func _ready() -> void:
 	add_to_group("destructible")
 	
 	if has_node("/root/GameState"):
-		var gs = get_node("/root/GameState")
+		var gs: Node = get_node("/root/GameState")
 		if "current_level" in gs:
-			var lvl: int = gs.current_level
+			var lvl: int = int(gs.get("current_level"))
 			if lvl <= 15:
 				max_hp = 650
 			elif lvl <= 30:
@@ -73,7 +73,7 @@ func _ready() -> void:
 		_base_scale = boss_sprite.scale
 		boss_sprite.rotation_degrees = Vector3.ZERO
 		if boss_sprite is Sprite3D:
-			boss_sprite.pixel_size = 0.0021
+			(boss_sprite as Sprite3D).pixel_size = 0.0021
 	_update_health_bar()
 	area_entered.connect(_on_area_entered)
 	
@@ -81,8 +81,8 @@ func _ready() -> void:
 	EventBus.boss_spawned_event.emit("Captain Bone-Beard", max_hp)
 	EventBus.boss_health_changed.emit(current_hp, max_hp)
 	
-	var player = get_tree().get_first_node_in_group("player")
-	var player_z = player.global_position.z if player else 0.0
+	var player := get_tree().get_first_node_in_group("player") as Node3D
+	var player_z: float = player.global_position.z if player else 0.0
 	_target_z = player_z + combat_z_offset
 
 
@@ -90,8 +90,8 @@ func _physics_process(delta: float) -> void:
 	if _is_defeated or current_state == State.DYING:
 		return
 
-	var player = get_tree().get_first_node_in_group("player")
-	var player_z = player.global_position.z if player else 0.0
+	var player := get_tree().get_first_node_in_group("player") as Node3D
+	var player_z: float = player.global_position.z if player else 0.0
 	_target_z = player_z + combat_z_offset
 
 	match current_state:
@@ -130,33 +130,31 @@ func _fire_twin_cannon_salvo(target_lane_x: float = NAN) -> void:
 	
 	AudioManager.play_sfx("cannon_shots", 0.85, 1.1, 1.5)
 	
-	var player = get_tree().get_first_node_in_group("player")
-	var root = get_tree().current_scene
-	var spawn_parent = root if root else get_parent()
+	var root := get_tree().current_scene
+	var spawn_parent := root if root else get_parent()
 	if not spawn_parent:
 		return
 		
+	var player := get_tree().get_first_node_in_group("player") as Node3D
 	var target_x: float = global_position.x
 	if not is_nan(target_lane_x):
 		target_x = target_lane_x
 	elif player and is_instance_valid(player):
 		target_x = player.global_position.x
 
-	var salvo = twin_salvo_scene.instantiate() as Area3D
-	spawn_parent.add_child(salvo)
-	salvo.global_position = Vector3(global_position.x, 0.5, global_position.z + 2.5)
-	
-	var fire_dir = Vector3(0, 0, 1)
-	if player and is_instance_valid(player):
-		var to_player = Vector3(target_x - salvo.global_position.x, 0.0, player.global_position.z - salvo.global_position.z)
-		if to_player.z > 0.1:
-			fire_dir = to_player.normalized()
-	
-	if salvo.has_method("setup"):
+	var salvo := twin_salvo_scene.instantiate() as EnemyCannonball
+	if salvo:
+		spawn_parent.add_child(salvo)
+		salvo.global_position = Vector3(global_position.x, 0.5, global_position.z + 2.5)
+		
+		var fire_dir := Vector3(0, 0, 1)
+		if player and is_instance_valid(player):
+			var to_player := Vector3(target_x - salvo.global_position.x, 0.0, player.global_position.z - salvo.global_position.z)
+			if to_player.z > 0.1:
+				fire_dir = to_player.normalized()
+		
 		salvo.setup(fire_dir, null, null)
-	if "direction" in salvo:
 		salvo.direction = fire_dir
-	if "speed" in salvo:
 		salvo.speed = 12.0
 	print("[BOSS ATTACK] Captain Bone-Beard fired Fire Twin Cannon Salvo downriver towards X=%.2f" % target_x)
 
@@ -164,24 +162,23 @@ func _fire_bonebeard_salvo() -> void:
 	_fire_twin_cannon_salvo()
 
 func _drop_powder_kegs() -> void:
-	var lanes = [-2.2, 0.0, 2.2]
+	var lanes: Array[float] = [-2.2, 0.0, 2.2]
 	lanes.shuffle()
 	
-	var player = get_tree().get_first_node_in_group("player")
-	var player_z = player.global_position.z if player and is_instance_valid(player) else 0.0
-	var safe_z = minf(global_position.z + 2.5, player_z - 15.0)
+	var player := get_tree().get_first_node_in_group("player") as Node3D
+	var player_z: float = player.global_position.z if player and is_instance_valid(player) else 0.0
+	var safe_z := minf(global_position.z + 2.5, player_z - 15.0)
 	
 	for i in range(2):
-		var spawn_x = lanes[i]
+		var spawn_x: float = lanes[i]
 		if powder_keg_scene:
-			var keg = powder_keg_scene.instantiate() as Node3D
-			var root = get_tree().current_scene
-			var spawn_parent = root if root else get_parent()
-			if spawn_parent:
+			var keg := powder_keg_scene.instantiate() as DestructibleObstacle
+			var root: Node = get_tree().current_scene
+			var spawn_parent: Node = root if root else get_parent()
+			if spawn_parent and keg:
 				spawn_parent.add_child(keg)
 				keg.global_position = Vector3(spawn_x, 0.5, safe_z)
-				if "forward_speed" in keg:
-					keg.forward_speed = 6.0
+				keg.forward_speed = 6.0
 
 func _flash_red() -> void:
 	if not is_instance_valid(boss_sprite):
@@ -221,64 +218,63 @@ func boss_defeat() -> void:
 		if child is CollisionShape3D:
 			child.set_deferred("disabled", true)
 			
-	var tween = create_tween()
+	var tween := create_tween()
 	for i in range(7):
-		tween.tween_callback(func():
+		tween.tween_callback(func() -> void:
 			_spawn_hull_explosion()
 			AudioManager.play_sfx("barrel_breaks")
 		)
 		tween.tween_interval(0.14)
 		
-	tween.tween_callback(func():
+	tween.tween_callback(func() -> void:
 		_spawn_doubloon_fountain()
 	)
 	tween.tween_interval(1.5)
-	tween.tween_callback(func():
+	tween.tween_callback(func() -> void:
 		EventBus.level_completed.emit(GameState.doubloons, GameState.targets_destroyed)
 		queue_free()
 	)
 
 func _spawn_hull_explosion() -> void:
 	if explosion_scene:
-		var vfx = explosion_scene.instantiate() as Node3D
-		var root = get_tree().current_scene
+		var vfx := explosion_scene.instantiate() as Node3D
+		var root := get_tree().current_scene
 		if root:
 			root.add_child(vfx)
-			var offset = Vector3(randf_range(-2.2, 2.2), randf_range(0.3, 1.8), randf_range(-1.0, 1.0))
+			var offset := Vector3(randf_range(-2.2, 2.2), randf_range(0.3, 1.8), randf_range(-1.0, 1.0))
 			vfx.global_position = global_position + offset
 
 func _spawn_doubloon_fountain() -> void:
 	if not doubloon_scene:
 		return
-	var spawn_parent = get_tree().current_scene
+	var spawn_parent := get_tree().current_scene
 	if not spawn_parent or spawn_parent == self:
 		spawn_parent = get_parent()
 		if spawn_parent == self or spawn_parent is BossBoneBeard:
 			return
 		
-	var count = randi_range(20, 30)
+	var count := randi_range(20, 30)
 	for i in range(count):
-		var d = doubloon_scene.instantiate() as Area3D
+		var d := doubloon_scene.instantiate() as CollectibleDoubloon
 		if d:
 			spawn_parent.add_child(d)
 			d.global_position = Vector3(global_position.x, 0.05, global_position.z)
-			var scatter = Vector2(randf_range(-3.0, 3.0), randf_range(-3.0, 3.0))
-			if d.has_method("_trigger_spawn_bounce"):
-				d._trigger_spawn_bounce(scatter)
+			var scatter := Vector2(randf_range(-3.0, 3.0), randf_range(-3.0, 3.0))
+			d._trigger_spawn_bounce(scatter)
 
 func _on_area_entered(area: Area3D) -> void:
 	if _is_defeated or current_state == State.DYING:
 		return
 	if area.is_in_group("player") or (area.get_parent() and area.get_parent().is_in_group("player")):
-		var player = get_tree().get_first_node_in_group("player")
-		if player and player.has_method("take_hit"):
+		var player := get_tree().get_first_node_in_group("player") as PlayerSwerve
+		if player:
 			player.take_hit(1, "BossBoneBeard hull contact")
 
 func _clean_shadow_nodes(node: Node) -> void:
 	if not node:
 		return
-	var lower_name = node.name.to_lower()
-	var is_shadow_node = false
+	var lower_name: String = str(node.name).to_lower()
+	var is_shadow_node := false
 	if "shadow" in lower_name or "decal" in lower_name or "projector" in lower_name or "card" in lower_name or "oblate" in lower_name or "shadow_sphere" in lower_name or "sphere_shadow" in lower_name:
 		is_shadow_node = true
 		
@@ -288,11 +284,12 @@ func _clean_shadow_nodes(node: Node) -> void:
 			return
 			
 	if node is MeshInstance3D:
+		var mesh_node := node as MeshInstance3D
 		if "shadow" in lower_name or "plane" in lower_name or "billboard" in lower_name or "card" in lower_name:
-			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-			node.visible = false
-			node.queue_free()
+			mesh_node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			mesh_node.visible = false
+			mesh_node.queue_free()
 			return
 			
-	for child in node.get_children():
+	for child: Node in node.get_children():
 		_clean_shadow_nodes(child)

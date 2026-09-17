@@ -41,8 +41,8 @@ func _physics_process(delta: float) -> void:
 		_bombard_timer = 0.0
 		_launch_heavy_bombard()
 		
-	var player = get_tree().get_first_node_in_group("player")
-	var player_z = player.global_position.z if player else 0.0
+	var player := get_tree().get_first_node_in_group("player")
+	var player_z: float = player.global_position.z if player else 0.0
 	if global_position.z > (player_z + 4.5):
 		GameState.record_mob_leaked()
 		if player and player.has_method("leak_threat"):
@@ -50,16 +50,16 @@ func _physics_process(delta: float) -> void:
 		queue_free()
 
 func _launch_heavy_bombard() -> void:
-	var player = get_tree().get_first_node_in_group("player")
+	var player := get_tree().get_first_node_in_group("player")
 	if not player or not is_instance_valid(player):
 		return
 		
-	var target_pos = player.global_position + Vector3(randf_range(-1.0, 1.0), 0, randf_range(-0.5, 0.5))
+	var target_pos: Vector3 = player.global_position + Vector3(randf_range(-1.0, 1.0), 0, randf_range(-0.5, 0.5))
 	
-	var reticle = Sprite3D.new()
+	var reticle := Sprite3D.new()
 	reticle.axis = Vector3.AXIS_Y
 	reticle.double_sided = true
-	var reticle_tex = preload("res://assets/sprites/ui/bombard_target_reticle.png")
+	var reticle_tex := preload("res://assets/sprites/ui/bombard_target_reticle.png")
 	reticle.texture = reticle_tex
 	reticle.pixel_size = 0.0058
 	reticle.modulate = Color(1.2, 0.45, 0.1, 0.35)
@@ -70,9 +70,9 @@ func _launch_heavy_bombard() -> void:
 	
 	AudioManager.play_sfx("cannon_shots", 0.6, 0.8, 2.0)
 	
-	var tween = reticle.create_tween()
-	var vfx_scene = explosion_scene
-	var tree = get_tree()
+	var tween := reticle.create_tween()
+	var vfx_scene := explosion_scene
+	var tree := get_tree()
 	tween.tween_property(reticle, "modulate:a", 1.0, 1.1).set_trans(Tween.TRANS_SINE)
 	tween.parallel().tween_property(reticle, "rotation:y", PI * 0.4, 1.1)
 	tween.tween_callback(Callable(EnemyMiniBossBombard, "execute_bombard_detonation").bind(reticle.global_position, vfx_scene, tree))
@@ -85,21 +85,21 @@ static func execute_bombard_detonation(pos: Vector3, vfx_prefab: PackedScene, tr
 	AudioManager.play_sfx("cannon_shots", 0.5, 0.7, 3.0)
 	
 	if vfx_prefab:
-		var vfx = vfx_prefab.instantiate() as Node3D
-		var root = tree.current_scene
+		var vfx := vfx_prefab.instantiate() as Node3D
+		var root := tree.current_scene
 		if root:
 			root.add_child(vfx)
 		vfx.global_position = pos
 		vfx.scale = Vector3(3.0, 3.0, 3.0)
 		vfx.modulate = Color(2.5, 0.8, 0.2, 1.0)
 		
-	var camera = tree.get_first_node_in_group("game_camera")
+	var camera := tree.get_first_node_in_group("game_camera")
 	if camera and camera.has_method("shake"):
 		camera.shake(0.3, 0.28)
 		
-	var player = tree.get_first_node_in_group("player")
+	var player := tree.get_first_node_in_group("player")
 	if player and is_instance_valid(player):
-		var dist = player.global_position.distance_to(pos)
+		var dist: float = player.global_position.distance_to(pos)
 		if dist <= 2.6 and player.has_method("damage_fleet"):
 			player.damage_fleet(1)
 
@@ -113,10 +113,10 @@ func take_damage(amount: int) -> void:
 	_update_health_bar()
 	_flash()
 	
-	var ft_script = load("res://src/vfx/floating_text.gd")
+	var ft_script := load("res://src/vfx/floating_text.gd")
 	if ft_script:
-		var fct = ft_script.new()
-		var root = get_tree().current_scene
+		var fct: Variant = ft_script.new()
+		var root := get_tree().current_scene
 		if root:
 			root.add_child(fct)
 			fct.global_position = global_position + Vector3(randf_range(-0.6, 0.6), 1.5, randf_range(-0.6, 0.6))
@@ -138,7 +138,7 @@ func _update_health_bar() -> void:
 	if progress_bar:
 		progress_bar.max_value = max_hp
 		progress_bar.value = current_hp
-		var ratio = float(current_hp) / float(max_hp) if max_hp > 0 else 0.0
+		var ratio := float(current_hp) / float(max_hp) if max_hp > 0 else 0.0
 		progress_bar.modulate = Color(1.0, 0.7, 0.1).lerp(Color(1.0, 0.1, 0.1), 1.0 - ratio)
 
 func die() -> void:
@@ -148,14 +148,14 @@ func die() -> void:
 	GameState.targets_destroyed += 1
 	AudioManager.play_sfx("barrel_breaks", 0.6, 0.8, 3.0)
 	
-	var camera = get_tree().get_first_node_in_group("game_camera")
+	var camera := get_tree().get_first_node_in_group("game_camera")
 	if camera and camera.has_method("shake"):
 		camera.shake(0.38, 0.32)
 		
 	for i in range(5):
-		get_tree().create_timer(i * 0.1).timeout.connect(func():
+		get_tree().create_timer(i * 0.1).timeout.connect(func() -> void:
 			if explosion_scene:
-				var vfx = explosion_scene.instantiate() as Node3D
+				var vfx := explosion_scene.instantiate() as Node3D
 				get_tree().current_scene.add_child(vfx)
 				vfx.global_position = global_position + Vector3(randf_range(-1.8, 1.8), 0.5, randf_range(-1.8, 1.8))
 				vfx.scale = Vector3(2.0, 2.0, 2.0)
@@ -164,15 +164,15 @@ func die() -> void:
 		
 	if doubloon_scene:
 		for i in range(doubloons_drop):
-			var d = doubloon_scene.instantiate() as Area3D
-			var root = get_tree().current_scene
+			var d := doubloon_scene.instantiate() as Area3D
+			var root := get_tree().current_scene
 			if root:
 				root.add_child(d)
 				d.global_position = global_position
 				if d.has_method("_trigger_spawn_bounce"):
 					d._trigger_spawn_bounce(Vector2(randf_range(-1.6, 1.6), randf_range(-1.6, 1.6)))
 					
-	var player = get_tree().get_first_node_in_group("player")
+	var player := get_tree().get_first_node_in_group("player")
 	if player and player.has_method("upgrade_ship"):
 		player.upgrade_ship(2)
 		

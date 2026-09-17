@@ -32,7 +32,7 @@ func _ready() -> void:
 
 func _apply_level_tuning() -> void:
 	var cur_lvl: int = 1
-	var gs = get_node_or_null("/root/GameState")
+	var gs := get_node_or_null("/root/GameState")
 	if gs and "current_level" in gs:
 		cur_lvl = int(gs.current_level)
 	if cur_lvl <= 3:
@@ -57,10 +57,10 @@ func _physics_process(delta: float) -> void:
 		sprite_node.position.y = 0.9 + sin(_time * 2.8) * 0.04
 		
 	# Shooting logic: only shoot if explicitly marked as gunner vanguard and not in boss fight
-	var is_boss_active = GameState.boss_spawned or get_tree().get_first_node_in_group("boss") != null
-	var player = get_tree().get_first_node_in_group("player")
-	var player_z = player.global_position.z if player else 0.0
-	var dist_to_player = abs(global_position.z - player_z)
+	var is_boss_active := GameState.boss_spawned or get_tree().get_first_node_in_group("boss") != null
+	var player := get_tree().get_first_node_in_group("player")
+	var player_z: float = player.global_position.z if player else 0.0
+	var dist_to_player: Variant = abs(global_position.z - player_z)
 
 	if (can_shoot or is_gunner_vanguard) and not is_boss_active and dist_to_player >= 14.0 and dist_to_player <= 45.0:
 		_shoot_timer += delta
@@ -81,15 +81,15 @@ func _fire_dual_cannons() -> void:
 	AudioManager.play_sfx("cannon_shots", 0.9, 1.1, 0.0)
 	
 	var cur_lvl: int = 1
-	var gs = get_node_or_null("/root/GameState")
+	var gs := get_node_or_null("/root/GameState")
 	if gs and "current_level" in gs:
 		cur_lvl = int(gs.current_level)
 		
-	var offsets = [0.0] if cur_lvl <= 3 else [-0.6, 0.6]
-	var player = get_tree().get_first_node_in_group("player")
+	var offsets := [0.0] if cur_lvl <= 3 else [-0.6, 0.6]
+	var player := get_tree().get_first_node_in_group("player")
 	for offset_x in offsets:
-		var ball = enemy_cannonball_scene.instantiate() as Area3D
-		var root = get_tree().current_scene
+		var ball := enemy_cannonball_scene.instantiate() as Area3D
+		var root := get_tree().current_scene
 		if root:
 			root.add_child(ball)
 		else:
@@ -97,9 +97,9 @@ func _fire_dual_cannons() -> void:
 		ball.global_position = global_position + Vector3(offset_x, 0.5, 1.2)
 		if "speed" in ball:
 			ball.speed = 12.5
-		var fire_dir = Vector3(0, 0, 1)
+		var fire_dir := Vector3(0, 0, 1)
 		if player and is_instance_valid(player):
-			var to_player = (player.global_position - ball.global_position)
+			var to_player: Vector3 = (player.global_position - ball.global_position)
 			to_player.y = 0.0
 			if to_player.length_squared() > 0.01:
 				fire_dir = to_player.normalized()
@@ -121,10 +121,10 @@ func take_damage(amount: int) -> void:
 	_update_health_bar()
 	_flash()
 	
-	var ft_script = load("res://src/vfx/floating_text.gd")
+	var ft_script := load("res://src/vfx/floating_text.gd")
 	if ft_script:
-		var fct = ft_script.new()
-		var root = get_tree().current_scene
+		var fct: Variant = ft_script.new()
+		var root := get_tree().current_scene
 		if root:
 			root.add_child(fct)
 			fct.global_position = global_position + Vector3(randf_range(-0.4, 0.4), 1.3, randf_range(-0.4, 0.4))
@@ -146,7 +146,7 @@ func _update_health_bar() -> void:
 	if progress_bar:
 		progress_bar.max_value = max_hp
 		progress_bar.value = current_hp
-		var ratio = float(current_hp) / float(max_hp) if max_hp > 0 else 0.0
+		var ratio := float(current_hp) / float(max_hp) if max_hp > 0 else 0.0
 		progress_bar.modulate = Color(0.2, 0.9, 0.3).lerp(Color(1.0, 0.3, 0.1), 1.0 - ratio)
 
 func die() -> void:
@@ -157,8 +157,8 @@ func die() -> void:
 	AudioManager.play_sfx("barrel_breaks")
 	
 	if explosion_scene:
-		var vfx = explosion_scene.instantiate() as Node3D
-		var root = get_tree().current_scene
+		var vfx := explosion_scene.instantiate() as Node3D
+		var root := get_tree().current_scene
 		if root:
 			root.add_child(vfx)
 		vfx.global_position = global_position
@@ -166,15 +166,15 @@ func die() -> void:
 		
 	if doubloon_scene:
 		for i in range(doubloons_drop):
-			var d = doubloon_scene.instantiate() as Area3D
-			var root = get_tree().current_scene
+			var d := doubloon_scene.instantiate() as Area3D
+			var root := get_tree().current_scene
 			if root:
 				root.add_child(d)
 				d.global_position = global_position
 				if d.has_method("_trigger_spawn_bounce"):
 					d._trigger_spawn_bounce(Vector2(randf_range(-0.7, 0.7), randf_range(-0.7, 0.7)))
 					
-	var player = get_tree().get_first_node_in_group("player")
+	var player := get_tree().get_first_node_in_group("player")
 	if player and player.has_method("upgrade_ship"):
 		player.upgrade_ship(1)
 		

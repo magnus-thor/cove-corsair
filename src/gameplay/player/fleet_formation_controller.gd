@@ -164,6 +164,6 @@ func _update_formation() -> void:
 		if is_instance_valid(follower):
 			var f_offset: Vector3 = offsets[i + 1]
 			if follower.has_method("set_target_offset"):
-				follower.set_target_offset(f_offset)
+				follower.call("set_target_offset", f_offset)
 			if follower.has_method("tween_scale"):
-				follower.tween_scale(target_sf, 0.4)
+				follower.call("tween_scale", target_sf, 0.4)

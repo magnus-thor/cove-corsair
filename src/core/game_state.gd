@@ -388,74 +388,74 @@ func _setup_event_bus_bridges() -> void:
 	if not EventBus:
 		return
 	# EventBus -> GameState (for legacy listeners attached to GameState)
-	EventBus.level_completed.connect(func(d: int, t: int):
+	EventBus.level_completed.connect(func(d: int, t: int) -> void:
 		if not _bridging_event:
 			_bridging_event = true
 			level_completed.emit(d, t)
 			_bridging_event = false
 	)
-	EventBus.campaign_completed.connect(func(d: int, t: int):
+	EventBus.campaign_completed.connect(func(d: int, t: int) -> void:
 		if not _bridging_event:
 			_bridging_event = true
 			campaign_completed.emit(d, t)
 			_bridging_event = false
 	)
-	EventBus.boss_spawned_event.connect(func(n: String, m: int):
+	EventBus.boss_spawned_event.connect(func(n: String, m: int) -> void:
 		if not _bridging_event:
 			_bridging_event = true
 			boss_spawned_event.emit(n, m)
 			_bridging_event = false
 	)
-	EventBus.boss_health_changed.connect(func(c: int, m: int):
+	EventBus.boss_health_changed.connect(func(c: int, m: int) -> void:
 		if not _bridging_event:
 			_bridging_event = true
 			boss_health_changed.emit(c, m)
 			_bridging_event = false
 	)
-	EventBus.distance_target_reached.connect(func():
+	EventBus.distance_target_reached.connect(func() -> void:
 		if not _bridging_event:
 			_bridging_event = true
 			distance_target_reached.emit()
 			_bridging_event = false
 	)
-	EventBus.run_failed.connect(func(c: int, d: float):
+	EventBus.run_failed.connect(func(c: int, d: float) -> void:
 		if not _bridging_event:
 			_bridging_event = true
 			run_failed.emit(c, d)
 			_bridging_event = false
 	)
 	# GameState -> EventBus (for legacy emitters calling GameState.<signal>.emit)
-	level_completed.connect(func(d: int, t: int):
+	level_completed.connect(func(d: int, t: int) -> void:
 		if not _bridging_event:
 			_bridging_event = true
 			EventBus.level_completed.emit(d, t)
 			_bridging_event = false
 	)
-	campaign_completed.connect(func(d: int, t: int):
+	campaign_completed.connect(func(d: int, t: int) -> void:
 		if not _bridging_event:
 			_bridging_event = true
 			EventBus.campaign_completed.emit(d, t)
 			_bridging_event = false
 	)
-	boss_spawned_event.connect(func(n: String, m: int):
+	boss_spawned_event.connect(func(n: String, m: int) -> void:
 		if not _bridging_event:
 			_bridging_event = true
 			EventBus.boss_spawned_event.emit(n, m)
 			_bridging_event = false
 	)
-	boss_health_changed.connect(func(c: int, m: int):
+	boss_health_changed.connect(func(c: int, m: int) -> void:
 		if not _bridging_event:
 			_bridging_event = true
 			EventBus.boss_health_changed.emit(c, m)
 			_bridging_event = false
 	)
-	distance_target_reached.connect(func():
+	distance_target_reached.connect(func() -> void:
 		if not _bridging_event:
 			_bridging_event = true
 			EventBus.distance_target_reached.emit()
 			_bridging_event = false
 	)
-	run_failed.connect(func(c: int, d: float):
+	run_failed.connect(func(c: int, d: float) -> void:
 		if not _bridging_event:
 			_bridging_event = true
 			EventBus.run_failed.emit(c, d)
@@ -481,23 +481,23 @@ func apply_audio_settings() -> void:
 		AudioManager.set_bus_muted("SFX", sfx_muted)
 
 func get_current_level_resource() -> LevelData:
-	var path = LEVEL_RESOURCES.get(current_level, LEVEL_RESOURCES[1])
+	var path: Variant = LEVEL_RESOURCES.get(current_level, LEVEL_RESOURCES[1])
 	if ResourceLoader.exists(path):
 		return load(path) as LevelData
 	return null
 
 func get_vessel_resource(vessel_id: String) -> ShipData:
 	if vessel_id in VESSEL_CATALOG:
-		var path = VESSEL_CATALOG[vessel_id]["resource_path"]
+		var path: Variant = VESSEL_CATALOG[vessel_id]["resource_path"]
 		if ResourceLoader.exists(path):
 			return load(path) as ShipData
 	return null
 
 func get_active_ship_resource() -> ShipData:
-	var res = get_vessel_resource(active_vessel)
+	var res := get_vessel_resource(active_vessel)
 	if res:
 		return res
-	var fallback_path = LEVEL_SHIPS.get(current_level, LEVEL_SHIPS[1])
+	var fallback_path: Variant = LEVEL_SHIPS.get(current_level, LEVEL_SHIPS[1])
 	if ResourceLoader.exists(fallback_path):
 		return load(fallback_path) as ShipData
 	return null
@@ -515,11 +515,13 @@ func get_vessel_tier(vessel_id: String) -> int:
 	return vessel_tiers.get(vessel_id, 1)
 
 func get_upgrade_cost(vessel_id: String, target_tier: int) -> int:
-	var res = get_vessel_resource(vessel_id)
+	var res := get_vessel_resource(vessel_id)
 	if res and res.upgrade_costs.size() >= target_tier and target_tier >= 1:
 		return res.upgrade_costs[target_tier - 1]
 	if VESSEL_CATALOG.has(vessel_id):
-		return VESSEL_CATALOG[vessel_id]["tier_prices"].get(target_tier, 0)
+		var v_dict: Dictionary = VESSEL_CATALOG[vessel_id] as Dictionary
+		var prices: Dictionary = v_dict.get("tier_prices", {}) as Dictionary
+		return int(prices.get(target_tier, 0))
 	return 0
 
 func can_afford(cost: int) -> bool:
@@ -530,7 +532,7 @@ func buy_vessel(vessel_id: String) -> bool:
 		return false
 	if is_vessel_owned(vessel_id):
 		return false
-	var cost = VESSEL_CATALOG[vessel_id]["purchase_price"]
+	var cost: int = int(VESSEL_CATALOG[vessel_id]["purchase_price"])
 	if doubloons < cost:
 		return false
 	doubloons -= cost
@@ -545,11 +547,11 @@ func buy_vessel(vessel_id: String) -> bool:
 func upgrade_vessel_tier(vessel_id: String) -> bool:
 	if not is_vessel_owned(vessel_id):
 		return false
-	var cur_tier = get_vessel_tier(vessel_id)
+	var cur_tier := get_vessel_tier(vessel_id)
 	if cur_tier >= 3:
 		return false
-	var next_tier = cur_tier + 1
-	var cost = get_upgrade_cost(vessel_id, next_tier)
+	var next_tier := cur_tier + 1
+	var cost := get_upgrade_cost(vessel_id, next_tier)
 	if doubloons < cost:
 		return false
 	doubloons -= cost
@@ -570,11 +572,11 @@ func set_active_vessel(vessel_id: String) -> bool:
 	return equip_vessel(vessel_id)
 
 func can_afford_active_vessel_upgrade() -> bool:
-	var cur_tier = get_vessel_tier(active_vessel)
+	var cur_tier := get_vessel_tier(active_vessel)
 	if cur_tier >= 3:
 		return false
-	var next_tier = cur_tier + 1
-	var cost = get_upgrade_cost(active_vessel, next_tier)
+	var next_tier := cur_tier + 1
+	var cost := get_upgrade_cost(active_vessel, next_tier)
 	return cost > 0 and doubloons >= cost
 
 # --- Crew Meta & Outfitting ---
@@ -591,7 +593,9 @@ func get_crew_unlock_cost(crew_id: String) -> int:
 
 func get_crew_upgrade_cost(crew_id: String, target_level: int) -> int:
 	if CREW_CATALOG.has(crew_id):
-		return CREW_CATALOG[crew_id]["upgrade_prices"].get(target_level, 0)
+		var c_dict: Dictionary = CREW_CATALOG[crew_id] as Dictionary
+		var prices: Dictionary = c_dict.get("upgrade_prices", {}) as Dictionary
+		return int(prices.get(target_level, 0))
 	return 0
 
 func buy_crew(crew_id: String) -> bool:
@@ -599,7 +603,7 @@ func buy_crew(crew_id: String) -> bool:
 		return false
 	if is_crew_unlocked(crew_id):
 		return false
-	var cost = get_crew_unlock_cost(crew_id)
+	var cost := get_crew_unlock_cost(crew_id)
 	if doubloons < cost:
 		return false
 	doubloons -= cost
@@ -612,11 +616,11 @@ func buy_crew(crew_id: String) -> bool:
 func upgrade_crew_level(crew_id: String) -> bool:
 	if not is_crew_unlocked(crew_id):
 		return false
-	var cur_lvl = get_crew_level(crew_id)
+	var cur_lvl := get_crew_level(crew_id)
 	if cur_lvl >= 3:
 		return false
-	var next_lvl = cur_lvl + 1
-	var cost = get_crew_upgrade_cost(crew_id, next_lvl)
+	var next_lvl := cur_lvl + 1
+	var cost := get_crew_upgrade_cost(crew_id, next_lvl)
 	if doubloons < cost:
 		return false
 	doubloons -= cost
@@ -627,18 +631,18 @@ func upgrade_crew_level(crew_id: String) -> bool:
 	return true
 
 func get_crew_sockets_for_ship(ship_id: String, tier: int = -1) -> Array[String]:
-	var ship_res = get_vessel_resource(ship_id)
+	var ship_res := get_vessel_resource(ship_id)
 	if not ship_res:
 		return []
 	if tier < 1:
 		tier = get_vessel_tier(ship_id)
 	if ship_res.tier_sockets.is_empty():
 		return []
-	var s_idx = clampi(tier - 1, 0, ship_res.tier_sockets.size() - 1)
+	var s_idx := clampi(tier - 1, 0, ship_res.tier_sockets.size() - 1)
 	var active_sockets: Array = ship_res.tier_sockets[s_idx]
 	var crew_sockets: Array[String] = []
-	for s_name in active_sockets:
-		var s_lower = str(s_name).to_lower()
+	for s_name: Variant in active_sockets:
+		var s_lower := str(s_name).to_lower()
 		if "crew" in s_lower:
 			crew_sockets.append(str(s_name))
 	return crew_sockets
@@ -646,19 +650,18 @@ func get_crew_sockets_for_ship(ship_id: String, tier: int = -1) -> Array[String]
 func get_equipped_crew(ship_id: String, socket_name: String) -> String:
 	if not equipped_crew.has(ship_id):
 		return ""
-	var ship_map = equipped_crew[ship_id]
-	if ship_map is Dictionary and ship_map.has(socket_name):
+	var ship_map: Dictionary = equipped_crew.get(ship_id, {}) as Dictionary
+	if ship_map.has(socket_name):
 		return str(ship_map[socket_name])
 	return ""
 
 func is_crew_equipped_on_ship(ship_id: String, crew_id: String) -> bool:
 	if not equipped_crew.has(ship_id):
 		return false
-	var ship_map = equipped_crew[ship_id]
-	if ship_map is Dictionary:
-		for s in ship_map:
-			if ship_map[s] == crew_id:
-				return true
+	var ship_map: Dictionary = equipped_crew.get(ship_id, {}) as Dictionary
+	for s: String in ship_map:
+		if ship_map[s] == crew_id:
+			return true
 	return false
 
 func is_crew_equipped_on_active_ship(crew_id: String) -> bool:
@@ -669,11 +672,12 @@ func equip_crew(ship_id: String, socket_name: String, crew_id: String) -> bool:
 		return false
 	if not equipped_crew.has(ship_id) or not (equipped_crew[ship_id] is Dictionary):
 		equipped_crew[ship_id] = {}
+	var eq_ship: Dictionary = equipped_crew[ship_id] as Dictionary
 	# If this crew is already on another socket on this ship, unequip from old socket
-	for s in equipped_crew[ship_id].keys():
-		if equipped_crew[ship_id][s] == crew_id:
-			equipped_crew[ship_id].erase(s)
-	equipped_crew[ship_id][socket_name] = crew_id
+	for s: String in eq_ship.keys():
+		if eq_ship[s] == crew_id:
+			eq_ship.erase(s)
+	eq_ship[socket_name] = crew_id
 	save_game()
 	crew_equipped.emit(ship_id, socket_name, crew_id)
 	return true
@@ -681,8 +685,9 @@ func equip_crew(ship_id: String, socket_name: String, crew_id: String) -> bool:
 func unequip_crew(ship_id: String, socket_name: String) -> bool:
 	if not equipped_crew.has(ship_id) or not (equipped_crew[ship_id] is Dictionary):
 		return false
-	if equipped_crew[ship_id].has(socket_name):
-		equipped_crew[ship_id].erase(socket_name)
+	var eq_ship: Dictionary = equipped_crew[ship_id] as Dictionary
+	if eq_ship.has(socket_name):
+		eq_ship.erase(socket_name)
 		save_game()
 		crew_equipped.emit(ship_id, socket_name, "")
 		return true
@@ -693,8 +698,8 @@ func toggle_equip_crew_active_ship(crew_id: String) -> bool:
 		return false
 	if not is_vessel_owned(active_vessel):
 		return false
-	var cur_tier = get_vessel_tier(active_vessel)
-	var available_sockets = get_crew_sockets_for_ship(active_vessel, cur_tier)
+	var cur_tier := get_vessel_tier(active_vessel)
+	var available_sockets := get_crew_sockets_for_ship(active_vessel, cur_tier)
 	
 	# Safe Ship Swap Guard: If vessel has 0 crew sockets (e.g. Tier 1), cannot equip
 	if available_sockets.is_empty():
@@ -702,17 +707,17 @@ func toggle_equip_crew_active_ship(crew_id: String) -> bool:
 		
 	# If already equipped on active ship, unequip it!
 	if is_crew_equipped_on_active_ship(crew_id):
-		var eq_map = equipped_crew.get(active_vessel, {})
-		for s in eq_map.keys():
+		var eq_map: Dictionary = equipped_crew.get(active_vessel, {}) as Dictionary
+		for s: String in eq_map.keys():
 			if eq_map[s] == crew_id:
 				unequip_crew(active_vessel, s)
 				return true
 		return false
 		
 	# Otherwise find first open socket or replace first socket
-	var target_socket = ""
-	var ship_map = equipped_crew.get(active_vessel, {})
-	for s in available_sockets:
+	var target_socket := ""
+	var ship_map: Dictionary = equipped_crew.get(active_vessel, {}) as Dictionary
+	for s: String in available_sockets:
 		if not ship_map.has(s) or ship_map[s] == "":
 			target_socket = s
 			break
@@ -745,7 +750,8 @@ func buy_outfitting(item_id: String) -> bool:
 		return false
 	if is_outfitting_unlocked(item_id):
 		return true
-	var price = OUTFITTING_CATALOG[item_id].get("price", 0)
+	var item_dict: Dictionary = OUTFITTING_CATALOG[item_id] as Dictionary
+	var price: int = int(item_dict.get("price", 0))
 	if doubloons < price:
 		return false
 	doubloons -= price
@@ -776,7 +782,8 @@ func toggle_equip_outfitting_active_ship(item_id: String) -> bool:
 		return false
 	if not is_outfitting_unlocked(item_id):
 		return false
-	var cat = OUTFITTING_CATALOG[item_id].get("category", "")
+	var item_dict: Dictionary = OUTFITTING_CATALOG[item_id] as Dictionary
+	var cat: String = str(item_dict.get("category", ""))
 	if cat == "ammo":
 		if get_active_ammo() == item_id and item_id != "standard_iron":
 			return equip_ammo(active_vessel, "standard_iron")
@@ -788,10 +795,10 @@ func toggle_equip_outfitting_active_ship(item_id: String) -> bool:
 	return false
 
 func record_fodder_kill() -> void:
-	var now = Time.get_ticks_msec() / 1000.0
+	var now := Time.get_ticks_msec() / 1000.0
 	fodder_kill_timestamps.append(now)
-	var cutoff = now - 2.0
-	fodder_kill_timestamps = fodder_kill_timestamps.filter(func(t): return t >= cutoff)
+	var cutoff := now - 2.0
+	fodder_kill_timestamps = fodder_kill_timestamps.filter(func(t: Variant) -> bool: return t >= cutoff)
 	if fodder_kill_timestamps.size() >= 3:
 		fodder_kill_timestamps.clear()
 		fire_frenzy_triggered.emit(2.5)
@@ -948,9 +955,9 @@ func save_game() -> void:
 		"music_muted": music_muted,
 		"sfx_muted": sfx_muted
 	}
-	var file = FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file:
-		var json_str = JSON.stringify(save_dict, "\t")
+		var json_str := JSON.stringify(save_dict, "\t")
 		file.store_string(json_str)
 		file.close()
 
@@ -979,22 +986,22 @@ func load_game() -> void:
 	if not FileAccess.file_exists(SAVE_PATH):
 		return
 
-	var file = FileAccess.open(SAVE_PATH, FileAccess.READ)
+	var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
 	if not file:
 		return
 
-	var json_str = file.get_as_text()
+	var json_str := file.get_as_text()
 	file.close()
-	var json = JSON.new()
-	var err = json.parse(json_str)
+	var json := JSON.new()
+	var err := json.parse(json_str)
 	if err == OK and json.data is Dictionary:
 		var data: Dictionary = json.data
 		doubloons = max(0, int(data.get("doubloons", doubloons)))
 		
 		if data.has("owned_vessels") and data["owned_vessels"] is Array:
 			var loaded_owned: Array[String] = []
-			for v in data["owned_vessels"]:
-				var v_str = str(v)
+			for v: Variant in (data["owned_vessels"] as Array):
+				var v_str := str(v)
 				if v_str in VESSEL_CATALOG and not loaded_owned.has(v_str):
 					loaded_owned.append(v_str)
 			if not loaded_owned.has("dinghy"):
@@ -1002,14 +1009,15 @@ func load_game() -> void:
 			owned_vessels = loaded_owned
 			
 		if data.has("vessel_tiers") and data["vessel_tiers"] is Dictionary:
-			for k in data["vessel_tiers"]:
-				var v_key = str(k)
+			var tiers_dict: Dictionary = data["vessel_tiers"] as Dictionary
+			for k: Variant in tiers_dict:
+				var v_key := str(k)
 				if v_key in VESSEL_CATALOG:
-					vessel_tiers[v_key] = clamp(int(data["vessel_tiers"][k]), 1, 3)
+					vessel_tiers[v_key] = clamp(int(tiers_dict[k]), 1, 3)
 
 		# Strict active vessel sanitization: MUST exist in owned_vessels
 		if data.has("active_vessel"):
-			var loaded_active = str(data["active_vessel"])
+			var loaded_active := str(data["active_vessel"])
 			if loaded_active in owned_vessels:
 				active_vessel = loaded_active
 			else:
@@ -1019,21 +1027,24 @@ func load_game() -> void:
 
 		if data.has("unlocked_crew") and data["unlocked_crew"] is Dictionary:
 			unlocked_crew = {}
-			for c_id in data["unlocked_crew"]:
-				var cid_str = str(c_id)
+			var crew_dict: Dictionary = data["unlocked_crew"] as Dictionary
+			for c_id: Variant in crew_dict:
+				var cid_str := str(c_id)
 				if cid_str in CREW_CATALOG:
-					unlocked_crew[cid_str] = clamp(int(data["unlocked_crew"][c_id]), 1, 3)
+					unlocked_crew[cid_str] = clamp(int(crew_dict[c_id]), 1, 3)
 		else:
 			unlocked_crew = {}
 
 		if data.has("equipped_crew") and data["equipped_crew"] is Dictionary:
 			equipped_crew = {}
-			for s_id in data["equipped_crew"]:
-				var sid_str = str(s_id)
-				if data["equipped_crew"][s_id] is Dictionary:
+			var eq_crew_dict: Dictionary = data["equipped_crew"] as Dictionary
+			for s_id: Variant in eq_crew_dict:
+				var sid_str := str(s_id)
+				if eq_crew_dict[s_id] is Dictionary:
 					equipped_crew[sid_str] = {}
-					for sock in data["equipped_crew"][s_id]:
-						var c_val = str(data["equipped_crew"][s_id][sock])
+					var sub_dict: Dictionary = eq_crew_dict[s_id] as Dictionary
+					for sock: Variant in sub_dict:
+						var c_val := str(sub_dict[sock])
 						if c_val in CREW_CATALOG:
 							equipped_crew[sid_str][str(sock)] = c_val
 		else:
@@ -1041,18 +1052,20 @@ func load_game() -> void:
 
 		if data.has("unlocked_outfitting") and data["unlocked_outfitting"] is Dictionary:
 			unlocked_outfitting = {"standard_iron": true, "none": true}
-			for o_id in data["unlocked_outfitting"]:
-				var oid_str = str(o_id)
+			var outfit_dict: Dictionary = data["unlocked_outfitting"] as Dictionary
+			for o_id: Variant in outfit_dict:
+				var oid_str := str(o_id)
 				if oid_str in OUTFITTING_CATALOG:
-					unlocked_outfitting[oid_str] = bool(data["unlocked_outfitting"][o_id])
+					unlocked_outfitting[oid_str] = (outfit_dict[o_id] == true)
 		else:
 			unlocked_outfitting = {"standard_iron": true, "none": true}
 
 		if data.has("equipped_ammo") and data["equipped_ammo"] is Dictionary:
 			equipped_ammo = {"dinghy": "standard_iron", "sloop": "standard_iron", "ironclad": "standard_iron", "bombard_skiff": "standard_iron"}
-			for s_id in data["equipped_ammo"]:
-				var sid_str = str(s_id)
-				var a_val = str(data["equipped_ammo"][s_id])
+			var ammo_dict: Dictionary = data["equipped_ammo"] as Dictionary
+			for s_id: Variant in ammo_dict:
+				var sid_str := str(s_id)
+				var a_val := str(ammo_dict[s_id])
 				if a_val in OUTFITTING_CATALOG:
 					equipped_ammo[sid_str] = a_val
 		else:
@@ -1060,9 +1073,10 @@ func load_game() -> void:
 
 		if data.has("equipped_plating") and data["equipped_plating"] is Dictionary:
 			equipped_plating = {"dinghy": "none", "sloop": "none", "ironclad": "none", "bombard_skiff": "none"}
-			for s_id in data["equipped_plating"]:
-				var sid_str = str(s_id)
-				var p_val = str(data["equipped_plating"][s_id])
+			var plating_dict: Dictionary = data["equipped_plating"] as Dictionary
+			for s_id: Variant in plating_dict:
+				var sid_str := str(s_id)
+				var p_val := str(plating_dict[s_id])
 				if p_val in OUTFITTING_CATALOG:
 					equipped_plating[sid_str] = p_val
 		else:
@@ -1081,27 +1095,29 @@ func load_game() -> void:
 		current_level = current_selected_level
 
 		if data.has("just_cleared_level"):
-			just_cleared_level = bool(data["just_cleared_level"])
+			just_cleared_level = (data["just_cleared_level"] == true)
 		if data.has("last_cleared_level"):
 			last_cleared_level = clamp(int(data["last_cleared_level"]), 1, 45)
 		if data.has("level_high_scores") and data["level_high_scores"] is Dictionary:
-			for k in data["level_high_scores"]:
-				var lvl_key = int(k)
+			var scores_dict: Dictionary = data["level_high_scores"] as Dictionary
+			for k: Variant in scores_dict:
+				var lvl_key := int(k)
 				if lvl_key >= 1 and lvl_key <= 45:
-					level_high_scores[lvl_key] = max(0, int(data["level_high_scores"][k]))
+					level_high_scores[lvl_key] = max(0, int(scores_dict[k]))
 
 		if data.has("level_stars") and data["level_stars"] is Dictionary:
-			for k in data["level_stars"]:
-				var lvl_key = int(k)
+			var stars_dict: Dictionary = data["level_stars"] as Dictionary
+			for k: Variant in stars_dict:
+				var lvl_key := int(k)
 				if lvl_key >= 1 and lvl_key <= 45:
-					level_stars[lvl_key] = clamp(int(data["level_stars"][k]), 0, 3)
+					level_stars[lvl_key] = clamp(int(stars_dict[k]), 0, 3)
 
 		if data.has("master_volume"): master_volume = clamp(float(data["master_volume"]), 0.0, 1.0)
 		if data.has("music_volume"): music_volume = clamp(float(data["music_volume"]), 0.0, 1.0)
 		if data.has("sfx_volume"): sfx_volume = clamp(float(data["sfx_volume"]), 0.0, 1.0)
-		if data.has("master_muted"): master_muted = bool(data["master_muted"])
-		if data.has("music_muted"): music_muted = bool(data["music_muted"])
-		if data.has("sfx_muted"): sfx_muted = bool(data["sfx_muted"])
+		if data.has("master_muted"): master_muted = (data["master_muted"] == true)
+		if data.has("music_muted"): music_muted = (data["music_muted"] == true)
+		if data.has("sfx_muted"): sfx_muted = (data["sfx_muted"] == true)
 
 		doubloons_changed.emit(doubloons)
 	else:

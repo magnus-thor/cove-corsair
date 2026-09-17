@@ -6,20 +6,21 @@ extends Area3D
 var direction: Vector3 = Vector3(0, 0, 1)
 
 const TRAIL_3D_SCENE: PackedScene = preload("res://src/vfx/trail_3d.tscn")
-var _trail = null
+var _trail: Node3D = null
 
 func attach_fire_trail() -> void:
 	if _trail and is_instance_valid(_trail):
 		return
 	if TRAIL_3D_SCENE:
-		var t = TRAIL_3D_SCENE.instantiate() as Node3D
+		var t := TRAIL_3D_SCENE.instantiate() as Node3D
 		if t:
 			add_child(t)
 			_trail = t
 
 func _detach_trail() -> void:
 	if _trail and is_instance_valid(_trail):
-		_trail.detach_and_fade()
+		if _trail.has_method("detach_and_fade"):
+			_trail.call("detach_and_fade")
 		_trail = null
 
 func _check_and_attach_fire_trail() -> void:
@@ -28,13 +29,13 @@ func _check_and_attach_fire_trail() -> void:
 	if has_meta("is_fire") or has_meta("is_incendiary") or has_meta("is_volcanic") or has_meta("is_magma") or has_meta("is_brimstone"):
 		attach_fire_trail()
 
-func setup(p_direction: Vector3 = Vector3.ZERO, _p_ammo_data = null, _p_weapon_data = null) -> void:
+func setup(p_direction: Vector3 = Vector3.ZERO, _p_ammo_data: Resource = null, _p_weapon_data: Resource = null) -> void:
 	if p_direction != Vector3.ZERO:
 		direction = p_direction.normalized()
 	else:
-		var player = get_tree().get_first_node_in_group("player") if get_tree() else null
+		var player: Node3D = get_tree().get_first_node_in_group("player") as Node3D if get_tree() else null
 		if player and is_instance_valid(player):
-			var to_player = (player.global_position - global_position)
+			var to_player: Vector3 = (player.global_position - global_position)
 			to_player.y = 0.0
 			if to_player.length_squared() > 0.01:
 				direction = to_player.normalized()
@@ -55,20 +56,20 @@ func _ready() -> void:
 	body_entered.connect(_on_hit)
 	
 	# Auto-detect 2D billboard sprite: if present, hide default 3D sphere meshes
-	var spr = get_node_or_null("AmmoSprite") as Sprite3D
+	var spr := get_node_or_null("AmmoSprite") as Sprite3D
 	if not spr:
 		spr = get_node_or_null("Sprite3D") as Sprite3D
 	if spr:
-		var core = get_node_or_null("FireCore")
+		var core := get_node_or_null("FireCore") as Node3D
 		if core: core.visible = false
-		var glow = get_node_or_null("FireGlow")
+		var glow := get_node_or_null("FireGlow") as Node3D
 		if glow: glow.visible = false
 		
 	# If direction is default, aim toward player vessel at current position
 	if direction == Vector3(0, 0, 1):
-		var player = get_tree().get_first_node_in_group("player")
+		var player: Node3D = get_tree().get_first_node_in_group("player") as Node3D
 		if player and is_instance_valid(player):
-			var to_player = (player.global_position - global_position)
+			var to_player: Vector3 = (player.global_position - global_position)
 			to_player.y = 0.0
 			if to_player.length_squared() > 0.01 and to_player.z > 0.1:
 				direction = to_player.normalized()
@@ -76,21 +77,21 @@ func _ready() -> void:
 	_check_and_attach_fire_trail()
 
 func set_color(color: Color) -> void:
-	var spr = get_node_or_null("AmmoSprite") as Sprite3D
+	var spr := get_node_or_null("AmmoSprite") as Sprite3D
 	if not spr:
 		spr = get_node_or_null("Sprite3D") as Sprite3D
 	if spr:
 		spr.modulate = color
 
-	var core = get_node_or_null("FireCore") as MeshInstance3D
+	var core := get_node_or_null("FireCore") as MeshInstance3D
 	if core:
-		var mat = StandardMaterial3D.new()
+		var mat := StandardMaterial3D.new()
 		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		mat.albedo_color = color
 		core.material_override = mat
-	var glow = get_node_or_null("FireGlow") as MeshInstance3D
+	var glow := get_node_or_null("FireGlow") as MeshInstance3D
 	if glow:
-		var mat = StandardMaterial3D.new()
+		var mat := StandardMaterial3D.new()
 		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
 		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
@@ -102,11 +103,11 @@ var _time: float = 0.0
 
 func _physics_process(delta: float) -> void:
 	_time += delta
-	var spr = get_node_or_null("AmmoSprite") as Sprite3D
+	var spr := get_node_or_null("AmmoSprite") as Sprite3D
 	if spr:
 		spr.scale = Vector3.ONE * (1.0 + sin(_time * 16.0) * 0.05)
 		
-	var fwd = direction if direction != Vector3.ZERO else Vector3(0, 0, 1)
+	var fwd := direction if direction != Vector3.ZERO else Vector3(0, 0, 1)
 	if fwd.z < 0.0:
 		fwd.z = abs(fwd.z)
 	global_position += fwd * speed * delta
@@ -116,31 +117,31 @@ func _physics_process(delta: float) -> void:
 		queue_free()
 
 func _on_hit(target: Node) -> void:
-	var is_player = target.is_in_group("player") or (target.get_parent() and target.get_parent().is_in_group("player"))
-	var is_follower = target.is_in_group("follower") or (target.get_parent() and target.get_parent().is_in_group("follower"))
+	var is_player := target.is_in_group("player") or (target.get_parent() and target.get_parent().is_in_group("player"))
+	var is_follower := target.is_in_group("follower") or (target.get_parent() and target.get_parent().is_in_group("follower"))
 	
 	if is_player or is_follower:
 		GameState.record_hit()
-		var player = get_tree().get_first_node_in_group("player")
+		var player: Node = get_tree().get_first_node_in_group("player")
 		if player:
 			if is_follower:
-				var follower = target
+				var follower: Node = target
 				if not follower.has_method("destroy_follower") and target.get_parent() and target.get_parent().has_method("destroy_follower"):
 					follower = target.get_parent()
 				if player.has_method("leak_threat"):
-					player.leak_threat(follower)
+					player.call("leak_threat", follower)
 				elif follower.has_method("destroy_follower"):
-					follower.destroy_follower()
+					follower.call("destroy_follower")
 			else:
 				if player.has_method("leak_threat"):
-					player.leak_threat(player)
+					player.call("leak_threat", player)
 				elif player.has_method("take_hit"):
-					player.take_hit(1, "enemy_cannonball")
+					player.call("take_hit", 1, "enemy_cannonball")
 						
-		var splash_scene = preload("res://src/vfx/hit_splash.tscn")
+		var splash_scene := preload("res://src/vfx/hit_splash.tscn")
 		if splash_scene:
-			var splash = splash_scene.instantiate() as Node3D
-			var root = get_tree().current_scene
+			var splash := splash_scene.instantiate() as Node3D
+			var root := get_tree().current_scene
 			if root:
 				root.add_child(splash)
 			splash.global_position = global_position

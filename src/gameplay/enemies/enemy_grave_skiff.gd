@@ -41,10 +41,10 @@ func _physics_process(delta: float) -> void:
 		sprite_node.position.y = 1.0 + sin(_time * 4.0) * 0.05
 		
 	# Shooting logic - only if can_shoot is enabled and not during boss fight
-	var is_boss_active = GameState.boss_spawned or get_tree().get_first_node_in_group("boss") != null
-	var player = get_tree().get_first_node_in_group("player")
-	var player_z = player.global_position.z if player else 0.0
-	var dist_to_player = abs(global_position.z - player_z)
+	var is_boss_active := GameState.boss_spawned or get_tree().get_first_node_in_group("boss") != null
+	var player := get_tree().get_first_node_in_group("player")
+	var player_z: float = player.global_position.z if player else 0.0
+	var dist_to_player: Variant = abs(global_position.z - player_z)
 	
 	if can_shoot and not is_boss_active and dist_to_player >= 14.0 and dist_to_player <= 45.0:
 		_shoot_timer += delta
@@ -61,31 +61,31 @@ func _physics_process(delta: float) -> void:
 func _fire_dart_burst() -> void:
 	if not enemy_cannonball_scene:
 		return
-	var boss_node = get_tree().get_first_node_in_group("boss")
+	var boss_node := get_tree().get_first_node_in_group("boss")
 	if boss_node != null and is_instance_valid(boss_node) and "is_barrage_active" in boss_node and boss_node.is_barrage_active:
 		return
 	
 	for i in range(burst_count):
-		get_tree().create_timer(i * 0.18).timeout.connect(func():
+		get_tree().create_timer(i * 0.18).timeout.connect(func() -> void:
 			if _is_dead or not is_instance_valid(self):
 				return
-			var dart = enemy_cannonball_scene.instantiate() as Area3D
-			var root = get_tree().current_scene
+			var dart := enemy_cannonball_scene.instantiate() as Area3D
+			var root := get_tree().current_scene
 			if root:
 				root.add_child(dart)
 			else:
 				get_parent().add_child(dart)
 			dart.global_position = global_position + Vector3(randf_range(-0.3, 0.3), 0.4, 1.0)
 			dart.scale = Vector3(0.85, 0.85, 0.85)
-			var fire_mesh = dart.get_node_or_null("FireCore")
+			var fire_mesh := dart.get_node_or_null("FireCore")
 			if fire_mesh:
 				fire_mesh.scale = Vector3(0.8, 0.8, 1.6)
 			if "speed" in dart:
 				dart.speed = 18.0
-			var player = get_tree().get_first_node_in_group("player")
-			var fire_dir = Vector3(0, 0, 1)
+			var player := get_tree().get_first_node_in_group("player")
+			var fire_dir := Vector3(0, 0, 1)
 			if player and is_instance_valid(player):
-				var to_player = (player.global_position - dart.global_position)
+				var to_player: Vector3 = (player.global_position - dart.global_position)
 				to_player.y = 0.0
 				if to_player.length_squared() > 0.01:
 					fire_dir = to_player.normalized()
@@ -111,10 +111,10 @@ func take_damage(amount: int) -> void:
 	_update_health_bar()
 	_flash()
 	
-	var ft_script = load("res://src/vfx/floating_text.gd")
+	var ft_script := load("res://src/vfx/floating_text.gd")
 	if ft_script:
-		var fct = ft_script.new()
-		var root = get_tree().current_scene
+		var fct: Variant = ft_script.new()
+		var root := get_tree().current_scene
 		if root:
 			root.add_child(fct)
 			fct.global_position = global_position + Vector3(randf_range(-0.4, 0.4), 1.2, randf_range(-0.4, 0.4))
@@ -136,7 +136,7 @@ func _update_health_bar() -> void:
 	if progress_bar:
 		progress_bar.max_value = max_hp
 		progress_bar.value = current_hp
-		var ratio = float(current_hp) / float(max_hp) if max_hp > 0 else 0.0
+		var ratio := float(current_hp) / float(max_hp) if max_hp > 0 else 0.0
 		progress_bar.modulate = Color(0.2, 0.9, 0.3).lerp(Color(0.9, 0.2, 0.2), 1.0 - ratio)
 
 func die() -> void:
@@ -147,23 +147,23 @@ func die() -> void:
 	AudioManager.play_sfx("barrel_breaks")
 	
 	if explosion_scene:
-		var vfx = explosion_scene.instantiate() as Node3D
-		var root = get_tree().current_scene
+		var vfx := explosion_scene.instantiate() as Node3D
+		var root := get_tree().current_scene
 		if root:
 			root.add_child(vfx)
 		vfx.global_position = global_position
 		
 	if doubloon_scene:
 		for i in range(doubloons_drop):
-			var d = doubloon_scene.instantiate() as Area3D
-			var root = get_tree().current_scene
+			var d := doubloon_scene.instantiate() as Area3D
+			var root := get_tree().current_scene
 			if root:
 				root.add_child(d)
 				d.global_position = global_position
 				if d.has_method("_trigger_spawn_bounce"):
 					d._trigger_spawn_bounce(Vector2(randf_range(-0.6, 0.6), randf_range(-0.6, 0.6)))
 					
-	var player = get_tree().get_first_node_in_group("player")
+	var player := get_tree().get_first_node_in_group("player")
 	if player and player.has_method("upgrade_ship"):
 		player.upgrade_ship(1)
 		

@@ -13,7 +13,7 @@ const WATER_SURFACE_MIN_Y: float = 0.0
 const WATER_SURFACE_MAX_Y: float = 0.05
 
 func _get_vfx_parent() -> Node:
-	var tree = get_tree()
+	var tree: SceneTree = get_tree()
 	if not tree:
 		return null
 		
@@ -30,12 +30,12 @@ func _get_vfx_parent() -> Node:
 		
 	# World Tree Rooting safeguard: Use a dedicated world-level container
 	# so entity queue_free() does not prematurely remove particles.
-	var container = target_scene.get_node_or_null("VFXContainer")
+	var container: Node = target_scene.get_node_or_null("VFXContainer")
 	if container and is_instance_valid(container):
 		return container
 		
 	if target_scene is Node3D:
-		var new_container = Node3D.new()
+		var new_container: Node3D = Node3D.new()
 		new_container.name = "VFXContainer"
 		target_scene.add_child(new_container)
 		return new_container
@@ -46,7 +46,7 @@ func _spawn_effect(packed_scene: PackedScene, world_pos: Vector3, lifetime: floa
 	if not packed_scene:
 		return null
 		
-	var instance = packed_scene.instantiate() as Node3D
+	var instance: Node3D = packed_scene.instantiate() as Node3D
 	if not instance:
 		return null
 		
@@ -56,7 +56,7 @@ func _spawn_effect(packed_scene: PackedScene, world_pos: Vector3, lifetime: floa
 	instance.top_level = true
 	instance.position = world_pos
 	
-	var parent = _get_vfx_parent()
+	var parent: Node = _get_vfx_parent()
 	if parent:
 		parent.add_child(instance)
 	else:
@@ -67,28 +67,29 @@ func _spawn_effect(packed_scene: PackedScene, world_pos: Vector3, lifetime: floa
 	
 	# Start emissions and wire auto-free
 	if instance is CPUParticles3D:
-		var cpu_p = instance as CPUParticles3D
+		var cpu_p: CPUParticles3D = instance as CPUParticles3D
 		cpu_p.restart()
 		cpu_p.emitting = true
 		cpu_p.finished.connect(cpu_p.queue_free)
 	elif instance.has_signal("finished"):
 		instance.connect("finished", Callable(instance, "queue_free"))
 	else:
-		var child_particles = instance.find_children("*", "CPUParticles3D", true, false)
-		for p in child_particles:
+		var child_particles: Array[Node] = instance.find_children("*", "CPUParticles3D", true, false)
+		for p: Node in child_particles:
 			if p is CPUParticles3D:
-				p.restart()
-				p.emitting = true
+				var cp: CPUParticles3D = p as CPUParticles3D
+				cp.restart()
+				cp.emitting = true
 				
 	# Fallback timer guarantee to prevent memory leaks in all circumstances
-	var tree = get_tree()
+	var tree: SceneTree = get_tree()
 	if tree:
 		var instance_id: int = instance.get_instance_id()
-		var timer = tree.create_timer(lifetime + 0.15)
-		timer.timeout.connect(func():
-			var obj = instance_from_id(instance_id)
-			if obj and is_instance_valid(obj) and not obj.is_queued_for_deletion():
-				obj.queue_free()
+		var timer: SceneTreeTimer = tree.create_timer(lifetime + 0.15)
+		timer.timeout.connect(func() -> void:
+			var obj: Object = instance_from_id(instance_id)
+			if obj and is_instance_valid(obj) and obj is Node and not (obj as Node).is_queued_for_deletion():
+				(obj as Node).queue_free()
 		)
 		
 	return instance
@@ -100,7 +101,7 @@ func spawn_wood_debris(world_pos: Vector3) -> Node3D:
 ## Spawns vertical water geyser and expanding horizontal shockwave ring.
 ## Waterline Alignment safeguard: Clamps world_pos.y to water surface level (~0.0m - 0.05m).
 func spawn_mortar_splash(world_pos: Vector3) -> Node3D:
-	var water_aligned_pos = world_pos
+	var water_aligned_pos: Vector3 = world_pos
 	water_aligned_pos.y = clampf(world_pos.y, WATER_SURFACE_MIN_Y, WATER_SURFACE_MAX_Y)
 	return _spawn_effect(SCENE_MORTAR_GEYSER, water_aligned_pos, 0.6)
 
@@ -127,13 +128,13 @@ var _is_hit_stopping: bool = false
 func hit_stop(duration_sec: float = 0.045, time_scale: float = 0.05) -> void:
 	if _is_hit_stopping:
 		return
-	var tree = get_tree()
+	var tree: SceneTree = get_tree()
 	if not tree:
 		return
 	_is_hit_stopping = true
 	Engine.time_scale = clampf(time_scale, 0.01, 1.0)
-	var timer = tree.create_timer(duration_sec, true, false, true)
-	timer.timeout.connect(func():
+	var timer: SceneTreeTimer = tree.create_timer(duration_sec, true, false, true)
+	timer.timeout.connect(func() -> void:
 		Engine.time_scale = 1.0
 		_is_hit_stopping = false
 	)

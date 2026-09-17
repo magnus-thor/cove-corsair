@@ -612,4 +612,3 @@ func _format_number(val: int) -> String:
 	if val < 0:
 		res = "-" + res
 	return res
-

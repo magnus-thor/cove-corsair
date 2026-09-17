@@ -43,7 +43,7 @@ func _ready() -> void:
 	body_entered.connect(_on_body_entered)
 	
 	# Apply water calibration values
-	var coin_sprite = get_node_or_null("Visuals/CoinSprite") as Sprite3D
+	var coin_sprite := get_node_or_null("Visuals/CoinSprite") as Sprite3D
 	if coin_sprite:
 		coin_sprite.pixel_size = 0.0042
 	scale = Vector3(3.00, 3.00, 3.00)
@@ -61,25 +61,25 @@ func attract_to(target: Node3D) -> void:
 ## Triggers an initial upward arc and horizontal scatter when dropped from defeated mobs/barrels
 func _trigger_spawn_bounce(horizontal_scatter: Vector2 = Vector2.ZERO) -> void:
 	_is_bouncing = true
-	var start_pos = global_position
-	var target_y = base_water_y
-	var peak_y = base_water_y + randf_range(0.8, 1.4)
+	var start_pos := global_position
+	var target_y := base_water_y
+	var peak_y := base_water_y + randf_range(0.8, 1.4)
 	
-	var target_x = clampf(start_pos.x + horizontal_scatter.x, -5.4, 5.4)
-	var target_z = start_pos.z + horizontal_scatter.y
+	var target_x := clampf(start_pos.x + horizontal_scatter.x, -5.4, 5.4)
+	var target_z := start_pos.z + horizontal_scatter.y
 	
-	var tween = create_tween().set_parallel(false)
+	var tween := create_tween().set_parallel(false)
 	# Arc up
 	tween.tween_property(self, "global_position:y", peak_y, 0.20).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
 	# Land onto water surface
 	tween.tween_property(self, "global_position:y", target_y, 0.25).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_BOUNCE)
 	
 	if horizontal_scatter != Vector2.ZERO:
-		var h_tween = create_tween().set_parallel(true)
+		var h_tween := create_tween().set_parallel(true)
 		h_tween.tween_property(self, "global_position:x", target_x, 0.45).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
 		h_tween.tween_property(self, "global_position:z", target_z, 0.45).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
 	
-	tween.finished.connect(func():
+	tween.finished.connect(func() -> void:
 		_is_bouncing = false
 		global_position.y = base_water_y
 	)
@@ -92,19 +92,19 @@ func _physics_process(delta: float) -> void:
 	
 	if _is_attracted and _target_attractor and is_instance_valid(_target_attractor):
 		# Magnetic attraction: pull directly towards target attractor
-		var target_pos = _target_attractor.global_position
+		var target_pos := _target_attractor.global_position
 		global_position = global_position.move_toward(target_pos, magnet_pull_speed * delta)
 		
-		var dist = global_position.distance_to(target_pos)
+		var dist := global_position.distance_to(target_pos)
 		if dist < 1.0:
 			collect_coin(_target_attractor)
 			return
 	else:
 		# Free floating: move downstream with river current (+Z direction) so coins do not freeze
-		var flow = river_flow_speed
-		var track_mgr = get_tree().get_first_node_in_group("track_manager")
+		var flow := river_flow_speed
+		var track_mgr := get_tree().get_first_node_in_group("track_manager") as Node3D
 		if track_mgr and "scroll_speed" in track_mgr:
-			flow = track_mgr.scroll_speed
+			flow = float(track_mgr.get("scroll_speed"))
 		
 		global_position.z += flow * delta
 		
@@ -114,8 +114,8 @@ func _physics_process(delta: float) -> void:
 				visual_container.position.y = sin(_time * bob_speed) * bob_height
 
 	# Despawn if passed beyond player
-	var player = get_tree().get_first_node_in_group("player")
-	var player_z = player.global_position.z if player else 0.0
+	var player := get_tree().get_first_node_in_group("player") as Node3D
+	var player_z: float = player.global_position.z if player else 0.0
 	if global_position.z > (player_z + 12.0):
 		queue_free()
 
@@ -136,7 +136,7 @@ func _is_player_node(node: Node) -> bool:
 		return false
 	if node.is_in_group("player"):
 		return true
-	var parent = node.get_parent()
+	var parent := node.get_parent()
 	if parent and parent.is_in_group("player"):
 		return true
 	return false
@@ -154,10 +154,9 @@ func collect_coin(_player_ref: Node = null) -> void:
 			
 	GameState.add_doubloons(value)
 	
-	var player = get_tree().get_first_node_in_group("player")
-	if player:
-		if player.has_method("add_doubloons"):
-			player.add_doubloons(value)
+	var player: Node = get_tree().get_first_node_in_group("player")
+	if player and player.has_method("add_doubloons"):
+		player.call("add_doubloons", value)
 		# NOTE: Doubloons are currency only — they do NOT award XP.
 		# XP is awarded solely on enemy/obstacle kills via die().
 		
@@ -170,9 +169,9 @@ func collect_coin(_player_ref: Node = null) -> void:
 
 func _spawn_pickup_vfx() -> void:
 	if pickup_vfx_scene:
-		var vfx = pickup_vfx_scene.instantiate() as Node3D
-		var root = get_tree().current_scene
-		var parent = root if root else get_parent()
+		var vfx := pickup_vfx_scene.instantiate() as Node3D
+		var root := get_tree().current_scene
+		var parent := root if root else get_parent()
 		if parent:
 			parent.add_child(vfx)
 			vfx.global_position = global_position

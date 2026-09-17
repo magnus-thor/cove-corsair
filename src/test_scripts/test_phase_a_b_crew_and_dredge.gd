@@ -25,9 +25,9 @@ func _test_phase_a_boss_dredge() -> void:
 	print("\n--- Testing Phase A: Phantom Dredge Boss & Telegraph ---")
 	
 	# 1. Telegraph Scene Verification
-	var tele_scene = load("res://src/vfx/telegraph_spectral_geyser.tscn") as PackedScene
+	var tele_scene := load("res://src/vfx/telegraph_spectral_geyser.tscn") as PackedScene
 	assert(tele_scene != null, "Telegraph scene must exist")
-	var tele = tele_scene.instantiate()
+	var tele := tele_scene.instantiate()
 	add_child(tele)
 	await get_tree().process_frame
 	assert(tele.is_in_group("spectral_geyser_telegraphs"), "Telegraph must be in spectral_geyser_telegraphs group")
@@ -35,9 +35,9 @@ func _test_phase_a_boss_dredge() -> void:
 	print("  [PASS] Telegraph scene verified with 1.6s duration and group membership")
 	
 	# 2. Boss Dredge Instantiation & Properties
-	var boss_scene = load("res://src/gameplay/enemies/boss_phantom_dredge.tscn") as PackedScene
+	var boss_scene := load("res://src/gameplay/enemies/boss_phantom_dredge.tscn") as PackedScene
 	assert(boss_scene != null, "Boss Dredge scene must exist")
-	var boss = boss_scene.instantiate()
+	var boss := boss_scene.instantiate()
 	add_child(boss)
 	await get_tree().process_frame
 	
@@ -53,13 +53,13 @@ func _test_phase_a_boss_dredge() -> void:
 	print("  [PASS] Attack turn-taking verified: direct volley suppressed during geyser barrage")
 
 	# 4. Safe Lane Guarantee Check
-	var safe_lanes_guaranteed = true
-	var all_lanes = [-3.2, 0.0, 3.2]
+	var safe_lanes_guaranteed := true
+	var all_lanes: Array[float] = [-3.2, 0.0, 3.2]
 	for i in range(10):
-		var safe_idx = randi() % all_lanes.size()
-		var safe_lane = all_lanes[safe_idx]
+		var safe_idx := randi() % all_lanes.size()
+		var safe_lane: float = all_lanes[safe_idx]
 		var target_lanes: Array[float] = []
-		for lane_x in all_lanes:
+		for lane_x: float in all_lanes:
 			if lane_x != safe_lane:
 				target_lanes.append(lane_x)
 		if target_lanes.has(safe_lane) or target_lanes.size() >= all_lanes.size():
@@ -70,14 +70,14 @@ func _test_phase_a_boss_dredge() -> void:
 
 	# 5. Add Suppression Check
 	boss.is_barrage_active = true
-	var enemies_before = get_tree().get_nodes_in_group("enemies").size()
+	var enemies_before := get_tree().get_nodes_in_group("enemies").size()
 	boss._spawn_bayou_adds()
-	var enemies_after = get_tree().get_nodes_in_group("enemies").size()
+	var enemies_after := get_tree().get_nodes_in_group("enemies").size()
 	assert(enemies_after == enemies_before, "No adds should spawn while is_barrage_active is true")
 	print("  [PASS] Add suppression verified: zero new adds spawned during geyser barrage")
 
 	# 6. Boss Death Cleanup Check
-	var active_tele = tele_scene.instantiate()
+	var active_tele := tele_scene.instantiate()
 	add_child(active_tele)
 	await get_tree().process_frame
 	assert(active_tele.is_inside_tree(), "Telegraph is in tree")
@@ -96,26 +96,26 @@ func _test_phase_a_boss_dredge() -> void:
 func _test_phase_b_vessel_decoupling() -> void:
 	print("\n--- Testing Phase B: Vessel Tier Decoupling ---")
 	
-	var ships = ["dinghy", "sloop", "bombard_skiff", "ironclad"]
+	var ships := ["dinghy", "sloop", "bombard_skiff", "ironclad"]
 	for s_id in ships:
 		var s_data: ShipData = GameState.get_vessel_resource(s_id)
 		assert(s_data != null, "Ship resource for %s must exist" % s_id)
 		assert(s_data.tier_sockets.size() >= 3, "%s must have 3 tiers" % s_id)
 		
 		# Tier 1: 1 weapon socket + 1 crew socket (accessible immediately without requiring boat tier upgrade)
-		var t1_sockets = s_data.tier_sockets[0]
-		var t1_crew = t1_sockets.filter(func(s): return "crew" in str(s).to_lower())
+		var t1_sockets := s_data.tier_sockets[0]
+		var t1_crew := t1_sockets.filter(func(s: Variant) -> bool: return "crew" in str(s).to_lower())
 		assert(t1_crew.size() == 1, "%s Tier 1 must have 1 crew socket" % s_id)
 		assert(t1_sockets.size() >= 2, "%s Tier 1 must have at least 2 sockets (weapon + crew)" % s_id)
 		
 		# Tier 2: 1 weapon socket + crew / weapon mounts
-		var t2_sockets = s_data.tier_sockets[1]
-		var t2_crew = t2_sockets.filter(func(s): return "crew" in str(s).to_lower())
+		var t2_sockets := s_data.tier_sockets[1]
+		var t2_crew := t2_sockets.filter(func(s: Variant) -> bool: return "crew" in str(s).to_lower())
 		assert(t2_crew.size() >= 1, "%s Tier 2 must have crew socket" % s_id)
 		
 		# Tier 3: All sockets (at least 1 crew socket)
-		var t3_sockets = s_data.tier_sockets[2]
-		var t3_crew = t3_sockets.filter(func(s): return "crew" in str(s).to_lower())
+		var t3_sockets := s_data.tier_sockets[2]
+		var t3_crew := t3_sockets.filter(func(s: Variant) -> bool: return "crew" in str(s).to_lower())
 		assert(t3_crew.size() >= 1, "%s Tier 3 must have crew sockets" % s_id)
 		
 		# Sockets start empty: socket_weapons must not have default crew thrower assigned
@@ -147,18 +147,18 @@ func _test_phase_b_gamestate_crew() -> void:
 	print("  [PASS] Crew catalog unlock & upgrade costs verified")
 	
 	# Buy and Upgrade
-	var bought = GameState.buy_crew("monkey_bomber")
+	var bought := GameState.buy_crew("monkey_bomber")
 	assert(bought, "Should successfully buy monkey_bomber")
 	assert(GameState.is_crew_unlocked("monkey_bomber"), "Monkey is unlocked")
 	assert(GameState.get_crew_level("monkey_bomber") == 1, "Monkey is level 1")
 	assert(GameState.doubloons == 10000 - 350, "Doubloons deducted for monkey unlock")
 	
-	var upgraded = GameState.upgrade_crew_level("monkey_bomber")
+	var upgraded := GameState.upgrade_crew_level("monkey_bomber")
 	assert(upgraded, "Should successfully upgrade monkey to L2")
 	assert(GameState.get_crew_level("monkey_bomber") == 2, "Monkey is level 2")
 	assert(GameState.doubloons == 10000 - 350 - 500, "Doubloons deducted for monkey L2")
 	
-	var upgraded_l3 = GameState.upgrade_crew_level("monkey_bomber")
+	var upgraded_l3 := GameState.upgrade_crew_level("monkey_bomber")
 	assert(upgraded_l3, "Should successfully upgrade monkey to L3")
 	assert(GameState.get_crew_level("monkey_bomber") == 3, "Monkey is level 3")
 	print("  [PASS] Crew purchase and level progression (L1 -> L2 -> L3) verified")
@@ -168,12 +168,12 @@ func _test_phase_b_gamestate_crew() -> void:
 	GameState.vessel_tiers["sloop"] = 2
 	GameState.set_active_vessel("sloop")
 	
-	var equipped = GameState.toggle_equip_crew_active_ship("monkey_bomber")
+	var equipped := GameState.toggle_equip_crew_active_ship("monkey_bomber")
 	assert(equipped, "Should equip monkey_bomber to sloop Tier 2")
 	assert(GameState.is_crew_equipped_on_active_ship("monkey_bomber"), "Monkey is equipped on sloop")
 	
 	# Unequip toggle
-	var unequipped = GameState.toggle_equip_crew_active_ship("monkey_bomber")
+	var unequipped := GameState.toggle_equip_crew_active_ship("monkey_bomber")
 	assert(unequipped, "Should toggle unequip monkey_bomber")
 	assert(not GameState.is_crew_equipped_on_active_ship("monkey_bomber"), "Monkey is no longer equipped")
 	
@@ -195,9 +195,9 @@ func _test_phase_b_gamestate_crew() -> void:
 func _test_phase_b_safe_ship_swap_guard() -> void:
 	print("\n--- Testing Phase B: Safe Ship Swap Guard ---")
 	
-	var boat_scene = load("res://src/gameplay/player/player_boat.tscn") as PackedScene
+	var boat_scene := load("res://src/gameplay/player/player_boat.tscn") as PackedScene
 	assert(boat_scene != null, "Player boat scene must exist")
-	var boat = boat_scene.instantiate()
+	var boat := boat_scene.instantiate()
 	add_child(boat)
 	await get_tree().process_frame
 	
@@ -207,13 +207,13 @@ func _test_phase_b_safe_ship_swap_guard() -> void:
 	GameState.vessel_tiers["sloop"] = 2
 	GameState.set_active_vessel("sloop")
 	GameState.unlocked_crew["monkey_bomber"] = 1
-	var eq_ok = GameState.equip_crew("sloop", "MidDeckCrew", "monkey_bomber")
+	var eq_ok := GameState.equip_crew("sloop", "MidDeckCrew", "monkey_bomber")
 	assert(eq_ok, "Equip crew to sloop MidDeckCrew should succeed")
 	
 	boat.apply_ship_data(GameState.get_vessel_resource("sloop"))
 	boat.apply_tier(2)
 	
-	var crew_equipped_count = 0
+	var crew_equipped_count := 0
 	for sock in boat.equipped_weapons:
 		if "crew" in sock.to_lower():
 			crew_equipped_count += 1
@@ -227,7 +227,7 @@ func _test_phase_b_safe_ship_swap_guard() -> void:
 	boat.apply_tier(1)
 	assert(boat.tier_fire_rate_multiplier == 1.0, "Tier 1 has baseline 1.0x fire rate")
 	
-	var t1_crew_count = 0
+	var t1_crew_count := 0
 	for sock in boat.equipped_weapons:
 		if "crew" in sock.to_lower():
 			t1_crew_count += 1
@@ -235,10 +235,10 @@ func _test_phase_b_safe_ship_swap_guard() -> void:
 	assert(boat.equipped_weapons.has("BowMount"), "Dinghy should keep its standard weapon socket")
 	
 	# Tier 1 Crew Equip: Player can equip crew directly on Tier 1 Dinghy!
-	var eq_t1 = GameState.equip_crew("dinghy", "MidDeckCrew", "monkey_bomber")
+	var eq_t1 := GameState.equip_crew("dinghy", "MidDeckCrew", "monkey_bomber")
 	assert(eq_t1, "Should successfully equip monkey_bomber onto Tier 1 Dinghy")
 	boat.apply_tier(1)
-	var t1_equipped_crew = 0
+	var t1_equipped_crew := 0
 	for sock in boat.equipped_weapons:
 		if "crew" in sock.to_lower():
 			t1_equipped_crew += 1
@@ -258,12 +258,12 @@ func _test_phase_b_safe_ship_swap_guard() -> void:
 func _test_phase_b_weapon_projectile_scaling() -> void:
 	print("\n--- Testing Phase B: AttachedWeapon & Cannonball Crew Scaling ---")
 	
-	var w_scene = load("res://src/gameplay/player/attached_weapon.tscn") as PackedScene
+	var w_scene := load("res://src/gameplay/player/attached_weapon.tscn") as PackedScene
 	assert(w_scene != null, "Attached weapon scene must exist")
-	var weapon = w_scene.instantiate()
+	var weapon := w_scene.instantiate()
 	add_child(weapon)
 	
-	var w_res = load("res://src/data/resources/user_crew/crew_monkey_bomber.tres") as WeaponData
+	var w_res := load("res://src/data/resources/user_crew/crew_monkey_bomber.tres") as WeaponData
 	assert(w_res != null, "crew_monkey_bomber.tres weapon resource must exist")
 	
 	# Test Monkey Bomber scaling: L1 fire_rate 1.2, L2/L3 fire_rate 1.0
@@ -277,7 +277,7 @@ func _test_phase_b_weapon_projectile_scaling() -> void:
 	assert(weapon.fire_rate == 1.0, "Monkey Bomber L2 fire_rate should be 1.0s")
 	
 	# Test Skeleton Tosser scaling: L1 fire_rate 1.4, L2/L3 fire_rate 1.2
-	var skel_res = load("res://src/data/resources/user_crew/crew_skeleton_tosser.tres") as WeaponData
+	var skel_res := load("res://src/data/resources/user_crew/crew_skeleton_tosser.tres") as WeaponData
 	assert(skel_res != null, "crew_skeleton_tosser.tres weapon resource must exist")
 	weapon.crew_id = "skeleton_tosser"
 	weapon.crew_level = 1
@@ -290,11 +290,11 @@ func _test_phase_b_weapon_projectile_scaling() -> void:
 	print("  [PASS] AttachedWeapon fire rates correctly scaled by crew level")
 
 	# Test Cannonball damage and metadata scaling
-	var ball_scene = load("res://src/gameplay/projectiles/cannonball.tscn") as PackedScene
+	var ball_scene := load("res://src/gameplay/projectiles/cannonball.tscn") as PackedScene
 	assert(ball_scene != null, "Cannonball scene must exist")
 	
 	# Monkey L1 -> 3 dmg
-	var ball1 = ball_scene.instantiate()
+	var ball1 := ball_scene.instantiate()
 	ball1.crew_id = "monkey_bomber"
 	ball1.crew_level = 1
 	ball1.setup(Vector3.FORWARD, null, null)
@@ -302,7 +302,7 @@ func _test_phase_b_weapon_projectile_scaling() -> void:
 	ball1.queue_free()
 	
 	# Monkey L2 -> 5 dmg
-	var ball2 = ball_scene.instantiate()
+	var ball2 := ball_scene.instantiate()
 	ball2.crew_id = "monkey_bomber"
 	ball2.crew_level = 2
 	ball2.setup(Vector3.FORWARD, null, null)
@@ -310,7 +310,7 @@ func _test_phase_b_weapon_projectile_scaling() -> void:
 	ball2.queue_free()
 
 	# Skeleton L1 -> 4 dmg
-	var ball3 = ball_scene.instantiate()
+	var ball3 := ball_scene.instantiate()
 	ball3.crew_id = "skeleton_tosser"
 	ball3.crew_level = 1
 	ball3.setup(Vector3.FORWARD, null, null)
@@ -318,7 +318,7 @@ func _test_phase_b_weapon_projectile_scaling() -> void:
 	ball3.queue_free()
 
 	# Skeleton L2 -> 6 dmg
-	var ball4 = ball_scene.instantiate()
+	var ball4 := ball_scene.instantiate()
 	ball4.crew_id = "skeleton_tosser"
 	ball4.crew_level = 2
 	ball4.setup(Vector3.FORWARD, null, null)
@@ -331,9 +331,9 @@ func _test_phase_b_weapon_projectile_scaling() -> void:
 func _test_phase_b_shipyard_crew_tab() -> void:
 	print("\n--- Testing Phase B: Shipyard UI Crew Tab & Interactivity ---")
 	
-	var ui_scene = load("res://src/ui/shipyard/shipyard_ui.tscn") as PackedScene
+	var ui_scene := load("res://src/ui/shipyard/shipyard_ui.tscn") as PackedScene
 	assert(ui_scene != null, "Shipyard UI scene must exist")
-	var ui = ui_scene.instantiate()
+	var ui := ui_scene.instantiate()
 	add_child(ui)
 	await get_tree().process_frame
 	

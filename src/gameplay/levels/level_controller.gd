@@ -55,7 +55,7 @@ func _ready() -> void:
 		GameState.current_level = debug_level_override
 	
 	# Load level according to GameState
-	var active_res = GameState.get_current_level_resource()
+	var active_res := GameState.get_current_level_resource()
 	if active_res:
 		load_level_resource(active_res)
 
@@ -71,26 +71,26 @@ func _ensure_chunk_assembler() -> void:
 
 func _on_chunk_boss_arena_reached(boss_chunk: BaseTrackChunk) -> void:
 	is_boss_spawned = true
-	var boss = boss_chunk.find_child("*Boss*", true, false)
+	var boss := boss_chunk.find_child("*Boss*", true, false)
 	if not boss:
 		boss = get_tree().get_first_node_in_group("boss")
-	var camera = get_tree().get_first_node_in_group("game_camera")
+	var camera := get_tree().get_first_node_in_group("game_camera")
 	if camera and camera.has_method("start_boss_focus") and boss:
-		camera.start_boss_focus(boss)
+		camera.call("start_boss_focus", boss)
 	if boss and boss.has_method("activate_arena"):
-		boss.activate_arena()
+		boss.call("activate_arena")
 	print("[LEVEL CONTROLLER] Locked camera to boss arena")
 
 
 func handle_player_defeat(coins_collected: int, distance_reached: float) -> void:
 	# 1. Freeze forward track scrolling smoothly
-	var freeze_tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	var freeze_tween := create_tween().set_parallel(true).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	freeze_tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	
 	if chunk_assembler and is_instance_valid(chunk_assembler):
 		freeze_tween.tween_property(chunk_assembler, "scroll_speed", 0.0, 0.5)
 		
-	var track_mgr = get_tree().get_first_node_in_group("track_manager")
+	var track_mgr := get_tree().get_first_node_in_group("track_manager")
 	if track_mgr and is_instance_valid(track_mgr) and "scroll_speed" in track_mgr:
 		freeze_tween.tween_property(track_mgr, "scroll_speed", 0.0, 0.5)
 		
@@ -101,41 +101,41 @@ func handle_player_defeat(coins_collected: int, distance_reached: float) -> void
 	# 2. Wait for deceleration, then display Defeat Settlement Screen
 	await get_tree().create_timer(0.45, true, false, true).timeout
 	
-	var settlement = get_tree().get_first_node_in_group("settlement_screen")
+	var settlement := get_tree().get_first_node_in_group("settlement_screen")
 	if not settlement:
-		var root = get_tree().current_scene
+		var root := get_tree().current_scene
 		if root and settlement_screen_scene:
 			settlement = settlement_screen_scene.instantiate()
 			settlement.add_to_group("settlement_screen")
 			root.add_child(settlement)
 			
 	if settlement and settlement.has_method("show_defeat"):
-		settlement.show_defeat(coins_collected, distance_reached, GameState.doubloons)
+		settlement.call("show_defeat", coins_collected, distance_reached, GameState.doubloons)
 
 func setup_active_queue() -> void:
 	active_queue = [] # Guarantee fresh untyped Array
 	if not level_data:
 		return
-	if not level_data.timeline_events.is_empty():
-		for te in level_data.timeline_events:
+	if "timeline_events" in level_data and not (level_data.get("timeline_events") as Array).is_empty():
+		for te: Variant in (level_data.get("timeline_events") as Array):
 			if te != null:
 				active_queue.append(te)
-		active_queue.sort_custom(func(a, b):
-			var da = a.trigger_distance if "trigger_distance" in a else a.get("distance", 0.0)
-			var db = b.trigger_distance if "trigger_distance" in b else b.get("distance", 0.0)
+		active_queue.sort_custom(func(a: Variant, b: Variant) -> bool:
+			var da: float = float(a.trigger_distance if "trigger_distance" in a else a.get("distance", 0.0))
+			var db: float = float(b.trigger_distance if "trigger_distance" in b else b.get("distance", 0.0))
 			return da < db
 		)
-	elif not level_data.wave_events.is_empty():
-		for we in level_data.wave_events:
+	elif "wave_events" in level_data and not (level_data.get("wave_events") as Array).is_empty():
+		for we: Variant in (level_data.get("wave_events") as Array):
 			if we != null:
 				active_queue.append(we)
-		active_queue.sort_custom(func(a, b): return a.distance < b.distance)
+		active_queue.sort_custom(func(a: Variant, b: Variant) -> bool: return a.distance < b.distance)
 
 	# Suppress multiplier gates on the final 30% immediately preceding boss encounter (buffer zone)
-	var gate_suppression_dist = 250.0 * 0.70 # 175.0m
-	active_queue = active_queue.filter(func(ev):
-		var dist = ev.trigger_distance if "trigger_distance" in ev else ev.get("distance", 0.0)
-		var is_gate = false
+	var gate_suppression_dist := 250.0 * 0.70 # 175.0m
+	active_queue = active_queue.filter(func(ev: Variant) -> bool:
+		var dist: float = float(ev.trigger_distance if "trigger_distance" in ev else ev.get("distance", 0.0))
+		var is_gate := false
 		if ev is SpawnEvent and ev.entity_type == SpawnEvent.EntityType.MULTIPLIER_GATE:
 			is_gate = true
 		elif typeof(ev) == TYPE_DICTIONARY and ev.get("type", "") == "gate":
@@ -156,13 +156,15 @@ func load_level_resource(res: LevelData) -> void:
 	base_scroll_speed = level_data.base_scroll_speed
 	GameState.distance_traveled = 0.0
 	
-	var hud = get_tree().get_first_node_in_group("top_hud")
-	if hud and "level_title" in hud and hud.level_title:
-		hud.level_title.text = level_data.level_title
+	var hud := get_tree().get_first_node_in_group("top_hud")
+	if hud and "level_title" in hud:
+		var title_label: Variant = hud.get("level_title")
+		if title_label and title_label is Label:
+			(title_label as Label).text = level_data.level_title
 		
 	# If this level contains chunk_scenes, hand off to ChunkAssembler
 	if not level_data.chunk_scenes.is_empty():
-		var track_mgr = get_tree().get_first_node_in_group("track_manager")
+		var track_mgr := get_tree().get_first_node_in_group("track_manager") as Node3D
 		if track_mgr:
 			track_mgr.visible = false
 			track_mgr.set_physics_process(false)
@@ -177,15 +179,17 @@ func load_level_resource(res: LevelData) -> void:
 				child.queue_free()
 		setup_active_queue()
 		
-		var track_mgr = get_tree().get_first_node_in_group("track_manager")
+		var track_mgr := get_tree().get_first_node_in_group("track_manager") as Node3D
 		if track_mgr:
 			track_mgr.visible = true
 			track_mgr.set_physics_process(true)
-			track_mgr.scroll_speed = base_scroll_speed
+			track_mgr.set("scroll_speed", base_scroll_speed)
 			if "current_level_data" in track_mgr:
-				track_mgr.current_level_data["is_scripted"] = true
+				var cld: Variant = track_mgr.get("current_level_data")
+				if cld is Dictionary:
+					cld["is_scripted"] = true
 			if track_mgr.has_method("clear_all_segment_obstacles"):
-				track_mgr.clear_all_segment_obstacles()
+				track_mgr.call("clear_all_segment_obstacles")
 			
 	if level_data:
 		var biome_name: String = level_data.biome_name if "biome_name" in level_data else "tropical"
@@ -195,7 +199,7 @@ func load_level_resource(res: LevelData) -> void:
 		if not _horizon_backdrop:
 			var backdrop_scene := preload("res://src/gameplay/levels/horizon_backdrop.tscn")
 			if backdrop_scene:
-				_horizon_backdrop = backdrop_scene.instantiate()
+				_horizon_backdrop = backdrop_scene.instantiate() as Node3D
 				add_child(_horizon_backdrop)
 				_horizon_backdrop.add_to_group("horizon_backdrop")  # exempt from child-scroll loop
 		
@@ -206,7 +210,7 @@ func load_level_resource(res: LevelData) -> void:
 				if ResourceLoader.exists(tex_path):
 					htex = load(tex_path) as Texture2D
 			if htex:
-				_horizon_backdrop.bind_texture(htex)
+				_horizon_backdrop.call("bind_texture", htex)
 
 		# ── Layer 2: Riverbank Framing Strips ────────────────────────────────
 		_setup_riverbank_chunks(biome_name)
@@ -218,7 +222,7 @@ func _apply_biome_visuals() -> void:
 	if not level_data:
 		return
 		
-	var env = get_node_or_null("../WorldEnvironment") as WorldEnvironment
+	var env := get_node_or_null("../WorldEnvironment") as WorldEnvironment
 	if env and env.environment:
 		env.environment.fog_enabled = level_data.fog_density > 0.0
 		env.environment.fog_light_color = level_data.fog_color
@@ -229,17 +233,19 @@ func _apply_biome_visuals() -> void:
 		chunk_assembler.update_water_color(level_data.water_albedo)
 		
 	# Apply water shader color across track segments
-	var track_mgr = get_tree().get_first_node_in_group("track_manager")
+	var track_mgr := get_tree().get_first_node_in_group("track_manager")
 	if track_mgr and "active_segments" in track_mgr:
-		for seg in track_mgr.active_segments:
-			_tint_segment_water(seg, level_data.water_albedo)
+		var segs: Variant = track_mgr.get("active_segments")
+		if segs is Array:
+			for seg: Node in (segs as Array):
+				_tint_segment_water(seg, level_data.water_albedo)
 
 func _tint_segment_water(segment: Node, water_color: Color) -> void:
 	if not segment:
 		return
-	var water_plane = segment.get_node_or_null("WaterPlane") as MeshInstance3D
+	var water_plane := segment.get_node_or_null("WaterPlane") as MeshInstance3D
 	if water_plane and water_plane.material_override:
-		var mat = water_plane.material_override as ShaderMaterial
+		var mat := water_plane.material_override as ShaderMaterial
 		if mat:
 			mat.set_shader_parameter("albedo", water_color)
 
@@ -250,41 +256,41 @@ func _physics_process(delta: float) -> void:
 	if chunk_assembler and chunk_assembler.is_assembled:
 		# Modular chunk system handles track scrolling, entities, and progress.
 		# Advance and wrap Layer-2 riverbank framing chunks
-		var scroll_step = chunk_assembler.scroll_speed * delta if not chunk_assembler.is_boss_active else 0.0
+		var scroll_step := chunk_assembler.scroll_speed * delta if not chunk_assembler.is_boss_active else 0.0
 		_scroll_riverbank_chunks(scroll_step)
 		return
 	# ──────────────────────────────────────────────────────────────────────────
 
-	var track_mgr = get_tree().get_first_node_in_group("track_manager")
-	var speed = base_scroll_speed
+	var track_mgr := get_tree().get_first_node_in_group("track_manager")
+	var speed := base_scroll_speed
 	if track_mgr and "scroll_speed" in track_mgr:
-		speed = track_mgr.scroll_speed
+		speed = float(track_mgr.get("scroll_speed"))
 
-	var max_dist = 250.0
+	var max_dist := 250.0
 
 	# ── Boss-Arena Trigger ───────────────────────────────────────────
 	if not is_boss_spawned and current_distance >= max_dist:
 		current_distance = max_dist       # Lock – no drift past cap
 		base_scroll_speed = 0.0
 		if track_mgr:
-			track_mgr.scroll_speed = 0.0
+			track_mgr.set("scroll_speed", 0.0)
 		active_queue.clear()           # Ensure nothing fires after boss spawn
 		_spawn_boss()
 		return
 
 	# Accumulate distance only while pre-boss and not yet halted
 	if not GameState.boss_spawned:
-		var new_dist = current_distance + speed * delta
+		var new_dist := current_distance + speed * delta
 		current_distance = minf(new_dist, max_dist)
 		GameState.update_distance(speed * delta)
 
 	# ── Deterministic wave event dispatch ─────────────────────────────────────
 	while not active_queue.is_empty():
-		var first = active_queue[0]
-		var dist = first.trigger_distance if "trigger_distance" in first else first.get("distance", 0.0)
+		var first: Variant = active_queue[0]
+		var dist: float = first.trigger_distance if "trigger_distance" in first else float(first.get("distance", 0.0))
 		if current_distance >= dist:
-			var event = active_queue.pop_front()
-			if event is SpawnEvent or "entity_type" in event:
+			var event: Variant = active_queue.pop_front()
+			if event is SpawnEvent or (typeof(event) == TYPE_DICTIONARY and "entity_type" in event):
 				_spawn_timeline_event(event)
 			else:
 				_spawn_wave_event(event)
@@ -293,8 +299,8 @@ func _physics_process(delta: float) -> void:
 	# ──────────────────────────────────────────────────────────────────────────
 
 	# Scroll LevelController-owned obstacles/enemies forward
-	var scroll_movement = speed * delta
-	for child in get_children():
+	var scroll_movement := speed * delta
+	for child: Node in get_children():
 		if child is Node3D \
 				and not child.is_in_group("boss") \
 				and not child.is_in_group("collectibles") \
@@ -302,7 +308,7 @@ func _physics_process(delta: float) -> void:
 				and not child.is_in_group("horizon_backdrop") \
 				and not child.is_in_group("riverbank_chunk") \
 				and not child.is_in_group("boundary_wall"):
-			child.global_position.z += scroll_movement
+			(child as Node3D).global_position.z += scroll_movement
 
 	# Wrap bank strips (legacy – array is empty; kept as no-op for safety)
 	for strip in bank_strips:
@@ -316,132 +322,129 @@ func normalized_to_world_x(norm_x: float) -> float:
 	return norm_x * (river_width_world / 2.0)
 
 func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> void:
-	var target_z = spawn_z_ahead if z_pos_override == 0.0 else z_pos_override
-	var z_spawn = minf(target_z, -45.0) # Ensure at least 45m distance from player vessel
+	var target_z := spawn_z_ahead if z_pos_override == 0.0 else z_pos_override
+	var z_spawn := minf(target_z, -45.0) # Ensure at least 45m distance from player vessel
 	var is_brimstone: bool = level_data != null and (level_data.biome_name == "brimstone" or level_data.level_id == 3)
 	
 	match event.entity_type:
 		SpawnEvent.EntityType.BARREL:
-			var x_pos = clampf(event.lane_x, -5.2, 5.2)
+			var x_pos := clampf(event.lane_x, -5.2, 5.2)
 			if barrel_scene:
-				var barrel = barrel_scene.instantiate() as Area3D
+				var barrel := barrel_scene.instantiate() as DestructibleObstacle
 				barrel.name = "Barrel_%.1fm_x%.1f" % [current_distance, x_pos]
 				add_child(barrel)
 				barrel.global_position = Vector3(x_pos, 0.05, z_spawn)
-				var hp = event.base_hp_override if event.base_hp_override > 0 else (2 if event.rarity_tier == SpawnEvent.RarityTier.COMMON else (4 if event.rarity_tier == SpawnEvent.RarityTier.NORMAL else 6))
+				var hp := event.base_hp_override if event.base_hp_override > 0 else (2 if event.rarity_tier == SpawnEvent.RarityTier.COMMON else (4 if event.rarity_tier == SpawnEvent.RarityTier.NORMAL else 6))
 				barrel.hp = hp
-				if "obstacle_type" in barrel:
-					if event.rarity_tier == SpawnEvent.RarityTier.RARE:
-						barrel.obstacle_type = DestructibleObstacle.ObstacleType.RUNE_BARREL
-					elif event.rarity_tier == SpawnEvent.RarityTier.NORMAL:
-						barrel.obstacle_type = DestructibleObstacle.ObstacleType.FUSE_BARREL
-					else:
-						barrel.obstacle_type = DestructibleObstacle.ObstacleType.WOODEN_BARREL
+				if event.rarity_tier == SpawnEvent.RarityTier.RARE:
+					barrel.obstacle_type = DestructibleObstacle.ObstacleType.RUNE_BARREL
+				elif event.rarity_tier == SpawnEvent.RarityTier.NORMAL:
+					barrel.obstacle_type = DestructibleObstacle.ObstacleType.FUSE_BARREL
+				else:
+					barrel.obstacle_type = DestructibleObstacle.ObstacleType.WOODEN_BARREL
 
 		SpawnEvent.EntityType.MOB:
 			if is_brimstone:
 				if event.rarity_tier == SpawnEvent.RarityTier.ELITE or event.base_hp_override >= 40:
-					var x_pos = clampf(event.lane_x, -4.1, 4.1)
+					var x_pos := clampf(event.lane_x, -4.1, 4.1)
 					if bombard_scene:
-						var bombard = bombard_scene.instantiate() as Area3D
+						var bombard := bombard_scene.instantiate() as EnemyMob
 						bombard.name = "MiniBossBombard_%.1fm" % current_distance
 						add_child(bombard)
 						bombard.global_position = Vector3(x_pos, 0.1, z_spawn)
 						bombard.max_hp = event.base_hp_override if event.base_hp_override > 0 else 120
-						bombard.current_hp = bombard.max_hp
+						bombard.set("current_hp", bombard.max_hp)
 						bombard.forward_speed = 1.3
 				elif event.rarity_tier == SpawnEvent.RarityTier.RARE or event.base_hp_override == 18:
-					var x_pos = clampf(event.lane_x, -4.5, 4.5)
+					var x_pos := clampf(event.lane_x, -4.5, 4.5)
 					if brimstone_raft_scene:
-						var raft = brimstone_raft_scene.instantiate() as Area3D
+						var raft := brimstone_raft_scene.instantiate() as EnemyMob
 						raft.name = "BrimstoneRaft_%.1fm_x%.1f" % [current_distance, x_pos]
 						add_child(raft)
 						raft.global_position = Vector3(x_pos, 0.1, z_spawn)
 						raft.max_hp = event.base_hp_override if event.base_hp_override > 0 else 18
-						raft.current_hp = raft.max_hp
+						raft.set("current_hp", raft.max_hp)
 						raft.forward_speed = 7.8
 				else:
-					var x_pos = clampf(event.lane_x, -4.5, 4.5)
+					var x_pos := clampf(event.lane_x, -4.5, 4.5)
 					if iron_gunner_scene:
-						var gunner = iron_gunner_scene.instantiate() as Area3D
-						var label = "IronGunnerScout" if (event.base_hp_override > 0 and event.base_hp_override < 20) else "IronGunner"
+						var gunner := iron_gunner_scene.instantiate() as EnemyMob
+						var label := "IronGunnerScout" if (event.base_hp_override > 0 and event.base_hp_override < 20) else "IronGunner"
 						gunner.name = "%s_%.1fm_x%.1f" % [label, current_distance, x_pos]
 						add_child(gunner)
 						gunner.global_position = Vector3(x_pos, 0.1, z_spawn)
 						gunner.max_hp = event.base_hp_override if event.base_hp_override > 0 else 22
-						gunner.current_hp = gunner.max_hp
+						gunner.set("current_hp", gunner.max_hp)
 						gunner.forward_speed = 2.6
 			else:
 				if event.rarity_tier == SpawnEvent.RarityTier.ELITE or event.base_hp_override >= 40:
-					var x_pos = clampf(event.lane_x, -4.1, 4.1)
+					var x_pos := clampf(event.lane_x, -4.1, 4.1)
 					if harvester_scene:
-						var harv = harvester_scene.instantiate() as Area3D
+						var harv := harvester_scene.instantiate() as EnemyMob
 						harv.name = "MiniBossHarvester_%.1fm" % current_distance
 						add_child(harv)
 						harv.global_position = Vector3(x_pos, 0.1, z_spawn)
 						harv.max_hp = event.base_hp_override if event.base_hp_override > 0 else 45
-						harv.current_hp = harv.max_hp
+						harv.set("current_hp", harv.max_hp)
 				elif (event.rarity_tier == SpawnEvent.RarityTier.RARE and event.base_hp_override >= 8) or event.base_hp_override == 8:
-					var x_pos = clampf(event.lane_x, -4.5, 4.5)
+					var x_pos := clampf(event.lane_x, -4.5, 4.5)
 					if tide_cutter_scene:
-						var cutter = tide_cutter_scene.instantiate() as Area3D
+						var cutter := tide_cutter_scene.instantiate() as EnemyMob
 						cutter.name = "TideCutter_%.1fm_x%.1f" % [current_distance, x_pos]
 						add_child(cutter)
 						cutter.global_position = Vector3(x_pos, 0.1, z_spawn)
 						cutter.max_hp = event.base_hp_override if event.base_hp_override > 0 else 8
-						cutter.current_hp = cutter.max_hp
+						cutter.set("current_hp", cutter.max_hp)
 						cutter.forward_speed = 4.5
 				else:
-					var x_pos = clampf(event.lane_x, -4.2, 4.2)
+					var x_pos := clampf(event.lane_x, -4.2, 4.2)
 					if grave_skiff_scene:
-						var skiff = grave_skiff_scene.instantiate() as Area3D
+						var skiff := grave_skiff_scene.instantiate() as EnemyMob
 						skiff.name = "GraveSkiff_%.1fm_x%.1f" % [current_distance, x_pos]
 						add_child(skiff)
 						skiff.global_position = Vector3(x_pos, 0.1, z_spawn)
 						skiff.max_hp = event.base_hp_override if event.base_hp_override > 0 else (6 if event.rarity_tier == SpawnEvent.RarityTier.RARE else 4)
-						skiff.current_hp = skiff.max_hp
+						skiff.set("current_hp", skiff.max_hp)
 						skiff.forward_speed = 2.4
 
 		SpawnEvent.EntityType.MULTIPLIER_GATE:
-			var x_pos = clampf(event.lane_x, -3.9, 3.9)
+			var x_pos := clampf(event.lane_x, -3.9, 3.9)
 			if absf(x_pos) < 1.2:
 				x_pos = 2.4 if int(current_distance) % 2 == 0 else -2.4
 			if multiplier_gate_scene:
-				var gate = multiplier_gate_scene.instantiate() as Area3D
+				var gate := multiplier_gate_scene.instantiate() as MultiplierGate
 				gate.name = "MultiplierGate_%.1fm" % current_distance
 				add_child(gate)
 				gate.global_position = Vector3(x_pos, 0.0, z_spawn)
-				var gate_val = event.gate_value
+				var gate_val := event.gate_value
 				if gate_val <= 6:
 					gate_val = gate_val * 10
-				var text_val = "+%d" % gate_val if event.gate_type == SpawnEvent.GateType.FLEET_SUMMON else ("x%d" % gate_val)
-				if "value" in gate:
-					gate.value = gate_val
-				if "custom_text" in gate:
-					gate.custom_text = text_val
+				var text_val := "+%d" % gate_val if event.gate_type == SpawnEvent.GateType.FLEET_SUMMON else ("x%d" % gate_val)
+				gate.value = gate_val
+				gate.custom_text = text_val
 				if gate.has_method("update_visuals"):
-					gate.update_visuals()
+					gate.call("update_visuals")
 
 		SpawnEvent.EntityType.HAZARD:
 			if is_brimstone:
-				var x_pos = clampf(event.lane_x, -4.2, 4.2)
+				var x_pos := clampf(event.lane_x, -4.2, 4.2)
 				if thermal_geyser_scene:
-					var geyser = thermal_geyser_scene.instantiate() as Node3D
+					var geyser := thermal_geyser_scene.instantiate() as Node3D
 					geyser.name = "ThermalGeyser_%.1fm_x%.1f" % [current_distance, x_pos]
 					add_child(geyser)
 					geyser.global_position = Vector3(x_pos, 0.0, z_spawn)
 			else:
 				if event.rarity_tier == SpawnEvent.RarityTier.RARE or event.base_hp_override >= 5:
-					var x_pos = clampf(event.lane_x, -4.5, 4.5)
-					var reef_prefab = preload("res://src/gameplay/obstacles/hazard_reef.tscn")
+					var x_pos := clampf(event.lane_x, -4.5, 4.5)
+					var reef_prefab := preload("res://src/gameplay/obstacles/hazard_reef.tscn")
 					if reef_prefab:
-						var reef = reef_prefab.instantiate() as Area3D
+						var reef := reef_prefab.instantiate() as Area3D
 						reef.name = "CoralReef_%.1fm_x%.1f" % [current_distance, x_pos]
 						add_child(reef)
 						reef.global_position = Vector3(x_pos, 0.0, z_spawn)
 				elif biogas_pod_scene:
-					var x_pos = clampf(event.lane_x, -5.2, 5.2)
-					var pod = biogas_pod_scene.instantiate() as Area3D
+					var x_pos := clampf(event.lane_x, -5.2, 5.2)
+					var pod := biogas_pod_scene.instantiate() as DestructibleObstacle
 					pod.name = "BiogasPod_%.1fm_x%.1f" % [current_distance, x_pos]
 					add_child(pod)
 					pod.global_position = Vector3(x_pos, 0.05, z_spawn)
@@ -455,366 +458,363 @@ func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> vo
 # EVENT SPAWNER – purely data-driven, no randomness
 # ──────────────────────────────────────────────────────────────────────────────
 func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
-	var target_z = spawn_z_ahead if z_pos_override == 0.0 else z_pos_override
-	var z_spawn = minf(target_z, -45.0) # Ensure at least 45m distance from player vessel
+	var target_z := spawn_z_ahead if z_pos_override == 0.0 else z_pos_override
+	var z_spawn := minf(target_z, -45.0) # Ensure at least 45m distance from player vessel
 	var event_type: String = event.get("type", "")
 
 	match event_type:
 
 		# ── Coin arc ──────────────────────────────────────────────────────────
 		"coin_arc":
-			var x_start = float(event.get("x_start", -0.3))
-			var x_end   = float(event.get("x_end",   0.3))
-			var count   = int(event.get("count", 5))
+			var x_start := float(event.get("x_start", -0.3))
+			var x_end := float(event.get("x_end",   0.3))
+			var count := int(event.get("count", 5))
 			for i in range(count):
-				var t      = float(i) / float(count - 1) if count > 1 else 0.5
-				var x_norm = lerp(x_start, x_end, t)
-				var x_world = clampf(normalized_to_world_x(x_norm), -5.2, 5.2)
-				var z_offset = -abs(sin(t * PI)) * 2.0
-				var z_pos    = z_spawn + z_offset - (i * 1.2)
+				var t := float(i) / float(count - 1) if count > 1 else 0.5
+				var x_norm: Variant = lerp(x_start, x_end, t)
+				var x_world := clampf(normalized_to_world_x(x_norm), -5.2, 5.2)
+				var z_offset: Variant = -abs(sin(t * PI)) * 2.0
+				var z_pos: Variant = z_spawn + z_offset - (i * 1.2)
 				if coin_scene:
-					var coin = coin_scene.instantiate() as Area3D
+					var coin := coin_scene.instantiate() as Area3D
 					add_child(coin)
 					coin.global_position = Vector3(x_world, 0.13, z_pos)
 
 		# ── Barrel row ────────────────────────────────────────────────────────
 		"obstacles":
 			var x_positions: Array = event.get("x_positions", [])
-			var hp           = int(event.get("hp", 1))
+			var hp := int(event.get("hp", 1))
 			var obs_type_str: String = event.get("obstacle_type", "wooden")
-			for x_norm in x_positions:
-				var x_world = clampf(normalized_to_world_x(float(x_norm)), -5.2, 5.2)
+			for x_norm: Variant in x_positions:
+				var x_world := clampf(normalized_to_world_x(float(x_norm)), -5.2, 5.2)
 				if barrel_scene:
-					var barrel = barrel_scene.instantiate() as Area3D
+					var barrel := barrel_scene.instantiate() as DestructibleObstacle
 					add_child(barrel)
 					barrel.global_position = Vector3(x_world, 0.05, z_spawn)
 					barrel.hp = hp
-					if "obstacle_type" in barrel:
-						if obs_type_str == "fuse" or obs_type_str == "explosive":
-							barrel.obstacle_type = DestructibleObstacle.ObstacleType.FUSE_BARREL
-						elif obs_type_str == "rune":
-							barrel.obstacle_type = DestructibleObstacle.ObstacleType.RUNE_BARREL
-						else:
-							barrel.obstacle_type = DestructibleObstacle.ObstacleType.WOODEN_BARREL
+					if obs_type_str == "fuse" or obs_type_str == "explosive":
+						barrel.obstacle_type = DestructibleObstacle.ObstacleType.FUSE_BARREL
+					elif obs_type_str == "rune":
+						barrel.obstacle_type = DestructibleObstacle.ObstacleType.RUNE_BARREL
+					else:
+						barrel.obstacle_type = DestructibleObstacle.ObstacleType.WOODEN_BARREL
 
 		# ── Single barrel / obstacle ──────────────────────────────────────────
 		"obstacle":
-			var x_norm  = float(event.get("x", 0.0))
-			var hp      = int(event.get("hp", 1))
-			var x_world = clampf(normalized_to_world_x(x_norm), -5.2, 5.2)
+			var x_norm := float(event.get("x", 0.0))
+			var hp := int(event.get("hp", 1))
+			var x_world := clampf(normalized_to_world_x(x_norm), -5.2, 5.2)
 			if barrel_scene:
-				var barrel = barrel_scene.instantiate() as Area3D
+				var barrel := barrel_scene.instantiate() as DestructibleObstacle
 				add_child(barrel)
 				barrel.global_position = Vector3(x_world, 0.05, z_spawn)
 				barrel.hp = hp
 				if event.get("sub_type", "") == "armored_barrel_chest":
 					barrel.set_meta("spawns_chest", true)
-					if "obstacle_type" in barrel:
-						barrel.obstacle_type = DestructibleObstacle.ObstacleType.RUNE_BARREL
+					barrel.obstacle_type = DestructibleObstacle.ObstacleType.RUNE_BARREL
 
 		# ── Fleet gate (adds ships) ────────────────────────────────────────────
 		"fleet_gate":
-			var gate_prefab = preload("res://src/gameplay/obstacles/multiplier_gate.tscn")
+			var gate_prefab := preload("res://src/gameplay/obstacles/multiplier_gate.tscn")
 			if gate_prefab:
-				var gate    = gate_prefab.instantiate() as Area3D
+				var gate := gate_prefab.instantiate() as MultiplierGate
 				add_child(gate)
-				var x_norm  = float(event.get("x", 0.0))
-				var x_world = clampf(normalized_to_world_x(x_norm), -3.9, 3.9)
+				var x_norm := float(event.get("x", 0.0))
+				var x_world := clampf(normalized_to_world_x(x_norm), -3.9, 3.9)
 				if absf(x_world) < 1.2:
 					x_world = 2.4 if int(current_distance) % 2 == 0 else -2.4
 				gate.global_position = Vector3(x_world, 0.0, z_spawn)
-				var raw_val     = int(event.get("value", 1))
-				var gate_val    = raw_val * 10 if raw_val <= 6 else raw_val
-				var gate_text   = str(event.get("text", "+%d" % gate_val))
+				var raw_val := int(event.get("value", 1))
+				var gate_val := raw_val * 10 if raw_val <= 6 else raw_val
+				var gate_text := str(event.get("text", "+%d" % gate_val))
 				if gate_text.begins_with("+") and gate_text.substr(1).to_int() <= 6:
 					gate_text = "+%d" % gate_val
-				var gate_action = str(event.get("action", "add_fleet_1" if raw_val <= 1 else "add_fleet_2"))
-				if "custom_text" in gate: gate.custom_text = gate_text
-				if "gate_action"  in gate: gate.gate_action  = gate_action
-				if "value"        in gate: gate.value         = gate_val
-				if "operation"    in gate: gate.operation     = 0  # ADD
+				var gate_action := str(event.get("action", "add_fleet_1" if raw_val <= 1 else "add_fleet_2"))
+				gate.custom_text = gate_text
+				gate.gate_action = gate_action
+				gate.value = gate_val
+				gate.operation = 0  # ADD
 				print("[GATE] Spawned +", gate_val, " gate at ", current_distance, "m")
 
 		# ── Biogas Pod (Level 2) ──────────────────────────────────────────────
 		"biogas_pod":
-			var x_norm = float(event.get("x", 0.0))
-			var x_world = clampf(normalized_to_world_x(x_norm), -5.2, 5.2)
+			var x_norm := float(event.get("x", 0.0))
+			var x_world := clampf(normalized_to_world_x(x_norm), -5.2, 5.2)
 			if biogas_pod_scene:
-				var pod = biogas_pod_scene.instantiate() as Area3D
+				var pod := biogas_pod_scene.instantiate() as Area3D
 				add_child(pod)
 				pod.global_position = Vector3(x_world, 0.0, z_spawn)
 				if "forward_speed" in pod:
-					pod.forward_speed = float(event.get("speed", 3.0))
+					pod.set("forward_speed", float(event.get("speed", 3.0)))
 
-		# ── Grave Skiffs (Level 2) ────────────────────────────────────────────
+		# ── Grave Skiffs (Level 2) ────────────────────────────────────
 		"grave_skiffs":
 			var x_positions: Array = event.get("x_positions", [0.0])
-			var hp = int(event.get("hp", 14))
-			var speed_val = float(event.get("speed", 3.2))
-			for x_norm in x_positions:
-				var x_world = clampf(normalized_to_world_x(float(x_norm)), -4.6, 4.6)
+			var hp := int(event.get("hp", 14))
+			var speed_val := float(event.get("speed", 3.2))
+			for x_norm: Variant in x_positions:
+				var x_world := clampf(normalized_to_world_x(float(x_norm)), -4.6, 4.6)
 				if grave_skiff_scene:
-					var skiff = grave_skiff_scene.instantiate() as Area3D
+					var skiff := grave_skiff_scene.instantiate() as EnemyMob
 					add_child(skiff)
 					skiff.global_position = Vector3(x_world, 0.1, z_spawn)
 					skiff.max_hp = hp
-					skiff.current_hp = hp
+					skiff.set("current_hp", hp)
 					skiff.forward_speed = speed_val
 
-		# ── Ghost Sloops (Level 2) ────────────────────────────────────────────
+		# ── Ghost Sloops (Level 2) ────────────────────────────────────
 		"ghost_sloops":
 			var x_positions: Array = event.get("x_positions", [0.0])
-			var hp = int(event.get("hp", 8))
-			var speed_val = float(event.get("speed", 2.4))
-			for x_norm in x_positions:
-				var x_world = clampf(normalized_to_world_x(float(x_norm)), -4.6, 4.6)
+			var hp := int(event.get("hp", 8))
+			var speed_val := float(event.get("speed", 2.4))
+			for x_norm: Variant in x_positions:
+				var x_world := clampf(normalized_to_world_x(float(x_norm)), -4.6, 4.6)
 				if enemy_mob_scene:
-					var mob = enemy_mob_scene.instantiate() as Area3D
+					var mob := enemy_mob_scene.instantiate() as EnemyMob
 					add_child(mob)
 					mob.global_position = Vector3(x_world, 0.1, z_spawn)
-					var sloop_data = preload("res://src/data/resources/enemy_vessels/ghost_sloop.tres")
+					var sloop_data := preload("res://src/data/resources/enemy_vessels/ghost_sloop.tres")
 					if mob.has_method("apply_enemy_data") and sloop_data:
 						mob.apply_enemy_data(sloop_data)
 					mob.max_hp = hp
-					mob.current_hp = hp
+					mob.set("current_hp", hp)
 					mob.forward_speed = speed_val
 
-		# ── Tide Cutters (Level 2) ────────────────────────────────────────────
+		# ── Tide Cutters (Level 2) ────────────────────────────────────
 		"tide_cutters":
 			var x_positions: Array = event.get("x_positions", [0.0])
-			var hp = int(event.get("hp", 20))
-			var speed_val = float(event.get("speed", 6.8))
-			for x_norm in x_positions:
-				var x_world = clampf(normalized_to_world_x(float(x_norm)), -4.6, 4.6)
+			var hp := int(event.get("hp", 20))
+			var speed_val := float(event.get("speed", 6.8))
+			for x_norm: Variant in x_positions:
+				var x_world := clampf(normalized_to_world_x(float(x_norm)), -4.6, 4.6)
 				if tide_cutter_scene:
-					var cutter = tide_cutter_scene.instantiate() as Area3D
+					var cutter := tide_cutter_scene.instantiate() as EnemyMob
 					add_child(cutter)
 					cutter.global_position = Vector3(x_world, 0.1, z_spawn)
 					cutter.max_hp = hp
-					cutter.current_hp = hp
+					cutter.set("current_hp", hp)
 					cutter.forward_speed = speed_val
 
-		# ── Mini Boss Harvester (Level 2) ─────────────────────────────────────
+		# ── Mini Boss Harvester (Level 2) ─────────────────────────────
 		"mini_boss_harvester":
-			var x_norm = float(event.get("x", 0.0))
-			var x_world = clampf(normalized_to_world_x(x_norm), -4.1, 4.1)
+			var x_norm := float(event.get("x", 0.0))
+			var x_world := clampf(normalized_to_world_x(x_norm), -4.1, 4.1)
 			if harvester_scene:
-				var harvester = harvester_scene.instantiate() as Area3D
+				var harvester := harvester_scene.instantiate() as EnemyMob
 				add_child(harvester)
 				harvester.global_position = Vector3(x_world, 0.1, z_spawn)
 				harvester.max_hp = int(event.get("hp", 110))
-				harvester.current_hp = harvester.max_hp
+				harvester.set("current_hp", harvester.max_hp)
 				harvester.forward_speed = float(event.get("speed", 1.4))
 
-		# ── Thermal Geyser (Level 3) ──────────────────────────────────────────
+		# ── Thermal Geyser (Level 3) ──────────────────────────────────
 		"thermal_geyser":
-			var x_norm = float(event.get("x", 0.0))
-			var x_world = clampf(normalized_to_world_x(x_norm), -4.2, 4.2)
+			var x_norm := float(event.get("x", 0.0))
+			var x_world := clampf(normalized_to_world_x(x_norm), -4.2, 4.2)
 			if thermal_geyser_scene:
-				var geyser = thermal_geyser_scene.instantiate() as Node3D
+				var geyser := thermal_geyser_scene.instantiate() as Node3D
 				add_child(geyser)
 				geyser.global_position = Vector3(x_world, 0.0, z_spawn)
 
-		# ── Whirlpool Hazard ──────────────────────────────────────────────────
+		# ── Whirlpool Hazard ──────────────────────────────────────────
 		"whirlpool":
-			var x_norm = float(event.get("x", 0.0))
-			var x_world = clampf(normalized_to_world_x(x_norm), -4.2, 4.2)
+			var x_norm := float(event.get("x", 0.0))
+			var x_world := clampf(normalized_to_world_x(x_norm), -4.2, 4.2)
 			if whirlpool_scene:
-				var pool = whirlpool_scene.instantiate() as Area3D
+				var pool := whirlpool_scene.instantiate() as Area3D
 				add_child(pool)
 				pool.global_position = Vector3(x_world, 0.0, z_spawn)
 
 
-		# ── Iron Gunners (Level 3) ────────────────────────────────────────────
+		# ── Iron Gunners (Level 3) ────────────────────────────────────
 		"iron_gunners":
 			var x_positions: Array = event.get("x_positions", [0.0])
-			var hp = int(event.get("hp", 22))
-			var speed_val = float(event.get("speed", 2.6))
-			for x_norm in x_positions:
-				var x_world = clampf(normalized_to_world_x(float(x_norm)), -4.6, 4.6)
+			var hp := int(event.get("hp", 22))
+			var speed_val := float(event.get("speed", 2.6))
+			for x_norm: Variant in x_positions:
+				var x_world := clampf(normalized_to_world_x(float(x_norm)), -4.6, 4.6)
 				if iron_gunner_scene:
-					var gunner = iron_gunner_scene.instantiate() as Area3D
+					var gunner := iron_gunner_scene.instantiate() as EnemyMob
 					add_child(gunner)
 					gunner.global_position = Vector3(x_world, 0.1, z_spawn)
 					gunner.max_hp = hp
-					gunner.current_hp = hp
+					gunner.set("current_hp", hp)
 					gunner.forward_speed = speed_val
 
-		# ── Brimstone Rafts (Level 3) ─────────────────────────────────────────
+		# ── Brimstone Rafts (Level 3) ─────────────────────────────────
 		"brimstone_rafts":
 			var x_positions: Array = event.get("x_positions", [0.0])
-			var hp = int(event.get("hp", 18))
-			var speed_val = float(event.get("speed", 7.8))
-			for x_norm in x_positions:
-				var x_world = clampf(normalized_to_world_x(float(x_norm)), -4.6, 4.6)
+			var hp := int(event.get("hp", 18))
+			var speed_val := float(event.get("speed", 7.8))
+			for x_norm: Variant in x_positions:
+				var x_world := clampf(normalized_to_world_x(float(x_norm)), -4.6, 4.6)
 				if brimstone_raft_scene:
-					var raft = brimstone_raft_scene.instantiate() as Area3D
+					var raft := brimstone_raft_scene.instantiate() as EnemyMob
 					add_child(raft)
 					raft.global_position = Vector3(x_world, 0.1, z_spawn)
 					raft.max_hp = hp
-					raft.current_hp = hp
+					raft.set("current_hp", hp)
 					raft.forward_speed = speed_val
 
-		# ── Mini Boss Bombard (Level 3) ───────────────────────────────────────
+		# ── Mini Boss Bombard (Level 3) ───────────────────────────────
 		"mini_boss_bombard":
-			var x_norm = float(event.get("x", 0.0))
-			var x_world = clampf(normalized_to_world_x(x_norm), -4.1, 4.1)
+			var x_norm := float(event.get("x", 0.0))
+			var x_world := clampf(normalized_to_world_x(x_norm), -4.1, 4.1)
 			if bombard_scene:
-				var bombard = bombard_scene.instantiate() as Area3D
+				var bombard := bombard_scene.instantiate() as EnemyMob
 				add_child(bombard)
 				bombard.global_position = Vector3(x_world, 0.1, z_spawn)
 				bombard.max_hp = int(event.get("hp", 120))
-				bombard.current_hp = bombard.max_hp
+				bombard.set("current_hp", bombard.max_hp)
 				bombard.forward_speed = float(event.get("speed", 1.3))
 
-		# ── Skeleton Rowers (Level 1) ─────────────────────────────────────────
+		# ── Skeleton Rowers (Level 1) ─────────────────────────────────
 		"skeleton_rowers":
 			var x_positions: Array = event.get("x_positions", [])
-			var hp = int(event.get("hp", 2))
-			var mob_speed = float(event.get("speed", 2.0))
-			for x_norm in x_positions:
-				var x_world = clampf(normalized_to_world_x(float(x_norm)), -4.6, 4.6)
+			var hp := int(event.get("hp", 2))
+			var mob_speed := float(event.get("speed", 2.0))
+			for x_norm: Variant in x_positions:
+				var x_world := clampf(normalized_to_world_x(float(x_norm)), -4.6, 4.6)
 				if enemy_mob_scene:
-					var mob = enemy_mob_scene.instantiate() as Area3D
+					var mob := enemy_mob_scene.instantiate() as EnemyMob
 					add_child(mob)
 					mob.global_position = Vector3(x_world, 0.1, z_spawn)
-					var rower_data = preload("res://src/data/resources/enemy_vessels/skeleton_rower.tres")
+					var rower_data := preload("res://src/data/resources/enemy_vessels/skeleton_rower.tres")
 					if mob.has_method("apply_enemy_data"):
 						mob.apply_enemy_data(rower_data)
 					mob.max_hp = hp
-					mob.current_hp = hp
+					mob.set("current_hp", hp)
 					mob.forward_speed = mob_speed
 
-		# ── Raider Skiffs (Level 1) ───────────────────────────────────────────
+		# ── Raider Skiffs (Level 1) ───────────────────────────────────
 		"raider_skiffs":
 			var x_positions: Array = event.get("x_positions", [])
-			var hp = int(event.get("hp", 4))
-			var skiff_speed = float(event.get("speed", 3.0))
-			for x_norm in x_positions:
-				var x_world = clampf(normalized_to_world_x(float(x_norm)), -4.2, 4.2)
+			var hp := int(event.get("hp", 4))
+			var skiff_speed := float(event.get("speed", 3.0))
+			for x_norm: Variant in x_positions:
+				var x_world := clampf(normalized_to_world_x(float(x_norm)), -4.2, 4.2)
 				if enemy_mob_scene:
-					var enemy = enemy_mob_scene.instantiate() as Area3D
+					var enemy := enemy_mob_scene.instantiate() as EnemyMob
 					add_child(enemy)
 					enemy.global_position = Vector3(x_world, 0.1, z_spawn)
-					var skiff_data = preload("res://src/data/resources/enemy_vessels/raider_skiff.tres")
+					var skiff_data := preload("res://src/data/resources/enemy_vessels/raider_skiff.tres")
 					if enemy.has_method("apply_enemy_data"):
 						enemy.apply_enemy_data(skiff_data)
 					enemy.max_hp = hp
-					enemy.current_hp = hp
+					enemy.set("current_hp", hp)
 					enemy.forward_speed = skiff_speed
 
-		# ── Kamikaze Rafts (Level 1) ──────────────────────────────────────────
+		# ── Kamikaze Rafts (Level 1) ──────────────────────────────────
 		"kamikaze_rafts":
 			var x_positions: Array = event.get("x_positions", [-0.6, 0.6])
-			var hp = int(event.get("hp", 5))
-			var raft_speed = float(event.get("speed", 7.0))
-			for x_norm in x_positions:
-				var x_world = clampf(normalized_to_world_x(float(x_norm)), -4.2, 4.2)
+			var hp := int(event.get("hp", 5))
+			var raft_speed := float(event.get("speed", 7.0))
+			for x_norm: Variant in x_positions:
+				var x_world := clampf(normalized_to_world_x(float(x_norm)), -4.2, 4.2)
 				if enemy_mob_scene:
-					var raft = enemy_mob_scene.instantiate() as Area3D
+					var raft := enemy_mob_scene.instantiate() as EnemyMob
 					add_child(raft)
 					raft.global_position = Vector3(x_world, 0.1, z_spawn)
-					var rower_data = preload("res://src/data/resources/enemy_vessels/skeleton_rower.tres")
+					var rower_data := preload("res://src/data/resources/enemy_vessels/skeleton_rower.tres")
 					if raft.has_method("apply_enemy_data"):
 						raft.apply_enemy_data(rower_data)
 					raft.forward_speed = raft_speed
 					raft.max_hp = hp
-					raft.current_hp = hp
+					raft.set("current_hp", hp)
 					raft.set_meta("is_kamikaze", true)
 
-		# ── Sea Mine ──────────────────────────────────────────────────────────
+		# ── Sea Mine ──────────────────────────────────────────────────
 		"sea_mine":
-			var x_norm  = float(event.get("x", 0.0))
-			var x_world = clampf(normalized_to_world_x(x_norm), -5.2, 5.2)
+			var x_norm := float(event.get("x", 0.0))
+			var x_world := clampf(normalized_to_world_x(x_norm), -5.2, 5.2)
 			if sea_mine_scene:
-				var mine = sea_mine_scene.instantiate() as Node3D
+				var mine := sea_mine_scene.instantiate() as Node3D
 				add_child(mine)
 				mine.global_position = Vector3(x_world, 0.0, z_spawn)
 
-		# ── Reef hazard ───────────────────────────────────────────────────────
+		# ── Reef hazard ───────────────────────────────────────────────
 		"reef_hazard":
-			var x_norm   = float(event.get("x", 0.0))
-			var scale_x  = clampf(float(event.get("scale_x", 1.2)), 0.6, 2.5)
-			var scale_z  = clampf(float(event.get("scale_z", 1.0)), 0.8, 1.5)
-			var half_w   = 1.2 * scale_x
-			var x_world  = clampf(normalized_to_world_x(x_norm), -5.8 + half_w, 5.8 - half_w)
-			var reef_prefab = preload("res://src/gameplay/obstacles/hazard_reef.tscn")
+			var x_norm := float(event.get("x", 0.0))
+			var scale_x := clampf(float(event.get("scale_x", 1.2)), 0.6, 2.5)
+			var scale_z := clampf(float(event.get("scale_z", 1.0)), 0.8, 1.5)
+			var half_w := 1.2 * scale_x
+			var x_world := clampf(normalized_to_world_x(x_norm), -5.8 + half_w, 5.8 - half_w)
+			var reef_prefab := preload("res://src/gameplay/obstacles/hazard_reef.tscn")
 			if reef_prefab:
-				var reef = reef_prefab.instantiate() as Area3D
+				var reef := reef_prefab.instantiate() as Area3D
 				add_child(reef)
 				reef.global_position = Vector3(x_world, 0.0, z_spawn)
 				reef.scale = Vector3(scale_x, 1.0, scale_z)
 
 
-		# ── Armored Turtle Rafts ───────────────────────────────────────────────
+		# ── Armored Turtle Rafts ───────────────────────────────────────
 		"turtle_rafts":
 			var x_positions: Array = event.get("x_positions", [0.0])
-			var hp         = int(event.get("hp", 6))
-			var cur_lvl = GameState.current_level if has_node("/root/GameState") else 1
+			var hp := int(event.get("hp", 6))
+			var cur_lvl := GameState.current_level if has_node("/root/GameState") else 1
 			if cur_lvl <= 1 and hp > 6:
 				hp = 6
-			var raft_speed = float(event.get("speed", 1.8))
-			for x_norm in x_positions:
-				var x_world = clampf(normalized_to_world_x(float(x_norm)), -4.4, 4.4)
+			var raft_speed := float(event.get("speed", 1.8))
+			for x_norm: Variant in x_positions:
+				var x_world := clampf(normalized_to_world_x(float(x_norm)), -4.4, 4.4)
 				if enemy_mob_scene:
-					var enemy = enemy_mob_scene.instantiate() as Area3D
+					var enemy := enemy_mob_scene.instantiate() as EnemyMob
 					add_child(enemy)
 					enemy.global_position = Vector3(x_world, 0.1, z_spawn)
-					var turtle_data = preload("res://src/data/resources/enemy_vessels/turtle_raft.tres")
+					var turtle_data := preload("res://src/data/resources/enemy_vessels/turtle_raft.tres")
 					if enemy.has_method("apply_enemy_data"):
 						enemy.apply_enemy_data(turtle_data)
 					enemy.max_hp        = hp
-					enemy.current_hp    = hp
+					enemy.set("current_hp", hp)
 					enemy.forward_speed = raft_speed
 
-		# ── Barricade wall ────────────────────────────────────────────────────
+		# ── Barricade wall ────────────────────────────────────────────
 		"barricade":
-			var x_points = event.get("x_points", [-0.8, -0.4, 0.0, 0.4, 0.8])
-			var hp       = int(event.get("hp", 2))
+			var x_points: Variant = event.get("x_points", [-0.8, -0.4, 0.0, 0.4, 0.8])
+			var hp := int(event.get("hp", 2))
 			var hp_values: Array = event.get("hp_values", [])
 			if barricade_scene:
-				var wall = barricade_scene.instantiate() as Node3D
+				var wall := barricade_scene.instantiate() as Node3D
 				add_child(wall)
 				wall.global_position = Vector3(0.0, 0.0, z_spawn)
-				if "x_points" in wall: wall.x_points = x_points
-				if "hp" in wall: wall.hp = hp
-				if "hp_values" in wall: wall.hp_values = hp_values
+				if "x_points" in wall: wall.set("x_points", x_points)
+				if "hp" in wall: wall.set("hp", hp)
+				if "hp_values" in wall: wall.set("hp_values", hp_values)
 
-		# ── Reinforced gate (Ironwood) ─────────────────────────────────────────
+		# ── Reinforced gate (Ironwood) ─────────────────────────────────
 		"reinforced_gate":
 			if reinforced_gate_scene:
-				var gate    = reinforced_gate_scene.instantiate() as Node3D
-				var gate_hp = int(event.get("hp", 50))
-				if "lock_hp" in gate: gate.lock_hp = gate_hp
+				var gate := reinforced_gate_scene.instantiate() as Node3D
+				var gate_hp := int(event.get("hp", 50))
+				if "lock_hp" in gate: gate.set("lock_hp", gate_hp)
 				add_child(gate)
 				gate.global_position = Vector3(0.0, 0.0, z_spawn)
 
-		# ── Mixed wave ────────────────────────────────────────────────────────
+		# ── Mixed wave ────────────────────────────────────────────────
 		"mixed_wave":
 			var barrel_positions: Array = event.get("barrel_positions", [])
-			var barrel_hp   = int(event.get("barrel_hp", 4))
+			var barrel_hp := int(event.get("barrel_hp", 4))
 			var barrel_type: String = event.get("barrel_type", "wooden")
-			for x_norm in barrel_positions:
-				var x_world = clampf(normalized_to_world_x(float(x_norm)), -5.2, 5.2)
+			for x_norm: Variant in barrel_positions:
+				var x_world := clampf(normalized_to_world_x(float(x_norm)), -5.2, 5.2)
 				if barrel_scene:
-					var barrel = barrel_scene.instantiate() as Area3D
+					var barrel := barrel_scene.instantiate() as DestructibleObstacle
 					add_child(barrel)
 					barrel.global_position = Vector3(x_world, 0.05, z_spawn)
 					barrel.hp = barrel_hp
-					if "obstacle_type" in barrel:
-						if barrel_type == "fuse":
-							barrel.obstacle_type = DestructibleObstacle.ObstacleType.FUSE_BARREL
-						else:
-							barrel.obstacle_type = DestructibleObstacle.ObstacleType.WOODEN_BARREL
+					if barrel_type == "fuse":
+						barrel.obstacle_type = DestructibleObstacle.ObstacleType.FUSE_BARREL
+					else:
+						barrel.obstacle_type = DestructibleObstacle.ObstacleType.WOODEN_BARREL
 
 			var mob_positions: Array = event.get("mob_positions", [])
-			var mob_hp        = int(event.get("mob_hp", 6))
+			var mob_hp := int(event.get("mob_hp", 6))
 			var mob_type: String = event.get("mob_type", "skeleton_rower")
-			var mob_speed     = float(event.get("mob_speed", 2.0))
-			for x_norm in mob_positions:
-				var x_world = clampf(normalized_to_world_x(float(x_norm)), -4.2, 4.2)
+			var mob_speed := float(event.get("mob_speed", 2.0))
+			for x_norm: Variant in mob_positions:
+				var x_world := clampf(normalized_to_world_x(float(x_norm)), -4.2, 4.2)
 				if enemy_mob_scene:
-					var mob = enemy_mob_scene.instantiate() as Area3D
+					var mob := enemy_mob_scene.instantiate() as EnemyMob
 					add_child(mob)
 					mob.global_position = Vector3(x_world, 0.1, z_spawn + 2.0)
 					var mob_data: EnemyData = null
@@ -825,16 +825,16 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 					if mob.has_method("apply_enemy_data") and mob_data:
 						mob.apply_enemy_data(mob_data)
 					mob.max_hp        = mob_hp
-					mob.current_hp    = mob_hp
+					mob.set("current_hp", mob_hp)
 					mob.forward_speed = mob_speed
 
-		# ── HUD alert/warning ────────────────────────────────────────────────
+		# ── HUD alert/warning ─────────────────────────────────────────
 		"warning":
-			var top_hud = get_tree().get_first_node_in_group("top_hud")
+			var top_hud := get_tree().get_first_node_in_group("top_hud")
 			if top_hud and top_hud.has_method("show_warning_alert"):
-				top_hud.show_warning_alert(event.get("message", "DANGER AHEAD!"))
+				top_hud.call("show_warning_alert", event.get("message", "DANGER AHEAD!"))
 
-		# ── Boss trigger ─────────────────────────────────────────────────────
+		# ── Boss trigger ──────────────────────────────────────────────
 		"boss":
 			_spawn_boss()
 
@@ -848,38 +848,39 @@ func _spawn_boss() -> void:
 	GameState.boss_spawned = true
 	EventBus.distance_target_reached.emit()
 
-	var player   = get_tree().get_first_node_in_group("player")
-	var player_z = player.global_position.z if player else 0.0
+	var player := get_tree().get_first_node_in_group("player") as Node3D
+	var player_z: float = player.global_position.z if player else 0.0
 
 	# Fully halt all scrolling
 	base_scroll_speed = 0.0
-	var track_mgr = get_tree().get_first_node_in_group("track_manager")
+	var track_mgr := get_tree().get_first_node_in_group("track_manager")
 	if track_mgr:
-		track_mgr.scroll_speed = 0.0
+		track_mgr.set("scroll_speed", 0.0)
 
 	# Clean up track obstacles in the arena so the boss channel is completely clear
-	for grp in ["obstacles", "destructible_obstacles", "multiplier_gate"]:
+	for grp: String in ["obstacles", "destructible_obstacles", "multiplier_gate"]:
 		for obs in get_tree().get_nodes_in_group(grp):
 			if is_instance_valid(obs) and not obs.is_in_group("boss") and not (obs is BossWarBarge) and not (obs is BossComponentDelegate) and not (obs is BossBoneBeard):
 				obs.queue_free()
 
-	var spawn_prefab = boss_scene
-	if level_data and "boss_scene" in level_data and level_data.boss_scene:
-		spawn_prefab = level_data.boss_scene
+	var spawn_prefab := boss_scene
+	if level_data and "boss_scene" in level_data and level_data.get("boss_scene"):
+		spawn_prefab = level_data.get("boss_scene") as PackedScene
 
 	if spawn_prefab:
-		var boss      = spawn_prefab.instantiate() as Node3D
-		if level_data and "boss_hp" in level_data and level_data.boss_hp > 0:
+		var boss := spawn_prefab.instantiate() as Node3D
+		var b_hp: int = int(level_data.get("boss_hp")) if (level_data and "boss_hp" in level_data) else 0
+		if b_hp > 0:
 			if "max_hp" in boss:
-				boss.max_hp = level_data.boss_hp
-				boss.current_hp = level_data.boss_hp
+				boss.set("max_hp", b_hp)
+				boss.set("current_hp", b_hp)
 			if boss is BossSiegeFortress:
-				var scale_factor: float = float(level_data.boss_hp) / 800.0
+				var scale_factor: float = float(b_hp) / 800.0
 				boss.hp_port_turret = int(round(150.0 * scale_factor))
 				boss.hp_starboard_turret = int(round(150.0 * scale_factor))
 				boss.hp_prow_ram = int(round(150.0 * scale_factor))
-				boss.hp_furnace_core = level_data.boss_hp - (boss.hp_port_turret + boss.hp_starboard_turret + boss.hp_prow_ram)
-		var main_root = get_tree().current_scene
+				boss.hp_furnace_core = b_hp - (boss.hp_port_turret + boss.hp_starboard_turret + boss.hp_prow_ram)
+		var main_root := get_tree().current_scene
 		if main_root:
 			main_root.add_child(boss)
 		else:
@@ -887,14 +888,14 @@ func _spawn_boss() -> void:
 		boss.global_position = Vector3(0.0, 0.0, player_z - 35.0)
 		print("[BOSS] Spawned boss for %s with HP: %s at Z = %.1f (35m buffer zone)" % [
 			level_data.level_title if level_data else "Level",
-			str(level_data.boss_hp) if (level_data and "boss_hp" in level_data) else "default",
+			str(b_hp) if b_hp > 0 else "default",
 			boss.global_position.z
 		])
 
 		# Lock camera to boss arena
-		var camera = get_tree().get_first_node_in_group("game_camera")
+		var camera := get_tree().get_first_node_in_group("game_camera")
 		if camera and camera.has_method("start_boss_focus"):
-			camera.start_boss_focus(boss)
+			camera.call("start_boss_focus", boss)
 
 ## Jumps directly to the boss chunk / arena encounter for isolated testing.
 func jump_to_boss() -> void:
@@ -904,9 +905,9 @@ func jump_to_boss() -> void:
 	current_distance = 250.0
 	GameState.distance_traveled = 250.0
 	base_scroll_speed = 0.0
-	var track_mgr = get_tree().get_first_node_in_group("track_manager")
+	var track_mgr := get_tree().get_first_node_in_group("track_manager")
 	if track_mgr:
-		track_mgr.scroll_speed = 0.0
+		track_mgr.set("scroll_speed", 0.0)
 	active_queue.clear()
 	_spawn_boss()
 	print("[LEVEL CONTROLLER] Jumped directly to boss encounter")
@@ -945,7 +946,7 @@ func _setup_boundary_walls() -> void:
 func _update_biome_music(biome_name: String) -> void:
 	if not AudioManager:
 		return
-	var music_track = "music_tropical"
+	var music_track := "music_tropical"
 	match biome_name.to_lower():
 		"bayou":
 			music_track = "music_bayou"
@@ -962,11 +963,11 @@ func _update_biome_music(biome_name: String) -> void:
 # ── Riverbank Chunk Overlap Guard & Recycling System ─────────────────────────
 
 func _setup_riverbank_chunks(biome_name: String) -> void:
-	var valid_chunks = riverbank_chunks.filter(func(c): return is_instance_valid(c))
+	var valid_chunks: Array = riverbank_chunks.filter(func(c: Variant) -> bool: return is_instance_valid(c))
 	var left_chunks: Array[Node3D] = []
 	var right_chunks: Array[Node3D] = []
-	for chunk in valid_chunks:
-		if "side" in chunk and chunk.side == "right":
+	for chunk: Node3D in valid_chunks:
+		if "side" in chunk and chunk.get("side") == "right":
 			right_chunks.append(chunk)
 		else:
 			left_chunks.append(chunk)
@@ -976,14 +977,16 @@ func _setup_riverbank_chunks(biome_name: String) -> void:
 		print("[RIVERBANK CHUNKS] Reusing pool of 8 chunks (4 left, 4 right). Offsets reset to [20, -20, -60, -100]m for biome %s" % biome_name)
 		for i in range(4):
 			left_chunks[i].global_position = Vector3(0.0, 0.0, 20.0 - i * 40.0)
-			left_chunks[i].setup("left", 40.0, biome_name)
+			if left_chunks[i].has_method("setup"):
+				left_chunks[i].call("setup", "left", 40.0, biome_name)
 			right_chunks[i].global_position = Vector3(0.0, 0.0, 20.0 - i * 40.0)
-			right_chunks[i].setup("right", 40.0, biome_name)
+			if right_chunks[i].has_method("setup"):
+				right_chunks[i].call("setup", "right", 40.0, biome_name)
 		return
 
 	# Otherwise, clear and eliminate any duplicate or orphaned chunks in tree
-	var purged = 0
-	for child in get_children():
+	var purged := 0
+	for child: Node in get_children():
 		if child.is_in_group("riverbank_chunk"):
 			child.queue_free()
 			purged += 1
@@ -993,14 +996,14 @@ func _setup_riverbank_chunks(biome_name: String) -> void:
 
 	var props_scene := preload("res://src/gameplay/levels/riverbank_props.tscn")
 	if props_scene:
-		for prop_side in ["left", "right"]:
+		for prop_side: String in ["left", "right"]:
 			for i in range(4):
-				var chunk := props_scene.instantiate()
+				var chunk := props_scene.instantiate() as Node3D
 				chunk.name = "RiverbankChunk_%s_%d" % [prop_side.capitalize(), i]
 				add_child(chunk)
 				chunk.global_position = Vector3(0.0, 0.0, 20.0 - i * 40.0)
 				if chunk.has_method("setup"):
-					chunk.setup(prop_side, 40.0, biome_name)
+					chunk.call("setup", prop_side, 40.0, biome_name)
 				riverbank_chunks.append(chunk)
 		print("[RIVERBANK CHUNKS] Instantiated fresh pool of 8 chunks (4 left, 4 right) with 0 initial overlaps.")
 
@@ -1012,7 +1015,7 @@ func _scroll_riverbank_chunks(delta_z: float) -> void:
 	var right_chunks: Array[Node3D] = []
 	for chunk in riverbank_chunks:
 		if is_instance_valid(chunk):
-			if "side" in chunk and chunk.side == "right":
+			if "side" in chunk and chunk.get("side") == "right":
 				right_chunks.append(chunk)
 			else:
 				left_chunks.append(chunk)
@@ -1036,10 +1039,10 @@ func _advance_and_wrap_side(chunks: Array[Node3D], delta_z: float) -> void:
 		return
 
 	# Sort furthest forward first
-	wrapping.sort_custom(func(a, b): return a.global_position.z > b.global_position.z)
+	wrapping.sort_custom(func(a: Variant, b: Variant) -> bool: return a.global_position.z > b.global_position.z)
 
 	for chunk in wrapping:
-		var c_len: float = chunk.chunk_length if "chunk_length" in chunk else 40.0
+		var c_len: float = float(chunk.get("chunk_length")) if "chunk_length" in chunk else 40.0
 		# Find the rearmost position among active chunks on this side
 		var min_z := INF
 		for other in chunks:
@@ -1060,7 +1063,7 @@ func run_blinking_diagnostic() -> Dictionary:
 	var positions: Dictionary = {}
 	var dupes: int = 0
 	var meshes: Array[MeshInstance3D] = []
-	for group in ["scenery", "riverbank_chunk"]:
+	for group: String in ["scenery", "riverbank_chunk"]:
 		for parent in get_tree().get_nodes_in_group(group):
 			if parent is Node:
 				_collect_diagnostic_meshes(parent, meshes)
@@ -1069,7 +1072,7 @@ func run_blinking_diagnostic() -> Dictionary:
 		if is_instance_valid(mesh) and mesh.is_inside_tree() and mesh.is_visible_in_tree():
 			if "water" in mesh.name.to_lower() or "backdrop" in mesh.name.to_lower():
 				continue
-			var key = "%0.1f_%0.1f" % [mesh.global_position.x, mesh.global_position.z]
+			var key := "%0.1f_%0.1f" % [mesh.global_position.x, mesh.global_position.z]
 			if positions.has(key):
 				print("[DUPLICATE DETECTED] Two meshes at same spot: %s - '%s' vs '%s'" % [key, mesh.name, positions[key]])
 				dupes += 1

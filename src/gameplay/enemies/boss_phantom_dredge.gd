@@ -57,9 +57,9 @@ func _ready() -> void:
 	add_to_group("boss")
 	
 	if has_node("/root/GameState"):
-		var gs = get_node("/root/GameState")
+		var gs: Node = get_node("/root/GameState")
 		if "current_level" in gs:
-			var lvl: int = gs.current_level
+			var lvl: int = int(gs.get("current_level"))
 			if lvl <= 10:
 				max_hp = 550
 			elif lvl <= 25:
@@ -74,10 +74,10 @@ func _ready() -> void:
 		visual_container.scale = Vector3(1.00, 1.00, 1.00)
 		visual_container.rotation_degrees = Vector3(0.0, 178.0, 0.0)
 		if visual_container is Sprite3D:
-			visual_container.pixel_size = 0.0021
+			(visual_container as Sprite3D).pixel_size = 0.0021
 		for child in visual_container.get_children():
 			if child is Sprite3D:
-				child.pixel_size = 0.0021
+				(child as Sprite3D).pixel_size = 0.0021
 	
 	EventBus.boss_spawned_event.emit("The Phantom Dredge", max_hp)
 	EventBus.boss_health_changed.emit(current_hp, max_hp)
@@ -87,22 +87,23 @@ func _physics_process(delta: float) -> void:
 	if _is_defeated or current_state == State.DYING:
 		return
 		
-	var player = get_tree().get_first_node_in_group("player")
-	var player_z = player.global_position.z if player else 0.0
+	var player := get_tree().get_first_node_in_group("player") as Node3D
+	var player_z: float = player.global_position.z if player and is_instance_valid(player) else 0.0
 	_target_z = player_z + combat_z_offset
 	
 	match current_state:
 		State.APPROACHING:
-			global_position.z = move_toward(global_position.z, _target_z, approach_speed * delta)
-			if abs(global_position.z - _target_z) < 0.5:
-				current_state = State.COMBAT
-				_attack_timer = 0.5
-				
+			_process_approaching(delta)
 		State.COMBAT:
 			_process_combat(delta)
-			
 		State.SUBMERGED:
 			_process_submerged(delta)
+
+func _process_approaching(delta: float) -> void:
+	global_position.z = move_toward(global_position.z, _target_z, approach_speed * delta)
+	if absf(global_position.z - _target_z) < 1.0:
+		current_state = State.COMBAT
+		AudioManager.play_sfx("water_splashes", 0.7, 0.9, 2.0)
 
 func _process_combat(delta: float) -> void:
 	combat_time += delta
@@ -120,7 +121,7 @@ func _process_combat(delta: float) -> void:
 	# PAUSE direct boss cannon fire while geysers are channeling/warning/active
 	if not is_barrage_active:
 		_cannon_timer += delta
-		var cannon_cd = attack_interval if current_phase == 1 else (attack_interval * 0.8 if current_phase == 2 else attack_interval * 0.6)
+		var cannon_cd: float = attack_interval if current_phase == 1 else (attack_interval * 0.8 if current_phase == 2 else attack_interval * 0.6)
 		if _cannon_timer >= cannon_cd:
 			_cannon_timer = 0.0
 			_fire_spectral_cannon_volley()
@@ -128,7 +129,7 @@ func _process_combat(delta: float) -> void:
 	# Poison Mortar / Geysers (paused if hazard spawning disabled or during active barrage)
 	if spawn_hazard_enabled and not is_barrage_active:
 		_mortar_timer += delta
-		var mortar_cooldown = 3.5 if current_phase == 1 else (2.5 if current_phase == 2 else 1.6)
+		var mortar_cooldown: float = 3.5 if current_phase == 1 else (2.5 if current_phase == 2 else 1.6)
 		if _mortar_timer >= mortar_cooldown:
 			_mortar_timer = 0.0
 			_fire_poison_mortars()
@@ -136,7 +137,7 @@ func _process_combat(delta: float) -> void:
 	# Submerge cycle in Phase 2 & 3
 	if current_phase >= 2:
 		_submerge_timer += delta
-		var submerge_cd = 9.0 if current_phase == 2 else 6.5
+		var submerge_cd: float = 9.0 if current_phase == 2 else 6.5
 		if _submerge_timer >= submerge_cd:
 			_submerge_timer = 0.0
 			_start_submerge()
@@ -144,7 +145,7 @@ func _process_combat(delta: float) -> void:
 			
 	# Minion Skiff Spawns
 	_minion_timer += delta
-	var minion_cd = 3.8 if current_phase == 1 else (2.8 if current_phase == 2 else 2.0)
+	var minion_cd: float = 3.8 if current_phase == 1 else (2.8 if current_phase == 2 else 2.0)
 	if _minion_timer >= minion_cd:
 		_minion_timer = 0.0
 		_spawn_bayou_adds()
@@ -153,57 +154,54 @@ func _fire_spectral_cannon_volley() -> void:
 	if not enemy_cannonball_scene or current_state == State.SUBMERGED or _is_defeated or is_barrage_active:
 		return
 	AudioManager.play_sfx("cannon_shots", 0.85, 1.15, -2.0)
-	var player = get_tree().get_first_node_in_group("player")
-	var root = get_tree().current_scene
-	var spawn_parent = root if root else get_parent()
+	var player := get_tree().get_first_node_in_group("player") as Node3D
+	var root: Node = get_tree().current_scene
+	var spawn_parent: Node = root if root else get_parent()
 	if not spawn_parent:
 		return
 		
-	for offset_x in [-1.5, 1.5]:
-		var ball = enemy_cannonball_scene.instantiate() as Area3D
-		spawn_parent.add_child(ball)
-		ball.global_position = global_position + Vector3(offset_x, 0.6, 2.0)
-		if ball.has_method("set_color"):
+	for offset_x: float in [-1.5, 1.5]:
+		var ball := enemy_cannonball_scene.instantiate() as EnemyCannonball
+		if ball:
+			spawn_parent.add_child(ball)
+			ball.global_position = global_position + Vector3(offset_x, 0.6, 2.0)
 			ball.set_color(Color(0.2, 1.0, 0.75)) # Spectral ghost cyan/green
-		var fire_dir = Vector3(0, 0, 1) # Default downriver facing
-		if player and is_instance_valid(player):
-			var to_player = (player.global_position - ball.global_position)
-			to_player.y = 0.0
-			if to_player.length_squared() > 0.01:
-				fire_dir = to_player.normalized()
-				if fire_dir.z < 0.1:
-					fire_dir.z = 0.4
-					fire_dir = fire_dir.normalized()
-		if ball.has_method("setup"):
+			var fire_dir := Vector3(0, 0, 1) # Default downriver facing
+			if player and is_instance_valid(player):
+				var to_player: Vector3 = (player.global_position - ball.global_position)
+				to_player.y = 0.0
+				if to_player.length_squared() > 0.01:
+					fire_dir = to_player.normalized()
+					if fire_dir.z < 0.1:
+						fire_dir.z = 0.4
+						fire_dir = fire_dir.normalized()
 			ball.setup(fire_dir, null, null)
-		if "direction" in ball:
 			ball.direction = fire_dir
-		if "speed" in ball:
 			ball.speed = 18.0
 
 func _fire_poison_mortars() -> void:
 	if not spawn_hazard_enabled or is_barrage_active:
 		return
-	var player = get_tree().get_first_node_in_group("player")
+	var player := get_tree().get_first_node_in_group("player") as Node3D
 	if not player or not is_instance_valid(player):
 		return
 		
 	# Select which lateral lane to leave GUARANTEED clear:
 	# Available lateral lanes: -3.2 (Left), 0.0 (Center), 3.2 (Right)
-	var lanes = [-3.2, 0.0, 3.2]
-	var safe_lane = lanes.pick_random()
-	var attack_lanes = lanes.filter(func(l): return l != safe_lane)
+	var lanes: Array[float] = [-3.2, 0.0, 3.2]
+	var safe_lane: float = lanes.pick_random()
+	var attack_lanes: Array = lanes.filter(func(l: Variant) -> bool: return l != safe_lane)
 	
 	is_barrage_active = true
-	var count = min(attack_lanes.size(), 2)
+	var count: int = mini(attack_lanes.size(), 2)
 	for i in range(count):
-		var target_lane_x = attack_lanes[i]
-		get_tree().create_timer(i * 0.25).timeout.connect(func():
+		var target_lane_x: float = float(attack_lanes[i])
+		get_tree().create_timer(i * 0.25).timeout.connect(func() -> void:
 			if _is_defeated or not is_instance_valid(self):
 				is_barrage_active = false
 				return
-			var target_pos = Vector3(target_lane_x + randf_range(-0.15, 0.15), 0, player.global_position.z + randf_range(-1.2, 1.2))
-			var is_last = (i == count - 1)
+			var target_pos := Vector3(target_lane_x + randf_range(-0.15, 0.15), 0, player.global_position.z + randf_range(-1.2, 1.2))
+			var is_last: bool = (i == count - 1)
 			_telegraph_and_strike_mortar(target_pos, is_last)
 		)
 
@@ -213,10 +211,10 @@ func _telegraph_and_strike_mortar(pos: Vector3, is_last: bool = false) -> void:
 			is_barrage_active = false
 		return
 
-	var tele_duration = maxf(1.6, hazard_telegraph_time)
-	var scene_to_use = telegraph_geyser_scene
-	var tree = get_tree()
-	var root = tree.current_scene if tree else null
+	var tele_duration := maxf(1.6, hazard_telegraph_time)
+	var scene_to_use := telegraph_geyser_scene
+	var tree := get_tree()
+	var root: Node = tree.current_scene if tree else null
 	if not root:
 		root = get_parent()
 	if not root:
@@ -227,67 +225,72 @@ func _telegraph_and_strike_mortar(pos: Vector3, is_last: bool = false) -> void:
 	AudioManager.play_sfx("cannon_shots", 0.8, 1.0)
 
 	if scene_to_use:
-		var marker = scene_to_use.instantiate()
+		var marker := scene_to_use.instantiate() as TelegraphSpectralGeyser
+		if marker:
+			root.add_child(marker)
+			marker.global_position = Vector3(pos.x, 0.03, pos.z)
+			marker.setup(tele_duration, 1.6)
+			var vfx_scene := explosion_scene
+			marker.countdown_finished.connect(func(detonation_pos: Vector3) -> void:
+				BossPhantomDredge.execute_poison_mortar_detonation(detonation_pos, vfx_scene, tree)
+				if is_last:
+					tree.create_timer(0.4).timeout.connect(func() -> void:
+						is_barrage_active = false
+					)
+			)
+	else:
+		var marker := MeshInstance3D.new()
+		var disc := CylinderMesh.new()
+		disc.top_radius = 1.6
+		disc.bottom_radius = 1.6
+		disc.height = 0.04
+		marker.mesh = disc
+		
+		var mat := StandardMaterial3D.new()
+		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		mat.albedo_color = Color(0.1, 0.9, 0.3, 0.25)
+		marker.material_override = mat
 		root.add_child(marker)
-		marker.global_position = Vector3(pos.x, 0.03, pos.z)
-		marker.setup(tele_duration, 1.6)
-		var vfx_scene = explosion_scene
-		marker.countdown_finished.connect(func(detonation_pos: Vector3):
-			BossPhantomDredge.execute_poison_mortar_detonation(detonation_pos, vfx_scene, tree)
+		marker.global_position = Vector3(pos.x, 0.02, pos.z)
+		
+		var tween := marker.create_tween()
+		tween.tween_property(mat, "albedo_color:a", 0.85, tele_duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		var vfx_scene := explosion_scene
+		tween.chain().tween_callback(func() -> void:
+			if is_instance_valid(marker):
+				marker.queue_free()
+			BossPhantomDredge.execute_poison_mortar_detonation(pos, vfx_scene, tree)
 			if is_last:
-				tree.create_timer(0.4).timeout.connect(func():
+				tree.create_timer(0.4).timeout.connect(func() -> void:
 					is_barrage_active = false
 				)
 		)
-	else:
-		var marker = MeshInstance3D.new()
-		var disc = CylinderMesh.new()
-		disc.top_radius = 1.6
-		disc.bottom_radius = 1.6
-		disc.height = 0.02
-		marker.mesh = disc
-		
-		var mat = StandardMaterial3D.new()
-		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		mat.albedo_color = Color(0.1, 0.9, 0.3, 0.35)
-		marker.material_override = mat
-		root.add_child(marker)
-		marker.global_position = Vector3(pos.x, 0.03, pos.z)
-		
-		var tween = marker.create_tween()
-		var vfx_scene = explosion_scene
-		tween.tween_property(mat, "albedo_color:a", 0.8, tele_duration)
-		tween.tween_callback(Callable(BossPhantomDredge, "execute_poison_mortar_detonation").bind(marker.global_position, vfx_scene, tree))
-		tween.tween_callback(func():
-			if is_last:
-				is_barrage_active = false
-		)
-		tween.tween_callback(marker.queue_free)
 
 static func execute_poison_mortar_detonation(pos: Vector3, vfx_prefab: PackedScene, tree: SceneTree) -> void:
 	if not tree:
 		return
-	AudioManager.play_sfx("barrel_breaks", 0.7, 0.9, 2.0)
-	AudioManager.play_sfx("water_splashes", 0.7, 0.9)
+	AudioManager.play_sfx("water_splashes", 0.7, 0.9, 3.0)
+	AudioManager.play_sfx("barrel_breaks", 0.6, 0.8, 1.0)
 	
 	if vfx_prefab:
-		var vfx = vfx_prefab.instantiate() as Node3D
-		var root = tree.current_scene
-		if root:
+		var vfx := vfx_prefab.instantiate() as Node3D
+		var root: Node = tree.current_scene
+		if root and vfx:
 			root.add_child(vfx)
-		vfx.global_position = pos
-		vfx.scale = Vector3(2.0, 2.0, 2.0)
-		vfx.modulate = Color(0.2, 2.0, 0.6, 1.0)
+			vfx.global_position = pos
+			vfx.scale = Vector3(2.0, 2.0, 2.0)
+			if "modulate" in vfx:
+				vfx.set("modulate", Color(0.2, 2.0, 0.6, 1.0))
 		
-	var camera = tree.get_first_node_in_group("game_camera")
+	var camera := tree.get_first_node_in_group("game_camera") as GameCamera
 	if camera and camera.has_method("shake"):
 		camera.shake(0.20, 0.20)
 		
-	var player = tree.get_first_node_in_group("player")
+	var player := tree.get_first_node_in_group("player") as PlayerSwerve
 	if player and is_instance_valid(player):
-		var dist = player.global_position.distance_to(pos)
-		if dist <= 1.7 and player.has_method("damage_fleet"):
+		var dist: float = player.global_position.distance_to(pos)
+		if dist <= 1.7:
 			player.damage_fleet(1)
 
 func _detonate_poison_mortar(pos: Vector3) -> void:
@@ -300,7 +303,7 @@ func _start_submerge() -> void:
 	
 	# Submerge animation: Dive down below the water plane (Y = -3.5)
 	if visual_container:
-		var tween = create_tween().set_parallel(true)
+		var tween := create_tween().set_parallel(true)
 		tween.tween_property(visual_container, "position:y", -3.5, 0.8).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 		
 	# Disable hitbox while underwater
@@ -310,7 +313,7 @@ func _start_submerge() -> void:
 		
 	# Emit 3 expanding shockwaves
 	for i in range(3):
-		get_tree().create_timer(i * 0.9).timeout.connect(func():
+		get_tree().create_timer(i * 0.9).timeout.connect(func() -> void:
 			if _is_defeated or not is_instance_valid(self):
 				return
 			_emit_water_shockwave()
@@ -320,13 +323,13 @@ func _start_submerge() -> void:
 	_rain_submerged_mobs()
 
 func _rain_submerged_mobs() -> void:
-	var lanes = [-3.0, 3.0, -1.5, 1.5, 0.0, -2.5, 2.5]
-	var count = 6 if current_phase >= 2 else 5
+	var lanes: Array[float] = [-3.0, 3.0, -1.5, 1.5, 0.0, -2.5, 2.5]
+	var count := 6 if current_phase >= 2 else 5
 	print("[BOSS SUBMERGED] Raining %d mobs on the player!" % count)
 	for i in range(count):
-		var delay = 0.35 + (i * 0.45)
-		var lane_x = lanes[i % lanes.size()]
-		get_tree().create_timer(delay).timeout.connect(func():
+		var delay: float = 0.35 + (i * 0.45)
+		var lane_x: float = lanes[i % lanes.size()]
+		get_tree().create_timer(delay).timeout.connect(func() -> void:
 			if _is_defeated or not is_instance_valid(self):
 				return
 			_spawn_bayou_adds(lane_x, i % 2)
@@ -341,13 +344,13 @@ func _process_submerged(delta: float) -> void:
 
 func _emit_water_shockwave() -> void:
 	AudioManager.play_sfx("water_splashes", 0.8, 1.1)
-	var shockwave = MeshInstance3D.new()
-	var torus = TorusMesh.new()
+	var shockwave := MeshInstance3D.new()
+	var torus := TorusMesh.new()
 	torus.inner_radius = 1.0
 	torus.outer_radius = 1.5
 	shockwave.mesh = torus
 	
-	var mat = StandardMaterial3D.new()
+	var mat := StandardMaterial3D.new()
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	mat.albedo_color = Color(0.1, 0.95, 0.7, 0.6)
@@ -355,14 +358,14 @@ func _emit_water_shockwave() -> void:
 	get_tree().current_scene.add_child(shockwave)
 	shockwave.global_position = Vector3(global_position.x, 0.05, global_position.z)
 	
-	var tween = shockwave.create_tween().set_parallel(true)
+	var tween := shockwave.create_tween().set_parallel(true)
 	tween.tween_property(shockwave, "scale", Vector3(5.5, 1.0, 5.5), 1.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tween.tween_property(mat, "albedo_color:a", 0.0, 1.2)
-	tween.chain().tween_callback(func():
+	tween.chain().tween_callback(func() -> void:
 		shockwave.queue_free()
 	)
 	
-	var camera = get_tree().get_first_node_in_group("game_camera")
+	var camera := get_tree().get_first_node_in_group("game_camera") as GameCamera
 	if camera and camera.has_method("shake"):
 		camera.shake(0.18, 0.16)
 
@@ -371,7 +374,7 @@ func _resurface() -> void:
 	AudioManager.play_sfx("water_splashes", 0.6, 0.8, 3.0)
 	
 	if visual_container:
-		var tween = create_tween().set_parallel(true)
+		var tween := create_tween().set_parallel(true)
 		tween.tween_property(visual_container, "position:y", _base_y, 0.6).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		
 	if hit_box:
@@ -383,34 +386,36 @@ func _resurface() -> void:
 func _spawn_bayou_adds(lane_x_override: float = NAN, type_choice: int = -1) -> void:
 	if is_barrage_active:
 		return # Enforce add suppression: zero new adds while geysers are warning or active
-	var existing_enemies = get_tree().get_nodes_in_group("enemies").filter(
-		func(e): return is_instance_valid(e) and not e.is_in_group("boss") and not e.is_queued_for_deletion()
+	var existing_enemies := get_tree().get_nodes_in_group("enemies").filter(
+		func(e: Node) -> bool: return is_instance_valid(e) and not e.is_in_group("boss") and not e.is_queued_for_deletion()
 	)
 	if existing_enemies.size() >= max_active_adds:
 		return
 
-	var parent = get_tree().get_first_node_in_group("level_controller")
+	var parent: Node = get_tree().get_first_node_in_group("level_controller")
 	if not parent: parent = get_parent()
 	if not parent: return
 	
-	var lx = randf_range(-3.5, 3.5) if is_nan(lane_x_override) else lane_x_override
+	var lx: float = randf_range(-3.5, 3.5) if is_nan(lane_x_override) else lane_x_override
 	lx = clampf(lx, -4.2, 4.2)
-	var use_skiff = (randf() < 0.55) if type_choice < 0 else (type_choice == 0)
+	var use_skiff: bool = (randf() < 0.55) if type_choice < 0 else (type_choice == 0)
 	
 	if use_skiff and grave_skiff_scene:
-		var skiff = grave_skiff_scene.instantiate() as Area3D
-		parent.add_child(skiff)
-		skiff.global_position = Vector3(lx, 0.1, global_position.z + 4.0)
-		skiff.max_hp = 12 if current_phase >= 2 else 10
-		skiff.current_hp = skiff.max_hp
-		skiff.forward_speed = 3.0
+		var skiff := grave_skiff_scene.instantiate() as EnemyMob
+		if skiff:
+			parent.add_child(skiff)
+			skiff.global_position = Vector3(lx, 0.1, global_position.z + 4.0)
+			skiff.max_hp = 12 if current_phase >= 2 else 10
+			skiff.current_hp = skiff.max_hp
+			skiff.forward_speed = 3.0
 	elif tide_cutter_scene:
-		var cutter = tide_cutter_scene.instantiate() as Area3D
-		parent.add_child(cutter)
-		cutter.global_position = Vector3(lx, 0.1, global_position.z + 4.0)
-		cutter.max_hp = 16 if current_phase >= 2 else 14
-		cutter.current_hp = cutter.max_hp
-		cutter.forward_speed = 5.0
+		var cutter := tide_cutter_scene.instantiate() as EnemyMob
+		if cutter:
+			parent.add_child(cutter)
+			cutter.global_position = Vector3(lx, 0.1, global_position.z + 4.0)
+			cutter.max_hp = 16 if current_phase >= 2 else 14
+			cutter.current_hp = cutter.max_hp
+			cutter.forward_speed = 5.0
 
 ## Ammo-aware damage entry point (SSOT Rule C).
 ## The Phantom Dredge is the Single Source of Truth for how it reacts to
@@ -432,14 +437,15 @@ func take_damage(amount: int) -> void:
 	EventBus.boss_health_changed.emit(current_hp, max_hp)
 	_flash_boss()
 	
-	var ft_script = load("res://src/vfx/floating_text.gd")
+	var ft_script := load("res://src/vfx/floating_text.gd") as GDScript
 	if ft_script:
-		var fct = ft_script.new()
-		var root = get_tree().current_scene
-		if root:
+		var fct: Node3D = ft_script.new() as Node3D
+		var root: Node = get_tree().current_scene
+		if root and fct:
 			root.add_child(fct)
 			fct.global_position = global_position + Vector3(randf_range(-0.8, 0.8), 2.0, randf_range(-0.8, 0.8))
-			fct.setup("-" + str(amount), Color(0.2, 1.0, 0.6))
+			if fct.has_method("setup"):
+				fct.call("setup", "-" + str(amount), Color(0.2, 1.0, 0.6))
 			
 	if current_hp <= 0:
 		boss_defeat()
@@ -472,11 +478,13 @@ func interrupt_channel() -> void:
 	if is_barrage_active:
 		is_barrage_active = false
 		print("[BOSS INTERRUPTED] Spectral Salt interrupted geyser barrage channel!")
-		var telegraphs = get_tree().get_nodes_in_group("spectral_geyser_telegraphs")
-		for tele in telegraphs:
+		var telegraphs := get_tree().get_nodes_in_group("spectral_geyser_telegraphs")
+		for tele: Node in telegraphs:
 			if is_instance_valid(tele):
-				if tele.has_method("cancel_and_cleanup"):
-					tele.cancel_and_cleanup()
+				if tele is TelegraphSpectralGeyser:
+					(tele as TelegraphSpectralGeyser).cancel_and_cleanup()
+				elif tele.has_method("cancel_and_cleanup"):
+					tele.call("cancel_and_cleanup")
 				else:
 					tele.queue_free()
 
@@ -489,36 +497,40 @@ func boss_defeat() -> void:
 	GameState.targets_destroyed += 1
 	
 	# Immediate cleanup of active telegraphs so lingering geysers don't damage player after victory
-	var telegraphs = get_tree().get_nodes_in_group("spectral_geyser_telegraphs")
-	for tele in telegraphs:
+	var telegraphs := get_tree().get_nodes_in_group("spectral_geyser_telegraphs")
+	for tele: Node in telegraphs:
 		if is_instance_valid(tele):
-			if tele.has_method("cancel_and_cleanup"):
-				tele.cancel_and_cleanup()
+			if tele is TelegraphSpectralGeyser:
+				(tele as TelegraphSpectralGeyser).cancel_and_cleanup()
+			elif tele.has_method("cancel_and_cleanup"):
+				tele.call("cancel_and_cleanup")
 			else:
 				tele.queue_free()
 	
 	# Series of massive green and fire explosions
-	var tween = create_tween()
+	var tween := create_tween()
 	for i in range(16):
-		tween.tween_callback(func():
+		tween.tween_callback(func() -> void:
 			if explosion_scene:
-				var vfx = explosion_scene.instantiate() as Node3D
-				get_tree().current_scene.add_child(vfx)
-				vfx.global_position = global_position + Vector3(randf_range(-3.5, 3.5), randf_range(0.2, 2.0), randf_range(-2.5, 2.5))
-				vfx.scale = Vector3.ONE * randf_range(2.0, 3.5)
-				vfx.modulate = Color(0.3, 1.8, 0.5, 1.0) if randf() < 0.6 else Color(2.0, 1.5, 0.4, 1.0)
+				var vfx := explosion_scene.instantiate() as Node3D
+				if vfx:
+					get_tree().current_scene.add_child(vfx)
+					vfx.global_position = global_position + Vector3(randf_range(-3.5, 3.5), randf_range(0.2, 2.0), randf_range(-2.5, 2.5))
+					vfx.scale = Vector3.ONE * randf_range(2.0, 3.5)
+					if "modulate" in vfx:
+						vfx.set("modulate", Color(0.3, 1.8, 0.5, 1.0) if randf() < 0.6 else Color(2.0, 1.5, 0.4, 1.0))
 			AudioManager.play_sfx("barrel_breaks", 0.5, 1.2, 2.0)
 		)
 		tween.tween_interval(0.11)
 		
-	tween.tween_callback(func():
+	tween.tween_callback(func() -> void:
 		AudioManager.stop_music()
 		AudioManager.play_sfx("gate_passes", 0.6, 0.8, 3.0)
 		AudioManager.play_sfx("coin_pickups", 0.9, 1.1, 4.0)
 		_spawn_doubloon_fountain()
 	)
 	tween.tween_interval(1.8)
-	tween.tween_callback(func():
+	tween.tween_callback(func() -> void:
 		GameState.is_game_active = false
 		GameState.unlock_next_level()
 		EventBus.level_completed.emit(GameState.doubloons, GameState.targets_destroyed)
@@ -529,9 +541,8 @@ func _spawn_doubloon_fountain() -> void:
 	if not doubloon_scene:
 		return
 	for i in range(180):
-		var d = doubloon_scene.instantiate() as Area3D
+		var d := doubloon_scene.instantiate() as CollectibleDoubloon
 		if d:
 			get_tree().current_scene.add_child(d)
 			d.global_position = Vector3(global_position.x, 0.1, global_position.z)
-			if d.has_method("_trigger_spawn_bounce"):
-				d._trigger_spawn_bounce(Vector2(randf_range(-4.0, 4.0), randf_range(-4.0, 4.0)))
+			d._trigger_spawn_bounce(Vector2(randf_range(-4.0, 4.0), randf_range(-4.0, 4.0)))

@@ -23,11 +23,11 @@ func _ready() -> void:
 	
 	var cur_level: int = 1
 	if has_node("/root/GameState"):
-		var gs = get_node("/root/GameState")
+		var gs: Node = get_node("/root/GameState")
 		if "current_level" in gs:
-			cur_level = int(gs.current_level)
+			cur_level = int(gs.get("current_level"))
 			
-	var tier_hp = get_tier_hp(cur_level)
+	var tier_hp: int = get_tier_hp(cur_level)
 	if cur_level <= 10:
 		if hp <= 1 or hp > tier_hp:
 			hp = tier_hp
@@ -40,7 +40,7 @@ func _ready() -> void:
 
 	
 	# Hide the default Sprite3D if it exists, as we will use a 3D log mesh
-	var default_sprite = get_node_or_null("ObstacleSprite")
+	var default_sprite := get_node_or_null("ObstacleSprite") as Node3D
 	if default_sprite:
 		default_sprite.visible = false
 		
@@ -68,8 +68,8 @@ func _physics_process(delta: float) -> void:
 	# When the player shoots a gap and steers through, the remaining intact slats
 	# must NEVER inflict leak_threat damage.
 	# Despawn once safely behind the player camera (+12m)
-	var player = get_tree().get_first_node_in_group("player")
-	var player_z = player.global_position.z if player else 0.0
+	var player := get_tree().get_first_node_in_group("player") as Node3D
+	var player_z: float = player.global_position.z if player else 0.0
 	if global_position.z > (player_z + 12.0):
 		queue_free()
 
@@ -104,19 +104,18 @@ func die() -> void:
 		return
 	collision_layer = 0
 	collision_mask = 0
-	var col = get_node_or_null("CollisionShape3D")
+	var col := get_node_or_null("CollisionShape3D") as CollisionShape3D
 	if col:
 		col.set_deferred("disabled", true)
 	set_deferred("monitoring", false)
 	set_deferred("monitorable", false)
 	
 	# Instantly hide 3D mesh and labels so slat visibly vanishes on death frame
-	var log_mesh = get_node_or_null("LogMesh")
+	var log_mesh := get_node_or_null("LogMesh") as Node3D
 	if log_mesh:
 		log_mesh.visible = false
 	if hp_label:
 		hp_label.visible = false
-	var obstacle_sprite = get_node_or_null("ObstacleSprite")
 	if obstacle_sprite:
 		obstacle_sprite.visible = false
 		
