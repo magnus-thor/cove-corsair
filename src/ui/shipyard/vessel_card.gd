@@ -36,6 +36,7 @@ var style_status_locked: StyleBoxFlat
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_init_styles()
+	_apply_card_border()
 	if click_button:
 		click_button.pressed.connect(_on_clicked)
 		click_button.mouse_entered.connect(_on_mouse_entered)
@@ -58,19 +59,19 @@ func _init_styles() -> void:
 	style_normal.shadow_size = 6
 	style_normal.shadow_offset = Vector2(0, 4)
 
-	# Selected Card Style (Glowing Gold Border)
+	# Selected Card Style (#38BDF8 sky-blue focus border — WCAG 2.1 AA 3:1 indicator)
 	style_selected = StyleBoxFlat.new()
-	style_selected.bg_color = Color(0.97, 0.93, 0.85, 1.0)
-	style_selected.border_width_left = 6
-	style_selected.border_width_top = 6
-	style_selected.border_width_right = 6
-	style_selected.border_width_bottom = 6
-	style_selected.border_color = Color(1.0, 0.82, 0.25, 1.0) # #FFD140
+	style_selected.bg_color = Color(0.043, 0.075, 0.122, 0.97)
+	style_selected.border_width_left = 3
+	style_selected.border_width_top = 3
+	style_selected.border_width_right = 3
+	style_selected.border_width_bottom = 3
+	style_selected.border_color = Color(0.22, 0.74, 0.97, 1.0) # #38BDF8 sky-blue
 	style_selected.corner_radius_top_left = 18
 	style_selected.corner_radius_top_right = 18
 	style_selected.corner_radius_bottom_right = 18
 	style_selected.corner_radius_bottom_left = 18
-	style_selected.shadow_color = Color(1.0, 0.8, 0.2, 0.45)
+	style_selected.shadow_color = Color(0.22, 0.74, 0.97, 0.5)
 	style_selected.shadow_size = 14
 	style_selected.shadow_offset = Vector2(0, 4)
 
@@ -137,14 +138,14 @@ func setup_vessel(v_id: String, index_num: int) -> void:
 		setup_mystery(index_num)
 		return
 		
-	var v_data = GameState.VESSEL_CATALOG[v_id]
+	var v_data: Dictionary = GameState.VESSEL_CATALOG[v_id]
 	if index_badge_label:
 		index_badge_label.text = str(index_num)
 	if title_label:
 		title_label.text = v_data["name"].to_upper()
 		
 	if preview_texture:
-		var tex_path = v_data["preview_texture"]
+		var tex_path: String = v_data["preview_texture"]
 		if ResourceLoader.exists(tex_path):
 			preview_texture.texture = load(tex_path)
 			preview_texture.modulate = Color.WHITE
@@ -167,7 +168,7 @@ func setup_mystery(index_num: int) -> void:
 		tier_badge.visible = false
 		
 	if preview_texture:
-		var sil_path = "res://assets/sprites/user_vessels/mystery_ship_silhouette.svg"
+		var sil_path: String = "res://assets/sprites/user_vessels/mystery_ship_silhouette.svg"
 		if ResourceLoader.exists(sil_path):
 			preview_texture.texture = load(sil_path)
 			preview_texture.modulate = Color(1, 1, 1, 0.85)
@@ -189,10 +190,10 @@ func update_status() -> void:
 	if is_mystery:
 		return
 		
-	var is_owned = GameState.is_vessel_owned(vessel_id)
-	var cur_tier = GameState.get_vessel_tier(vessel_id)
-	var is_active = (GameState.active_vessel == vessel_id)
-	var v_data = GameState.VESSEL_CATALOG[vessel_id]
+	var is_owned: bool = GameState.is_vessel_owned(vessel_id)
+	var cur_tier: int = GameState.get_vessel_tier(vessel_id)
+	var is_active: bool = (GameState.active_vessel == vessel_id)
+	var v_data: Dictionary = GameState.VESSEL_CATALOG[vessel_id]
 	
 	# Current Tier badge: e.g., "TIER 2 / 3"
 	if tier_badge:
@@ -221,7 +222,7 @@ func update_status() -> void:
 		if status_icon:
 			status_icon.visible = false
 	else:
-		var price = v_data["purchase_price"]
+		var price: int = v_data["purchase_price"]
 		if status_panel:
 			status_panel.add_theme_stylebox_override("panel", style_status_locked)
 		if status_label:
@@ -242,10 +243,21 @@ func _apply_card_border() -> void:
 		
 	if is_mystery:
 		add_theme_stylebox_override("panel", style_mystery)
+		if title_label:
+			title_label.add_theme_color_override("font_color", Color(0.28, 0.32, 0.36, 1.0))
+			title_label.add_theme_constant_override("outline_size", 0)
 	elif is_selected:
 		add_theme_stylebox_override("panel", style_selected)
+		if title_label:
+			title_label.add_theme_color_override("font_color", Color(0.98, 0.96, 0.90, 1.0))
+			title_label.add_theme_color_override("font_outline_color", Color(0.02, 0.04, 0.08, 1.0))
+			title_label.add_theme_constant_override("outline_size", 3)
 	else:
 		add_theme_stylebox_override("panel", style_normal)
+		if title_label:
+			title_label.add_theme_color_override("font_color", Color(0.10, 0.05, 0.02, 1.0))
+			title_label.add_theme_color_override("font_outline_color", Color(0.10, 0.05, 0.02, 1.0))
+			title_label.add_theme_constant_override("outline_size", 0)
 
 func _on_clicked() -> void:
 	if is_mystery:
@@ -255,7 +267,7 @@ func _on_clicked() -> void:
 
 func _on_mouse_entered() -> void:
 	if not is_selected and not is_mystery:
-		var hover_style = style_normal.duplicate() as StyleBoxFlat
+		var hover_style: StyleBoxFlat = style_normal.duplicate() as StyleBoxFlat
 		hover_style.border_color = Color(0.88, 0.68, 0.28, 1.0)
 		hover_style.shadow_size = 10
 		add_theme_stylebox_override("panel", hover_style)
@@ -264,9 +276,9 @@ func _on_mouse_exited() -> void:
 	_apply_card_border()
 
 func _format_number(val: int) -> String:
-	var s = str(abs(val))
-	var res = ""
-	var count = 0
+	var s: String = str(abs(val))
+	var res: String = ""
+	var count: int = 0
 	for i in range(s.length() - 1, -1, -1):
 		res = s[i] + res
 		count += 1

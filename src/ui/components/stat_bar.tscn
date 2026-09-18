@@ -1,0 +1,71 @@
+[gd_scene format=3 uid="uid://stat_bar_component"]
+
+[ext_resource type="Script" path="res://src/ui/components/stat_bar.gd" id="1_stat_bar_script"]
+[ext_resource type="FontFile" path="res://assets/fonts/CarterOne.ttf" id="2_font_body"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_bg"]
+bg_color = Color(0.082, 0.149, 0.22, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_fill"]
+bg_color = Color(0.22, 0.74, 0.97, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="UIStatBar" type="HBoxContainer"]
+custom_minimum_size = Vector2(0, 32)
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+script = ExtResource("1_stat_bar_script")
+
+[node name="StatNameLabel" type="Label" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.886, 0.910, 0.941, 1)
+theme_override_fonts/font = ExtResource("2_font_body")
+theme_override_font_sizes/font_size = 16
+text = "Hull Armor"
+vertical_alignment = 1
+
+[node name="StatProgressBar" type="ProgressBar" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_bar_fill")
+value = 75.0
+show_percentage = false
+
+[node name="StatValueLabel" type="Label" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(52, 0)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.886, 0.910, 0.941, 1)
+theme_override_fonts/font = ExtResource("2_font_body")
+theme_override_font_sizes/font_size = 16
+text = "75"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="StatDeltaLabel" type="Label" parent="."]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(52, 0)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.29, 0.867, 0.502, 1)
+theme_override_fonts/font = ExtResource("2_font_body")
+theme_override_font_sizes/font_size = 14
+text = "+15"
+horizontal_alignment = 1
+vertical_alignment = 1

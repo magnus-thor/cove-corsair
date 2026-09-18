@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://c6qvkn1k2q47p"]
 
 [ext_resource type="Script" path="res://src/ui/shipyard/vessel_card.gd" id="1_vcard_script"]
-[ext_resource type="FontFile" path="res://assets/fonts/LilitaOne-Regular.ttf" id="2_font_lilita"]
+[ext_resource type="FontFile" path="res://assets/fonts/CinzelDecorative-Bold.ttf" id="2_font_lilita"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ui/coin_icon.svg" id="3_coin_icon"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ui/theme/icon_padlock.svg" id="4_lock_icon"]
 
@@ -76,9 +76,9 @@ vertical_alignment = 1
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.18, 0.1, 0.05, 1)
-theme_override_colors/font_outline_color = Color(0.95, 0.9, 0.82, 1)
-theme_override_constants/outline_size = 4
+theme_override_colors/font_color = Color(0.1, 0.05, 0.02, 1)
+theme_override_colors/font_outline_color = Color(0.1, 0.05, 0.02, 1)
+theme_override_constants/outline_size = 0
 theme_override_fonts/font = ExtResource("2_font_lilita")
 theme_override_font_sizes/font_size = 18
 text = "THE DINGHY"
@@ -154,7 +154,7 @@ theme_override_constants/margin_right = 4
 
 [node name="StatusPanel" type="PanelContainer" parent="Margin/CardVBox/StatusContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 42)
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
@@ -200,6 +200,7 @@ stretch_mode = 5
 
 [node name="ClickButton" type="Button" parent="."]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 focus_mode = 0
 mouse_default_cursor_shape = 2

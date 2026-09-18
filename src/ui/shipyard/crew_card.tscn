@@ -1,32 +1,38 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://src/ui/shipyard/crew_card.gd" id="1_script"]
-[ext_resource type="FontFile" path="res://assets/fonts/LilitaOne-Regular.ttf" id="2_font"]
+[ext_resource type="FontFile" path="res://assets/fonts/CinzelDecorative-Bold.ttf" id="2_font_heading"]
+[ext_resource type="FontFile" path="res://assets/fonts/CarterOne.ttf" id="3_font_body"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
-bg_color = Color(0.18, 0.12, 0.08, 0.95)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.42, 0.28, 0.16, 1)
+bg_color = Color(0.043, 0.075, 0.122, 0.97)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.118, 0.227, 0.373, 1)
 corner_radius_top_left = 16
 corner_radius_top_right = 16
 corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
-shadow_color = Color(0, 0, 0, 0.4)
-shadow_size = 6
+shadow_color = Color(0, 0, 0, 0.5)
+shadow_size = 8
 shadow_offset = Vector2(0, 4)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_role_badge"]
-bg_color = Color(0.72, 0.38, 0.14, 1)
+bg_color = Color(0.055, 0.149, 0.251, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.22, 0.74, 0.97, 0.7)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_icon_bg"]
-bg_color = Color(0.12, 0.08, 0.05, 0.8)
+bg_color = Color(0.082, 0.149, 0.22, 0.9)
 corner_radius_top_left = 12
 corner_radius_top_right = 12
 corner_radius_bottom_right = 12
@@ -40,21 +46,21 @@ corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
 
 [node name="CrewCard" type="PanelContainer"]
-custom_minimum_size = Vector2(0, 320)
+custom_minimum_size = Vector2(0, 350)
 size_flags_horizontal = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_card")
 script = ExtResource("1_script")
 
 [node name="Margin" type="MarginContainer" parent="."]
 layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 10
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 12
 
 [node name="VBox" type="VBoxContainer" parent="Margin"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 8
 
 [node name="HeaderHBox" type="HBoxContainer" parent="Margin/VBox"]
 layout_mode = 2
@@ -64,10 +70,10 @@ theme_override_constants/separation = 6
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(1, 0.95, 0.8, 1)
-theme_override_colors/font_outline_color = Color(0.15, 0.08, 0.04, 1)
-theme_override_constants/outline_size = 4
-theme_override_fonts/font = ExtResource("2_font")
+theme_override_colors/font_color = Color(0.973, 0.980, 0.988, 1)
+theme_override_colors/font_outline_color = Color(0.043, 0.075, 0.122, 1)
+theme_override_constants/outline_size = 3
+theme_override_fonts/font = ExtResource("2_font_heading")
 theme_override_font_sizes/font_size = 18
 text = "MONKEY BOMBER"
 vertical_alignment = 1
@@ -80,17 +86,17 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_role_badge")
 
 [node name="Margin" type="MarginContainer" parent="Margin/VBox/HeaderHBox/RoleBadge"]
 layout_mode = 2
-theme_override_constants/margin_left = 6
-theme_override_constants/margin_top = 2
-theme_override_constants/margin_right = 6
-theme_override_constants/margin_bottom = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 3
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 3
 
 [node name="RoleBadgeLabel" type="Label" parent="Margin/VBox/HeaderHBox/RoleBadge/Margin"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.886, 0.910, 0.941, 1)
+theme_override_fonts/font = ExtResource("3_font_body")
+theme_override_font_sizes/font_size = 12
 text = "BOMBARDIER"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -109,79 +115,103 @@ size_flags_vertical = 4
 expand_mode = 1
 stretch_mode = 5
 
-[node name="LevelBadgeLabel" type="Label" parent="Margin/VBox"]
+[node name="StarRatingHBox" type="HBoxContainer" parent="Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.85, 0.35, 1)
-theme_override_colors/font_outline_color = Color(0.15, 0.08, 0.04, 1)
+theme_override_constants/separation = 2
+alignment = 1
+
+[node name="Star1Label" type="Label" parent="Margin/VBox/StarRatingHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.984, 0.750, 0.141, 1)
+theme_override_colors/font_outline_color = Color(0.043, 0.075, 0.122, 1)
 theme_override_constants/outline_size = 3
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 15
-text = "LEVEL 1"
+theme_override_fonts/font = ExtResource("3_font_body")
+theme_override_font_sizes/font_size = 22
+text = "★"
+horizontal_alignment = 1
+
+[node name="Star2Label" type="Label" parent="Margin/VBox/StarRatingHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.294, 0.333, 0.388, 1)
+theme_override_fonts/font = ExtResource("3_font_body")
+theme_override_font_sizes/font_size = 22
+text = "☆"
+horizontal_alignment = 1
+
+[node name="Star3Label" type="Label" parent="Margin/VBox/StarRatingHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.294, 0.333, 0.388, 1)
+theme_override_fonts/font = ExtResource("3_font_body")
+theme_override_font_sizes/font_size = 22
+text = "☆"
 horizontal_alignment = 1
 
 [node name="StatsDescLabel" type="Label" parent="Margin/VBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 34)
+custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.9, 0.85, 0.75, 1)
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.886, 0.910, 0.941, 1)
+theme_override_fonts/font = ExtResource("3_font_body")
+theme_override_font_sizes/font_size = 18
 text = "3 AoE damage, 1.2s cooldown"
 horizontal_alignment = 1
 autowrap_mode = 2
 
 [node name="NextUpgradeLabel" type="Label" parent="Margin/VBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 22)
+custom_minimum_size = Vector2(0, 26)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.65, 0.55, 1)
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 12
-text = "Next (L2 - 500 🪙): 5 AoE damage, 1.0s cooldown"
+theme_override_colors/font_color = Color(0.58, 0.647, 0.722, 1)
+theme_override_fonts/font = ExtResource("3_font_body")
+theme_override_font_sizes/font_size = 16
+text = "Next (L2 - 500 🪙): 5 AoE damage"
 horizontal_alignment = 1
 autowrap_mode = 2
 
 [node name="ButtonsHBox" type="HBoxContainer" parent="Margin/VBox"]
 layout_mode = 2
 size_flags_vertical = 10
-theme_override_constants/separation = 4
+theme_override_constants/separation = 6
 
 [node name="BuyButton" type="Button" parent="Margin/VBox/ButtonsHBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 40)
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 size_flags_horizontal = 3
 focus_mode = 0
 mouse_default_cursor_shape = 2
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 15
+theme_override_fonts/font = ExtResource("3_font_body")
+theme_override_font_sizes/font_size = 18
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn")
 text = "BUY: 350 🪙"
 clip_text = true
 
 [node name="UpgradeButton" type="Button" parent="Margin/VBox/ButtonsHBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 40)
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 size_flags_horizontal = 3
 focus_mode = 0
 mouse_default_cursor_shape = 2
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 13
+theme_override_fonts/font = ExtResource("3_font_body")
+theme_override_font_sizes/font_size = 18
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn")
-text = "UPGRADE: 500 🪙"
+text = "UPGRADE L2: 500 🪙"
 clip_text = true
 
 [node name="EquipButton" type="Button" parent="Margin/VBox/ButtonsHBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 40)
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 size_flags_horizontal = 3
 focus_mode = 0
 mouse_default_cursor_shape = 2
-theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 13
+theme_override_fonts/font = ExtResource("3_font_body")
+theme_override_font_sizes/font_size = 18
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn")
 text = "EQUIP"
 clip_text = true
