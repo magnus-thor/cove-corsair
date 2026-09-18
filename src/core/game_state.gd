@@ -103,6 +103,7 @@ var distance_traveled: float = 0.0
 var is_game_active: bool = false
 var boss_spawned: bool = false
 var should_auto_start: bool = false
+var should_auto_start_endless: bool = false
 
 const VESSEL_CATALOG: Dictionary = {
 	"dinghy": {

@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://b7yak4m2p5q8y"]
+[gd_scene load_steps=18 format=3 uid="uid://b7yak4m2p5q8y"]
 
 [ext_resource type="Script" path="res://src/ui/start_screen.gd" id="1_start_script"]
 [ext_resource type="PackedScene" uid="uid://c3q8v41j3kn6e" path="res://src/ui/river_map.tscn" id="2_river_map"]
@@ -45,6 +45,48 @@ texture_margin_top = 14.0
 texture_margin_right = 18.0
 texture_margin_bottom = 14.0
 modulate_color = Color(0.85, 0.85, 0.85, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_endless_normal"]
+bg_color = Color(0.12, 0.05, 0.06, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.84, 0.22, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.6)
+shadow_size = 6
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_endless_hover"]
+bg_color = Color(0.22, 0.08, 0.1, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.92, 0.45, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0.9, 0.3, 0.1, 0.4)
+shadow_size = 8
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_endless_pressed"]
+bg_color = Color(0.08, 0.03, 0.04, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.85, 0.65, 0.15, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
 
 [node name="StartScreen" type="CanvasLayer"]
 layer = 15
@@ -125,6 +167,96 @@ mouse_default_cursor_shape = 2
 theme_override_styles/normal = SubResource("StyleBoxTexture_gear")
 theme_override_styles/hover = SubResource("StyleBoxTexture_gear")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_gear")
+
+[node name="EndlessCard" type="Control" parent="Control"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 22.0
+offset_top = 106.0
+offset_right = -22.0
+offset_bottom = 186.0
+grow_horizontal = 2
+
+[node name="EndlessButton" type="Button" parent="Control/EndlessCard"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_endless_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_endless_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_endless_pressed")
+
+[node name="Margin" type="MarginContainer" parent="Control/EndlessCard/EndlessButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 6
+
+[node name="HBox" type="HBoxContainer" parent="Control/EndlessCard/EndlessButton/Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="SkullIcon" type="TextureRect" parent="Control/EndlessCard/EndlessButton/Margin/HBox"]
+custom_minimum_size = Vector2(42, 42)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("8_icon_anchor")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="VBox" type="VBoxContainer" parent="Control/EndlessCard/EndlessButton/Margin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 1
+alignment = 1
+
+[node name="Title" type="Label" parent="Control/EndlessCard/EndlessButton/Margin/HBox/VBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.88, 0.35, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
+theme_override_constants/shadow_offset_y = 2
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("4_font_carter")
+theme_override_font_sizes/font_size = 20
+text = "CORSAIR GAUNTLET (ENDLESS)"
+
+[node name="Subtitle" type="Label" parent="Control/EndlessCard/EndlessButton/Margin/HBox/VBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.95, 0.85, 0.75, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 12
+text = "HIGH-SEAS EXTRACTION • ESCALATING SPEED • 1,000m WAGERS"
+
+[node name="PlayBadge" type="Label" parent="Control/EndlessCard/EndlessButton/Margin/HBox"]
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.2, 1, 0.4, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
+theme_override_constants/shadow_offset_y = 2
+theme_override_fonts/font = ExtResource("4_font_carter")
+theme_override_font_sizes/font_size = 18
+text = "SAIL ▶"
 
 [node name="BottomBar" type="Control" parent="Control"]
 layout_mode = 1

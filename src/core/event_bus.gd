@@ -55,3 +55,17 @@ signal distance_target_reached()
 ## Subscribers (game_camera.gd) call add_trauma(amount).
 @warning_ignore("unused_signal")
 signal screen_shake_requested(trauma: float)
+
+## ── Endless / Extraction Mode ──────────────────────────────────────────────
+
+## Fired when a doubloon or gold award is collected in the river.
+@warning_ignore("unused_signal")
+signal gold_collected(amount: int)
+
+## Fired when the player successfully banks unbanked plunder and extracts safely.
+@warning_ignore("unused_signal")
+signal run_extracted(score: int, doubloons: int)
+
+## Fired when the player chooses Corsair's Gamble at a wager fork to increase stakes.
+@warning_ignore("unused_signal")
+signal wager_pushed(new_multiplier: float, new_speed: float)

@@ -34,6 +34,9 @@ signal map_requested
 @onready var map_button: Button = %MapButton
 
 var _is_victory: bool = false
+var _is_extraction: bool = false
+var _extracted_distance: int = 0
+var _extracted_multiplier: float = 1.0
 var _bonus_claimed: bool = false
 var _run_doubloons: int = 0
 var _completion_bonus: int = 0
@@ -71,6 +74,7 @@ func _ready() -> void:
 
 func show_defeat(coins_collected: int, _distance_reached: float, banked_total: int) -> void:
 	_is_victory = false
+	_is_extraction = false
 	_run_doubloons = coins_collected
 	_completion_bonus = 0
 	_banked_this_run = coins_collected
@@ -80,6 +84,7 @@ func show_defeat(coins_collected: int, _distance_reached: float, banked_total: i
 
 func show_victory(coins_collected: int, completion_bonus: int, banked_total: int, stars: int = 3) -> void:
 	_is_victory = true
+	_is_extraction = false
 	_run_doubloons = coins_collected
 	_completion_bonus = completion_bonus
 	_banked_this_run = coins_collected + completion_bonus
@@ -93,6 +98,18 @@ func show_victory(coins_collected: int, completion_bonus: int, banked_total: int
 	
 	_present_modal()
 
+func show_extraction(distance_reached: int, doubloons_banked: int, total_banked: int, multiplier_reached: float) -> void:
+	_is_victory = true
+	_is_extraction = true
+	_extracted_distance = distance_reached
+	_extracted_multiplier = multiplier_reached
+	_run_doubloons = doubloons_banked
+	_completion_bonus = 0
+	_banked_this_run = doubloons_banked
+	_total_banked = total_banked
+	_stars_earned = 0
+	_present_modal()
+
 func _present_modal() -> void:
 	visible = true
 	get_tree().paused = true
@@ -101,7 +118,36 @@ func _present_modal() -> void:
 		GameState.set_performance_mode(false)
 
 	# 1. Setup Header & Subtitle
-	if _is_victory:
+	if _is_extraction:
+		if header_label:
+			header_label.text = "⚓ SAFE HARBOR REACHED!"
+			header_label.add_theme_color_override("font_color", Color(0.20, 0.96, 0.65, 1.0))
+		if subtitle_label:
+			subtitle_label.text = "CORSAIR GAUNTLET EXTRACTED • %dm VOYAGE • %.1fx MULTIPLIER" % [_extracted_distance, _extracted_multiplier]
+			subtitle_label.add_theme_color_override("font_color", Color(0.80, 0.98, 0.90, 1.0))
+		if modal_panel:
+			var panel_style: StyleBox = modal_panel.get_theme_stylebox("panel")
+			if panel_style is StyleBoxFlat:
+				var flat: StyleBoxFlat = (panel_style as StyleBoxFlat).duplicate() as StyleBoxFlat
+				flat.border_color = Color(0.18, 0.92, 0.65, 1.0)
+				modal_panel.add_theme_stylebox_override("panel", flat)
+		if stars_container:
+			stars_container.visible = false
+		if bonus_row:
+			bonus_row.visible = false
+		if bonus_claim_button:
+			bonus_claim_button.visible = false
+		if primary_button:
+			primary_button.text = "SAIL AGAIN (GAUNTLET)"
+		if map_button:
+			map_button.text = "RETURN TO HARBOR"
+	elif _is_victory:
+		if modal_panel:
+			var panel_style: StyleBox = modal_panel.get_theme_stylebox("panel")
+			if panel_style is StyleBoxFlat:
+				var flat: StyleBoxFlat = (panel_style as StyleBoxFlat).duplicate() as StyleBoxFlat
+				flat.border_color = Color(0.82, 0.65, 0.32, 1.0)
+				modal_panel.add_theme_stylebox_override("panel", flat)
 		if header_label:
 			header_label.text = "VICTORY!"
 			header_label.add_theme_color_override("font_color", COLOR_VICTORY_HEADER)
@@ -125,6 +171,8 @@ func _present_modal() -> void:
 			bonus_claim_button.visible = true
 			bonus_claim_button.disabled = false
 			bonus_claim_button.text = "✦ CLAIM 2X BONUS DOUBLOONS"
+		if map_button:
+			map_button.text = "LEVEL MAP"
 	else:
 		if header_label:
 			header_label.text = "SHIP SUNK!"
@@ -140,6 +188,8 @@ func _present_modal() -> void:
 			bonus_claim_button.visible = false
 		if primary_button:
 			primary_button.text = "RETRY"
+		if map_button:
+			map_button.text = "LEVEL MAP"
 
 	# 2. Setup initial counters
 	if run_doubloons_label:
@@ -299,7 +349,13 @@ func _on_primary_pressed() -> void:
 	if AudioManager and AudioManager.has_method("play_sfx"):
 		AudioManager.play_sfx("gate_passes")
 	get_tree().paused = false
-	if _is_victory:
+	if _is_extraction:
+		retry_requested.emit()
+		GameState.should_auto_start = false
+		GameState.should_auto_start_endless = true
+		GameState.reset_level()
+		get_tree().reload_current_scene()
+	elif _is_victory:
 		next_level_requested.emit()
 		GameState.should_auto_start = true
 		GameState.reset_level()

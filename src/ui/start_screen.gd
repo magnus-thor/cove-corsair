@@ -5,11 +5,13 @@ extends CanvasLayer
 ## Integrates the scrollable RiverMap, top economy/settings bar, and shipyard dock.
 
 signal game_started
+signal endless_started
 
 @onready var main_control: Control = $Control
 @onready var doubloons_label: Label = %DoubloonsLabel
 @onready var settings_button: Button = %SettingsButton
 @onready var shipyard_button: Button = %ShipyardButton
+@onready var endless_button: Button = %EndlessButton
 @onready var river_map: RiverMap = %RiverMap
 
 const LEVEL_NAMES: Dictionary = {
@@ -52,6 +54,9 @@ func _ready() -> void:
 	if settings_button:
 		settings_button.pressed.connect(_on_settings_button_pressed)
 		
+	if endless_button:
+		endless_button.pressed.connect(_on_endless_button_pressed)
+		
 	GameState.active_vessel_changed.connect(_on_active_vessel_changed)
 	GameState.doubloons_changed.connect(_on_doubloons_changed)
 	
@@ -70,14 +75,14 @@ func _on_active_vessel_changed(_v_id: String) -> void:
 	_refresh_player_ship()
 
 func _refresh_player_ship() -> void:
-	var player = get_tree().get_first_node_in_group("player")
+	var player: Node = get_tree().get_first_node_in_group("player")
 	if player and player.has_method("apply_ship_data"):
-		var ship = GameState.get_active_ship_resource()
+		var ship: ShipData = GameState.get_active_ship_resource()
 		if ship:
-			player.apply_ship_data(ship)
+			player.call("apply_ship_data", ship)
 			
 	if river_map and river_map.has_method("_setup_mini_vessel"):
-		river_map._setup_mini_vessel()
+		river_map.call("_setup_mini_vessel")
 
 func _on_river_map_level_selected(lvl: int) -> void:
 	_select_level(lvl, false)
@@ -88,12 +93,34 @@ func _on_river_map_sail_requested(lvl: int) -> void:
 	visible = false
 	game_started.emit()
 	
-	var fade_tween = create_tween().set_parallel(true)
+	var fade_tween: Tween = create_tween().set_parallel(true)
 	if main_control:
 		fade_tween.tween_property(main_control, "modulate:a", 0.0, 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 		fade_tween.tween_property(main_control, "position:y", main_control.position.y - 60.0, 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	
-	fade_tween.chain().tween_callback(func():
+	fade_tween.chain().tween_callback(func() -> void:
+		queue_free()
+	)
+
+func _on_endless_button_pressed() -> void:
+	if AudioManager and AudioManager.has_method("play_sfx"):
+		AudioManager.play_sfx("gate_passes")
+		
+	var hud: Node = get_tree().get_first_node_in_group("top_hud")
+	if hud and "level_title" in hud and hud.get("level_title"):
+		var title_label: Label = hud.get("level_title") as Label
+		if title_label:
+			title_label.text = "CORSAIR GAUNTLET"
+			
+	visible = false
+	endless_started.emit()
+	
+	var fade_tween: Tween = create_tween().set_parallel(true)
+	if main_control:
+		fade_tween.tween_property(main_control, "modulate:a", 0.0, 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		fade_tween.tween_property(main_control, "position:y", main_control.position.y - 60.0, 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	
+	fade_tween.chain().tween_callback(func() -> void:
 		queue_free()
 	)
 

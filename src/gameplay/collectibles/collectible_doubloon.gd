@@ -153,6 +153,8 @@ func collect_coin(_player_ref: Node = null) -> void:
 			child.set_deferred("disabled", true)
 			
 	GameState.add_doubloons(value)
+	if EventBus and EventBus.has_signal("gold_collected"):
+		EventBus.gold_collected.emit(value)
 	
 	var player: Node = get_tree().get_first_node_in_group("player")
 	if player and player.has_method("add_doubloons"):

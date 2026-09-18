@@ -15,7 +15,10 @@ var harbor_bay: HarborBay
 func _ready() -> void:
 	GameState.active_vessel_changed.connect(_on_active_vessel_changed)
 	_update_active_player_vessel()
-	if GameState.should_auto_start:
+	if GameState.should_auto_start_endless:
+		GameState.should_auto_start_endless = false
+		_on_endless_mode_started()
+	elif GameState.should_auto_start:
 		GameState.should_auto_start = false
 		_start_game_immediately()
 	else:
@@ -91,6 +94,18 @@ func _setup_start_screen() -> void:
 		start_screen = start_screen_scene.instantiate() as StartScreen
 		add_child(start_screen)
 		start_screen.game_started.connect(_on_game_started)
+		if start_screen.has_signal("endless_started"):
+			start_screen.endless_started.connect(_on_endless_mode_started)
+
+const EndlessModeScript: GDScript = preload("res://src/features/modes/endless_mode.gd")
+
+func _on_endless_mode_started() -> void:
+	_on_game_started()
+	var endless_mode: Node = EndlessModeScript.new()
+	endless_mode.name = "EndlessMode"
+	add_child(endless_mode)
+	if endless_mode.has_method("start_run"):
+		endless_mode.call("start_run")
 
 func _on_game_started() -> void:
 	GameState.is_game_active = true

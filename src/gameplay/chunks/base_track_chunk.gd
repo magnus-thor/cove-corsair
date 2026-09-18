@@ -89,6 +89,11 @@ func get_end_z() -> float:
 		return chunk_end.global_position.z
 	return global_position.z - CHUNK_LENGTH
 
+func get_chunk_length() -> float:
+	if chunk_end:
+		return absf(chunk_end.position.z)
+	return CHUNK_LENGTH
+
 ## Checks whether the entire chunk (including its end at Z = -50 relative to origin)
 ## has moved past the cleanup threshold behind the camera.
 func is_past_camera(cleanup_z: float = 30.0) -> bool:

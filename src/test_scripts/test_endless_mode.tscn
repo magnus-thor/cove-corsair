@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://testendlessmode01"]
+
+[ext_resource type="Script" path="res://src/test_scripts/test_endless_mode.gd" id="1_test"]
+
+[node name="TestEndlessMode" type="Node"]
+script = ExtResource("1_test")
