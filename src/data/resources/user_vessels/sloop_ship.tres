@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="ShipData" format=3 uid="uid://bqws0t8inpnf5"]
 
-[ext_resource type="Script" path="res://src/data/ship_data.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/user_vessels/The Sloop.png" id="2_tex"]
+[ext_resource type="Script" uid="uid://cs0f78ukvxpo3" path="res://src/data/ship_data.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://dnrr4dhkxp2cc" path="res://assets/sprites/user_vessels/The Sloop.png" id="2_tex"]
 [ext_resource type="PackedScene" uid="uid://bfesco2vc1j1d" path="res://assets/models/user/vessels/the_sloop.glb" id="3_sloop_mesh"]
 
 [resource]
@@ -12,12 +12,12 @@ model_scene = ExtResource("3_sloop_mesh")
 sprite_texture = ExtResource("2_tex")
 pixel_size = 0.0028
 y_offset = 0.33
-scale = Vector3(2.0, 2.0, 2.0)
+scale = Vector3(2, 2, 2)
 rotation_degrees = Vector3(0, -90, 0)
-collision_size = Vector3(1.4, 1.0, 2.5)
+collision_size = Vector3(1.4, 1, 2.5)
 max_health = 4
-move_speed = 11.0
-fire_rate = 0.16
+move_speed = 11.5
+fire_rate = 0.18
 base_cannons = 2
 hardpoint_offsets = {
 "AftDeckCrew": Vector3(0.26, 0.77, 0.73),
@@ -40,7 +40,9 @@ hardpoint_scales = {
 "PortSwivelMount": Vector3(3.1, 3.1, 3.1),
 "StarboardSwivelMount": Vector3(3.1, 3.1, 3.1)
 }
-current_tier = 1
+socket_weapons = {
+"BowMount": "res://src/data/resources/user_crew/weapon_sloop_twin_chaser.tres"
+}
 upgrade_costs = Array[int]([500, 700, 1600])
 tier_descriptions = Array[String](["Standard Hull (4 HP, Twin Cannon + 1 Crew Socket)", "Reinforced Oak (5 HP, +15% Firepower, +2 Swivel Cannons)", "Fleet Flagship (6 HP, +30% Firepower, All Sockets Unlocked)"])
 tier_sockets = Array[Array]([["BowMount", "MidDeckCrew"], ["BowMount", "MidDeckCrew", "PortSwivelMount", "StarboardSwivelMount"], ["BowMount", "MidDeckCrew", "AftDeckCrew", "PortSwivelMount", "StarboardSwivelMount"]])

@@ -25,6 +25,8 @@ extends Resource
 @export var pellet_count: int = 5
 @export var scatter_spread_deg: float = 30.0 # Horizontal cone spread angle (-15° to +15°)
 @export var projectile_lifetime: float = 0.0 # If > 0, overrides projectile lifetime
+@export var cannon_count: int = 1 # Number of parallel barrels / simultaneous cannonballs
+@export var barrel_spacing: float = 0.44 # Lateral separation distance in meters between parallel barrels
 
 func can_use_ammo(ammo: Resource) -> bool:
 	if not ammo:

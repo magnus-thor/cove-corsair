@@ -30,13 +30,19 @@ func set_stat(stat_name: String, current_val: float, max_val: float,
 		_apply_bar_color()
 
 	if value_label:
-		value_label.text = "%.0f%s" % [current_val, suffix]
+		if suffix == " m/s" or not is_equal_approx(current_val, roundf(current_val)):
+			value_label.text = "%.1f%s" % [current_val, suffix]
+		else:
+			value_label.text = "%.0f%s" % [current_val, suffix]
 
 	if delta_label:
 		if baseline_val >= 0.0 and not is_equal_approx(current_val, baseline_val):
 			var delta: float = current_val - baseline_val
 			var sign_str: String = "+" if delta > 0.0 else ""
-			delta_label.text = "%s%.0f" % [sign_str, delta]
+			if suffix == " m/s" or not is_equal_approx(delta, roundf(delta)):
+				delta_label.text = "%s%.1f" % [sign_str, delta]
+			else:
+				delta_label.text = "%s%.0f" % [sign_str, delta]
 			if delta > 0.0:
 				delta_label.add_theme_color_override("font_color", Color("#4ADE80"))
 			else:

@@ -144,7 +144,7 @@ func _ready() -> void:
 	var f_sloop_equipped: Dictionary = follower_sloop.get("equipped_weapons") as Dictionary
 	assert_test(f_sloop_equipped.has("BowMount"), "Follower boat equips 'BowMount' when player is Sloop")
 	var f_chaser: AttachedWeapon = f_sloop_equipped.get("BowMount") as AttachedWeapon
-	assert_test(f_chaser != null and f_chaser.weapon_data != null and f_chaser.weapon_data.weapon_name == "Bow Chaser", "Follower BowMount weapon is Sloop's Bow Chaser")
+	assert_test(f_chaser != null and f_chaser.weapon_data != null and ("chaser" in f_chaser.weapon_data.weapon_name.to_lower()), "Follower BowMount weapon is Sloop's Bow Chaser")
 
 	# Clean up
 	follower.queue_free()

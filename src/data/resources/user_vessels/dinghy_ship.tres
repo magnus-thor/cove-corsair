@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="ShipData" format=3 uid="uid://d08y4untdiyc7"]
 
-[ext_resource type="Script" path="res://src/data/ship_data.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/user_vessels/The Dinghy.png" id="2_tex"]
+[ext_resource type="Script" uid="uid://cs0f78ukvxpo3" path="res://src/data/ship_data.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://btb22xeh01yqb" path="res://assets/sprites/user_vessels/The Dinghy.png" id="2_tex"]
 [ext_resource type="PackedScene" uid="uid://dqvdevegruw8w" path="res://assets/models/user/vessels/dinghy.glb" id="3_dinghy_mesh"]
 
 [resource]
@@ -14,9 +14,8 @@ pixel_size = 0.0021
 y_offset = 0.26
 scale = Vector3(3.8, 3.8, 3.8)
 rotation_degrees = Vector3(0, 0, 0)
-max_health = 3
-collision_size = Vector3(1.6, 1, 2.8)
-move_speed = 12.0
+max_health = 2
+move_speed = 10.5
 fire_rate = 0.2
 hardpoint_offsets = {
 "AftDeckCrew": Vector3(0.05, 0.46, 0.55),
@@ -33,7 +32,6 @@ hardpoint_scales = {
 "BowMount": Vector3(1, 1, 1),
 "MidDeckCrew": Vector3(1.25, 1.25, 1.25)
 }
-current_tier = 1
-upgrade_costs = Array[int]([0, 250, 1000])
-tier_descriptions = Array[String](["Standard Hull (3 HP, 1 Cannon + 1 Crew Socket)", "Reinforced Hull (4 HP, +15% Firepower, +1 Crew Socket)", "Masterwork Hull (5 HP, +30% Firepower, All Sockets Unlocked)"])
+upgrade_costs = Array[int]([0, 50, 100])
+tier_descriptions = Array[String](["Leaky Skiff (2 HP, 1 Bow Chaser)", "Patched Planks (3 HP, +15% Firepower, +1 Crew Socket)", "Reinforced Rowboat (4 HP, +30% Firepower, All Sockets Unlocked)"])
 tier_sockets = Array[Array]([["BowMount", "MidDeckCrew"], ["BowMount", "MidDeckCrew", "AftDeckCrew"], ["BowMount", "MidDeckCrew", "AftDeckCrew"]])

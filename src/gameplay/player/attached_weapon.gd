@@ -501,35 +501,55 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 		if camera and camera.has_method("add_trauma"):
 			camera.call("add_trauma", 0.08, 0.35)
 			
-		var ball := proj_scene.instantiate() as Cannonball
-		if ball:
-			if from_bow:
-				ball.set_meta("from_bow", true)
-			if is_hostile:
-				ball.add_to_group("enemy_projectiles")
-				ball.set_meta("is_hostile", true)
-				ball.is_hostile = true
-			world_container.add_child(ball)
-			ball.top_level = true
-			ball.global_position = spawn_pos
-			ball.set_spawn_pos(spawn_pos)
-			
-			ball.crew_id = crew_id
-			ball.set_meta("crew_id", crew_id)
-			ball.crew_level = crew_level
-			ball.set_meta("crew_level", crew_level)
-			if crew_id == "skeleton_tosser" or (weapon_data and ("skeleton" in weapon_data.weapon_name.to_lower() or "fire" in weapon_data.weapon_name.to_lower() or "incendiary" in weapon_data.weapon_name.to_lower())):
-				ball.set_meta("is_incendiary", true)
+		var num_cannons: int = weapon_data.cannon_count if ("cannon_count" in weapon_data and weapon_data.cannon_count > 1) else 1
+		if num_cannons == 1 and from_bow and player and "ship_data" in player and player.ship_data and player.ship_data.base_cannons > 1:
+			num_cannons = player.ship_data.base_cannons
 
-			if not is_hostile and GameState:
-				var a_id := GameState.get_active_ammo()
-				ball.set_meta("ammo_id", a_id)
-				ball.ammo_id = a_id
+		var spacing: float = weapon_data.barrel_spacing if ("barrel_spacing" in weapon_data and weapon_data.barrel_spacing > 0.0) else 0.44
+		var offsets: Array[float] = []
+		if num_cannons <= 1:
+			offsets = [0.0]
+		elif num_cannons == 2:
+			offsets = [-spacing * 0.5, spacing * 0.5]
+		elif num_cannons == 3:
+			offsets = [-spacing, 0.0, spacing]
+		else:
+			var total_span: float = spacing * float(num_cannons - 1)
+			for idx: int in range(num_cannons):
+				offsets.append(-total_span * 0.5 + float(idx) * spacing)
 
-			ball.setup(proj_dir, weapon_data.default_ammo, weapon_data)
+		var right_dir: Vector3 = global_transform.basis.x.normalized()
+		for offset_x: float in offsets:
+			var ball := proj_scene.instantiate() as Cannonball
+			if ball:
+				if from_bow:
+					ball.set_meta("from_bow", true)
+				if is_hostile:
+					ball.add_to_group("enemy_projectiles")
+					ball.set_meta("is_hostile", true)
+					ball.is_hostile = true
+				world_container.add_child(ball)
+				ball.top_level = true
+				var shot_pos: Vector3 = spawn_pos + right_dir * offset_x
+				ball.global_position = shot_pos
+				ball.set_spawn_pos(shot_pos)
 				
-			if player and "base_damage_bonus" in player and not is_hostile:
-				ball.damage += int(round(float(player.get("base_damage_bonus"))))
+				ball.crew_id = crew_id
+				ball.set_meta("crew_id", crew_id)
+				ball.crew_level = crew_level
+				ball.set_meta("crew_level", crew_level)
+				if crew_id == "skeleton_tosser" or (weapon_data and ("skeleton" in weapon_data.weapon_name.to_lower() or "fire" in weapon_data.weapon_name.to_lower() or "incendiary" in weapon_data.weapon_name.to_lower())):
+					ball.set_meta("is_incendiary", true)
+
+				if not is_hostile and GameState:
+					var a_id := GameState.get_active_ammo()
+					ball.set_meta("ammo_id", a_id)
+					ball.ammo_id = a_id
+
+				ball.setup(proj_dir, weapon_data.default_ammo, weapon_data)
+					
+				if player and "base_damage_bonus" in player and not is_hostile:
+					ball.damage += int(round(float(player.get("base_damage_bonus"))))
 
 func fire_scattershot(_proj_dir: Vector3 = Vector3.ZERO, world_container: Node = null, p_proj_scene: PackedScene = null) -> void:
 	if not world_container:

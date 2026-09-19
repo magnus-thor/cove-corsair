@@ -109,35 +109,35 @@ const VESSEL_CATALOG: Dictionary = {
 	"dinghy": {
 		"id": "dinghy",
 		"name": "The Dinghy",
-		"archetype": "Agility Skiff",
+		"archetype": "Starter Rowboat",
 		"resource_path": "res://src/data/resources/user_vessels/dinghy_ship.tres",
 		"purchase_price": 0,
-		"tier_prices": { 2: 250, 3: 1000 },
+		"tier_prices": { 2: 50, 3: 100 },
 		"tier_descriptions": {
-			1: "Standard Hull (3 HP, 1 Cannon + 1 Crew Socket)",
-			2: "Reinforced Hull (4 HP, +15% Firepower, +1 Crew Socket)",
-			3: "Masterwork Hull (5 HP, +30% Firepower, All Sockets Unlocked)"
+			1: "Leaky Skiff (2 HP, 1 Bow Chaser)",
+			2: "Patched Planks (3 HP, +15% Firepower, +1 Crew Socket)",
+			3: "Reinforced Rowboat (4 HP, +30% Firepower, All Sockets Unlocked)"
 		},
-		"base_hp": 3,
-		"base_speed": 12.0,
+		"base_hp": 2,
+		"base_speed": 10.5,
 		"fire_rate": 0.20,
 		"preview_texture": "res://assets/sprites/user_vessels/The Dinghy.png"
 	},
 	"sloop": {
 		"id": "sloop",
 		"name": "The Sloop",
-		"archetype": "Balanced Standard",
+		"archetype": "Agile Long-Range Runner",
 		"resource_path": "res://src/data/resources/user_vessels/sloop_ship.tres",
 		"purchase_price": 500,
 		"tier_prices": { 2: 700, 3: 1600 },
 		"tier_descriptions": {
-			1: "Standard Hull & Bow Chasers",
-			2: "Reinforced Oak (5 HP, 1 Weapon + 1 Crew Socket)",
-			3: "Fleet Flagship (6 HP, All Sockets Unlocked)"
+			1: "Standard Oak (4 HP, Twin Bow Chasers)",
+			2: "Reinforced Oak (5 HP, +15% Firepower, +2 Swivel Cannons)",
+			3: "Fleet Flagship (6 HP, +30% Firepower, All Sockets Unlocked)"
 		},
 		"base_hp": 4,
-		"base_speed": 11.0,
-		"fire_rate": 0.16,
+		"base_speed": 11.5,
+		"fire_rate": 0.18,
 		"preview_texture": "res://assets/sprites/user_vessels/The Sloop.png"
 	},
 	"ironclad": {
@@ -148,29 +148,29 @@ const VESSEL_CATALOG: Dictionary = {
 		"purchase_price": 2500,
 		"tier_prices": { 2: 3000, 3: 5000 },
 		"tier_descriptions": {
-			1: "Armored Plating & Heavy Battery",
-			2: "Reinforced Iron (9 HP, 1 Weapon + 1 Crew Socket)",
-			3: "Dreadnought Hull (10 HP, All Sockets Unlocked)"
+			1: "Armored Plating (8 HP, Triple Heavy Battery + 1 Crew Socket)",
+			2: "Reinforced Iron (9 HP, +15% Firepower, +2 Swivel Mounts)",
+			3: "Dreadnought Hull (10 HP, +30% Firepower, All Sockets Unlocked)"
 		},
 		"base_hp": 8,
-		"base_speed": 7.5,
-		"fire_rate": 0.15,
+		"base_speed": 8.5,
+		"fire_rate": 0.22,
 		"preview_texture": "res://assets/sprites/user_vessels/The Ironclad.png"
 	},
 	"bombard_skiff": {
 		"id": "bombard_skiff",
 		"name": "The Bombard Skiff",
-		"archetype": "Artillery Mortar",
+		"archetype": "Heavy Siege Artillery",
 		"resource_path": "res://src/data/resources/user_vessels/bombard_skiff_ship.tres",
 		"purchase_price": 1000,
 		"tier_prices": { 2: 1200, 3: 2200 },
 		"tier_descriptions": {
-			1: "Artillery Skiff (3 HP, 1 Weapon Socket)",
-			2: "Reinforced Keel (4 HP, 1 Weapon + 1 Crew Socket)",
-			3: "Siege Dreadnought (5 HP, All Sockets Unlocked)"
+			1: "Artillery Skiff (4 HP, Siege Mortar + 1 Crew Socket)",
+			2: "Reinforced Keel (5 HP, +15% Firepower, +Port Scattershot)",
+			3: "Siege Dreadnought (6 HP, +30% Firepower, All Mounts Unlocked)"
 		},
-		"base_hp": 3,
-		"base_speed": 9.0,
+		"base_hp": 4,
+		"base_speed": 6.5,
 		"fire_rate": 1.3,
 		"preview_texture": "res://assets/sprites/user_vessels/The Bombard Skiff.png"
 	}

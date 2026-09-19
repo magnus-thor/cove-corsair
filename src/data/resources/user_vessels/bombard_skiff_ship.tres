@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="ShipData" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="ShipData" format=3 uid="uid://do3jw8oab3cso"]
 
-[ext_resource type="Script" path="res://src/data/ship_data.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/user_vessels/The Bombard Skiff.png" id="2_tex"]
-[ext_resource type="PackedScene" path="res://assets/models/user/vessels/the_bombard_skiff.glb" id="3_mesh"]
+[ext_resource type="Script" uid="uid://cs0f78ukvxpo3" path="res://src/data/ship_data.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://dtsjn83wjp4ig" path="res://assets/sprites/user_vessels/The Bombard Skiff.png" id="2_tex"]
+[ext_resource type="PackedScene" uid="uid://css7h5jkrfn2d" path="res://assets/models/user/vessels/the_bombard_skiff.glb" id="3_mesh"]
 
 [resource]
 script = ExtResource("1_script")
@@ -14,11 +14,10 @@ pixel_size = 0.0028
 y_offset = 1.0
 scale = Vector3(3, 3, 3)
 rotation_degrees = Vector3(0, -90, 0)
-collision_size = Vector3(1.8, 1.2, 3.0)
-max_health = 3
-move_speed = 9.0
+collision_size = Vector3(1.8, 1.2, 3)
+max_health = 4
+move_speed = 6.5
 fire_rate = 1.3
-base_cannons = 1
 hardpoint_offsets = {
 "BowMortarMount": Vector3(-0.04, 1.35, -0.53),
 "PortRailMount": Vector3(-0.53, 1.12, -1.51),
@@ -42,7 +41,6 @@ socket_weapons = {
 "PortRailMount": "res://src/data/resources/user_crew/weapon_scattershot.tres",
 "StarboardRailMount": "res://src/data/resources/user_crew/weapon_scattershot.tres"
 }
-current_tier = 1
 upgrade_costs = Array[int]([1000, 1200, 2200])
 tier_descriptions = Array[String](["Artillery Skiff (3 HP, Siege Mortar + 1 Crew Socket)", "Reinforced Keel (4 HP, +15% Firepower, +Port Scattershot)", "Siege Dreadnought (5 HP, +30% Firepower, All Mounts Unlocked)"])
 tier_sockets = Array[Array]([["BowMortarMount", "QuarterdeckCrew"], ["BowMortarMount", "QuarterdeckCrew", "PortRailMount"], ["BowMortarMount", "QuarterdeckCrew", "PortRailMount", "StarboardRailMount"]])

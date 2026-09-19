@@ -310,14 +310,21 @@ func _update_inspection_drawer() -> void:
 		var tier_str: String = "TIER %d" % cur_tier if is_owned else "LOCKED"
 		inspector_title_label.text = "%s — %s (%s)" % [name_str, arch_str, tier_str]
 
-	# 2. Collect selected-vessel raw stats
-	var hp_val: float = float(ship_data.max_health) if ship_data else float(v_info.get("base_hp", 2))
-	var speed_val: float = ship_data.move_speed if ship_data else float(v_info.get("base_speed", 8.0))
-	var cannons_val: float = float(ship_data.base_cannons) if ship_data else 1.0
-	# Steering: light fast ships score higher; max_speed vessel = lowest agility
-	var agility_val: float = clampf((14.0 - speed_val) / 14.0 * 70.0 + 30.0, 20.0, 100.0)
+	# 2. Collect max ceilings across all vessels when fully upgraded (Tier 3)
+	var max_stats: Dictionary = _get_max_fully_upgraded_stats()
+	var max_hp_ceiling: float = float(max_stats["hp"])
+	var max_speed_ceiling: float = float(max_stats["speed"])
+	var max_firepower_ceiling: float = float(max_stats["firepower"])
+	var max_agility_ceiling: float = float(max_stats["agility"])
 
-	# 3. Collect baseline (active/equipped) vessel stats for delta display
+	# 3. Collect selected-vessel stats scaled to current tier
+	var tier_offset: int = cur_tier - 1 if is_owned else 0
+	var hp_val: float = float(ship_data.max_health + tier_offset) if ship_data else float(v_info.get("base_hp", 2))
+	var speed_val: float = (ship_data.move_speed if ship_data else float(v_info.get("base_speed", 8.0))) + float(tier_offset) * 1.5
+	var cannons_val: float = _get_vessel_firepower(ship_data, cur_tier if is_owned else 1)
+	var agility_val: float = clampf((speed_val / max_speed_ceiling) * 85.0 + 15.0, 10.0, 100.0)
+
+	# 4. Collect baseline (active/equipped) vessel stats for delta display
 	var baseline_hp: float = -1.0
 	var baseline_speed: float = -1.0
 	var baseline_cannons: float = -1.0
@@ -326,25 +333,26 @@ func _update_inspection_drawer() -> void:
 	if not is_active and GameState.VESSEL_CATALOG.has(GameState.active_vessel):
 		var base_data: ShipData = GameState.get_vessel_resource(GameState.active_vessel)
 		if base_data:
-			baseline_hp = float(base_data.max_health)
-			baseline_speed = base_data.move_speed
-			baseline_cannons = float(base_data.base_cannons)
-			baseline_agility = clampf((14.0 - baseline_speed) / 14.0 * 70.0 + 30.0, 20.0, 100.0)
+			var active_tier: int = GameState.get_vessel_tier(GameState.active_vessel) if GameState.is_vessel_owned(GameState.active_vessel) else 1
+			var active_offset: int = active_tier - 1
+			baseline_hp = float(base_data.max_health + active_offset)
+			baseline_speed = base_data.move_speed + float(active_offset) * 1.5
+			baseline_cannons = _get_vessel_firepower(base_data, active_tier)
+			baseline_agility = clampf((baseline_speed / max_speed_ceiling) * 85.0 + 15.0, 10.0, 100.0)
 
-	# 4. Set stat bars
+	# 5. Set stat bars normalized against fully upgraded vessel ceiling
 	if stat_bar_hull_armor:
 		stat_bar_hull_armor.set_bar_color(Color("#EF4444"))
-		stat_bar_hull_armor.set_stat("Hull Armor", hp_val, 8.0, baseline_hp, " HP")
+		stat_bar_hull_armor.set_stat("Hull Armor", hp_val, max_hp_ceiling, baseline_hp, " HP")
 	if stat_bar_top_speed:
 		stat_bar_top_speed.set_bar_color(Color("#38BDF8"))
-		stat_bar_top_speed.set_stat("Top Speed", speed_val, 14.0, baseline_speed, " m/s")
+		stat_bar_top_speed.set_stat("Top Speed", speed_val, max_speed_ceiling, baseline_speed, " m/s")
 	if stat_bar_firepower:
 		stat_bar_firepower.set_bar_color(Color("#F97316"))
-		stat_bar_firepower.set_stat("Firepower", cannons_val, 4.0, baseline_cannons, "x")
+		stat_bar_firepower.set_stat("Firepower", cannons_val, max_firepower_ceiling, baseline_cannons, "x")
 	if stat_bar_steering:
 		stat_bar_steering.set_bar_color(Color("#A78BFA"))
-		# Agility is on a 0-100 scale already, so max_val = 100
-		stat_bar_steering.set_stat("Agility", agility_val, 100.0, baseline_agility, "")
+		stat_bar_steering.set_stat("Agility", agility_val, max_agility_ceiling, baseline_agility, "")
 
 	# 5. Perk chips from tier_descriptions
 	_rebuild_perk_chips(ship_data, cur_tier)
@@ -354,6 +362,46 @@ func _update_inspection_drawer() -> void:
 
 	# 7. Action buttons (unchanged logic, preserved signal hookups)
 	_update_action_buttons(v_info, is_owned, cur_tier, is_active)
+
+func _get_vessel_firepower(s_data: ShipData, tier: int) -> float:
+	if not s_data:
+		return 1.0
+	var count: int = s_data.base_cannons
+	if s_data.tier_sockets.size() > 0:
+		var tier_idx: int = clampi(tier - 1, 0, s_data.tier_sockets.size() - 1)
+		var sockets: Array = s_data.tier_sockets[tier_idx]
+		for s: Variant in sockets:
+			var s_str: String = str(s).to_lower()
+			if "crew" not in s_str and "bow" not in s_str:
+				count += 1
+	return float(count)
+
+func _get_max_fully_upgraded_stats() -> Dictionary:
+	var max_hp: float = 1.0
+	var max_speed: float = 1.0
+	var max_firepower: float = 1.0
+
+	for v_id: String in GameState.VESSEL_CATALOG.keys():
+		var s_data: ShipData = GameState.get_vessel_resource(v_id)
+		if not s_data:
+			continue
+		var max_tier: int = 3
+		if s_data.upgrade_costs.size() > 0:
+			max_tier = s_data.upgrade_costs.size()
+		var upgraded_hp: float = float(s_data.max_health + (max_tier - 1))
+		var upgraded_speed: float = s_data.move_speed + float(max_tier - 1) * 1.5
+		var upgraded_fp: float = _get_vessel_firepower(s_data, max_tier)
+
+		max_hp = maxf(max_hp, upgraded_hp)
+		max_speed = maxf(max_speed, upgraded_speed)
+		max_firepower = maxf(max_firepower, upgraded_fp)
+
+	return {
+		"hp": max_hp,
+		"speed": max_speed,
+		"firepower": max_firepower,
+		"agility": 100.0
+	}
 
 func _rebuild_perk_chips(ship_data: ShipData, cur_tier: int) -> void:
 	if not perk_flow_container:

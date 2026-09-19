@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="ShipData" format=3 uid="uid://i3y6e47wyxa1"]
 
-[ext_resource type="Script" path="res://src/data/ship_data.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/user_vessels/The Ironclad.png" id="2_tex"]
+[ext_resource type="Script" uid="uid://cs0f78ukvxpo3" path="res://src/data/ship_data.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://d3vjd6donghmj" path="res://assets/sprites/user_vessels/The Ironclad.png" id="2_tex"]
 [ext_resource type="PackedScene" uid="uid://dxytf28ecba3w" path="res://assets/models/user/vessels/the_ironclad.glb" id="3_mesh"]
 
 [resource]
@@ -12,12 +12,12 @@ model_scene = ExtResource("3_mesh")
 sprite_texture = ExtResource("2_tex")
 pixel_size = 0.0011
 y_offset = 0.35
-scale = Vector3(2.0, 2.0, 2.0)
+scale = Vector3(2, 2, 2)
 rotation_degrees = Vector3(0, -90, 0)
 collision_size = Vector3(2.4, 1.4, 3.8)
 max_health = 8
-move_speed = 7.5
-fire_rate = 0.15
+move_speed = 8.5
+fire_rate = 0.22
 base_cannons = 3
 hardpoint_offsets = {
 "BowMount": Vector3(0.05, 0.57, -1.47),
@@ -46,7 +46,9 @@ hardpoint_scales = {
 "StarboardSwivelMount1": Vector3(3.2, 3.2, 3.2),
 "StarboardSwivelMount2": Vector3(3.2, 3.2, 3.2)
 }
-current_tier = 1
+socket_weapons = {
+"BowMount": "res://src/data/resources/user_crew/weapon_ironclad_battery.tres"
+}
 upgrade_costs = Array[int]([2500, 3000, 5000])
-tier_descriptions = Array[String](["Armored Plating (8 HP, 1 Cannon + 1 Crew Socket)", "Reinforced Iron (9 HP, +15% Firepower, +2 Swivel Mounts)", "Dreadnought Hull (10 HP, +30% Firepower, All Sockets Unlocked)"])
+tier_descriptions = Array[String](["Armored Plating (8 HP, Triple Heavy Battery + 1 Crew Socket)", "Reinforced Iron (9 HP, +15% Firepower, +2 Swivel Mounts)", "Dreadnought Hull (10 HP, +30% Firepower, All Sockets Unlocked)"])
 tier_sockets = Array[Array]([["BowMount", "MonkeyCrew"], ["BowMount", "MonkeyCrew", "PortSwivelMount1", "StarboardSwivelMount1"], ["BowMount", "MonkeyCrew", "SkeletonCrew", "PortSwivelMount1", "PortSwivelMount2", "StarboardSwivelMount1", "StarboardSwivelMount2"]])
