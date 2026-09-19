@@ -188,6 +188,6 @@ func _on_start_screen_pressed() -> void:
 	get_tree().paused = false
 	GameState.should_auto_start = false
 	GameState.reset_level()
-	get_tree().reload_current_scene()
+	get_tree().change_scene_to_file("res://src/features/hub/pirate_lair_hub.tscn")
 
 

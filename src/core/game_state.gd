@@ -506,6 +506,9 @@ func get_active_ship_resource() -> ShipData:
 func get_current_ship_resource() -> ShipData:
 	return get_active_ship_resource()
 
+func get_equipped_vessel_id() -> String:
+	return active_vessel
+
 func get_active_ship_tier() -> int:
 	return vessel_tiers.get(active_vessel, 1)
 
@@ -846,6 +849,9 @@ func select_level(lvl: int) -> void:
 	current_selected_level = clamp(lvl, 1, 45)
 	current_level = current_selected_level
 	save_game()
+
+func get_highest_level_unlocked() -> int:
+	return highest_unlocked_level
 
 func unlock_next_level() -> void:
 	last_cleared_level = current_level

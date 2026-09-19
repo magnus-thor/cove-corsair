@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Cove Corsair"
-run/main_scene="res://src/core/main_game.tscn"
+run/main_scene="res://src/features/hub/pirate_lair_hub.tscn"
 config/features=PackedStringArray("4.8", "Forward Plus")
 run/max_fps=60
 boot_splash/bg_color=Color(0.05, 0.08, 0.12, 1)
