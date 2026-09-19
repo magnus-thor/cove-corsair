@@ -1,50 +1,94 @@
 class_name PirateLairHub
 extends Control
 
-## Pirate Lair Hub (Smuggler's Hideout) Orchestrator.
-## 2D Town Canvas (top 60%) + 3D Side-Dock Vessel Showcase (bottom 40%).
+## Pirate Lair Hub (Smuggler's Cove) Orchestrator.
+## Full-screen 2D nocturnal pirate cove with interactive building hotspot pins
+## and an overlaid 3D docked flagship bobbing in the foreground water pocket.
 
-# 2D Interactive Building Hotspots
-@onready var hotspot_chart_house: LairHotspotArea = %HotspotChartHouse
-@onready var hotspot_skull_outpost: LairHotspotArea = %HotspotSkullOutpost
-@onready var hotspot_drydock: LairHotspotArea = %HotspotDrydock
-
-# Backwards compatibility aliases
-@onready var building_chart_house: LairHotspotArea = %HotspotChartHouse
-@onready var building_skull_outpost: LairHotspotArea = %HotspotSkullOutpost
-@onready var building_drydock: LairHotspotArea = %HotspotDrydock
+# 2D Interactive Building Hotspot Pins
+@onready var hotspot_chart_house: LairHotspotArea = %HotspotChartHouse as LairHotspotArea
+@onready var hotspot_skull_outpost: LairHotspotArea = %HotspotSkullOutpost as LairHotspotArea
+@onready var hotspot_drydock: LairHotspotArea = %HotspotDrydock as LairHotspotArea
 
 # Quick-HUD header nodes
-@onready var doubloons_label: Label = %DoubloonsLabel
-@onready var vessel_badge_label: Label = %VesselBadgeLabel
-@onready var btn_settings: BaseButton = %BtnSettings
+@onready var doubloons_label: Label = %DoubloonsLabel as Label
+@onready var vessel_badge_label: Label = %VesselBadgeLabel as Label
+@onready var btn_settings: BaseButton = %BtnSettings as BaseButton
+@onready var btn_calibrate: BaseButton = %BtnCalibrate as BaseButton
 
-# 3D Showcase Anchor
-@onready var basin_flagship_anchor: Node3D = %BasinFlagshipAnchor
+# 3D Showcase Nodes in the Water Pocket
+@onready var basin_flagship_anchor: Node3D = %BasinFlagshipAnchor as Node3D
+@onready var flagship_click_area: Control = %FlagshipClickArea as Control
+@onready var flagship_tag_label: Label = %FlagshipTagLabel as Label
 
 # River Map Overlay & Back Button
-@onready var river_map_layer: CanvasLayer = %RiverMapLayer
-@onready var river_map_instance: Control = %RiverMapInstance
-@onready var btn_close_river_map: Button = %BtnCloseRiverMap
+@onready var river_map_layer: CanvasLayer = %RiverMapLayer as CanvasLayer
+@onready var river_map_instance: Control = %RiverMapInstance as Control
+@onready var btn_close_river_map: Button = %BtnCloseRiverMap as Button
 
 const WAKE_SCENE: PackedScene = preload("res://src/vfx/boat_wake.tscn")
 const SHIPYARD_SCENE: PackedScene = preload("res://src/ui/shipyard/shipyard_ui.tscn")
 const SETTINGS_SCENE: PackedScene = preload("res://src/ui/settings_menu.tscn")
+const CALIBRATION_PANEL_SCENE: PackedScene = preload("res://src/features/hub/harbor_calibration_panel.tscn")
 const MAIN_GAME_PATH: String = "res://src/core/main_game.tscn"
 
-# Baseline elevation offset added to ship.y_offset to prevent dinghy / hulls sinking into water
 const WATERLINE_ELEVATION_OFFSET: float = 0.35
+
+## Default calibrated harbor dock configuration per vessel.
+## Angles (pitch, yaw, roll) are applied to the harbor pivot node while the child
+## ship model preserves its canonical game baseline orientation and y_offset.
+var harbor_dock_configs: Dictionary = {
+	"dinghy": {
+		"pitch": 14.00,
+		"yaw": 11.00,
+		"roll": 0.00,
+		"waterline_y": 0.420,
+		"scale_mult": 0.430,
+		"offset_x": 0.000,
+		"offset_z": 0.000,
+	},
+	"sloop": {
+		"pitch": 13.00,
+		"yaw": 12.00,
+		"roll": 7.00,
+		"waterline_y": 0.450,
+		"scale_mult": 0.640,
+		"offset_x": 0.140,
+		"offset_z": 0.000,
+	},
+	"ironclad": {
+		"pitch": 23.00,
+		"yaw": 12.00,
+		"roll": 0.00,
+		"waterline_y": 0.460,
+		"scale_mult": 0.570,
+		"offset_x": 0.320,
+		"offset_z": -0.220,
+	},
+	"bombard_skiff": {
+		"pitch": 22.50,
+		"yaw": 11.00,
+		"roll": 0.00,
+		"waterline_y": 0.260,
+		"scale_mult": 0.450,
+		"offset_x": 0.240,
+		"offset_z": -1.480,
+	},
+
+}
 
 var _current_flagship_mesh: Node3D = null
 var _flagship_wake: Node3D = null
 var _bob_tween: Tween = null
+var _calibration_panel: HarborCalibrationPanel = null
 
 func _ready() -> void:
 	GameState.set_performance_mode(false)
 	GameState.is_game_active = false
 
-	_setup_building_cards()
+	_setup_building_pins()
 	_setup_hud_buttons()
+	_setup_flagship_interaction()
 	_setup_river_map()
 	_refresh_docked_flagship()
 	_update_hud_display()
@@ -55,7 +99,13 @@ func _ready() -> void:
 	if AudioManager and AudioManager.has_method("play_music"):
 		AudioManager.play_music()
 
-func _setup_building_cards() -> void:
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey:
+		var key_ev := event as InputEventKey
+		if key_ev.pressed and not key_ev.echo and key_ev.keycode == KEY_C:
+			_toggle_calibration_panel()
+
+func _setup_building_pins() -> void:
 	if hotspot_chart_house:
 		hotspot_chart_house.hotspot_activated.connect(_on_building_activated)
 		hotspot_chart_house.refresh_lock_state()
@@ -72,8 +122,15 @@ func _setup_hud_buttons() -> void:
 	if btn_settings:
 		btn_settings.pressed.connect(_on_settings_pressed)
 
+	if btn_calibrate:
+		btn_calibrate.pressed.connect(_toggle_calibration_panel)
+
 	if btn_close_river_map:
 		btn_close_river_map.pressed.connect(_close_river_map)
+
+func _setup_flagship_interaction() -> void:
+	if flagship_click_area:
+		flagship_click_area.gui_input.connect(_on_flagship_gui_input)
 
 func _setup_river_map() -> void:
 	if river_map_layer:
@@ -88,11 +145,15 @@ func _update_hud_display() -> void:
 	if doubloons_label:
 		doubloons_label.text = "%s DOUBLOONS" % _format_number(GameState.doubloons)
 
+	var ship := GameState.get_active_ship_resource()
+	var ship_title: String = ship.ship_name.to_upper() if ship else "THE DINGHY"
+	var tier: int = GameState.get_active_ship_tier()
+
 	if vessel_badge_label:
-		var ship := GameState.get_active_ship_resource()
-		var ship_title: String = ship.ship_name.to_upper() if ship else "THE DINGHY"
-		var tier: int = GameState.get_active_ship_tier()
 		vessel_badge_label.text = "%s (TIER %d)" % [ship_title, tier]
+
+	if flagship_tag_label:
+		flagship_tag_label.text = "⚓ %s" % ship_title
 
 	if hotspot_skull_outpost:
 		hotspot_skull_outpost.refresh_lock_state()
@@ -122,49 +183,98 @@ func _refresh_docked_flagship() -> void:
 	if not ship or not ship.model_scene:
 		return
 
-	var boat_node := ship.model_scene.instantiate() as Node3D
-	if not boat_node:
+	# Pivot node to apply harbor docking angles cleanly in vessel-relative space
+	var pivot := Node3D.new()
+	pivot.name = "DockedFlagshipMesh"
+	basin_flagship_anchor.add_child(pivot)
+	_current_flagship_mesh = pivot
+
+	# Inside pivot, instantiate ship model with its canonical game orientation and y_offset
+	var boat_model := ship.model_scene.instantiate() as Node3D
+	if not boat_model:
 		return
+	boat_model.name = "ShipModel"
+	boat_model.position = Vector3(0.0, ship.y_offset, 0.0)
+	boat_model.rotation_degrees = ship.rotation_degrees
+	boat_model.scale = ship.scale
+	pivot.add_child(boat_model)
 
-	boat_node.name = "DockedFlagshipMesh"
-	boat_node.scale = ship.scale * 0.95
-	# Side-angle profile: vessel docked parallel to pier along X-axis
-	boat_node.rotation_degrees = Vector3(0.0, -90.0, 0.0)
+	_apply_harbor_transform_to_pivot(pivot, ship.ship_id)
 
-	# Corrected baseline Y so small hulls and dinghy do NOT sink into water
-	var baseline_y: float = ship.y_offset + WATERLINE_ELEVATION_OFFSET
-	boat_node.position = Vector3(0.0, baseline_y, 0.0)
-
-	basin_flagship_anchor.add_child(boat_node)
-	_current_flagship_mesh = boat_node
-
-	# Gentle water wake underneath
 	if WAKE_SCENE:
 		var wake_instance := WAKE_SCENE.instantiate() as Node3D
 		if wake_instance:
-			wake_instance.name = "CalmDockWake"
-			wake_instance.position = Vector3(0.0, 0.04, 0.0)
-			wake_instance.scale = Vector3(0.85, 0.85, 0.85)
+			wake_instance.name = "CalmWaterRipples"
+			wake_instance.position = Vector3(0.0, 0.02, 0.0)
+			wake_instance.scale = Vector3(0.9, 0.9, 0.9)
 			basin_flagship_anchor.add_child(wake_instance)
 			_flagship_wake = wake_instance
 
-	_start_flagship_bobbing(boat_node, baseline_y)
+	var cfg: Dictionary = harbor_dock_configs.get(ship.ship_id, {}) as Dictionary
+	var base_y: float = float(cfg.get("waterline_y", 0.40))
+	_start_flagship_bobbing(pivot, base_y)
+
+func _apply_harbor_transform_to_pivot(pivot: Node3D, ship_id: String) -> void:
+	if not pivot or not is_instance_valid(pivot):
+		return
+
+	var cfg: Dictionary = harbor_dock_configs.get(ship_id, {}) as Dictionary
+	var p: float = float(cfg.get("pitch", 0.0))
+	var y: float = float(cfg.get("yaw", -115.0))
+	var r: float = float(cfg.get("roll", 0.0))
+	var by: float = float(cfg.get("waterline_y", 0.40))
+	var sc: float = float(cfg.get("scale_mult", 0.65))
+	var ox: float = float(cfg.get("offset_x", 0.0))
+	var oz: float = float(cfg.get("offset_z", 0.0))
+
+	pivot.scale = Vector3(sc, sc, sc)
+	pivot.position = Vector3(ox, by, oz)
+	pivot.rotation_degrees = Vector3(p, y, r)
 
 func _start_flagship_bobbing(target_node: Node3D, base_y: float) -> void:
 	var base_rot_z: float = target_node.rotation_degrees.z
 	var base_rot_x: float = target_node.rotation_degrees.x
 
-	# Subtle, gentle idle water bobbing (Y offset +/- 0.03m, Z tilt +/- 1.0 deg)
 	_bob_tween = create_tween().set_loops()
 	_bob_tween.set_parallel(true).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	_bob_tween.tween_property(target_node, "position:y", base_y + 0.03, 2.0)
-	_bob_tween.tween_property(target_node, "rotation_degrees:z", base_rot_z + 1.0, 2.0)
-	_bob_tween.tween_property(target_node, "rotation_degrees:x", base_rot_x - 0.5, 2.0)
+	_bob_tween.tween_property(target_node, "position:y", base_y + 0.03, 2.2)
+	_bob_tween.tween_property(target_node, "rotation_degrees:z", base_rot_z + 0.8, 2.2)
+	_bob_tween.tween_property(target_node, "rotation_degrees:x", base_rot_x - 0.4, 2.2)
 
 	_bob_tween.chain().set_parallel(true).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	_bob_tween.tween_property(target_node, "position:y", base_y - 0.03, 2.0)
-	_bob_tween.tween_property(target_node, "rotation_degrees:z", base_rot_z - 1.0, 2.0)
-	_bob_tween.tween_property(target_node, "rotation_degrees:x", base_rot_x + 0.5, 2.0)
+	_bob_tween.tween_property(target_node, "position:y", base_y - 0.03, 2.2)
+	_bob_tween.tween_property(target_node, "rotation_degrees:z", base_rot_z - 0.8, 2.2)
+	_bob_tween.tween_property(target_node, "rotation_degrees:x", base_rot_x + 0.4, 2.2)
+
+func _toggle_calibration_panel() -> void:
+	if _calibration_panel and is_instance_valid(_calibration_panel):
+		_calibration_panel.visible = not _calibration_panel.visible
+		if _calibration_panel.visible:
+			_calibration_panel.setup_configs(harbor_dock_configs, GameState.active_vessel)
+		return
+
+	if not CALIBRATION_PANEL_SCENE:
+		return
+
+	_calibration_panel = CALIBRATION_PANEL_SCENE.instantiate() as HarborCalibrationPanel
+	if not _calibration_panel:
+		return
+
+	add_child(_calibration_panel)
+	_calibration_panel.setup_configs(harbor_dock_configs, GameState.active_vessel)
+	_calibration_panel.config_changed.connect(_on_calibration_config_changed)
+	_calibration_panel.vessel_switch_requested.connect(_on_calibration_vessel_switch)
+
+func _on_calibration_config_changed(ship_id: String, cfg: Dictionary) -> void:
+	harbor_dock_configs[ship_id] = cfg
+	if GameState.active_vessel == ship_id and _current_flagship_mesh:
+		_apply_harbor_transform_to_pivot(_current_flagship_mesh, ship_id)
+		if _bob_tween and _bob_tween.is_valid():
+			_bob_tween.kill()
+		_start_flagship_bobbing(_current_flagship_mesh, float(cfg.get("waterline_y", 0.40)))
+
+func _on_calibration_vessel_switch(ship_id: String) -> void:
+	GameState.set_active_vessel(ship_id)
 
 func _on_building_activated(mode_id: String) -> void:
 	match mode_id:
@@ -174,6 +284,22 @@ func _on_building_activated(mode_id: String) -> void:
 			_launch_endless_mode()
 		"shipyard":
 			_open_shipyard_ui()
+
+func _on_flagship_gui_input(event: InputEvent) -> void:
+	var activated: bool = false
+	if event is InputEventMouseButton:
+		var mouse_ev := event as InputEventMouseButton
+		if mouse_ev.button_index == MOUSE_BUTTON_LEFT and mouse_ev.pressed:
+			activated = true
+	elif event is InputEventScreenTouch:
+		var touch_ev := event as InputEventScreenTouch
+		if touch_ev.pressed:
+			activated = true
+
+	if activated:
+		if AudioManager and AudioManager.has_method("play_sfx"):
+			AudioManager.play_sfx("gate_passes")
+		_open_shipyard_ui()
 
 func _open_campaign_map() -> void:
 	if river_map_layer:
@@ -209,6 +335,10 @@ func _open_shipyard_ui() -> void:
 	if not SHIPYARD_SCENE:
 		return
 
+	for child: Node in get_children():
+		if child is ShipyardUI:
+			return
+
 	var shipyard_node := SHIPYARD_SCENE.instantiate() as CanvasLayer
 	if not shipyard_node:
 		return
@@ -233,6 +363,8 @@ func _on_settings_pressed() -> void:
 func _on_active_vessel_changed(_vessel_id: String) -> void:
 	_refresh_docked_flagship()
 	_update_hud_display()
+	if _calibration_panel and is_instance_valid(_calibration_panel) and _calibration_panel.visible:
+		_calibration_panel.setup_configs(harbor_dock_configs, _vessel_id)
 
 func _on_doubloons_changed(_amt: int) -> void:
 	_update_hud_display()

@@ -128,6 +128,8 @@ func _test_tab_state_enum() -> void:
 	var script: GDScript = load("res://src/ui/shipyard/shipyard_ui.gd") as GDScript
 	_assert(script != null, "shipyard_ui.gd loaded as GDScript")
 
+
+	@warning_ignore("UNUSED_VARIABLE")
 	var constants: Dictionary = script.get_script_constant_map()
 	# TabType values are inlined as top-level constants after class_name parsing
 	# In GDScript 4, enum values appear as ClassName.ENUM_KEY patterns; we check

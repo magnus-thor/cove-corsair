@@ -8,7 +8,7 @@ extends Node
 
 func _ready() -> void:
 	print("==================================================")
-	print("   TESTING 2D TOWN CANVAS + 3D SIDE-DOCK SHOWCASE ")
+	print("   TESTING FULL-SCREEN 2D LAIR + WATER POCKET SHOWCASE ")
 	print("==================================================")
 
 	var hub_scene: PackedScene = preload("res://src/features/hub/pirate_lair_hub.tscn")
@@ -21,7 +21,7 @@ func _ready() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 
-	print("[STEP 1] Verifying 2D Town Canvas & Interactive Hotspot Areas...")
+	print("[STEP 1] Verifying 2D Full-Screen Canvas & Interactive Hotspot Pins...")
 	var chart_hotspot: LairHotspotArea = hub.hotspot_chart_house
 	assert(chart_hotspot != null, "Chart House hotspot must exist")
 	assert(chart_hotspot.mode_id == "campaign", "Chart House mode_id must be 'campaign'")
@@ -60,16 +60,16 @@ func _ready() -> void:
 	skull_hotspot.refresh_lock_state()
 	print("[PASS] Padlock gating and level unlock logic verified.")
 
-	print("[STEP 3] Verifying 3D Side-Dock Vessel Showcase & Non-Submerged Waterline...")
+	print("[STEP 3] Verifying 3D Flagship Showcase in Foreground Water Pocket...")
 	var anchor: Node3D = hub.basin_flagship_anchor
 	assert(anchor != null, "Basin flagship anchor must exist in SubViewport")
 	var flagship_mesh: Node3D = anchor.get_node_or_null("DockedFlagshipMesh") as Node3D
 	assert(flagship_mesh != null, "DockedFlagshipMesh must be present in anchor")
 
-	# Verify positive elevation above water (not sunken)
+	# Verify positive elevation above water
 	assert(flagship_mesh.position.y >= 0.35, "Flagship position Y must be >= 0.35m to prevent sinking (current: %.2f)" % flagship_mesh.position.y)
 	assert(hub._bob_tween != null and hub._bob_tween.is_valid(), "Flagship idle water bobbing tween must be active")
-	print("[PASS] Side-dock flagship verified with elevated non-submerged waterline (Y = %.2f)." % flagship_mesh.position.y)
+	print("[PASS] Flagship in water pocket verified with elevated waterline (Y = %.2f)." % flagship_mesh.position.y)
 
 	print("[STEP 4] Testing Real-Time Flagship Swap on active_vessel_changed...")
 	var prev_vessel: String = GameState.active_vessel
@@ -84,9 +84,13 @@ func _ready() -> void:
 	GameState.active_vessel = prev_vessel
 	GameState.active_vessel_changed.emit(prev_vessel)
 	await get_tree().process_frame
-	print("[PASS] Real-time flagship swap verified in 3D side dock.")
+	print("[PASS] Real-time flagship swap verified in 3D water pocket.")
 
-	print("[STEP 5] Testing River Map Overlay Open & Close...")
+	print("[STEP 5] Testing Flagship Interactive Click Area...")
+	assert(hub.flagship_click_area != null, "Flagship click area must exist for tap-to-inspect")
+	print("[PASS] Flagship click area verified.")
+
+	print("[STEP 6] Testing River Map Overlay Open & Close...")
 	assert(not hub.river_map_layer.visible, "RiverMap layer must be hidden initially")
 	hub._open_campaign_map()
 	assert(hub.river_map_layer.visible, "RiverMap layer must become visible on open")
@@ -95,6 +99,6 @@ func _ready() -> void:
 	print("[PASS] River Map overlay open/close flow verified.")
 
 	print("==================================================")
-	print("   ALL 2D TOWN + 3D SIDE-DOCK TESTS PASSED!       ")
+	print("   ALL FULL-SCREEN PIRATE LAIR TESTS PASSED!      ")
 	print("==================================================")
 	get_tree().quit(0)
