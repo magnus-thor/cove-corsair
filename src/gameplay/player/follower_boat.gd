@@ -4,6 +4,7 @@ var target_offset: Vector3 = Vector3.ZERO
 var lerp_speed: float = 14.0
 var rotation_lerp_speed: float = 12.0
 var weapon_instance: Node3D = null
+var equipped_weapons: Dictionary = {}
 
 func _ready() -> void:
 	_clean_shadow_nodes(self)
@@ -82,22 +83,8 @@ func _ready() -> void:
 		if sprite:
 			sprite.scale = Vector3.ONE * sf
 	
-	# Instantiate BowMount weapon
-	var attached_weapon_scene := load("res://src/gameplay/player/attached_weapon.tscn") as PackedScene
-	if attached_weapon_scene:
-		var weapon_data := load("res://src/data/resources/user_crew/weapon_bow_chaser.tres") as WeaponData
-		if weapon_data:
-			weapon_instance = attached_weapon_scene.instantiate() as Node3D
-			if weapon_instance:
-				if weapon_instance.has_method("setup_weapon"):
-					weapon_instance.call("setup_weapon", weapon_data)
-				elif "weapon_data" in weapon_instance:
-					weapon_instance.set("weapon_data", weapon_data)
-				var bow := get_node_or_null("BowMount") as Node3D
-				if bow:
-					bow.rotation_degrees = Vector3(0, 180, 0)
-					bow.add_child(weapon_instance)
-					bow.scale = Vector3.ONE * sf
+	# Instantiate weapons matching the player's active ship
+	setup_weapons_from_player(player, sf)
 
 	# Attach stern hydrodynamic water wake
 	var wake_scene := preload("res://src/vfx/boat_wake.tscn") as PackedScene
@@ -107,6 +94,113 @@ func _ready() -> void:
 			add_child(wake)
 			wake.position = Vector3(0, 0.02, 0.8)
 			wake.scale = Vector3(0.65, 0.65, 0.65) * sf
+
+func setup_weapons_from_player(player: Node3D, sf: float = 1.0) -> void:
+	var legacy_bow: Node3D = get_node_or_null("BowMount") as Node3D
+	if legacy_bow:
+		legacy_bow.visible = false
+		for c: Node in legacy_bow.get_children():
+			c.queue_free()
+
+	var hardpoints: Node3D = get_node_or_null("Hardpoints") as Node3D
+	if not hardpoints:
+		hardpoints = Node3D.new()
+		hardpoints.name = "Hardpoints"
+		add_child(hardpoints)
+		
+	for w: Node in equipped_weapons.values():
+		if is_instance_valid(w):
+			w.queue_free()
+	equipped_weapons.clear()
+	for child: Node in hardpoints.get_children():
+		child.queue_free()
+
+	if not player or not ("ship_data" in player) or not player.get("ship_data"):
+		return
+	var s_data: ShipData = player.get("ship_data") as ShipData
+	var tier_level: int = int(player.get("current_tier")) if "current_tier" in player else 1
+	if GameState and GameState.vessel_tiers.has(s_data.ship_id):
+		tier_level = GameState.get_vessel_tier(s_data.ship_id)
+
+	var active_sockets: Array = []
+	if s_data.tier_sockets.size() > 0:
+		active_sockets = s_data.tier_sockets[clampi(tier_level - 1, 0, s_data.tier_sockets.size() - 1)]
+
+	const DEFAULT_SOCKET_WEAPONS: Dictionary = {
+		"BowMount": "res://src/data/resources/user_crew/weapon_bow_chaser.tres",
+		"BowMortarMount": "res://src/data/resources/user_crew/weapon_bow_mortar.tres",
+		"PortSwivelMount": "res://src/data/resources/user_crew/weapon_port_swivel.tres",
+		"StarboardSwivelMount": "res://src/data/resources/user_crew/weapon_port_swivel.tres",
+		"PortSwivelMount1": "res://src/data/resources/user_crew/weapon_port_swivel.tres",
+		"PortSwivelMount2": "res://src/data/resources/user_crew/weapon_port_swivel.tres",
+		"StarboardSwivelMount1": "res://src/data/resources/user_crew/weapon_port_swivel.tres",
+		"StarboardSwivelMount2": "res://src/data/resources/user_crew/weapon_port_swivel.tres",
+		"PortRailMount": "res://src/data/resources/user_crew/weapon_scattershot.tres",
+		"StarboardRailMount": "res://src/data/resources/user_crew/weapon_scattershot.tres"
+	}
+
+	var weapons_map: Dictionary = DEFAULT_SOCKET_WEAPONS.duplicate()
+	if "socket_weapons" in s_data and not s_data.socket_weapons.is_empty():
+		weapons_map.merge(s_data.socket_weapons, true)
+
+	var attached_weapon_scene: PackedScene = preload("res://src/gameplay/player/attached_weapon.tscn")
+	if not attached_weapon_scene:
+		return
+
+	for socket_name: String in active_sockets:
+		var s_lower: String = socket_name.to_lower()
+		var w_data: WeaponData = null
+		var c_id: String = ""
+		var c_lvl: int = 1
+		
+		# If player has active instance in equipped_weapons, use its data
+		if "equipped_weapons" in player and (player.get("equipped_weapons") is Dictionary) and (player.get("equipped_weapons") as Dictionary).has(socket_name):
+			var pw: Node = (player.get("equipped_weapons") as Dictionary)[socket_name] as Node
+			if pw and "weapon_data" in pw and pw.get("weapon_data"):
+				w_data = pw.get("weapon_data") as WeaponData
+			if pw and "crew_id" in pw:
+				c_id = str(pw.get("crew_id"))
+			if pw and "crew_level" in pw:
+				c_lvl = int(pw.get("crew_level"))
+				
+		if not w_data:
+			if "crew" in s_lower:
+				c_id = GameState.get_equipped_crew(s_data.ship_id, socket_name) if GameState else ""
+				if c_id != "" and GameState and GameState.CREW_CATALOG.has(c_id):
+					var res_path: String = str(GameState.CREW_CATALOG[c_id].get("resource_path", ""))
+					if res_path != "" and ResourceLoader.exists(res_path):
+						w_data = load(res_path) as WeaponData
+					c_lvl = GameState.get_crew_level(c_id)
+			elif weapons_map.has(socket_name):
+				var val: Variant = weapons_map[socket_name]
+				if val is String and ResourceLoader.exists(val):
+					w_data = load(val) as WeaponData
+				elif val is WeaponData:
+					w_data = val
+
+		if not w_data:
+			continue
+			
+		var socket: Node3D = Node3D.new()
+		socket.name = socket_name
+		hardpoints.add_child(socket)
+		
+		if s_data.hardpoint_offsets.has(socket_name):
+			socket.position = s_data.hardpoint_offsets[socket_name] * sf
+		if s_data.hardpoint_rotations.has(socket_name):
+			socket.rotation_degrees = s_data.hardpoint_rotations[socket_name]
+		if s_data.hardpoint_scales.has(socket_name):
+			socket.scale = s_data.hardpoint_scales[socket_name] * sf
+			
+		var w_inst: AttachedWeapon = attached_weapon_scene.instantiate() as AttachedWeapon
+		w_inst.crew_id = c_id
+		w_inst.crew_level = c_lvl
+		w_inst.setup_weapon(w_data)
+		socket.add_child(w_inst)
+		equipped_weapons[socket_name] = w_inst
+		
+		if "bow" in s_lower or "mortar" in s_lower:
+			weapon_instance = w_inst
 
 func set_target_offset(offset: Vector3) -> void:
 	target_offset = offset
@@ -134,6 +228,17 @@ func tween_scale(target_sf: float, duration: float) -> void:
 	if bow:
 		var t_bow := create_tween()
 		t_bow.tween_property(bow, "scale", Vector3.ONE * target_sf, duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	var hardpoints: Node3D = get_node_or_null("Hardpoints") as Node3D
+	if hardpoints and player and "ship_data" in player and player.get("ship_data"):
+		var s_data: ShipData = player.get("ship_data") as ShipData
+		for socket_name: String in equipped_weapons.keys():
+			var socket: Node3D = hardpoints.get_node_or_null(socket_name) as Node3D
+			if socket and s_data:
+				var base_pos: Vector3 = s_data.hardpoint_offsets.get(socket_name, Vector3.ZERO)
+				var base_scale: Vector3 = s_data.hardpoint_scales.get(socket_name, Vector3.ONE)
+				var t_sock: Tween = create_tween().set_parallel(true)
+				t_sock.tween_property(socket, "position", base_pos * target_sf, duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+				t_sock.tween_property(socket, "scale", base_scale * target_sf, duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 func _physics_process(delta: float) -> void:
 	var player: Node3D = null
@@ -161,8 +266,11 @@ func _physics_process(delta: float) -> void:
 	# Auto-fires in sync with the fleet
 	var shooting_enabled: bool = (player.get("is_shooting_enabled") == true) if ("is_shooting_enabled" in player) else true
 	var rate_mult: float = float(player.get("fire_rate_multiplier")) if ("fire_rate_multiplier" in player) else 1.0
-	if shooting_enabled and is_instance_valid(weapon_instance) and weapon_instance.has_method("try_fire"):
-		weapon_instance.call("try_fire", delta * rate_mult)
+	var tier_mult: float = float(player.get("tier_fire_rate_multiplier")) if ("tier_fire_rate_multiplier" in player) else 1.0
+	if shooting_enabled:
+		for w: Node in equipped_weapons.values():
+			if is_instance_valid(w) and w.has_method("try_fire"):
+				w.call("try_fire", delta * rate_mult * tier_mult)
 
 func _on_area_entered(area: Area3D) -> void:
 	if area.is_in_group("collectibles") or area.is_in_group("cannonballs") or area.is_in_group("multiplier_gate") or area.is_in_group("player") or area.is_in_group("follower"):

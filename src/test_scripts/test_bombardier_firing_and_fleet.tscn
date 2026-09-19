@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://c8bombardfleet01"]
+
+[ext_resource type="Script" path="res://src/test_scripts/test_bombardier_firing_and_fleet.gd" id="1_test"]
+
+[node name="TestBombardierFiringAndFleet" type="Node"]
+script = ExtResource("1_test")

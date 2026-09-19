@@ -188,34 +188,48 @@ func _apply_weapon_data() -> void:
 		if fallback:
 			fallback.visible = false
 
+func _is_mortar() -> bool:
+	if not weapon_data:
+		return false
+	var socket_name: String = get_parent().name.to_lower() if get_parent() else ""
+	var w_type: String = weapon_data.weapon_type.to_lower()
+	var w_name: String = weapon_data.weapon_name.to_lower()
+	return ("mortar" in socket_name) or ("mortar" in w_type) or ("mortar" in w_name)
+
 func _physics_process(delta: float) -> void:
 	if Engine.is_editor_hint():
 		return
 		
-	var player := get_tree().get_first_node_in_group("player")
+	var player: Node = get_tree().get_first_node_in_group("player")
 	if player and player.get("is_game_over") == true:
 		return
 		
 	if not weapon_data:
 		return
 		
-	var is_crew := _is_crew()
+	var is_crew: bool = _is_crew()
+	var is_mortar: bool = _is_mortar()
 	
 	if is_crew:
 		_process_deck_idle(delta)
 		_process_targeting(delta)
-		# Smooth Y-Axis rotation aiming to face locked targets within 20.0m range
-		if current_target and is_instance_valid(current_target):
-			var m_pos := muzzle_point.global_position if muzzle_point else global_position
-			var to_target := (current_target.global_position - m_pos)
-			to_target.y = 0.0
-			if to_target.length_squared() > 0.001:
-				var target_yaw := atan2(-to_target.x, -to_target.z)
-				rotation.y = lerp_angle(rotation.y, target_yaw, 10.0 * delta)
-		else:
-			rotation.y = lerp_angle(rotation.y, deg_to_rad(weapon_data.spread_angle_deg), 5.0 * delta)
+		_update_aim_rotation(delta)
+	elif is_mortar:
+		_process_targeting(delta)
+		_update_aim_rotation(delta)
 	else:
 		aim_direction = Vector3(0, 0, -1)
+
+func _update_aim_rotation(delta: float) -> void:
+	if current_target and is_instance_valid(current_target):
+		var m_pos: Vector3 = muzzle_point.global_position if muzzle_point else global_position
+		var to_target: Vector3 = (current_target.global_position - m_pos)
+		to_target.y = 0.0
+		if to_target.length_squared() > 0.001:
+			var target_yaw: float = atan2(-to_target.x, -to_target.z)
+			rotation.y = lerp_angle(rotation.y, target_yaw, 10.0 * delta)
+	else:
+		rotation.y = lerp_angle(rotation.y, deg_to_rad(weapon_data.spread_angle_deg), 5.0 * delta)
 
 func _process_deck_idle(delta: float) -> void:
 	idle_timer += delta * 5.0
@@ -246,20 +260,21 @@ func _process_deck_idle(delta: float) -> void:
 
 func _process_targeting(_delta: float) -> void:
 	var is_crew: bool = _is_crew()
+	var is_mortar: bool = _is_mortar()
 	var player: Node3D = get_tree().get_first_node_in_group("player") as Node3D
 	var boat_z: float = player.global_position.z if (player and is_instance_valid(player)) else global_position.z
 	
-	# Priority 1: Active enemy mobs, destructibles, and destructible obstacles
+	# Priority 1: Active enemy mobs, destructibles, barricades, sea mines, and destructible obstacles
 	var spawn_candidates: Array[Node] = []
-	for grp: String in ["enemies", "destructible", "destructible_obstacles", "obstacles"]:
+	for grp: String in ["enemies", "destructible", "destructible_obstacles", "barricade", "sea_mine", "obstacles"]:
 		for node in get_tree().get_nodes_in_group(grp):
 			if is_instance_valid(node) and not node.is_in_group("boss") and not (node is BossWarBarge) and not (node is BossComponentDelegate):
-				if node.has_method("take_damage") or (node.get_parent() and node.get_parent().has_method("take_damage")):
+				if node.has_method("take_damage") or node.has_method("take_hit") or (node.get_parent() and (node.get_parent().has_method("take_damage") or node.get_parent().has_method("take_hit"))):
 					spawn_candidates.append(node)
 				
-	# Check other crew targets to avoid redundant targeting
+	# Check other crew targets to avoid redundant targeting (crew only)
 	var claimed_targets: Dictionary = {}
-	if player is PlayerSwerve:
+	if is_crew and player is PlayerSwerve:
 		var swerve := player as PlayerSwerve
 		for w: Node in swerve.equipped_weapons.values():
 			if is_instance_valid(w) and w != self and "current_target" in w and is_instance_valid(w.get("current_target")):
@@ -267,13 +282,17 @@ func _process_targeting(_delta: float) -> void:
 
 	var best_target: Node3D = null
 	var best_unclaimed: Node3D = null
-	var min_dist := INF
-	var min_unclaimed_dist := INF
-	var max_range := 32.0
+	var min_dist: float = INF
+	var min_unclaimed_dist: float = INF
+	var max_range: float = 32.0
 	if "detection_range" in weapon_data and float(weapon_data.get("detection_range")) > 0.0:
 		max_range = float(weapon_data.get("detection_range"))
+	elif "max_range" in weapon_data and float(weapon_data.get("max_range")) > 0.0:
+		max_range = float(weapon_data.get("max_range"))
 	if is_crew:
 		max_range = min(max_range, 20.0)
+	elif is_mortar:
+		max_range = min(max_range, 22.0)
 	var m_pos_ref := muzzle_point.global_position if muzzle_point else global_position
 
 	var processed: Dictionary = {}
@@ -289,7 +308,7 @@ func _process_targeting(_delta: float) -> void:
 		var to_target := (node3d.global_position - m_pos_ref)
 		to_target.y = 0.0
 		var dir_norm := to_target.normalized()
-		if -dir_norm.z < 0.35:
+		if -dir_norm.z < 0.25:
 			continue
 			
 		var dist := global_position.distance_to(node3d.global_position)
@@ -301,7 +320,9 @@ func _process_targeting(_delta: float) -> void:
 				min_unclaimed_dist = dist
 				best_unclaimed = node3d
 				
-	best_target = best_unclaimed if best_unclaimed else best_target
+	if is_crew:
+		best_target = best_unclaimed if best_unclaimed else best_target
+	# Mortar weapons intentionally use best_target (min_dist) to fire directly at the closest threat!
 			
 	# Fallback to boss
 	if not best_target:
@@ -321,7 +342,7 @@ func _process_targeting(_delta: float) -> void:
 
 		processed.clear()
 		min_dist = INF
-		var max_boss_range := 20.0 if is_crew else 28.0
+		var max_boss_range: float = 20.0 if is_crew else 28.0
 		for target in boss_candidates:
 			if not is_instance_valid(target) or not target is Node3D or processed.has(target):
 				continue
@@ -334,7 +355,7 @@ func _process_targeting(_delta: float) -> void:
 			var to_target := (node3d.global_position - m_pos_ref)
 			to_target.y = 0.0
 			var dir_norm := to_target.normalized()
-			if -dir_norm.z < 0.35:
+			if -dir_norm.z < 0.25:
 				continue
 				
 			var dist := global_position.distance_to(node3d.global_position)
@@ -400,7 +421,7 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 	var is_mortar := ("mortar" in socket_name) or (weapon_data and ("mortar" in weapon_data.weapon_name.to_lower() or "mortar" in weapon_data.weapon_type.to_lower()))
 	
 	var proj_dir: Vector3
-	if is_crew:
+	if is_crew or is_mortar:
 		proj_dir = aim_direction if aim_direction != Vector3.ZERO else default_fwd
 	else:
 		var mount_fwd := -global_transform.basis.z if is_hostile else global_transform.basis.z
@@ -459,6 +480,15 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 				var a_id := GameState.get_active_ammo()
 				ball.set_meta("ammo_id", a_id)
 				ball.ammo_id = a_id
+
+			if current_target and is_instance_valid(current_target):
+				var target_dist: float = spawn_pos.distance_to(current_target.global_position)
+				ball.target_range = target_dist
+				ball.target_node = current_target
+			else:
+				var def_range: float = weapon_data.max_range if (weapon_data and "max_range" in weapon_data and weapon_data.max_range > 0.0) else 18.0
+				ball.target_range = def_range
+				ball.target_node = null
 
 			ball.setup(proj_dir, weapon_data.default_ammo, weapon_data)
 				

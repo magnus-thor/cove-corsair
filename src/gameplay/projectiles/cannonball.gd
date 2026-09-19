@@ -29,6 +29,8 @@ extends Area3D
 var crew_id: String = ""
 var crew_level: int = 1
 var ammo_id: String = ""
+var target_range: float = 0.0
+var target_node: Node = null
 
 const TRAIL_3D_SCENE: PackedScene = preload("res://src/vfx/trail_3d.tscn")
 var _trail: Node3D = null
@@ -183,7 +185,9 @@ func setup(p_direction: Vector3, p_ammo_data: AmmoData, p_weapon_data: WeaponDat
 		scale = Vector3.ONE * ammo_data.scale_multiplier
 		
 	# Determine max_range
-	if ammo_data and "max_range_override" in ammo_data and ammo_data.max_range_override > 0.0:
+	if target_range > 0.0:
+		max_range = target_range
+	elif ammo_data and "max_range_override" in ammo_data and ammo_data.max_range_override > 0.0:
 		max_range = ammo_data.max_range_override
 	elif weapon_data:
 		if weapon_data.has_method("get_effective_max_range"):
@@ -206,6 +210,12 @@ func setup(p_direction: Vector3, p_ammo_data: AmmoData, p_weapon_data: WeaponDat
 			base_arc = float(weapon_data.get("arc_height"))
 	if ammo_data and "arc_height_bonus" in ammo_data:
 		base_arc += float(ammo_data.get("arc_height_bonus"))
+		
+	# Scale arc height if target distance is short so close shots don't soar high above targets
+	var is_mortar_flag: bool = has_meta("is_mortar") or (weapon_data and ("mortar" in weapon_data.weapon_name.to_lower() or "mortar" in weapon_data.weapon_type.to_lower()))
+	if is_mortar_flag and target_range > 0.0 and base_arc > 0.0:
+		base_arc = clampf(base_arc * (target_range / 14.0), 0.45, base_arc)
+
 	arc_height = base_arc
 	
 	# Determine spinning
@@ -420,8 +430,15 @@ func _physics_process(delta: float) -> void:
 		_is_destroyed = true
 		set_deferred("monitoring", false)
 		set_deferred("monitorable", false)
-		AudioManager.play_sfx("water_splashes")
-		_spawn_splash(true)
+		for child: Node in get_children():
+			if child is CollisionShape3D:
+				child.set_deferred("disabled", true)
+		var is_mortar_flag: bool = has_meta("is_mortar") or (weapon_data and ("mortar" in weapon_data.weapon_name.to_lower() or "mortar" in weapon_data.weapon_type.to_lower()))
+		if is_mortar_flag:
+			_detonate_mortar_impact()
+		else:
+			AudioManager.play_sfx("water_splashes")
+			_spawn_splash(true)
 		_detach_trail()
 		queue_free()
 		return
@@ -431,12 +448,44 @@ func _physics_process(delta: float) -> void:
 		_is_destroyed = true
 		set_deferred("monitoring", false)
 		set_deferred("monitorable", false)
+		for child: Node in get_children():
+			if child is CollisionShape3D:
+				child.set_deferred("disabled", true)
 		if GameState.boss_spawned:
 			print("[CANNON EXPIRED] %s lifetime ended at %s" % [name, global_position])
-		AudioManager.play_sfx("water_splashes")
-		_spawn_splash(true)
+		var is_mortar_flag: bool = has_meta("is_mortar") or (weapon_data and ("mortar" in weapon_data.weapon_name.to_lower() or "mortar" in weapon_data.weapon_type.to_lower()))
+		if is_mortar_flag:
+			_detonate_mortar_impact()
+		else:
+			AudioManager.play_sfx("water_splashes")
+			_spawn_splash(true)
 		_detach_trail()
 		queue_free()
+		return
+
+func _detonate_mortar_impact() -> void:
+	AudioManager.play_sfx("sfx_mortar_impact")
+	_spawn_splash(true)
+	if VFXManager and VFXManager.has_method("spawn_mortar_splash"):
+		VFXManager.spawn_mortar_splash(global_position)
+	var camera: Node = get_tree().get_first_node_in_group("game_camera") if get_tree() else null
+	if camera and camera.has_method("add_trauma"):
+		camera.call("add_trauma", 0.45)
+		
+	var valid_target: Node = target_node if is_instance_valid(target_node) else null
+	if valid_target:
+		var hit_damage: int = damage
+		if valid_target.has_method("take_hit"):
+			valid_target.call("take_hit", hit_damage, ammo_id)
+		elif valid_target.has_method("take_damage"):
+			valid_target.call("take_damage", hit_damage)
+		elif valid_target.get_parent() and valid_target.get_parent().has_method("take_hit"):
+			valid_target.get_parent().call("take_hit", hit_damage, ammo_id)
+		elif valid_target.get_parent() and valid_target.get_parent().has_method("take_damage"):
+			valid_target.get_parent().call("take_damage", hit_damage)
+
+	var exclude: Node = valid_target if is_instance_valid(valid_target) else null
+	_apply_splash_damage(exclude)
 
 func _sweep_chain_shot_mines() -> void:
 	var tree := get_tree()
@@ -567,9 +616,10 @@ func _on_hit(target: Node) -> void:
 		elif target.get_parent() and target.get_parent().has_method("take_damage"):
 			target.get_parent().call("take_damage", hit_damage)
 			
-		# Apply splash AoE to nearby destructibles if ammo has splash_radius
-		if (ammo_data and ammo_data.splash_radius > 0.0) or splash_radius_multiplier > 1.0:
-			_apply_splash_damage(target)
+		# Apply splash AoE to nearby destructibles if ammo has splash_radius or is mortar
+		if (ammo_data and ammo_data.splash_radius > 0.0) or splash_radius_multiplier > 1.0 or has_meta("is_mortar"):
+			var exclude: Node = target if is_instance_valid(target) else null
+			_apply_splash_damage(exclude)
 				
 		_spawn_splash(false)
 		_detach_trail()
@@ -592,7 +642,8 @@ func _spawn_splash(at_water_level: bool = false) -> void:
 			get_parent().add_child(splash)
 		splash.global_position = splash_pos
 
-func _apply_splash_damage(exclude_target: Node = null) -> void:
+func _apply_splash_damage(exclude_target: Variant = null) -> void:
+	var valid_exclude: Node = exclude_target as Node if (exclude_target is Node and is_instance_valid(exclude_target)) else null
 	var is_mortar := has_meta("is_mortar") or (weapon_data and ("mortar" in weapon_data.weapon_name.to_lower() or "mortar" in weapon_data.weapon_type.to_lower())) or (ammo_data and ("mortar" in ammo_data.ammo_name.to_lower() or ammo_data.splash_radius >= 3.0))
 	if is_mortar:
 		AudioManager.play_sfx("sfx_mortar_impact")
@@ -613,7 +664,7 @@ func _apply_splash_damage(exclude_target: Node = null) -> void:
 	for obj in targets:
 		if obj != null and is_instance_valid(obj) and obj != self and not processed.has(obj):
 			processed[obj] = true
-			if obj == exclude_target or (exclude_target and obj == exclude_target.get_parent()):
+			if valid_exclude and (obj == valid_exclude or obj == valid_exclude.get_parent()):
 				continue
 			if obj is Node3D:
 				var dist := (obj as Node3D).global_position.distance_to(global_position)
