@@ -243,13 +243,47 @@ func _ready() -> void:
 func _enable_collisions() -> void:
 	if not _is_destroyed and is_inside_tree():
 		collision_layer = 2
-		collision_mask = 0xFFFFFFFF
+		collision_mask = 31 # Layers 1-5 (World/Obstacles, Projectiles, Player, Enemies, Boss)
 		monitoring = true
 		monitorable = true
 		area_entered.connect(_on_hit)
 		body_entered.connect(_on_hit)
 
 static var _flare_texture_cache: GradientTexture2D = null
+static var _mat_cast_iron: StandardMaterial3D = null
+static var _mat_coconut_bomb: StandardMaterial3D = null
+static var _mat_fire_bomb: StandardMaterial3D = null
+
+static func _get_iron_material() -> StandardMaterial3D:
+	if not _mat_cast_iron:
+		_mat_cast_iron = StandardMaterial3D.new()
+		_mat_cast_iron.albedo_color = Color(0.18, 0.18, 0.20) # Authentic dark cast iron
+		_mat_cast_iron.metallic = 0.95
+		_mat_cast_iron.roughness = 0.25
+		_mat_cast_iron.emission_enabled = false
+	return _mat_cast_iron
+
+static func _get_coconut_material() -> StandardMaterial3D:
+	if not _mat_coconut_bomb:
+		_mat_coconut_bomb = StandardMaterial3D.new()
+		_mat_coconut_bomb.albedo_color = Color(0.42, 0.25, 0.12) # Textured coconut husk brown
+		_mat_coconut_bomb.roughness = 0.85
+		_mat_coconut_bomb.metallic = 0.05
+		_mat_coconut_bomb.emission_enabled = true
+		_mat_coconut_bomb.emission = Color(0.2, 0.35, 0.08) # Jungle green accent
+		_mat_coconut_bomb.emission_energy_multiplier = 0.9
+	return _mat_coconut_bomb
+
+static func _get_fire_material() -> StandardMaterial3D:
+	if not _mat_fire_bomb:
+		_mat_fire_bomb = StandardMaterial3D.new()
+		_mat_fire_bomb.albedo_color = Color(1.0, 0.28, 0.05) # Blazing fire sphere
+		_mat_fire_bomb.roughness = 0.25
+		_mat_fire_bomb.metallic = 0.1
+		_mat_fire_bomb.emission_enabled = true
+		_mat_fire_bomb.emission = Color(3.5, 1.2, 0.2) # High intensity fire glow
+		_mat_fire_bomb.emission_energy_multiplier = 1.8
+	return _mat_fire_bomb
 
 static func _get_flare_texture() -> GradientTexture2D:
 	if not _flare_texture_cache:
@@ -269,11 +303,7 @@ static func _get_flare_texture() -> GradientTexture2D:
 func _apply_visual_styling() -> void:
 	var model := get_node_or_null("CannonBallModel") as Node3D
 	if model:
-		var mat := StandardMaterial3D.new()
-		mat.albedo_color = Color(0.18, 0.18, 0.20) # Authentic dark cast iron
-		mat.metallic = 0.95
-		mat.roughness = 0.25
-		mat.emission_enabled = false
+		var mat: StandardMaterial3D = _get_iron_material()
 		if model is MeshInstance3D:
 			(model as MeshInstance3D).material_override = mat
 		else:
@@ -301,13 +331,7 @@ func _apply_ammo_data() -> void:
 	match ammo_data.ammo_name:
 		"Coconut Bomb":
 			if model:
-				var mat := StandardMaterial3D.new()
-				mat.albedo_color = Color(0.42, 0.25, 0.12) # Textured coconut husk brown
-				mat.roughness = 0.85
-				mat.metallic = 0.05
-				mat.emission_enabled = true
-				mat.emission = Color(0.2, 0.35, 0.08) # Jungle green accent
-				mat.emission_energy_multiplier = 0.9
+				var mat: StandardMaterial3D = _get_coconut_material()
 				if model is MeshInstance3D:
 					(model as MeshInstance3D).material_override = mat
 				else:
@@ -319,13 +343,7 @@ func _apply_ammo_data() -> void:
 				
 		"Fire Bomb":
 			if model:
-				var mat := StandardMaterial3D.new()
-				mat.albedo_color = Color(1.0, 0.28, 0.05) # Blazing fire sphere
-				mat.roughness = 0.25
-				mat.metallic = 0.1
-				mat.emission_enabled = true
-				mat.emission = Color(3.5, 1.2, 0.2) # High intensity fire glow
-				mat.emission_energy_multiplier = 1.8
+				var mat: StandardMaterial3D = _get_fire_material()
 				if model is MeshInstance3D:
 					(model as MeshInstance3D).material_override = mat
 				else:
@@ -348,11 +366,7 @@ func _apply_ammo_data() -> void:
 		_:
 			# Standard vessel cannonball (pure authentic dark cast iron, no yellow)
 			if model:
-				var mat := StandardMaterial3D.new()
-				mat.albedo_color = Color(0.18, 0.18, 0.20) # Pure dark cast iron
-				mat.metallic = 0.95
-				mat.roughness = 0.25
-				mat.emission_enabled = false
+				var mat: StandardMaterial3D = _get_iron_material()
 				if model is MeshInstance3D:
 					(model as MeshInstance3D).material_override = mat
 				else:
@@ -451,8 +465,6 @@ func _physics_process(delta: float) -> void:
 		for child: Node in get_children():
 			if child is CollisionShape3D:
 				child.set_deferred("disabled", true)
-		if GameState.boss_spawned:
-			print("[CANNON EXPIRED] %s lifetime ended at %s" % [name, global_position])
 		var is_mortar_flag: bool = has_meta("is_mortar") or (weapon_data and ("mortar" in weapon_data.weapon_name.to_lower() or "mortar" in weapon_data.weapon_type.to_lower()))
 		if is_mortar_flag:
 			_detonate_mortar_impact()
@@ -575,17 +587,6 @@ func _on_hit(target: Node) -> void:
 			if child is CollisionShape3D:
 				child.set_deferred("disabled", true)
 				
-		var target_pos := (target as Node3D).global_position if target is Node3D else Vector3.ZERO
-		if GameState.boss_spawned:
-			print("[CANNON HIT] %s HIT %s (groups: %s, pos: %s) at ball pos: %s | Dmg: %d" % [
-				name,
-				target.name,
-				target.get_groups(),
-				target_pos,
-				global_position,
-				damage
-			])
-		
 		var hit_damage := damage
 
 		# ── Diversified tactile surface impact feedback (attacker-side sensory, not SSOT violation) ───

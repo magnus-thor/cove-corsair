@@ -110,6 +110,12 @@ func _on_endless_mode_started() -> void:
 func _on_game_started() -> void:
 	GameState.is_game_active = true
 	GameState.set_performance_mode(true)
+	print("[RIVER RUN STARTED] River Level %d | Active Vessel: %s (Tier %d) | Vault: %d 🪙" % [
+		GameState.current_level,
+		GameState.active_vessel,
+		GameState.get_active_ship_tier(),
+		GameState.doubloons
+	])
 	
 	# 1. Disable harbor backdrop camera & hide 3D parent node BEFORE chunk instantiation
 	if harbor_bay and is_instance_valid(harbor_bay):
@@ -233,12 +239,14 @@ func _unhandled_input(event: InputEvent) -> void:
 			if GameState.current_level > 1:
 				GameState.current_level -= 1
 				GameState.current_selected_level = GameState.current_level
+				print("[RIVER LEVEL] Stepped back to River Level %d" % GameState.current_level)
 				GameState.should_auto_start = true
 				get_tree().reload_current_scene()
 		KEY_BRACKETRIGHT:
 			if GameState.current_level < 45:
 				GameState.current_level += 1
 				GameState.current_selected_level = GameState.current_level
+				print("[RIVER LEVEL] Advanced to River Level %d" % GameState.current_level)
 				GameState.should_auto_start = true
 				get_tree().reload_current_scene()
 		KEY_B:

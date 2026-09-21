@@ -35,13 +35,11 @@ var is_arena_active: bool = false
 
 func activate_arena() -> void:
 	is_arena_active = true
-	print("[BOSS ARENA] Activated Captain Bone-Beard: vulnerability enabled | HP: %d/%d" % [current_hp, max_hp])
 
 func take_damage(amount: int) -> void:
 	if _is_defeated or current_state == State.DYING or not is_arena_active:
 		return
 	current_hp = max(0, current_hp - amount)
-	print("[BOSS HIT] Captain Bone-Beard took %d damage | HP: %d/%d" % [amount, current_hp, max_hp])
 	EventBus.boss_health_changed.emit(current_hp, max_hp)
 	_flash_red()
 	_update_health_bar()
@@ -156,7 +154,6 @@ func _fire_twin_cannon_salvo(target_lane_x: float = NAN) -> void:
 		salvo.setup(fire_dir, null, null)
 		salvo.direction = fire_dir
 		salvo.speed = 12.0
-	print("[BOSS ATTACK] Captain Bone-Beard fired Fire Twin Cannon Salvo downriver towards X=%.2f" % target_x)
 
 func _fire_bonebeard_salvo() -> void:
 	_fire_twin_cannon_salvo()

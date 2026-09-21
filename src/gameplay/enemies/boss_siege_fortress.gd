@@ -58,7 +58,6 @@ var _base_mesh_scale: Vector3 = Vector3(4.74, 4.74, 4.74)
 
 func activate_arena() -> void:
 	is_arena_active = true
-	print("[BOSS ARENA] Activated Siege Fortress: vulnerability enabled | HP: %d/%d" % [current_hp, max_hp])
 
 func _ready() -> void:
 	add_to_group("enemies")
@@ -313,8 +312,6 @@ func _spawn_bastion_minions() -> void:
 			var pos_clamped: Vector3 = s["pos"]
 			pos_clamped.x = clampf(pos_clamped.x, -4.2, 4.2)
 			mob.global_position = pos_clamped
-			if GameState.boss_spawned:
-				print("[BOSS MINION] Spawning %s at pos: %s | HP: %d" % [mob.name, mob.global_position, mob.current_hp])
 
 # Damage Routing
 func take_damage(amount: int) -> void:
@@ -323,10 +320,6 @@ func take_damage(amount: int) -> void:
 func damage_component(comp_name: String, amount: int, _from_bow: bool = false) -> void:
 	if _is_defeated or not is_arena_active:
 		return
-
-		
-	if GameState.boss_spawned:
-		print("[BOSS HIT] The Siege Fortress [%s] took %d dmg | HP: %d/%d" % [comp_name, amount, current_hp, max_hp])
 		
 	match comp_name:
 		"port_turret":

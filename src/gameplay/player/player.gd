@@ -243,6 +243,7 @@ func apply_ship_data(data: ShipData) -> void:
 				boat_mesh.rotation_degrees = data.rotation_degrees if ("rotation_degrees" in data and data.rotation_degrees != Vector3.ZERO) else Vector3.ZERO
 				var sc := data.scale if ("scale" in data and data.scale != Vector3.ZERO) else Vector3.ONE
 				boat_mesh.scale = sc
+				_clean_shadow_nodes(boat_mesh)
 				if data.ship_id == "dinghy" and not boat_mesh.has_node("CockpitWaterMask"):
 					var mask := MeshInstance3D.new()
 					mask.name = "CockpitWaterMask"
@@ -343,11 +344,17 @@ func apply_tier(tier_level: int) -> void:
 		return
 	current_tier = tier_level
 	
-	# Hull Tier Decoupling: scale Base Hull HP, Max Speed, and Firepower with Tier
-	max_health = ship_data.max_health + (tier_level - 1)
+	var max_lvl: int = ship_data.upgrade_costs.size() if (ship_data and not ship_data.upgrade_costs.is_empty()) else 3
+	var progress_ratio: float = float(clampi(tier_level, 1, max_lvl) - 1) / float(maxi(1, max_lvl - 1))
+
+	# Incremental stat scaling up to max ceilings (e.g. Sloop +3.0 m/s at L10 = 14.5 m/s ceiling)
+	var hp_gain: int = int(round(progress_ratio * (2.0 if ship_data.ship_id == "dinghy" else (3.0 if ship_data.ship_id == "sloop" else 2.0))))
+	max_health = ship_data.max_health + hp_gain
 	current_health = max_health
-	var tier_speed: float = ship_data.move_speed + (tier_level - 1) * 1.5
-	tier_fire_rate_multiplier = 1.0 + (tier_level - 1) * 0.15
+	
+	var speed_bonus_max: float = 1.0 if ship_data.ship_id == "dinghy" else 3.0
+	var tier_speed: float = ship_data.move_speed + progress_ratio * speed_bonus_max
+	tier_fire_rate_multiplier = 1.0 + progress_ratio * 0.35
 	if _movement:
 		_movement.sync_from_ship_data(tier_speed, tier_speed * 1.3)
 	health_changed.emit(current_health, max_health)
@@ -580,9 +587,6 @@ func take_hit(amount: int = 1, source_info: String = "") -> void:
 		if AudioManager and AudioManager.has_method("set_low_hp_tension"):
 			AudioManager.set_low_hp_tension(false)
 
-	print("[PLAYER HIT] Vessel took %d dmg from '%s' | HP: %d/%d | Fleet: %d" % [amount, source_info, current_health, max_health, (_fleet.get_follower_count() if _fleet else 0) + 1])
-	if current_health <= 0:
-		print("[FATAL DAMAGE] Killed by: %s | Damage: %d | Remaining HP: %d" % [source_info, amount, current_health])
 	health_changed.emit(current_health, max_health)
 	player_health_changed.emit(current_health, max_health)
 	if current_health <= 0:

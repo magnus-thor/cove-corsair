@@ -32,6 +32,6 @@ hardpoint_scales = {
 "BowMount": Vector3(1, 1, 1),
 "MidDeckCrew": Vector3(1.25, 1.25, 1.25)
 }
-upgrade_costs = Array[int]([0, 50, 100])
-tier_descriptions = Array[String](["Leaky Skiff (2 HP, 1 Bow Chaser)", "Patched Planks (3 HP, +15% Firepower, +1 Crew Socket)", "Reinforced Rowboat (4 HP, +30% Firepower, All Sockets Unlocked)"])
-tier_sockets = Array[Array]([["BowMount", "MidDeckCrew"], ["BowMount", "MidDeckCrew", "AftDeckCrew"], ["BowMount", "MidDeckCrew", "AftDeckCrew"]])
+upgrade_costs = Array[int]([0, 150, 450])
+tier_descriptions = Array[String](["Leaky Skiff (2 HP, 1 Bow Chaser)", "Patched Planks (3 HP, 11.0 m/s, +Mid Crew Socket)", "Reinforced Rowboat (4 HP, 11.5 m/s, All Sockets Unlocked)"])
+tier_sockets = Array[Array]([["BowMount"], ["BowMount", "MidDeckCrew"], ["BowMount", "MidDeckCrew", "AftDeckCrew"]])

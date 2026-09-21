@@ -77,7 +77,6 @@ func _on_spawners_activated() -> void:
 			var camera = get_tree().get_first_node_in_group("game_camera")
 			if camera and camera.has_method("start_boss_focus"):
 				camera.start_boss_focus(boss)
-			print("[BOSS CHUNK] Spawned boss: %s at Z = -35.0 (35m buffer zone)" % boss.name)
 
 func get_start_z() -> float:
 	if chunk_start:

@@ -4,39 +4,73 @@
 [ext_resource type="FontFile" path="res://assets/fonts/CarterOne.ttf" id="2_font_body"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_bg"]
-bg_color = Color(0.082, 0.149, 0.22, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+bg_color = Color(0.06, 0.09, 0.14, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.18, 0.24, 0.32, 0.6)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_fill"]
 bg_color = Color(0.22, 0.74, 0.97, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_delta_box"]
+bg_color = Color(0.08, 0.22, 0.12, 0.85)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.29, 0.87, 0.5, 0.8)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
 
 [node name="UIStatBar" type="HBoxContainer"]
-custom_minimum_size = Vector2(0, 32)
+custom_minimum_size = Vector2(0, 38)
 size_flags_horizontal = 3
-theme_override_constants/separation = 8
+theme_override_constants/separation = 10
+alignment = 1
 script = ExtResource("1_stat_bar_script")
+
+[node name="StatIcon" type="TextureRect" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 5
 
 [node name="StatNameLabel" type="Label" parent="."]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(120, 0)
+custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_vertical = 4
-theme_override_colors/font_color = Color(0.886, 0.910, 0.941, 1)
+theme_override_colors/font_color = Color(0.96, 0.94, 0.88, 1)
+theme_override_colors/font_outline_color = Color(0.05, 0.03, 0.01, 1)
+theme_override_constants/outline_size = 2
 theme_override_fonts/font = ExtResource("2_font_body")
-theme_override_font_sizes/font_size = 16
-text = "Hull Armor"
+theme_override_font_sizes/font_size = 15
+text = "ARMOR"
 vertical_alignment = 1
 
-[node name="StatProgressBar" type="ProgressBar" parent="."]
+[node name="BarContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_constants/separation = 6
+
+[node name="StatProgressBar" type="ProgressBar" parent="BarContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 14)
+custom_minimum_size = Vector2(0, 16)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
@@ -45,27 +79,48 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_bar_fill")
 value = 75.0
 show_percentage = false
 
-[node name="StatValueLabel" type="Label" parent="."]
+[node name="StatValueLabel" type="Label" parent="BarContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(52, 0)
+custom_minimum_size = Vector2(46, 0)
 layout_mode = 2
 size_flags_vertical = 4
-theme_override_colors/font_color = Color(0.886, 0.910, 0.941, 1)
+theme_override_colors/font_color = Color(1, 0.98, 0.92, 1)
+theme_override_colors/font_outline_color = Color(0.05, 0.05, 0.05, 1)
+theme_override_constants/outline_size = 2
 theme_override_fonts/font = ExtResource("2_font_body")
-theme_override_font_sizes/font_size = 16
-text = "75"
+theme_override_font_sizes/font_size = 15
+text = "75%"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="StatDeltaLabel" type="Label" parent="."]
+[node name="DeltaPanel" type="PanelContainer" parent="."]
 unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(52, 0)
+custom_minimum_size = Vector2(42, 34)
 layout_mode = 2
 size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_delta_box")
+
+[node name="DeltaVBox" type="VBoxContainer" parent="DeltaPanel"]
+layout_mode = 2
+theme_override_constants/separation = -2
+alignment = 1
+
+[node name="DeltaArrowLabel" type="Label" parent="DeltaPanel/DeltaVBox"]
+unique_name_in_owner = true
+layout_mode = 2
 theme_override_colors/font_color = Color(0.29, 0.867, 0.502, 1)
 theme_override_fonts/font = ExtResource("2_font_body")
-theme_override_font_sizes/font_size = 14
-text = "+15"
+theme_override_font_sizes/font_size = 10
+text = "▲"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DeltaNumberLabel" type="Label" parent="DeltaPanel/DeltaVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.29, 0.867, 0.502, 1)
+theme_override_fonts/font = ExtResource("2_font_body")
+theme_override_font_sizes/font_size = 13
+text = "+8"
 horizontal_alignment = 1
 vertical_alignment = 1

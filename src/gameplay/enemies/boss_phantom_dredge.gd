@@ -49,7 +49,6 @@ var is_arena_active: bool = false
 
 func activate_arena() -> void:
 	is_arena_active = true
-	print("[BOSS ARENA] Activated Phantom Dredge: vulnerability enabled | HP: %d/%d" % [current_hp, max_hp])
 
 func _ready() -> void:
 	add_to_group("enemies")
@@ -324,7 +323,6 @@ func _start_submerge() -> void:
 func _rain_submerged_mobs() -> void:
 	var lanes: Array[float] = [-3.0, 3.0, -1.5, 1.5, 0.0, -2.5, 2.5]
 	var count := 6 if current_phase >= 2 else 5
-	print("[BOSS SUBMERGED] Raining %d mobs on the player!" % count)
 	for i in range(count):
 		var delay: float = 0.35 + (i * 0.45)
 		var lane_x: float = lanes[i % lanes.size()]
@@ -432,7 +430,6 @@ func take_damage(amount: int) -> void:
 		
 	current_hp = max(0, current_hp - amount)
 
-	print("[BOSS HIT] The Phantom Dredge took %d damage | HP: %d/%d" % [amount, current_hp, max_hp])
 	EventBus.boss_health_changed.emit(current_hp, max_hp)
 	_flash_boss()
 	
@@ -476,7 +473,6 @@ func die() -> void:
 func interrupt_channel() -> void:
 	if is_barrage_active:
 		is_barrage_active = false
-		print("[BOSS INTERRUPTED] Spectral Salt interrupted geyser barrage channel!")
 		var telegraphs := get_tree().get_nodes_in_group("spectral_geyser_telegraphs")
 		for tele: Node in telegraphs:
 			if is_instance_valid(tele):

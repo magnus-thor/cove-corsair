@@ -69,7 +69,6 @@ var _base_mesh_scale: Vector3 = Vector3.ONE
 
 func activate_arena() -> void:
 	is_arena_active = true
-	print("[BOSS ARENA] Activated Captain Ironjaw: vulnerability enabled | HP: %d/%d" % [current_hp, max_hp])
 
 func _ready() -> void:
 	_clean_shadow_nodes(self)
@@ -495,7 +494,6 @@ func _drop_keg() -> void:
 			parent.add_child(keg)
 			keg.global_position = Vector3(global_position.x, 0.4, global_position.z + 3.0)
 			keg.forward_speed = 5.0
-			print("[BOSS SPAWN] Powder Keg launched at %s | Speed: 5.0" % keg.global_position)
 
 func _eject_mine() -> void:
 	if not spawn_hazard_enabled or is_barrage_active:
@@ -514,7 +512,6 @@ func _eject_mine() -> void:
 			mine.global_position = Vector3(spawn_x, 0.3, spawn_z)
 			if "forward_speed" in mine:
 				mine.set("forward_speed", 4.0)
-			print("[BOSS SPAWN] Spiked Sea Mine ejected at %s (safe >=15m) | Speed: 4.0" % mine.global_position)
 
 # Steam Venting
 func _start_steam_venting() -> void:
@@ -595,7 +592,6 @@ func take_damage(amount: int) -> void:
 		_show_crit_flash()
 		
 	current_hp = max(0, current_hp - actual_damage)
-	print("[BOSS HIT] Captain Ironjaw's War-Barge took %d damage | HP: %d/%d" % [actual_damage, current_hp, max_hp])
 	EventBus.boss_health_changed.emit(current_hp, max_hp)
 	_flash_boss_main()
 	

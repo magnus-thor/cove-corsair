@@ -1,10 +1,11 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://src/ui/hud/frenzy_vignette.gd" id="1_frenzy_script"]
+[ext_resource type="FontFile" path="res://assets/fonts/CarterOne.ttf" id="2_font_carter"]
 
 [sub_resource type="Gradient" id="Gradient_vignette"]
-offsets = PackedFloat32Array(0, 0.45, 0.78, 1)
-colors = PackedColorArray(1, 0.8, 0.2, 0, 1, 0.7, 0.1, 0, 1, 0.45, 0.05, 0.4, 1, 0.3, 0, 0.85)
+offsets = PackedFloat32Array(0, 0.5, 0.8, 1)
+colors = PackedColorArray(1, 0.92, 0.4, 0, 1, 0.82, 0.2, 0, 1, 0.72, 0.1, 0.22, 0.95, 0.62, 0.05, 0.45)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_vignette"]
 gradient = SubResource("Gradient_vignette")
@@ -27,3 +28,50 @@ grow_vertical = 2
 mouse_filter = 2
 texture = SubResource("GradientTexture2D_vignette")
 expand_mode = 1
+
+[node name="BannerContainer" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+mouse_filter = 2
+
+[node name="BannerPanel" type="PanelContainer" parent="BannerContainer"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -140.0
+offset_top = -28.0
+offset_right = 140.0
+offset_bottom = 28.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(140, 28)
+mouse_filter = 2
+
+[node name="VBox" type="VBoxContainer" parent="BannerContainer/BannerPanel"]
+layout_mode = 2
+theme_override_constants/separation = 1
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="BannerContainer/BannerPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.94, 0.4, 1)
+theme_override_colors/font_outline_color = Color(0.18, 0.08, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("2_font_carter")
+theme_override_font_sizes/font_size = 18
+text = "🔥 FIRE FRENZY 🔥"
+horizontal_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="BannerContainer/BannerPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.98, 0.88, 0.95)
+theme_override_colors/font_outline_color = Color(0.12, 0.05, 0, 1)
+theme_override_constants/outline_size = 2
+theme_override_fonts/font = ExtResource("2_font_carter")
+theme_override_font_sizes/font_size = 11
+text = "⚡ SPEED & FIREPOWER BOOST ⚡"
+horizontal_alignment = 1

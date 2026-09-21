@@ -98,14 +98,13 @@ func _trigger_gate_collect(node: Node) -> void:
 		
 	# Balanced fleet reward: 1 gate gives +1 ship (+2 if maxed to 100), never full armada in 1 gate!
 	var ships_to_add: int = 2 if final_value >= 100 else 1
-	var doubloons_to_add: int = 150 if final_value >= 100 else int(round(final_value * 1.5))
+	var doubloons_to_add: int = 15 if final_value >= 100 else clampi(int(round(final_value * 0.1)), 2, 8)
 	
-	GameState.doubloons += doubloons_to_add
+	if GameState:
+		GameState.add_doubloons(doubloons_to_add)
 	if player_node:
 		if "doubloons" in player_node:
 			player_node.set("doubloons", int(player_node.get("doubloons")) + doubloons_to_add)
-		if player_node.has_signal("doubloons_changed"):
-			player_node.emit_signal("doubloons_changed", GameState.doubloons)
 		if player_node.has_method("add_follower_ships"):
 			player_node.call("add_follower_ships", ships_to_add)
 		if final_value >= 100 and player_node.has_method("trigger_armada_overdrive"):

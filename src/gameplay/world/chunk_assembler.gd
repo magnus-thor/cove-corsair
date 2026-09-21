@@ -185,7 +185,6 @@ func assemble_level(data: LevelData = null) -> void:
 						buffer_instance.position = Vector3(0.0, 0.0, current_z_offset)
 						current_z_offset -= buffer_instance.CHUNK_LENGTH
 						active_chunks.append(buffer_instance)
-						print("[CHUNK ASSEMBLER] Inserted 50m buffer chunk before boss: %s" % buffer_instance.name)
 			
 		# If this is the starting chunk (index 0), enforce safe clearance runway (>= 35.0m) from player start
 		if active_chunks.is_empty():
@@ -219,12 +218,6 @@ func assemble_level(data: LevelData = null) -> void:
 		
 	is_assembled = true
 	level_assembled.emit(total_track_distance)
-	print("[CHUNK ASSEMBLER] Level %d (%s) assembled: %d chunks, total distance %.1fm" % [
-		active_level_data.level_id,
-		active_level_data.level_title,
-		active_chunks.size(),
-		total_track_distance
-	])
 
 func _physics_process(delta: float) -> void:
 	var gs := _get_game_state()
@@ -269,7 +262,6 @@ func _physics_process(delta: float) -> void:
 	for chunk in to_remove:
 		active_chunks.erase(chunk)
 		chunk.queue_free()
-		print("[CHUNK CLEANUP] Chunk %s freed (+30m behind camera)" % chunk.name)
 
 func _on_boss_arena_reached(boss_chunk: BaseTrackChunk) -> void:
 	if is_boss_active:
@@ -293,7 +285,6 @@ func _on_boss_arena_reached(boss_chunk: BaseTrackChunk) -> void:
 		boss_chunk.activate_spawners()
 		
 	boss_arena_reached.emit(boss_chunk)
-	print("[CHUNK ASSEMBLER] Clean transition into Boss Arena: %s" % boss_chunk.name)
 
 ## Suppresses multiplier gates occurring in the final portion (e.g. 30%) of a chunk.
 func _suppress_gates_in_chunk_final_portion(chunk: BaseTrackChunk, portion: float = 0.30) -> void:
@@ -307,9 +298,6 @@ func _suppress_gates_in_chunk_final_portion(chunk: BaseTrackChunk, portion: floa
 			# Check Z relative to chunk origin
 			var rel_z: float = (child as Node3D).position.z
 			if rel_z <= threshold_z:
-				print("[CHUNK ASSEMBLER] Suppressing multiplier gate '%s' in final %.0f%% (Z=%.1fm <= %.1fm) of chunk %s" % [
-					child.name, portion * 100.0, rel_z, threshold_z, chunk.name
-				])
 				if child.get_parent():
 					child.get_parent().remove_child(child)
 				child.queue_free()
@@ -327,7 +315,6 @@ func _enforce_start_clearance_in_chunk(chunk: BaseTrackChunk, min_clearance: flo
 		var is_hazard := child is HazardSeaMine or child is HazardThermalGeyser or child.is_in_group("hazards") or child.name.to_lower().contains("mine")
 		var is_enemy := child.is_in_group("enemies") or child is EnemyMob or child.name.to_lower().contains("enemy") or child.name.to_lower().contains("fodder") or child.name.to_lower().contains("skiff") or child.name.to_lower().contains("rower")
 		if (is_hazard or is_enemy) and child is Node3D and (child as Node3D).position.z > -min_clearance:
-			print("[CHUNK ASSEMBLER] Suppressed early hostile/hazard '%s' at Z=%.1fm in starting chunk (< %.1fm clearance)" % [child.name, (child as Node3D).position.z, min_clearance])
 			if child.get_parent():
 				child.get_parent().remove_child(child)
 			child.queue_free()
@@ -351,5 +338,4 @@ func jump_to_boss() -> void:
 				if gs.has_signal("progress_changed"):
 					gs.emit_signal("progress_changed", total_track_distance, total_track_distance)
 			_on_boss_arena_reached(chunk)
-			print("[CHUNK ASSEMBLER] Jumped directly to boss chunk: %s" % chunk.name)
 			break

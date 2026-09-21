@@ -26,6 +26,10 @@ var throw_tween: Tween = null
 var wander_tween: Tween = null
 var hop_in_done: bool = false
 
+const TARGETING_INTERVAL: float = 0.12
+var targeting_timer: float = 0.0
+static var _last_cannon_sfx_time: float = -1.0
+
 var fire_rate: float:
 	get:
 		return weapon_data.fire_rate if weapon_data else 1.0
@@ -210,12 +214,19 @@ func _physics_process(delta: float) -> void:
 	var is_crew: bool = _is_crew()
 	var is_mortar: bool = _is_mortar()
 	
+	targeting_timer += delta
+	var should_retarget: bool = (targeting_timer >= TARGETING_INTERVAL) or not is_instance_valid(current_target)
+
 	if is_crew:
 		_process_deck_idle(delta)
-		_process_targeting(delta)
+		if should_retarget:
+			targeting_timer = 0.0
+			_process_targeting(delta)
 		_update_aim_rotation(delta)
 	elif is_mortar:
-		_process_targeting(delta)
+		if should_retarget:
+			targeting_timer = 0.0
+			_process_targeting(delta)
 		_update_aim_rotation(delta)
 	else:
 		aim_direction = Vector3(0, 0, -1)
@@ -292,7 +303,7 @@ func _process_targeting(_delta: float) -> void:
 	if is_crew:
 		max_range = min(max_range, 20.0)
 	elif is_mortar:
-		max_range = min(max_range, 22.0)
+		max_range = min(max_range, 18.5)
 	var m_pos_ref := muzzle_point.global_position if muzzle_point else global_position
 
 	var processed: Dictionary = {}
@@ -342,7 +353,7 @@ func _process_targeting(_delta: float) -> void:
 
 		processed.clear()
 		min_dist = INF
-		var max_boss_range: float = 20.0 if is_crew else 28.0
+		var max_boss_range: float = 20.0 if is_crew else (18.5 if is_mortar else 28.0)
 		for target in boss_candidates:
 			if not is_instance_valid(target) or not target is Node3D or processed.has(target):
 				continue
@@ -495,7 +506,10 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 			if player and "base_damage_bonus" in player and not is_hostile:
 				ball.damage += int(round(float(player.get("base_damage_bonus"))))
 	else:
-		AudioManager.play_sfx("cannon_shots")
+		var cur_time: float = Time.get_ticks_msec() / 1000.0
+		if cur_time - _last_cannon_sfx_time >= 0.05:
+			_last_cannon_sfx_time = cur_time
+			AudioManager.play_sfx("cannon_shots")
 		if not is_hostile and player and player.has_method("apply_firing_recoil"):
 			player.call("apply_firing_recoil", 1.8, false)
 		if camera and camera.has_method("add_trauma"):

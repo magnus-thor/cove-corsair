@@ -79,7 +79,6 @@ func _on_chunk_boss_arena_reached(boss_chunk: BaseTrackChunk) -> void:
 		camera.call("start_boss_focus", boss)
 	if boss and boss.has_method("activate_arena"):
 		boss.call("activate_arena")
-	print("[LEVEL CONTROLLER] Locked camera to boss arena")
 
 
 func handle_player_defeat(coins_collected: int, distance_reached: float) -> void:
@@ -141,7 +140,6 @@ func setup_active_queue() -> void:
 		elif ev is Dictionary and str(ev.get("type", "")) == "gate":
 			is_gate = true
 		if is_gate and dist >= gate_suppression_dist:
-			print("[LEVEL CONTROLLER] Suppressed multiplier gate at %.1fm (final 30%% before boss)" % dist)
 			return false
 		return true
 	)
@@ -451,7 +449,6 @@ func _spawn_timeline_event(event: SpawnEvent, z_pos_override: float = 0.0) -> vo
 					pod.hp = event.base_hp_override if event.base_hp_override > 0 else 1
 
 		SpawnEvent.EntityType.BOSS:
-			print("[SPAWN BOSS TRIGGER] Triggering Boss at dist=%.1fm" % current_distance)
 			_spawn_boss()
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -534,7 +531,6 @@ func _spawn_wave_event(event: Dictionary, z_pos_override: float = 0.0) -> void:
 				gate.gate_action = gate_action
 				gate.value = gate_val
 				gate.operation = MultiplierGate.OperationType.ADD
-				print("[GATE] Spawned +", gate_val, " gate at ", current_distance, "m")
 
 		# ── Biogas Pod (Level 2) ──────────────────────────────────────────────
 		"biogas_pod":
@@ -887,11 +883,6 @@ func _spawn_boss() -> void:
 		else:
 			add_child(boss)
 		boss.global_position = Vector3(0.0, 0.0, player_z - 35.0)
-		print("[BOSS] Spawned boss for %s with HP: %s at Z = %.1f (35m buffer zone)" % [
-			level_data.level_title if level_data else "Level",
-			str(b_hp) if b_hp > 0 else "default",
-			boss.global_position.z
-		])
 
 		# Lock camera to boss arena
 		var camera := get_tree().get_first_node_in_group("game_camera")
@@ -911,7 +902,6 @@ func jump_to_boss() -> void:
 		track_mgr.set("scroll_speed", 0.0)
 	active_queue.clear()
 	_spawn_boss()
-	print("[LEVEL CONTROLLER] Jumped directly to boss encounter")
 
 ## Constructs invisible StaticBody3D physical collision walls bounding the navigable corridor at X = +/- 6.0
 func _setup_boundary_walls() -> void:
@@ -975,7 +965,6 @@ func _setup_riverbank_chunks(biome_name: String) -> void:
 
 	# If 8 valid chunks already exist (4 left, 4 right), cleanly reset positions and re-seed biome
 	if left_chunks.size() == 4 and right_chunks.size() == 4:
-		print("[RIVERBANK CHUNKS] Reusing pool of 8 chunks (4 left, 4 right). Offsets reset to [20, -20, -60, -100]m for biome %s" % biome_name)
 		for i in range(4):
 			left_chunks[i].global_position = Vector3(0.0, 0.0, 20.0 - i * 40.0)
 			if left_chunks[i].has_method("setup"):
@@ -992,8 +981,6 @@ func _setup_riverbank_chunks(biome_name: String) -> void:
 			child.queue_free()
 			purged += 1
 	riverbank_chunks.clear()
-	if purged > 0:
-		print("[RIVERBANK CHUNKS] Purged %d duplicate/orphaned riverbank chunks from scene tree" % purged)
 
 	var props_scene := preload("res://src/gameplay/levels/riverbank_props.tscn")
 	if props_scene:
@@ -1006,7 +993,6 @@ func _setup_riverbank_chunks(biome_name: String) -> void:
 				if chunk.has_method("setup"):
 					chunk.call("setup", prop_side, 40.0, biome_name)
 				riverbank_chunks.append(chunk)
-		print("[RIVERBANK CHUNKS] Instantiated fresh pool of 8 chunks (4 left, 4 right) with 0 initial overlaps.")
 
 func _scroll_riverbank_chunks(delta_z: float) -> void:
 	if delta_z <= 0.0 or riverbank_chunks.is_empty():
@@ -1075,11 +1061,8 @@ func run_blinking_diagnostic() -> Dictionary:
 				continue
 			var key := "%0.1f_%0.1f" % [mesh.global_position.x, mesh.global_position.z]
 			if positions.has(key):
-				print("[DUPLICATE DETECTED] Two meshes at same spot: %s - '%s' vs '%s'" % [key, mesh.name, positions[key]])
 				dupes += 1
 			positions[key] = mesh.name
-			
-	print("[DIAGNOSTIC MONITOR] Total Active Nodes: %d | Scenery Meshes: %d | Duplicates: %d" % [node_count, positions.size(), dupes])
 	return {
 		"node_count": node_count,
 		"mesh_count": positions.size(),

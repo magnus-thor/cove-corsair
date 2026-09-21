@@ -48,6 +48,7 @@ func _ready() -> void:
 				if model_mesh:
 					model_mesh.name = "BoatMesh"
 					add_child(model_mesh)
+					_clean_shadow_nodes(model_mesh)
 			if model_mesh:
 				model_mesh.visible = true
 				var base_sc: Vector3 = s_data.scale if ("scale" in s_data and s_data.scale != Vector3.ZERO) else Vector3.ONE
@@ -314,8 +315,8 @@ func _clean_shadow_nodes(node: Node) -> void:
 			
 	if node is MeshInstance3D:
 		var mesh_node := node as MeshInstance3D
+		mesh_node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		if "shadow" in lower_name or "plane" in lower_name or "billboard" in lower_name or "card" in lower_name:
-			mesh_node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 			mesh_node.visible = false
 			mesh_node.queue_free()
 			return

@@ -30,16 +30,23 @@ func _test_vessel_card_contrast() -> void:
 	add_child(card)
 	card.setup_vessel("sloop", 2)
 
+	# Verify index badge was removed
+	assert(card.get_node_or_null("%IndexBadge") == null, "IndexBadge node must be removed from VesselCard")
+
 	# Test normal unselected state
 	card.set_selected(false)
 	var title_normal_color: Color = card.title_label.get_theme_color("font_color")
-	assert(title_normal_color.r < 0.2 and title_normal_color.g < 0.2, "Normal title color must be dark for contrast on parchment")
+	assert(title_normal_color.r > 0.8 and title_normal_color.g > 0.8, "Normal title color must be light cream for dark card contrast")
 
 	# Test selected state
 	card.set_selected(true)
 	var title_selected_color: Color = card.title_label.get_theme_color("font_color")
-	assert(title_selected_color.r > 0.8 and title_selected_color.g > 0.8, "Selected title color must be light for contrast on dark navy")
-	print("[PASS] Vessel card text contrast in normal and selected states verified!")
+	assert(title_selected_color.r > 0.9 and title_selected_color.g > 0.9, "Selected title color must be bright gold/cream")
+
+	# Verify Tier Badge contrast
+	var tier_font_color: Color = card.tier_badge_label.get_theme_color("font_color")
+	assert(tier_font_color.r > 0.9 and tier_font_color.g > 0.8, "Tier badge font color must be bright gold for clear contrast")
+	print("[PASS] Vessel card text contrast, index removal, and tier badge contrast verified!")
 	card.queue_free()
 
 func _test_crew_badge_font_size() -> void:

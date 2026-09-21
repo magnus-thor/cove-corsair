@@ -80,6 +80,11 @@ func show_defeat(coins_collected: int, _distance_reached: float, banked_total: i
 	_banked_this_run = coins_collected
 	_total_banked = banked_total
 	_stars_earned = 0
+	print("[LEVEL END] River Level %d DEFEAT | In-Run Coins Saved: %d 🪙 | Vault Total: %d 🪙" % [
+		GameState.current_level,
+		coins_collected,
+		banked_total
+	])
 	_present_modal()
 
 func show_victory(coins_collected: int, completion_bonus: int, banked_total: int, stars: int = 3) -> void:
@@ -90,6 +95,14 @@ func show_victory(coins_collected: int, completion_bonus: int, banked_total: int
 	_banked_this_run = coins_collected + completion_bonus
 	_total_banked = banked_total
 	_stars_earned = clamp(stars, 1, 3)
+	
+	print("[LEVEL COMPLETE] River Level %d VICTORY! | In-Run Coins: %d | Clear Bonus: %d | Total Earned: %d 🪙 | Vault Total: %d 🪙" % [
+		GameState.current_level,
+		coins_collected,
+		completion_bonus,
+		coins_collected + completion_bonus,
+		banked_total
+	])
 	
 	# Record high score, star mastery, and unlock next level
 	GameState.record_level_score(GameState.current_level, coins_collected + completion_bonus)
@@ -108,6 +121,13 @@ func show_extraction(distance_reached: int, doubloons_banked: int, total_banked:
 	_banked_this_run = doubloons_banked
 	_total_banked = total_banked
 	_stars_earned = 0
+	print("[GAUNTLET EXTRACTED] River Level %d | Distance: %dm (%.1fx) | Coins Banked: %d 🪙 | Vault Total: %d 🪙" % [
+		GameState.current_level,
+		distance_reached,
+		multiplier_reached,
+		doubloons_banked,
+		total_banked
+	])
 	_present_modal()
 
 func _present_modal() -> void:
@@ -323,6 +343,11 @@ func _on_bonus_claim_pressed() -> void:
 		GameState.is_game_active = false
 		GameState.doubloons += bonus_amount
 		GameState.save_game()
+		print("[2X SETTLEMENT CLAIMED] River Level %d | Claimed 2X Bonus: +%d 🪙 | New Vault Total: %d 🪙" % [
+			GameState.current_level,
+			bonus_amount,
+			GameState.doubloons
+		])
 		GameState.doubloons_changed.emit(GameState.doubloons)
 		
 	if AudioManager and AudioManager.has_method("play_sfx"):

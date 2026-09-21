@@ -32,6 +32,7 @@ func _ready() -> void:
 	assert_test(sloop_res.max_health == 4, "Sloop max_health is 4 HP")
 	assert_test(sloop_res.move_speed == 11.5, "Sloop move_speed is 11.5 m/s (fastest)")
 	assert_test(sloop_res.base_cannons == 2, "Sloop base_cannons is 2")
+	assert_test(sloop_res.fire_rate == 0.36, "Sloop fire_rate reduced to 0.36s for balanced DPS")
 
 	var ironclad_res: ShipData = load("res://src/data/resources/user_vessels/ironclad_ship.tres") as ShipData
 	assert_test(ironclad_res != null, "ironclad_ship.tres loads successfully")
@@ -43,18 +44,20 @@ func _ready() -> void:
 	assert_test(bombard_res != null, "bombard_skiff_ship.tres loads successfully")
 	assert_test(bombard_res.max_health == 4, "Bombard Skiff max_health is 4 HP")
 	assert_test(bombard_res.move_speed == 6.5, "Bombard Skiff move_speed is 6.5 m/s (slowest)")
+	assert_test(bombard_res.fire_rate == 1.5, "Bombard Skiff fire_rate is 1.5s")
 
 	# 2. Verify Weapons & Ammo Tuning
 	print("\n--- 2. Testing Weapons and Ammo Tuning ---")
 	var heavy_shot: AmmoData = load("res://src/data/resources/user_ammo/ammo_heavy_shot.tres") as AmmoData
 	assert_test(heavy_shot != null, "ammo_heavy_shot.tres loads successfully")
-	assert_test(heavy_shot.damage == 4, "Heavy Shot damage reduced from 8 to 4")
-	assert_test(heavy_shot.aoe_damage == 3, "Heavy Shot AoE damage reduced from 5 to 3")
-	assert_test(heavy_shot.splash_radius == 3.2, "Heavy Shot splash radius reduced to 3.2m")
+	assert_test(heavy_shot.damage == 4, "Heavy Shot damage is 4")
+	assert_test(heavy_shot.aoe_damage == 2, "Heavy Shot AoE damage tuned to 2")
+	assert_test(heavy_shot.splash_radius == 1.6, "Heavy Shot splash radius narrowed to 1.6m single-lane focus")
 
 	var mortar_w: WeaponData = load("res://src/data/resources/user_crew/weapon_bow_mortar.tres") as WeaponData
 	assert_test(mortar_w != null, "weapon_bow_mortar.tres loads successfully")
-	assert_test(mortar_w.max_range == 13.0, "Heavy Mortar range reduced to short-range 13.0m")
+	assert_test(mortar_w.max_range == 18.5, "Heavy Mortar range tuned to 18.5m to reach boss")
+	assert_test(mortar_w.fire_rate == 1.5, "Heavy Mortar fire_rate tuned to 1.5s deliberate siege cooldown")
 
 	var ironclad_battery: WeaponData = load("res://src/data/resources/user_crew/weapon_ironclad_battery.tres") as WeaponData
 	assert_test(ironclad_battery != null, "weapon_ironclad_battery.tres loads successfully")
@@ -65,6 +68,7 @@ func _ready() -> void:
 	var sloop_chaser: WeaponData = load("res://src/data/resources/user_crew/weapon_sloop_twin_chaser.tres") as WeaponData
 	assert_test(sloop_chaser != null, "weapon_sloop_twin_chaser.tres loads successfully")
 	assert_test(sloop_chaser.cannon_count == 2, "Sloop Twin Chasers has 2 cannons")
+	assert_test(sloop_chaser.fire_rate == 0.36, "Sloop Twin Chasers fire_rate tuned to 0.36s")
 	assert_test(sloop_chaser.max_range == 38.0, "Sloop Twin Chasers has 38.0m long range")
 
 	# 3. Simulate Weapon Volleys in Tree
@@ -119,6 +123,47 @@ func _ready() -> void:
 		b.free()
 	remove_child(ironclad_weapon_inst)
 	ironclad_weapon_inst.free()
+
+	# 4. Verify Economy & Progression Gating
+	print("\n--- 4. Testing Economy & Progression Gating ---")
+	assert_test(GameState.VESSEL_CATALOG["sloop"]["purchase_price"] == 400, "Sloop base purchase is accessible at 400 doubloons")
+	assert_test(GameState.VESSEL_CATALOG["bombard_skiff"]["purchase_price"] == 800, "Bombard Skiff base purchase is accessible at 800 doubloons")
+	assert_test(GameState.VESSEL_CATALOG["ironclad"]["purchase_price"] == 1500, "Ironclad base purchase is accessible at 1500 doubloons")
+	assert_test(GameState.get_max_vessel_tier("dinghy") == 3, "Dinghy has max level of 3")
+	assert_test(GameState.get_max_vessel_tier("sloop") == 10, "Sloop has max level of 10")
+	assert_test(GameState.get_max_vessel_tier("bombard_skiff") == 10, "Bombard Skiff has max level of 10")
+	assert_test(GameState.get_max_vessel_tier("ironclad") == 10, "Ironclad has max level of 10")
+
+	# Check exponential upgrade curve
+	var sloop_costs: Dictionary = GameState.VESSEL_CATALOG["sloop"]["tier_prices"]
+	assert_test(sloop_costs.size() == 9, "Sloop has 9 upgrade tiers (L2-L10)")
+	assert_test(sloop_costs[2] == 200, "Sloop L2 upgrade is 200 doubloons")
+	assert_test(sloop_costs[5] == 1500, "Sloop L5 upgrade is 1500 doubloons")
+	assert_test(sloop_costs[10] == 16000, "Sloop L10 capstone upgrade is 16000 doubloons")
+
+	# Crew progression
+	assert_test(GameState.CREW_CATALOG["monkey_bomber"]["unlock_price"] == 350, "Monkey Bomber unlock cost is 350 doubloons")
+	assert_test(GameState.get_crew_upgrade_cost("monkey_bomber", 2) == 500, "Monkey Bomber L2 upgrade is 500 doubloons")
+	assert_test(GameState.get_crew_upgrade_cost("monkey_bomber", 5) == 5000, "Monkey Bomber L5 upgrade is 5000 doubloons")
+
+	# 5. Verify Mobile Optimizations
+	print("\n--- 5. Testing Mobile Optimizations ---")
+	var mat_iron1: StandardMaterial3D = Cannonball._get_iron_material()
+	var mat_iron2: StandardMaterial3D = Cannonball._get_iron_material()
+	assert_test(mat_iron1 == mat_iron2, "Cannonball cast iron material is statically cached and shared")
+	var mat_coconut1: StandardMaterial3D = Cannonball._get_coconut_material()
+	var mat_coconut2: StandardMaterial3D = Cannonball._get_coconut_material()
+	assert_test(mat_coconut1 == mat_coconut2, "Cannonball coconut material is statically cached and shared")
+	var mat_fire1: StandardMaterial3D = Cannonball._get_fire_material()
+	var mat_fire2: StandardMaterial3D = Cannonball._get_fire_material()
+	assert_test(mat_fire1 == mat_fire2, "Cannonball fire material is statically cached and shared")
+
+	var test_cb: Cannonball = Cannonball.new()
+	add_child(test_cb)
+	test_cb._enable_collisions()
+	assert_test(test_cb.collision_mask == 31, "Cannonball collision mask pruned to 31 (layers 1-5)")
+	remove_child(test_cb)
+	test_cb.free()
 
 	print("\n========================================================")
 	print("  TEST RESULTS: %d / %d PASSED" % [passed_count, total_count])

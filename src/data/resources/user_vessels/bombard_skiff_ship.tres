@@ -17,7 +17,7 @@ rotation_degrees = Vector3(0, -90, 0)
 collision_size = Vector3(1.8, 1.2, 3)
 max_health = 4
 move_speed = 6.5
-fire_rate = 1.3
+fire_rate = 1.5
 hardpoint_offsets = {
 "BowMortarMount": Vector3(-0.04, 1.35, -0.53),
 "PortRailMount": Vector3(-0.53, 1.12, -1.51),
@@ -41,6 +41,6 @@ socket_weapons = {
 "PortRailMount": "res://src/data/resources/user_crew/weapon_scattershot.tres",
 "StarboardRailMount": "res://src/data/resources/user_crew/weapon_scattershot.tres"
 }
-upgrade_costs = Array[int]([1000, 1200, 2200])
-tier_descriptions = Array[String](["Artillery Skiff (3 HP, Siege Mortar + 1 Crew Socket)", "Reinforced Keel (4 HP, +15% Firepower, +Port Scattershot)", "Siege Dreadnought (5 HP, +30% Firepower, All Mounts Unlocked)"])
-tier_sockets = Array[Array]([["BowMortarMount", "QuarterdeckCrew"], ["BowMortarMount", "QuarterdeckCrew", "PortRailMount"], ["BowMortarMount", "QuarterdeckCrew", "PortRailMount", "StarboardRailMount"]])
+upgrade_costs = Array[int]([800, 300, 650, 1200, 2200, 3800, 6000, 9500, 15000, 22000])
+tier_descriptions = Array[String](["Artillery Skiff (4 HP, Siege Mortar)", "Balanced Pontoons (4 HP, 6.8 m/s, +5% Firepower)", "Quarterdeck Station (5 HP, 7.1 m/s, +Quarterdeck Crew Socket)", "Reinforced Hull (5 HP, 7.4 m/s, +15% Firepower)", "Quick-Load Hoists (5 HP, 7.7 m/s, +20% Firepower)", "Flank Scattershot (6 HP, 8.0 m/s, +Dual Scattershot Carronades)", "Heavy Caliber Bore (6 HP, 8.3 m/s, +30% Firepower)", "Reinforced Transom (6 HP, 8.6 m/s, +35% Firepower)", "Dreadnought Mortar (7 HP, 8.9 m/s, +Expanded Shell Spread)", "Siege Dreadnought (7 HP, 9.2 m/s, All Mounts Maxed)"])
+tier_sockets = Array[Array]([["BowMortarMount"], ["BowMortarMount"], ["BowMortarMount", "QuarterdeckCrew"], ["BowMortarMount", "QuarterdeckCrew"], ["BowMortarMount", "QuarterdeckCrew"], ["BowMortarMount", "QuarterdeckCrew", "PortRailMount", "StarboardRailMount"], ["BowMortarMount", "QuarterdeckCrew", "PortRailMount", "StarboardRailMount"], ["BowMortarMount", "QuarterdeckCrew", "PortRailMount", "StarboardRailMount"], ["BowMortarMount", "QuarterdeckCrew", "PortRailMount", "StarboardRailMount"], ["BowMortarMount", "QuarterdeckCrew", "PortRailMount", "StarboardRailMount"]])

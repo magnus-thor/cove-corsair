@@ -31,6 +31,9 @@ extends Resource
 ## tier_sockets: array of string arrays — each sub-array lists the active socket names for that tier (index 0 = Tier 1)
 @export var tier_sockets: Array[Array] = []
 
+func get_max_level() -> int:
+	return maxi(1, upgrade_costs.size())
+
 func get_boat_scene() -> PackedScene:
 	if boat_scene:
 		return boat_scene

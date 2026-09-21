@@ -116,8 +116,6 @@ func take_damage(amount: int) -> void:
 	if _is_dead:
 		return
 	current_hp = max(0, current_hp - amount)
-	if GameState.boss_spawned:
-		print("[BOSS MINION HIT] Iron Gunner took %d dmg | HP: %d/%d" % [amount, current_hp, max_hp])
 	_update_health_bar()
 	_flash()
 	

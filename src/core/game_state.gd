@@ -112,11 +112,12 @@ const VESSEL_CATALOG: Dictionary = {
 		"archetype": "Starter Rowboat",
 		"resource_path": "res://src/data/resources/user_vessels/dinghy_ship.tres",
 		"purchase_price": 0,
-		"tier_prices": { 2: 50, 3: 100 },
+		"max_level": 3,
+		"tier_prices": { 2: 150, 3: 450 },
 		"tier_descriptions": {
 			1: "Leaky Skiff (2 HP, 1 Bow Chaser)",
-			2: "Patched Planks (3 HP, +15% Firepower, +1 Crew Socket)",
-			3: "Reinforced Rowboat (4 HP, +30% Firepower, All Sockets Unlocked)"
+			2: "Patched Planks (3 HP, 11.0 m/s, +Mid Crew Socket)",
+			3: "Reinforced Rowboat (4 HP, 11.5 m/s, All Sockets Unlocked)"
 		},
 		"base_hp": 2,
 		"base_speed": 10.5,
@@ -128,16 +129,24 @@ const VESSEL_CATALOG: Dictionary = {
 		"name": "The Sloop",
 		"archetype": "Agile Long-Range Runner",
 		"resource_path": "res://src/data/resources/user_vessels/sloop_ship.tres",
-		"purchase_price": 500,
-		"tier_prices": { 2: 700, 3: 1600 },
+		"purchase_price": 400,
+		"max_level": 10,
+		"tier_prices": { 2: 200, 3: 450, 4: 850, 5: 1500, 6: 2600, 7: 4200, 8: 6800, 9: 10500, 10: 16000 },
 		"tier_descriptions": {
 			1: "Standard Oak (4 HP, Twin Bow Chasers)",
-			2: "Reinforced Oak (5 HP, +15% Firepower, +2 Swivel Cannons)",
-			3: "Fleet Flagship (6 HP, +30% Firepower, All Sockets Unlocked)"
+			2: "Tuned Rigging (4 HP, 11.8 m/s, +5% Firepower)",
+			3: "Reinforced Planks (5 HP, 12.1 m/s, +Mid Crew Socket)",
+			4: "Copper Fasteners (5 HP, 12.4 m/s, +15% Firepower)",
+			5: "Hardened Gunwales (5 HP, 12.8 m/s, +20% Firepower)",
+			6: "Broadside Carronades (6 HP, 13.2 m/s, +Dual Swivel Mounts)",
+			7: "Storm Sails (6 HP, 13.6 m/s, +30% Firepower)",
+			8: "Reinforced Keel (6 HP, 14.0 m/s, +35% Firepower)",
+			9: "Flagship Quarters (7 HP, 14.3 m/s, +Aft Crew Socket)",
+			10: "Fleet Flagship (7 HP, 14.5 m/s, All Sockets Maxed)"
 		},
 		"base_hp": 4,
 		"base_speed": 11.5,
-		"fire_rate": 0.18,
+		"fire_rate": 0.36,
 		"preview_texture": "res://assets/sprites/user_vessels/The Sloop.png"
 	},
 	"ironclad": {
@@ -145,12 +154,20 @@ const VESSEL_CATALOG: Dictionary = {
 		"name": "The Ironclad",
 		"archetype": "Armored Brawler",
 		"resource_path": "res://src/data/resources/user_vessels/ironclad_ship.tres",
-		"purchase_price": 2500,
-		"tier_prices": { 2: 3000, 3: 5000 },
+		"purchase_price": 1500,
+		"max_level": 10,
+		"tier_prices": { 2: 500, 3: 1000, 4: 1800, 5: 3200, 6: 5500, 7: 9000, 8: 14000, 9: 22000, 10: 32000 },
 		"tier_descriptions": {
-			1: "Armored Plating (8 HP, Triple Heavy Battery + 1 Crew Socket)",
-			2: "Reinforced Iron (9 HP, +15% Firepower, +2 Swivel Mounts)",
-			3: "Dreadnought Hull (10 HP, +30% Firepower, All Sockets Unlocked)"
+			1: "Armored Plating (8 HP, Triple Heavy Battery)",
+			2: "Tempered Rivets (8 HP, 8.7 m/s, +5% Firepower)",
+			3: "Dual Crew Stations (9 HP, 8.9 m/s, +Deck Crew Sockets)",
+			4: "Blast Bulkheads (9 HP, 9.1 m/s, +15% Firepower)",
+			5: "Steam Injectors (9 HP, 9.3 m/s, +20% Firepower)",
+			6: "Flank Gunports (10 HP, 9.5 m/s, +Dual Swivel Mounts)",
+			7: "Cast Iron Prow (10 HP, 9.7 m/s, +30% Firepower)",
+			8: "Reinforced Boiler (10 HP, 9.9 m/s, +35% Firepower)",
+			9: "Full Battery Array (11 HP, 10.1 m/s, +Quad Swivel Mounts)",
+			10: "Dreadnought Hull (11 HP, 10.3 m/s, All Mounts Maxed)"
 		},
 		"base_hp": 8,
 		"base_speed": 8.5,
@@ -162,12 +179,20 @@ const VESSEL_CATALOG: Dictionary = {
 		"name": "The Bombard Skiff",
 		"archetype": "Heavy Siege Artillery",
 		"resource_path": "res://src/data/resources/user_vessels/bombard_skiff_ship.tres",
-		"purchase_price": 1000,
-		"tier_prices": { 2: 1200, 3: 2200 },
+		"purchase_price": 800,
+		"max_level": 10,
+		"tier_prices": { 2: 300, 3: 650, 4: 1200, 5: 2200, 6: 3800, 7: 6000, 8: 9500, 9: 15000, 10: 22000 },
 		"tier_descriptions": {
-			1: "Artillery Skiff (4 HP, Siege Mortar + 1 Crew Socket)",
-			2: "Reinforced Keel (5 HP, +15% Firepower, +Port Scattershot)",
-			3: "Siege Dreadnought (6 HP, +30% Firepower, All Mounts Unlocked)"
+			1: "Artillery Skiff (4 HP, Siege Mortar)",
+			2: "Balanced Pontoons (4 HP, 6.8 m/s, +5% Firepower)",
+			3: "Quarterdeck Station (5 HP, 7.1 m/s, +Quarterdeck Crew Socket)",
+			4: "Reinforced Hull (5 HP, 7.4 m/s, +15% Firepower)",
+			5: "Quick-Load Hoists (5 HP, 7.7 m/s, +20% Firepower)",
+			6: "Flank Scattershot (6 HP, 8.0 m/s, +Dual Scattershot Carronades)",
+			7: "Heavy Caliber Bore (6 HP, 8.3 m/s, +30% Firepower)",
+			8: "Reinforced Transom (6 HP, 8.6 m/s, +35% Firepower)",
+			9: "Dreadnought Mortar (7 HP, 8.9 m/s, +Expanded Shell Spread)",
+			10: "Siege Dreadnought (7 HP, 9.2 m/s, All Mounts Maxed)"
 		},
 		"base_hp": 4,
 		"base_speed": 6.5,
@@ -184,11 +209,13 @@ const CREW_CATALOG: Dictionary = {
 		"resource_path": "res://src/data/resources/user_crew/crew_monkey_bomber.tres",
 		"preview_texture": "res://assets/sprites/user_crew/weapon_deckhand_sniper_back.png",
 		"unlock_price": 350,
-		"upgrade_prices": { 2: 500, 3: 850 },
+		"upgrade_prices": { 2: 500, 3: 1100, 4: 2400, 5: 5000 },
 		"levels": {
 			1: { "damage": 3, "cooldown": 1.2, "description": "3 AoE damage, 1.2s cooldown" },
 			2: { "damage": 5, "cooldown": 1.0, "description": "5 AoE damage, 1.0s cooldown" },
-			3: { "damage": 5, "cooldown": 1.0, "description": "5 AoE damage + secondary mini-cluster bounce" }
+			3: { "damage": 5, "cooldown": 0.9, "description": "5 AoE damage + secondary mini-cluster bounce" },
+			4: { "damage": 6, "cooldown": 0.8, "description": "6 AoE damage, wider blast radius" },
+			5: { "damage": 7, "cooldown": 0.7, "description": "7 AoE damage + double cluster detonation" }
 		}
 	},
 	"skeleton_tosser": {
@@ -197,12 +224,14 @@ const CREW_CATALOG: Dictionary = {
 		"role": "PYROTECHNIC",
 		"resource_path": "res://src/data/resources/user_crew/crew_skeleton_tosser.tres",
 		"preview_texture": "res://assets/sprites/user_crew/skeleton_crew.png",
-		"unlock_price": 550,
-		"upgrade_prices": { 2: 750, 3: 1200 },
+		"unlock_price": 600,
+		"upgrade_prices": { 2: 850, 3: 1800, 4: 3800, 5: 7500 },
 		"levels": {
 			1: { "damage": 4, "cooldown": 1.4, "description": "4 direct damage + short burn" },
 			2: { "damage": 6, "cooldown": 1.2, "description": "6 damage, wider fire radius" },
-			3: { "damage": 6, "cooldown": 1.2, "description": "Lingering napalm effect on water surface" }
+			3: { "damage": 6, "cooldown": 1.0, "description": "Lingering napalm effect on water surface" },
+			4: { "damage": 7, "cooldown": 0.9, "description": "7 damage, persistent blaze" },
+			5: { "damage": 8, "cooldown": 0.8, "description": "8 damage, inferno tempest" }
 		}
 	}
 }
@@ -544,15 +573,33 @@ func buy_vessel(vessel_id: String) -> bool:
 	vessel_tiers[vessel_id] = 1
 	active_vessel = vessel_id
 	save_game()
+	print("[PURCHASE] Bought Vessel: %s | Cost: %d 🪙 | River Level: %d | Vault Remaining: %d 🪙" % [vessel_id, cost, current_level, doubloons])
 	doubloons_changed.emit(doubloons)
 	active_vessel_changed.emit(active_vessel)
 	return true
+
+func get_max_vessel_tier(vessel_id: String) -> int:
+	if VESSEL_CATALOG.has(vessel_id):
+		var v_dict: Dictionary = VESSEL_CATALOG[vessel_id] as Dictionary
+		if v_dict.has("max_level"):
+			return int(v_dict["max_level"])
+	var res := get_vessel_resource(vessel_id)
+	if res and not res.upgrade_costs.is_empty():
+		return res.upgrade_costs.size()
+	return 3
+
+func get_max_vessel_level(vessel_id: String) -> int:
+	return get_max_vessel_tier(vessel_id)
+
+func get_vessel_level(vessel_id: String) -> int:
+	return get_vessel_tier(vessel_id)
 
 func upgrade_vessel_tier(vessel_id: String) -> bool:
 	if not is_vessel_owned(vessel_id):
 		return false
 	var cur_tier := get_vessel_tier(vessel_id)
-	if cur_tier >= 3:
+	var max_tier := get_max_vessel_tier(vessel_id)
+	if cur_tier >= max_tier:
 		return false
 	var next_tier := cur_tier + 1
 	var cost := get_upgrade_cost(vessel_id, next_tier)
@@ -561,6 +608,7 @@ func upgrade_vessel_tier(vessel_id: String) -> bool:
 	doubloons -= cost
 	vessel_tiers[vessel_id] = next_tier
 	save_game()
+	print("[UPGRADE] Upgraded Vessel: %s to Tier %d | Cost: %d 🪙 | River Level: %d | Vault Remaining: %d 🪙" % [vessel_id, next_tier, cost, current_level, doubloons])
 	doubloons_changed.emit(doubloons)
 	return true
 
@@ -577,7 +625,8 @@ func set_active_vessel(vessel_id: String) -> bool:
 
 func can_afford_active_vessel_upgrade() -> bool:
 	var cur_tier := get_vessel_tier(active_vessel)
-	if cur_tier >= 3:
+	var max_tier := get_max_vessel_tier(active_vessel)
+	if cur_tier >= max_tier:
 		return false
 	var next_tier := cur_tier + 1
 	var cost := get_upgrade_cost(active_vessel, next_tier)
@@ -613,6 +662,7 @@ func buy_crew(crew_id: String) -> bool:
 	doubloons -= cost
 	unlocked_crew[crew_id] = 1
 	save_game()
+	print("[PURCHASE] Hired Crew: %s (Tier 1) | Cost: %d 🪙 | River Level: %d | Vault Remaining: %d 🪙" % [crew_id, cost, current_level, doubloons])
 	doubloons_changed.emit(doubloons)
 	crew_unlocked.emit(crew_id, 1)
 	return true
@@ -630,6 +680,7 @@ func upgrade_crew_level(crew_id: String) -> bool:
 	doubloons -= cost
 	unlocked_crew[crew_id] = next_lvl
 	save_game()
+	print("[UPGRADE] Promoted Crew: %s to Tier %d | Cost: %d 🪙 | River Level: %d | Vault Remaining: %d 🪙" % [crew_id, next_lvl, cost, current_level, doubloons])
 	doubloons_changed.emit(doubloons)
 	crew_unlocked.emit(crew_id, next_lvl)
 	return true
@@ -761,6 +812,7 @@ func buy_outfitting(item_id: String) -> bool:
 	doubloons -= price
 	unlocked_outfitting[item_id] = true
 	save_game()
+	print("[PURCHASE] Bought Outfitting: %s | Cost: %d 🪙 | River Level: %d | Vault Remaining: %d 🪙" % [item_id, price, current_level, doubloons])
 	doubloons_changed.emit(doubloons)
 	outfitting_unlocked.emit(item_id)
 	return true
@@ -849,6 +901,7 @@ func select_level(lvl: int) -> void:
 	current_selected_level = clamp(lvl, 1, 45)
 	current_level = current_selected_level
 	save_game()
+	print("[RIVER LEVEL] Selected Level %d" % current_level)
 
 func get_highest_level_unlocked() -> int:
 	return highest_unlocked_level
@@ -862,6 +915,7 @@ func unlock_next_level() -> void:
 	unlocked_levels = highest_unlocked_level
 	current_level = current_selected_level
 	save_game()
+	print("[RIVER LEVEL] Unlocked River Level %d" % highest_unlocked_level)
 
 func record_level_score(level_num: int, score: int) -> void:
 	var cur_best: int = int(level_high_scores.get(level_num, 0))

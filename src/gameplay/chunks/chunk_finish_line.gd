@@ -31,7 +31,6 @@ func _trigger_victory() -> void:
 	if _is_finished:
 		return
 	_is_finished = true
-	print("[FINISH LINE] Player crossed the Harbor Victory Gate! Level Complete!")
 	
 	if AudioManager:
 		AudioManager.play_sfx("gate_passes")

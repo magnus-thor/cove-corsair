@@ -63,28 +63,28 @@ func _ready() -> void:
 	var expected_fp_pct: float = (2.0 / 7.0) * 100.0
 	assert_test(absf(prog_fp.value - expected_fp_pct) < 0.1, "Sloop Tier 1 Firepower bar is approximately 28.6% (2/7)")
 
-	# 3. Simulate Owned Tier 3 Ironclad (Should fill HP and Firepower to 100%)
+	# 3. Simulate Owned Level 10 Ironclad (Should fill HP and Firepower to 100%)
 	print("\n--- 3. Testing Fully Upgraded Ironclad (100% Ceilings) ---")
 	if not GameState.owned_vessels.has("ironclad"):
 		GameState.owned_vessels.append("ironclad")
-	GameState.vessel_tiers["ironclad"] = 3
+	GameState.vessel_tiers["ironclad"] = 10
 
 	shipyard.set("selected_vessel_id", "ironclad")
 	shipyard.call("_update_inspection_drawer")
 
-	assert_test(is_equal_approx(prog_hp.value, 100.0), "Ironclad Tier 3 HP bar is 100% full (10/10)")
-	assert_test(is_equal_approx(prog_fp.value, 100.0), "Ironclad Tier 3 Firepower bar is 100% full (7/7)")
+	assert_test(is_equal_approx(prog_hp.value, 100.0), "Ironclad Level 10 HP bar is 100% full (10/10)")
+	assert_test(is_equal_approx(prog_fp.value, 100.0), "Ironclad Level 10 Firepower bar is 100% full (7/7)")
 
-	# 4. Simulate Owned Tier 3 Sloop (Should fill Speed to 100%)
+	# 4. Simulate Owned Level 10 Sloop (Should fill Speed to 100%)
 	print("\n--- 4. Testing Fully Upgraded Sloop Speed (100% Ceiling) ---")
 	if not GameState.owned_vessels.has("sloop"):
 		GameState.owned_vessels.append("sloop")
-	GameState.vessel_tiers["sloop"] = 3
+	GameState.vessel_tiers["sloop"] = 10
 
 	shipyard.set("selected_vessel_id", "sloop")
 	shipyard.call("_update_inspection_drawer")
 
-	assert_test(is_equal_approx(prog_speed.value, 100.0), "Sloop Tier 3 Speed bar is 100% full (14.5/14.5)")
+	assert_test(is_equal_approx(prog_speed.value, 100.0), "Sloop Level 10 Speed bar is 100% full (14.5/14.5)")
 
 	# Restore state
 	GameState.owned_vessels = orig_owned
