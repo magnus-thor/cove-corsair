@@ -323,13 +323,13 @@ func _on_sail_requested(level_num: int) -> void:
 	GameState.should_auto_start = true
 	GameState.should_auto_start_endless = false
 	GameState.reset_level()
-	get_tree().change_scene_to_file(MAIN_GAME_PATH)
+	GameState.change_scene_with_loading(MAIN_GAME_PATH, GameState.get_level_display_name(level_num))
 
 func _launch_endless_mode() -> void:
 	GameState.should_auto_start = false
 	GameState.should_auto_start_endless = true
 	GameState.reset_level()
-	get_tree().change_scene_to_file(MAIN_GAME_PATH)
+	GameState.change_scene_with_loading(MAIN_GAME_PATH, "Endless Skull Outpost")
 
 func _open_shipyard_ui() -> void:
 	if not SHIPYARD_SCENE:

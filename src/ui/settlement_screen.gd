@@ -416,5 +416,4 @@ func _on_map_pressed() -> void:
 	map_requested.emit()
 	get_tree().paused = false
 	GameState.should_auto_start = false
-	GameState.reset_level()
-	get_tree().change_scene_to_file("res://src/features/hub/pirate_lair_hub.tscn")
+	GameState.change_scene_with_loading("res://src/features/hub/pirate_lair_hub.tscn", "Pirate Lair")

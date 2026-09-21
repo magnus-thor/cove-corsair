@@ -68,6 +68,30 @@ var equipped_plating: Dictionary = {
 # Fodder Streak Tracking
 var fodder_kill_timestamps: Array[float] = []
 
+# Scene Loading & Transition State
+var pending_loading_path: String = ""
+var pending_loading_title: String = ""
+const LOADING_SCREEN_PATH: String = "res://src/ui/loading_screen.tscn"
+
+const LEVEL_TITLES: Dictionary = {
+	1: "Smuggler's Run",
+	2: "Black Tide Bayou",
+	3: "Brimstone Bastion",
+	4: "Smuggler's Nightmare",
+	5: "Black Tide Abyss",
+	6: "Brimstone Inferno"
+}
+
+func get_level_display_name(level_num: int) -> String:
+	if LEVEL_TITLES.has(level_num):
+		return str(LEVEL_TITLES[level_num])
+	return "River Level %d" % level_num
+
+func change_scene_with_loading(target_path: String, destination_title: String = "") -> void:
+	pending_loading_path = target_path
+	pending_loading_title = destination_title
+	get_tree().change_scene_to_file(LOADING_SCREEN_PATH)
+
 # Persistent Progression & Level Map State
 var highest_unlocked_level: int = 1
 var current_selected_level: int = 1
