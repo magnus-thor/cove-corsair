@@ -9,35 +9,36 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/ui/theme/title_cove_corsair.svg" id="7_title_logo"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_river_bed"]
-bg_color = Color(0.035, 0.085, 0.14, 0.96)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.76, 0.56, 0.22, 0.9)
-corner_radius_top_left = 22
-corner_radius_top_right = 22
-corner_radius_bottom_right = 22
-corner_radius_bottom_left = 22
-shadow_color = Color(0, 0, 0, 0.7)
-shadow_size = 14
-shadow_offset = Vector2(0, 6)
+bg_color = Color(0.025, 0.065, 0.11, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.82, 0.65, 0.28, 0.95)
+corner_radius_top_left = 13
+corner_radius_top_right = 13
+corner_radius_bottom_right = 13
+corner_radius_bottom_left = 13
+shadow_color = Color(0, 0, 0, 0.5)
+shadow_size = 6
+shadow_offset = Vector2(0, 3)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_water_fill"]
-bg_color = Color(0.12, 0.58, 0.84, 0.92)
-border_width_top = 2
-border_width_bottom = 2
-border_color = Color(0.45, 0.85, 1, 0.8)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
+bg_color = Color(0.14, 0.65, 0.92, 0.95)
+border_width_top = 1
+border_width_bottom = 1
+border_color = Color(0.55, 0.9, 1, 0.85)
+corner_radius_top_left = 11
+corner_radius_top_right = 11
+corner_radius_bottom_right = 11
+corner_radius_bottom_left = 11
 
 [node name="LoadingScreen" type="CanvasLayer"]
 layer = 120
 script = ExtResource("1_loader_script")
 
 [node name="RootControl" type="Control" parent="."]
+unique_name_in_owner = true
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -57,71 +58,76 @@ texture = ExtResource("2_splash_bg")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="DarkVignette" type="ColorRect" parent="RootControl"]
+[node name="TopLogoContainer" type="CenterContainer" parent="RootControl"]
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = 10
 anchor_right = 1.0
-anchor_bottom = 1.0
+offset_top = 45.0
+offset_bottom = 145.0
 grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.02, 0.05, 0.09, 0.78)
 
-[node name="ContentVBox" type="VBoxContainer" parent="RootControl"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-alignment = 1
-theme_override_constants/separation = 28
-
-[node name="LogoContainer" type="CenterContainer" parent="RootControl/ContentVBox"]
-layout_mode = 2
-
-[node name="LogoTexture" type="TextureRect" parent="RootControl/ContentVBox/LogoContainer"]
-custom_minimum_size = Vector2(360, 110)
+[node name="LogoTexture" type="TextureRect" parent="RootControl/TopLogoContainer"]
+custom_minimum_size = Vector2(340, 95)
 layout_mode = 2
 texture = ExtResource("7_title_logo")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="SpacerTop" type="Control" parent="RootControl/ContentVBox"]
-custom_minimum_size = Vector2(0, 30)
-layout_mode = 2
+[node name="BottomContainer" type="VBoxContainer" parent="RootControl"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 32.0
+offset_top = -120.0
+offset_right = -32.0
+offset_bottom = -36.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 10
+alignment = 2
 
-[node name="DestinationLabel" type="Label" parent="RootControl/ContentVBox"]
+[node name="DestinationLabel" type="Label" parent="RootControl/BottomContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.92, 0.95, 0.99, 1)
-theme_override_colors/font_outline_color = Color(0.04, 0.08, 0.14, 1)
-theme_override_constants/outline_size = 4
+theme_override_colors/font_color = Color(0.96, 0.98, 1, 1)
+theme_override_colors/font_outline_color = Color(0.02, 0.05, 0.1, 0.95)
+theme_override_constants/outline_size = 5
 theme_override_fonts/font = ExtResource("3_font_cinzel")
-theme_override_font_sizes/font_size = 22
-text = "SAILING TO: SMUGGLER'S RUN"
+theme_override_font_sizes/font_size = 18
+text = "SETTING SAIL FOR SMUGGLER'S COVE"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="RiverContainer" type="CenterContainer" parent="RootControl/ContentVBox"]
+[node name="RiverContainer" type="CenterContainer" parent="RootControl/BottomContainer"]
 layout_mode = 2
 
-[node name="RiverTrack" type="Panel" parent="RootControl/ContentVBox/RiverContainer"]
+[node name="RiverTrack" type="Panel" parent="RootControl/BottomContainer/RiverContainer"]
 unique_name_in_owner = true
-clip_children = 2
-custom_minimum_size = Vector2(620, 84)
+custom_minimum_size = Vector2(600, 26)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_river_bed")
 
-[node name="RiverBedBack" type="ColorRect" parent="RootControl/ContentVBox/RiverContainer/RiverTrack"]
+[node name="WaterClipper" type="Control" parent="RootControl/BottomContainer/RiverContainer/RiverTrack"]
+clip_contents = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.04, 0.14, 0.22, 0.7)
 
-[node name="RiverWaterFill" type="Panel" parent="RootControl/ContentVBox/RiverContainer/RiverTrack"]
+[node name="RiverBedBack" type="ColorRect" parent="RootControl/BottomContainer/RiverContainer/RiverTrack/WaterClipper"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.03, 0.1, 0.16, 0.7)
+
+[node name="RiverWaterFill" type="Panel" parent="RootControl/BottomContainer/RiverContainer/RiverTrack/WaterClipper"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 9
@@ -130,99 +136,104 @@ offset_right = 0.0
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_water_fill")
 
-[node name="WharfMarker" type="ColorRect" parent="RootControl/ContentVBox/RiverContainer/RiverTrack"]
+[node name="WharfMarker" type="ColorRect" parent="RootControl/BottomContainer/RiverContainer/RiverTrack"]
 layout_mode = 1
 anchors_preset = 9
 anchor_bottom = 1.0
-offset_right = 12.0
+offset_right = 8.0
 grow_vertical = 2
-color = Color(0.48, 0.32, 0.14, 0.9)
+color = Color(0.52, 0.36, 0.18, 0.9)
 
-[node name="FinishMarker" type="TextureRect" parent="RootControl/ContentVBox/RiverContainer/RiverTrack"]
+[node name="FinishMarker" type="TextureRect" parent="RootControl/BottomContainer/RiverContainer/RiverTrack"]
 layout_mode = 1
 anchors_preset = 11
 anchor_left = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -48.0
-offset_top = 18.0
-offset_right = -12.0
-offset_bottom = -18.0
+offset_left = -30.0
+offset_top = 3.0
+offset_right = -10.0
+offset_bottom = -3.0
 grow_horizontal = 0
 grow_vertical = 2
 texture = ExtResource("6_skull_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="BoatAnchor" type="Control" parent="RootControl/ContentVBox/RiverContainer/RiverTrack"]
+[node name="BoatAnchor" type="Control" parent="RootControl/BottomContainer/RiverContainer/RiverTrack"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
-offset_left = 6.0
-offset_top = -2.0
-offset_right = 6.0
-offset_bottom = -2.0
+offset_left = 4.0
+offset_top = 0.0
+offset_right = 4.0
+offset_bottom = 0.0
 grow_vertical = 2
 
-[node name="WakeParticles" type="CPUParticles2D" parent="RootControl/ContentVBox/RiverContainer/RiverTrack/BoatAnchor"]
-position = Vector2(-26, 12)
-amount = 14
-lifetime = 0.55
+[node name="WakeParticles" type="CPUParticles2D" parent="RootControl/BottomContainer/RiverContainer/RiverTrack/BoatAnchor"]
+position = Vector2(-20, 2)
+amount = 8
+lifetime = 0.4
 emission_shape = 1
-emission_sphere_radius = 4.0
+emission_sphere_radius = 3.0
 direction = Vector2(-1, 0)
 spread = 20.0
-gravity = Vector2(0, -6)
-initial_velocity_min = 18.0
-initial_velocity_max = 38.0
-scale_amount_min = 2.0
-scale_amount_max = 4.5
+gravity = Vector2(0, -5)
+initial_velocity_min = 14.0
+initial_velocity_max = 28.0
+scale_amount_min = 1.5
+scale_amount_max = 3.2
 color = Color(0.88, 0.96, 1, 0.75)
 
-[node name="DinghySprite" type="TextureRect" parent="RootControl/ContentVBox/RiverContainer/RiverTrack/BoatAnchor"]
+[node name="DinghySprite" type="TextureRect" parent="RootControl/BottomContainer/RiverContainer/RiverTrack/BoatAnchor"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(88, 72)
+custom_minimum_size = Vector2(66, 54)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -44.0
-offset_top = -42.0
-offset_right = 44.0
-offset_bottom = 30.0
+offset_left = -33.0
+offset_top = -40.0
+offset_right = 33.0
+offset_bottom = 14.0
 grow_horizontal = 2
 grow_vertical = 2
-pivot_offset = Vector2(44, 40)
+pivot_offset = Vector2(33, 33)
 texture = ExtResource("5_dinghy_monkey")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="PercentageLabel" type="Label" parent="RootControl/ContentVBox"]
+[node name="StatusHBox" type="HBoxContainer" parent="RootControl/BottomContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="StatusCaption" type="Label" parent="RootControl/BottomContainer/StatusHBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.984, 0.75, 0.141, 1)
-theme_override_colors/font_outline_color = Color(0.04, 0.08, 0.14, 1)
-theme_override_constants/outline_size = 6
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.84, 0.92, 0.98, 0.95)
+theme_override_colors/font_outline_color = Color(0.02, 0.05, 0.1, 0.95)
+theme_override_constants/outline_size = 4
 theme_override_fonts/font = ExtResource("4_font_carter")
-theme_override_font_sizes/font_size = 46
-text = "0%"
-horizontal_alignment = 1
+theme_override_font_sizes/font_size = 15
+text = "Assembling the pirate crew..."
 vertical_alignment = 1
 
-[node name="StatusCaption" type="Label" parent="RootControl/ContentVBox"]
+[node name="PercentageLabel" type="Label" parent="RootControl/BottomContainer/StatusHBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.78, 0.86, 0.94, 0.9)
-theme_override_colors/font_outline_color = Color(0.04, 0.08, 0.14, 1)
-theme_override_constants/outline_size = 3
+theme_override_colors/font_color = Color(0.984, 0.78, 0.18, 1)
+theme_override_colors/font_outline_color = Color(0.02, 0.05, 0.1, 0.95)
+theme_override_constants/outline_size = 5
 theme_override_fonts/font = ExtResource("4_font_carter")
-theme_override_font_sizes/font_size = 18
-text = "Untying docklines & hoisting the colors..."
-horizontal_alignment = 1
+theme_override_font_sizes/font_size = 20
+text = "0%"
+horizontal_alignment = 2
 vertical_alignment = 1
 
 [node name="FadeOverlay" type="ColorRect" parent="RootControl"]

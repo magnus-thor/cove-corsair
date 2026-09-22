@@ -120,20 +120,9 @@ static func _build_milestones() -> Dictionary:
 func _init_milestones_data() -> void:
 	if MILESTONES.is_empty():
 		MILESTONES = _build_milestones()
-	for lvl in range(1, 46):
-		if GameState.LEVEL_RESOURCES.has(lvl):
-			var res_path: String = str(GameState.LEVEL_RESOURCES[lvl])
-			if ResourceLoader.exists(res_path):
-				var res := load(res_path) as LevelData
-				if res:
-					MILESTONES[lvl]["name"] = res.level_title.replace("Level %d: " % lvl, "").to_upper()
-					MILESTONES[lvl]["target_dist"] = (res.chunk_scenes.size() - 1) * 50
-					if res.biome_name == "tropical":
-						MILESTONES[lvl]["biome"] = "Tropical Reef"
-					elif res.biome_name == "bayou":
-						MILESTONES[lvl]["biome"] = "Murky Bayou"
-					elif res.biome_name == "brimstone":
-						MILESTONES[lvl]["biome"] = "Volcanic Brimstone"
+	for lvl: int in MILESTONES.keys():
+		if GameState.LEVEL_TITLES.has(lvl):
+			MILESTONES[lvl]["name"] = str(GameState.LEVEL_TITLES[lvl]).to_upper()
 
 func _setup_river_spline() -> void:
 	river_curve.clear_points()
@@ -734,6 +723,20 @@ func _show_level_popup(lvl: int) -> void:
 		
 	popup_selected_level = lvl
 	var data: Dictionary = MILESTONES[lvl] as Dictionary
+
+	if GameState.LEVEL_RESOURCES.has(lvl):
+		var res_path: String = str(GameState.LEVEL_RESOURCES[lvl])
+		if ResourceLoader.exists(res_path):
+			var res := load(res_path) as LevelData
+			if res:
+				data["name"] = res.level_title.replace("Level %d: " % lvl, "").to_upper()
+				data["target_dist"] = (res.chunk_scenes.size() - 1) * 50
+				if res.biome_name == "tropical":
+					data["biome"] = "Tropical Reef"
+				elif res.biome_name == "bayou":
+					data["biome"] = "Murky Bayou"
+				elif res.biome_name == "brimstone":
+					data["biome"] = "Volcanic Brimstone"
 	
 	if popup_num:
 		popup_num.text = "EXPEDITION %02d" % lvl

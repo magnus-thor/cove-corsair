@@ -52,9 +52,12 @@ func _ready() -> void:
 	assert(screen.river_water_fill.offset_right >= screen.river_track.size.x - 1.0, "River water fill must cover entire track at 100%")
 	print("[PASS] Percentage and boat movement across the river bar verified.")
 
-	print("[STEP 3] Verifying Procedural Water Bobbing & Rocking...")
+	print("[STEP 3] Verifying Elevated Boat Height & Procedural Bobbing...")
+	# Verify boat is elevated above 0
+	assert(screen.base_boat_y <= -35.0, "Boat base Y must be elevated above the riverbed (expected <= -35.0, got %f)" % screen.base_boat_y)
 	screen.bob_time = 0.0
 	screen._update_boat_float_animation()
+	assert(screen.dinghy_sprite.position.y <= -30.0, "Animated dinghy sprite must remain elevated, not sunken to bottom")
 	var initial_rot: float = screen.dinghy_sprite.rotation_degrees
 	var initial_y: float = screen.dinghy_sprite.position.y
 
@@ -64,13 +67,25 @@ func _ready() -> void:
 	var moved_y: float = screen.dinghy_sprite.position.y
 
 	assert(initial_rot != moved_rot or initial_y != moved_y, "Bobbing animation must dynamically update pitch and elevation")
-	print("[PASS] Procedural water bobbing and rocking animation verified.")
+	assert(screen.dinghy_sprite.position.y <= -30.0, "Dinghy must remain elevated after animation tick")
+	print("[PASS] Boat elevation and procedural water bobbing verified.")
 
-	print("[STEP 4] Verifying Destination Title & GameState Helper...")
+	print("[STEP 4] Verifying Boot Splash Screen Mode Defaults...")
+	# Verify boot splash configuration when loaded without a scene
+	var splash_screen: CanvasLayer = loading_scene.instantiate() as CanvasLayer
+	add_child(splash_screen)
+	await get_tree().process_frame
+	assert(splash_screen.target_scene_path == LoadingScreenScript.DEFAULT_STARTUP_SCENE, "Default target scene must be pirate_lair_hub")
+	assert(splash_screen.is_startup_splash == true, "Startup splash mode must be activated")
+	assert(splash_screen.destination_label.text == "SETTING SAIL FOR SMUGGLER'S COVE", "Destination label must show setting sail for Smuggler's Cove")
+	splash_screen.queue_free()
+	print("[PASS] Boot splash mode correctly targets pirate lair hub.")
+
+	print("[STEP 5] Verifying Destination Title & GameState Helper...")
 	screen.set_destination("res://src/ui/river_map.tscn", "Smuggler's Run")
 	assert(screen.destination_label.text == "SAILING TO: SMUGGLER'S RUN", "Destination label must format title accurately")
 
-	print("[STEP 5] Testing Asynchronous Threaded Scene Loading...")
+	print("[STEP 6] Testing Asynchronous Threaded Scene Loading...")
 	var load_completed: bool = false
 	screen.loading_completed.connect(func(scene: PackedScene) -> void:
 		load_completed = true
@@ -88,3 +103,4 @@ func _ready() -> void:
 	print("==================================================")
 	print("   ALL LOADING SCREEN TESTS PASSED!               ")
 	print("==================================================")
+	get_tree().quit(0)
