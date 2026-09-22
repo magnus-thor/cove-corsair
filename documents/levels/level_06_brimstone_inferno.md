@@ -1,7 +1,7 @@
 ---
 level_id: 6
 level_title: "Level 6: Corsair's Cut (Hazard Nav)"
-biome_name: "black_tide_bayou"
+biome_name: "tropical"
 base_scroll_speed: 7.6
 completion_doubloon_reward: 112
 river_width_world: 12.0

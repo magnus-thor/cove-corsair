@@ -45,6 +45,21 @@ func _apply_level_tuning() -> void:
 		current_hp = 10
 		forward_speed = 2.2
 		shoot_interval = 2.4
+	elif cur_lvl <= 15:
+		max_hp = 22
+		current_hp = 22
+		forward_speed = 2.6
+		shoot_interval = 2.2
+	elif cur_lvl <= 30:
+		max_hp = 36
+		current_hp = 36
+		forward_speed = 3.0
+		shoot_interval = 1.9
+	else:
+		max_hp = 52
+		current_hp = 52
+		forward_speed = 3.4
+		shoot_interval = 1.6
 
 func _physics_process(delta: float) -> void:
 	if _is_dead or not GameState.is_game_active:

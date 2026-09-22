@@ -68,6 +68,8 @@ func _apply_weapon_data() -> void:
 			var glb_path := "res://assets/models/user/crew/monkey_crew.glb"
 			if "skeleton" in w_name or "tosser" in w_name:
 				glb_path = "res://assets/models/user/crew/skeleton_crew.glb"
+			elif "grease" in w_name or "mechanic" in w_name or crew_id == "grease_monkey":
+				glb_path = "res://assets/models/user/crew/artillery_grease__monkey.glb"
 			
 			var model_mesh: Node3D = model_container.get_node_or_null("CrewMesh") as Node3D
 			if not model_mesh or model_mesh.get_meta("glb_path", "") != glb_path:
@@ -84,7 +86,9 @@ func _apply_weapon_data() -> void:
 			if model_mesh:
 				model_mesh.visible = true
 				var crew_scale := Vector3(0.525, 0.525, 0.525)
-				if "model_scale" in weapon_data and weapon_data.model_scale != Vector3.ZERO and weapon_data.model_scale != Vector3(0.4, 0.4, 0.4):
+				if "grease" in w_name or "mechanic" in w_name or crew_id == "grease_monkey":
+					crew_scale = Vector3(0.55, 0.55, 0.55)
+				elif "model_scale" in weapon_data and weapon_data.model_scale != Vector3.ZERO and weapon_data.model_scale != Vector3(0.4, 0.4, 0.4):
 					crew_scale = weapon_data.model_scale * 1.5
 				model_mesh.scale = crew_scale
 				model_mesh.position = Vector3.ZERO
@@ -169,6 +173,8 @@ func _apply_weapon_data() -> void:
 			weapon_data.fire_rate = 1.2 if crew_level == 1 else 1.0
 		elif crew_id == "skeleton_tosser" or "skeleton" in w_name:
 			weapon_data.fire_rate = 1.4 if crew_level == 1 else 1.2
+		elif crew_id == "grease_monkey" or "grease" in w_name or "mechanic" in w_name:
+			weapon_data.fire_rate = clampf(1.3 - (0.12 * float(crew_level - 1)), 0.8, 1.3)
 
 	fire_timer = randf_range(0.0, weapon_data.fire_rate * 0.5)
 	wander_timer = randf_range(2.0, 3.5)
@@ -392,7 +398,13 @@ func try_fire(p_projectile_scene: Variant = null, world_container: Node = null) 
 		if not weapon_data:
 			return
 		fire_timer += delta
-		if fire_timer >= weapon_data.fire_rate:
+		var eff_fire_rate: float = weapon_data.fire_rate
+		if not _is_hostile_vessel() and _is_mortar():
+			if GameState and GameState.is_crew_equipped_on_active_ship("grease_monkey"):
+				var b_lvl: int = GameState.get_crew_level("grease_monkey")
+				var rof_boost: float = 0.20 + 0.06 * float(b_lvl)
+				eff_fire_rate *= (1.0 - rof_boost)
+		if fire_timer >= eff_fire_rate:
 			fire_timer = 0.0
 			var parent := get_tree().current_scene
 			if not parent:
@@ -493,13 +505,18 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 				ball.ammo_id = a_id
 
 			if current_target and is_instance_valid(current_target):
-				var target_dist: float = spawn_pos.distance_to(current_target.global_position)
-				ball.target_range = target_dist
 				ball.target_node = current_target
+				ball.target_range = global_position.distance_to(current_target.global_position)
 			else:
 				var def_range: float = weapon_data.max_range if (weapon_data and "max_range" in weapon_data and weapon_data.max_range > 0.0) else 18.0
 				ball.target_range = def_range
 				ball.target_node = null
+
+			if not is_hostile and GameState and GameState.is_crew_equipped_on_active_ship("grease_monkey"):
+				var b_lvl: int = GameState.get_crew_level("grease_monkey")
+				ball.speed *= (1.15 + 0.05 * float(b_lvl))
+				ball.target_range *= (1.15 + 0.05 * float(b_lvl))
+				ball.splash_radius_multiplier *= (1.20 + 0.06 * float(b_lvl))
 
 			ball.setup(proj_dir, weapon_data.default_ammo, weapon_data)
 				
@@ -562,6 +579,10 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 
 				ball.setup(proj_dir, weapon_data.default_ammo, weapon_data)
 					
+				if crew_id == "grease_monkey" or (weapon_data and ("grease" in weapon_data.weapon_name.to_lower() or "mechanic" in weapon_data.weapon_name.to_lower())):
+					ball.speed = 18.0
+					ball.damage = 4 + (crew_level - 1)
+
 				if player and "base_damage_bonus" in player and not is_hostile:
 					ball.damage += int(round(float(player.get("base_damage_bonus"))))
 

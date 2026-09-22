@@ -1,7 +1,7 @@
 ---
 level_id: 11
 level_title: "Level 11: Dead Calm Pass (Swarm Threat)"
-biome_name: "pirate_citadel"
+biome_name: "tropical"
 base_scroll_speed: 8.2
 completion_doubloon_reward: 180
 river_width_world: 12.0

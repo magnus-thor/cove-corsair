@@ -91,7 +91,15 @@ func apply_enemy_data(data: EnemyData) -> void:
 	if not data:
 		return
 		
-	max_hp = data.max_hp
+	var cur_lvl: int = GameState.current_level if GameState else 1
+	var hp_mult: float = 1.0
+	if cur_lvl > 30:
+		hp_mult = 2.4
+	elif cur_lvl > 15:
+		hp_mult = 1.6
+	elif cur_lvl > 6:
+		hp_mult = 1.25
+	max_hp = int(ceil(float(data.max_hp) * hp_mult))
 	forward_speed = data.forward_speed
 	doubloons_drop = data.doubloon_drop_count
 	_current_base_y = data.y_offset

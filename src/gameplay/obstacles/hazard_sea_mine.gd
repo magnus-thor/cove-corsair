@@ -14,7 +14,9 @@ func _ready() -> void:
 	obstacle_type = ObstacleType.SEA_MINE
 	super._ready()
 	add_to_group("destructible")
+	add_to_group("sea_mine")
 	if not area_entered.is_connected(_on_area_entered):
+
 		area_entered.connect(_on_area_entered)
 
 func _on_area_entered(area: Area3D) -> void:

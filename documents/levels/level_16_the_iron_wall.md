@@ -1,7 +1,7 @@
 ---
 level_id: 16
 level_title: "Level 16: The Iron Wall (Hazard Nav)"
-biome_name: "brimstone_bastion"
+biome_name: "bayou"
 base_scroll_speed: 8.7
 completion_doubloon_reward: 248
 river_width_world: 12.0

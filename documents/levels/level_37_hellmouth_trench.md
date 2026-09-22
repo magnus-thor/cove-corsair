@@ -1,7 +1,7 @@
 ---
 level_id: 37
 level_title: "Level 37: Hellmouth Trench (Swarm Threat)"
-biome_name: "brimstone_bastion"
+biome_name: "brimstone"
 base_scroll_speed: 11.1
 completion_doubloon_reward: 531
 river_width_world: 12.0

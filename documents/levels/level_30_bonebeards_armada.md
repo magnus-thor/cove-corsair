@@ -1,7 +1,7 @@
 ---
 level_id: 30
 level_title: "Level 30: Bonebeard's Armada (Boss Threat)"
-biome_name: "pirate_citadel"
+biome_name: "bayou"
 base_scroll_speed: 10.3
 completion_doubloon_reward: 796
 river_width_world: 12.0

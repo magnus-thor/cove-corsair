@@ -3,15 +3,15 @@
 [ext_resource type="Script" path="res://src/vfx/vfx_auto_destroy.gd" id="1_vfx_script"]
 
 [sub_resource type="Curve" id="Curve_scale_splash"]
-_data = [Vector2(0, 0.9), 0.0, 0.2, 0, 0, Vector2(1, 0.1), -1.8, 0.0, 0, 0]
+_data = [Vector2(0, 0.8), 0.0, 0.2, 0, 0, Vector2(1, 0.05), -1.8, 0.0, 0, 0]
 point_count = 2
 
 [sub_resource type="CurveTexture" id="CurveTexture_scale_splash"]
 curve = SubResource("Curve_scale_splash")
 
 [sub_resource type="Gradient" id="Gradient_color_splash"]
-offsets = PackedFloat32Array(0, 0.65, 1)
-colors = PackedColorArray(0.85, 0.98, 1, 1, 0.65, 0.92, 1, 0.8, 0.5, 0.85, 1, 0)
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(0.85, 0.98, 1, 0.5, 0.65, 0.92, 1, 0.35, 0.5, 0.85, 1, 0)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_color_splash"]
 gradient = SubResource("Gradient_color_splash")
@@ -19,8 +19,8 @@ gradient = SubResource("Gradient_color_splash")
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_splash"]
 direction = Vector3(0, 1, 0)
 spread = 60.0
-initial_velocity_min = 3.0
-initial_velocity_max = 5.0
+initial_velocity_min = 1.2
+initial_velocity_max = 2.2
 gravity = Vector3(0, -9.8, 0)
 scale_curve = SubResource("CurveTexture_scale_splash")
 color_ramp = SubResource("GradientTexture1D_color_splash")
@@ -29,7 +29,7 @@ color_ramp = SubResource("GradientTexture1D_color_splash")
 transparency = 1
 shading_mode = 0
 vertex_color_use_as_albedo = true
-albedo_color = Color(0.7, 0.93, 1, 0.95)
+albedo_color = Color(0.75, 0.93, 1, 0.4)
 billboard_mode = 3
 particles_anim_h_frames = 1
 particles_anim_v_frames = 1
@@ -37,18 +37,18 @@ particles_anim_loop = false
 
 [sub_resource type="QuadMesh" id="QuadMesh_splash"]
 material = SubResource("StandardMaterial3D_splash")
-size = Vector2(0.18, 0.18)
+size = Vector2(0.11, 0.11)
 
 [node name="HitSplash" type="Node3D"]
 top_level = true
 script = ExtResource("1_vfx_script")
-max_lifetime = 0.5
+max_lifetime = 0.35
 
 [node name="SplashParticles" type="GPUParticles3D" parent="."]
 local_coords = true
 emitting = false
-amount = 16
-lifetime = 0.4
+amount = 12
+lifetime = 0.3
 one_shot = true
 explosiveness = 0.95
 process_material = SubResource("ParticleProcessMaterial_splash")

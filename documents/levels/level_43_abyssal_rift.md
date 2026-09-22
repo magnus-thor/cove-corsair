@@ -1,7 +1,7 @@
 ---
 level_id: 43
 level_title: "Level 43: Abyssal Rift (Swarm Threat)"
-biome_name: "brimstone_bastion"
+biome_name: "brimstone"
 base_scroll_speed: 11.8
 completion_doubloon_reward: 612
 river_width_world: 12.0

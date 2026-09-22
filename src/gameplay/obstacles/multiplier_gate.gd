@@ -101,7 +101,8 @@ func _trigger_gate_collect(node: Node) -> void:
 	var doubloons_to_add: int = 15 if final_value >= 100 else clampi(int(round(final_value * 0.1)), 2, 8)
 	
 	if GameState:
-		GameState.add_doubloons(doubloons_to_add)
+		GameState.add_doubloons(doubloons_to_add, "multiplier_gate")
+
 	if player_node:
 		if "doubloons" in player_node:
 			player_node.set("doubloons", int(player_node.get("doubloons")) + doubloons_to_add)

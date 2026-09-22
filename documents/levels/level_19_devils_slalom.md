@@ -1,7 +1,7 @@
 ---
 level_id: 19
 level_title: "Level 19: Devil's Slalom (Swarm Threat)"
-biome_name: "brimstone_bastion"
+biome_name: "bayou"
 base_scroll_speed: 9.1
 completion_doubloon_reward: 288
 river_width_world: 12.0

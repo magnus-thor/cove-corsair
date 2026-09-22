@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://cgm8821948834"]
+
+[ext_resource type="Script" path="res://src/test_scripts/test_grease_monkey.gd" id="1_test"]
+
+[node name="TestGreaseMonkey" type="Node3D"]
+script = ExtResource("1_test")

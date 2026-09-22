@@ -12,8 +12,10 @@ func _ready() -> void:
 	super._ready()
 	chunk_id = "finish_line"
 	if finish_trigger:
-		finish_trigger.area_entered.connect(_on_finish_area_entered)
-		finish_trigger.body_entered.connect(_on_finish_body_entered)
+		if not finish_trigger.area_entered.is_connected(_on_finish_area_entered):
+			finish_trigger.area_entered.connect(_on_finish_area_entered)
+		if not finish_trigger.body_entered.is_connected(_on_finish_body_entered):
+			finish_trigger.body_entered.connect(_on_finish_body_entered)
 
 func _on_finish_area_entered(area: Area3D) -> void:
 	if _is_finished:

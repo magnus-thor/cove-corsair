@@ -1,7 +1,7 @@
 ---
 level_id: 44
 level_title: "Level 44: Dreadflame Basin (Hazard Nav)"
-biome_name: "brimstone_bastion"
+biome_name: "brimstone"
 base_scroll_speed: 11.9
 completion_doubloon_reward: 626
 river_width_world: 12.0

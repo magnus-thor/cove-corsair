@@ -57,13 +57,16 @@ func _ready() -> void:
 		if "current_level" in gs:
 			var lvl: int = int(gs.get("current_level"))
 			if lvl <= 15:
-				max_hp = 650
+				max_hp = 1800
+			elif lvl <= 20:
+				max_hp = 2600
 			elif lvl <= 30:
-				max_hp = 1200
+				max_hp = 3800
 			else:
-				max_hp = 2200
+				max_hp = 6000
 				
 	current_hp = max_hp
+	_attack_timer = attack_interval * 0.75
 	if boss_sprite:
 		_current_base_y = 2.00
 		boss_sprite.position.y = _current_base_y

@@ -16,8 +16,8 @@ scale = Vector3(3, 3, 3)
 rotation_degrees = Vector3(0, -90, 0)
 collision_size = Vector3(1.8, 1.2, 3)
 max_health = 4
-move_speed = 6.5
-fire_rate = 1.5
+move_speed = 7.6
+fire_rate = 0.95
 hardpoint_offsets = {
 "BowMortarMount": Vector3(-0.04, 1.35, -0.53),
 "PortRailMount": Vector3(-0.53, 1.12, -1.51),
@@ -41,6 +41,7 @@ socket_weapons = {
 "PortRailMount": "res://src/data/resources/user_crew/weapon_scattershot.tres",
 "StarboardRailMount": "res://src/data/resources/user_crew/weapon_scattershot.tres"
 }
-upgrade_costs = Array[int]([800, 300, 650, 1200, 2200, 3800, 6000, 9500, 15000, 22000])
-tier_descriptions = Array[String](["Artillery Skiff (4 HP, Siege Mortar)", "Balanced Pontoons (4 HP, 6.8 m/s, +5% Firepower)", "Quarterdeck Station (5 HP, 7.1 m/s, +Quarterdeck Crew Socket)", "Reinforced Hull (5 HP, 7.4 m/s, +15% Firepower)", "Quick-Load Hoists (5 HP, 7.7 m/s, +20% Firepower)", "Flank Scattershot (6 HP, 8.0 m/s, +Dual Scattershot Carronades)", "Heavy Caliber Bore (6 HP, 8.3 m/s, +30% Firepower)", "Reinforced Transom (6 HP, 8.6 m/s, +35% Firepower)", "Dreadnought Mortar (7 HP, 8.9 m/s, +Expanded Shell Spread)", "Siege Dreadnought (7 HP, 9.2 m/s, All Mounts Maxed)"])
-tier_sockets = Array[Array]([["BowMortarMount"], ["BowMortarMount"], ["BowMortarMount", "QuarterdeckCrew"], ["BowMortarMount", "QuarterdeckCrew"], ["BowMortarMount", "QuarterdeckCrew"], ["BowMortarMount", "QuarterdeckCrew", "PortRailMount", "StarboardRailMount"], ["BowMortarMount", "QuarterdeckCrew", "PortRailMount", "StarboardRailMount"], ["BowMortarMount", "QuarterdeckCrew", "PortRailMount", "StarboardRailMount"], ["BowMortarMount", "QuarterdeckCrew", "PortRailMount", "StarboardRailMount"], ["BowMortarMount", "QuarterdeckCrew", "PortRailMount", "StarboardRailMount"]])
+upgrade_costs = Array[int]([800, 400, 900, 1800, 3400, 5800, 9500, 15000, 23000, 33000])
+tier_descriptions = Array[String](["Artillery Skiff (4 HP, Siege Mortar)", "Flank Gunwales (4 HP, 7.8 m/s, +Dual Rail Mounts)", "Quarterdeck Station (5 HP, 8.0 m/s, +Quarterdeck Crew Socket)", "Reinforced Hull (5 HP, 8.2 m/s, +15% Firepower)", "Quick-Load Hoists (5 HP, 8.5 m/s, +20% Firepower)", "Twin Heavy Mortars (6 HP, 8.8 m/s, +Heavy Caliber)", "Heavy Caliber Bore (6 HP, 9.0 m/s, +30% Firepower)", "Reinforced Transom (6 HP, 9.3 m/s, +35% Firepower)", "Dreadnought Mortar (7 HP, 9.5 m/s, +Expanded Shell Spread)", "Siege Dreadnought (7 HP, 9.8 m/s, All Mounts Maxed)"])
+tier_sockets = Array[Array]([["BowMortarMount"], ["BowMortarMount", "PortRailMount", "StarboardRailMount"], ["BowMortarMount", "QuarterdeckCrew", "PortRailMount", "StarboardRailMount"], ["BowMortarMount", "QuarterdeckCrew", "PortRailMount", "StarboardRailMount"], ["BowMortarMount", "QuarterdeckCrew", "PortRailMount", "StarboardRailMount"], ["BowMortarMount", "QuarterdeckCrew", "PortRailMount", "StarboardRailMount"], ["BowMortarMount", "QuarterdeckCrew", "PortRailMount", "StarboardRailMount"], ["BowMortarMount", "QuarterdeckCrew", "PortRailMount", "StarboardRailMount"], ["BowMortarMount", "QuarterdeckCrew", "PortRailMount", "StarboardRailMount"], ["BowMortarMount", "QuarterdeckCrew", "PortRailMount", "StarboardRailMount"]])
+

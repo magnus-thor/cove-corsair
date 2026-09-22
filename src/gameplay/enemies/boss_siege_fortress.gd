@@ -60,8 +60,28 @@ func activate_arena() -> void:
 	is_arena_active = true
 
 func _ready() -> void:
-	add_to_group("enemies")
-	add_to_group("boss")
+	if has_node("/root/GameState"):
+		var gs: Node = get_node("/root/GameState")
+		if "current_level" in gs:
+			var lvl: int = int(gs.get("current_level"))
+			if lvl <= 15:
+				hp_port_turret = 300
+				hp_starboard_turret = 300
+				hp_prow_ram = 300
+				hp_furnace_core = 700
+				max_hp = 1600
+			elif lvl <= 30:
+				hp_port_turret = 550
+				hp_starboard_turret = 550
+				hp_prow_ram = 550
+				hp_furnace_core = 1350
+				max_hp = 3000
+			else:
+				hp_port_turret = 850
+				hp_starboard_turret = 850
+				hp_prow_ram = 850
+				hp_furnace_core = 2250
+				max_hp = 4800
 	current_hp = max_hp
 
 	if boss_sprite:

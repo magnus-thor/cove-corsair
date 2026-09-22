@@ -53,6 +53,8 @@ var _spawn_pos: Vector3 = Vector3.ZERO
 var _spawn_pos_initialized: bool = false
 var _distance_traveled: float = 0.0
 var _base_spawn_y: float = 0.48
+var _mine_sweep_timer: float = 0.0
+
 
 func set_spawn_pos(pos: Vector3) -> void:
 	_spawn_pos = pos
@@ -435,9 +437,13 @@ func _physics_process(delta: float) -> void:
 		if model and model.visible:
 			model.rotate_x(spin_speed * delta)
 
-	# Chain Shot sweeps and detonates sea mines in a radius safely
+	# Chain Shot sweeps and detonates sea mines in a radius safely (throttled to 10Hz)
 	if ammo_id == "chain_shot" and not (is_hostile or is_in_group("enemy_projectiles") or has_meta("is_hostile")):
-		_sweep_chain_shot_mines()
+		_mine_sweep_timer -= delta
+		if _mine_sweep_timer <= 0.0:
+			_mine_sweep_timer = 0.1
+			_sweep_chain_shot_mines()
+
 
 	# Travel distance clamp (primary check: total travel progress vs max_range)
 	if _distance_traveled >= max_range or global_position.distance_to(_spawn_pos) >= max_range:
@@ -503,15 +509,15 @@ func _sweep_chain_shot_mines() -> void:
 	var tree := get_tree()
 	if not tree:
 		return
-	var destructibles: Array[Node] = tree.get_nodes_in_group("destructible")
-	for obj: Node in destructibles:
+	var mines: Array[Node] = tree.get_nodes_in_group("sea_mine")
+	for obj: Node in mines:
 		if is_instance_valid(obj) and not obj.is_queued_for_deletion():
-			var is_mine: bool = (obj is DestructibleObstacle and (obj as DestructibleObstacle).obstacle_type == DestructibleObstacle.ObstacleType.SEA_MINE) or ("mine" in obj.name.to_lower()) or obj.is_in_group("sea_mine")
-			if is_mine and obj is Node3D and global_position.distance_to((obj as Node3D).global_position) <= 3.5:
+			if obj is Node3D and global_position.distance_to((obj as Node3D).global_position) <= 4.0:
 				if obj.has_method("die"):
 					obj.call("die")
 				else:
 					obj.queue_free()
+
 
 func _on_hit(target: Node) -> void:
 	if _is_destroyed or not target or not is_instance_valid(target):

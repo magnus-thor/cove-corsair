@@ -3,33 +3,33 @@
 [ext_resource type="Script" path="res://src/vfx/vfx_mortar_geyser.gd" id="1_geyser_script"]
 
 [sub_resource type="Gradient" id="Gradient_water"]
-offsets = PackedFloat32Array(0, 0.25, 0.7, 1)
-colors = PackedColorArray(1, 1, 1, 0.95, 0.85, 0.98, 1, 0.9, 0.65, 0.92, 0.88, 0.7, 0.5, 0.85, 0.85, 0)
+offsets = PackedFloat32Array(0, 0.35, 0.8, 1)
+colors = PackedColorArray(1, 1, 1, 0.65, 0.85, 0.98, 1, 0.45, 0.65, 0.92, 0.88, 0.25, 0.5, 0.85, 0.85, 0)
 
 [sub_resource type="Curve" id="Curve_water_scale"]
-_data = [Vector2(0, 0.4), 0.0, 1.5, 0, 0, Vector2(0.5, 1.0), 0.0, 0.0, 0, 0, Vector2(1, 0.1), -2.0, 0.0, 0, 0]
+_data = [Vector2(0, 0.5), 0.0, 1.0, 0, 0, Vector2(0.4, 0.8), 0.0, 0.0, 0, 0, Vector2(1, 0.05), -1.5, 0.0, 0, 0]
 point_count = 3
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_water_drop"]
 transparency = 1
 shading_mode = 0
 vertex_color_use_as_albedo = true
-albedo_color = Color(0.85, 0.96, 1, 0.9)
+albedo_color = Color(0.85, 0.96, 1, 0.45)
 
 [sub_resource type="SphereMesh" id="SphereMesh_drop"]
 material = SubResource("StandardMaterial3D_water_drop")
-radius = 0.16
-height = 0.32
+radius = 0.09
+height = 0.18
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_shockwave"]
 transparency = 1
 shading_mode = 0
-albedo_color = Color(0.75, 0.95, 1, 0.75)
+albedo_color = Color(0.75, 0.95, 1, 0.5)
 
 [sub_resource type="TorusMesh" id="TorusMesh_shockwave"]
 material = SubResource("StandardMaterial3D_shockwave")
-inner_radius = 0.82
-outer_radius = 1.0
+inner_radius = 0.9
+outer_radius = 1.15
 
 [node name="VFXMortarGeyser" type="Node3D"]
 top_level = true
@@ -38,21 +38,21 @@ script = ExtResource("1_geyser_script")
 [node name="WaterColumn" type="CPUParticles3D" parent="."]
 local_coords = true
 emitting = false
-amount = 24
-lifetime = 0.6
+amount = 18
+lifetime = 0.45
 one_shot = true
-explosiveness = 0.9
+explosiveness = 0.92
 mesh = SubResource("SphereMesh_drop")
 emission_shape = 1
-emission_sphere_radius = 0.3
+emission_sphere_radius = 0.4
 direction = Vector3(0, 1, 0)
-spread = 15.0
+spread = 40.0
 gravity = Vector3(0, -9.8, 0)
-initial_velocity_min = 7.0
-initial_velocity_max = 8.5
+initial_velocity_min = 1.8
+initial_velocity_max = 2.6
 scale_amount_curve = SubResource("Curve_water_scale")
 color_ramp = SubResource("Gradient_water")
 
 [node name="ShockwaveRing" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0)
 mesh = SubResource("TorusMesh_shockwave")

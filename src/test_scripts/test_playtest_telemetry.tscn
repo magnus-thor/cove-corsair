@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://c8playtesttele01"]
+
+[ext_resource type="Script" path="res://src/test_scripts/test_playtest_telemetry.gd" id="1_test"]
+
+[node name="TestPlaytestTelemetry" type="Node"]
+script = ExtResource("1_test")

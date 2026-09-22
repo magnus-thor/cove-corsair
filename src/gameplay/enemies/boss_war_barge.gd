@@ -80,18 +80,20 @@ func _ready() -> void:
 		if "current_level" in gs:
 			var lvl: int = int(gs.get("current_level"))
 			if lvl <= 5:
-				max_hp = 380
-			elif lvl <= 10:
-				max_hp = 550
-			elif lvl <= 20:
 				max_hp = 850
-			elif lvl <= 35:
+			elif lvl <= 10:
 				max_hp = 1400
+			elif lvl <= 20:
+				max_hp = 2400
+			elif lvl <= 35:
+				max_hp = 3800
 			else:
-				max_hp = 2000
+				max_hp = 5500
 	
 	current_hp = max_hp
 	original_combat_z = combat_z_offset
+	mortar_timer = 6.0
+	keg_timer = 4.5
 	
 	if boss_sprite:
 		boss_sprite.position.y = 0.22
@@ -151,13 +153,14 @@ func _process_combat(delta: float) -> void:
 	# Targeted mortar pressure (paused if hazard spawning disabled or already in a barrage)
 	if spawn_hazard_enabled and not is_barrage_active:
 		mortar_timer += delta
-		if mortar_timer >= 10.0:
+		var mortar_cd: float = 6.0 if current_phase == 1 else 4.0
+		if mortar_timer >= mortar_cd:
 			mortar_timer = 0.0
 			_fire_targeted_mortar()
 
 	# Continuous Minion Add Spawns
 	minion_timer += delta
-	var spawn_interval: float = 6.5 if current_phase == 1 else (4.5 if current_phase == 2 else 3.5)
+	var spawn_interval: float = 5.5 if current_phase == 1 else (4.0 if current_phase == 2 else 3.0)
 	if minion_timer >= spawn_interval:
 		minion_timer = 0.0
 		_deploy_side_minions()
@@ -165,7 +168,8 @@ func _process_combat(delta: float) -> void:
 	# Rolling Powder Keg Spawns (paused if hazards disabled or barrage active)
 	if spawn_hazard_enabled and not is_barrage_active:
 		keg_timer += delta
-		if keg_timer >= 7.5:
+		var keg_cd: float = 5.0 if current_phase == 1 else 3.5
+		if keg_timer >= keg_cd:
 			keg_timer = 0.0
 			_deploy_center_kegs()
 		

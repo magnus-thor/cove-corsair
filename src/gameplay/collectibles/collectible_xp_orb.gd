@@ -156,7 +156,8 @@ func collect_orb(_player_ref: Node = null) -> void:
 		if player.has_method("spawn_floating_text_at_position"):
 			player.spawn_floating_text_at_position("+" + str(int(value)) + " COINS", Color(1.0, 0.85, 0.2))
 	if GameState:
-		GameState.add_doubloons(int(value))
+		GameState.add_doubloons(int(value), "xp_orb")
+
 		
 	AudioManager.play_sfx("coin_pickups")
 	queue_free()

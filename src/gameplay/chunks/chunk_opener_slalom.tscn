@@ -1,0 +1,65 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/gameplay/chunks/chunk_reef_slalom.gd" id="1_chunk"]
+[ext_resource type="PackedScene" path="res://assets/models/palm-detailed-bend.glb" id="2_palm"]
+[ext_resource type="PackedScene" path="res://assets/models/rocks-a.glb" id="3_rocks"]
+[ext_resource type="PackedScene" path="res://src/gameplay/obstacles/hazard_reef.tscn" id="4_reef"]
+[ext_resource type="PackedScene" path="res://src/gameplay/obstacles/destructible_barrel.tscn" id="5_barrel"]
+[ext_resource type="Script" path="res://src/gameplay/obstacles/destructible_barrel.gd" id="6_barrel_script"]
+[ext_resource type="PackedScene" path="res://src/gameplay/enemies/enemy_tide_cutter.tscn" id="7_cutter"]
+[ext_resource type="PackedScene" path="res://src/gameplay/enemies/enemy_iron_gunner.tscn" id="8_gunner"]
+[ext_resource type="PackedScene" path="res://src/gameplay/obstacles/multiplier_gate.tscn" id="9_gate"]
+[ext_resource type="Script" path="res://src/gameplay/obstacles/multiplier_gate.gd" id="10_gate_script"]
+
+[node name="ChunkOpenerSlalom" type="Node3D" unique_id=9825101]
+script = ExtResource("1_chunk")
+chunk_id = "opener_slalom"
+
+[node name="ChunkStart" type="Marker3D" parent="." unique_id=9825102]
+
+[node name="ChunkEnd" type="Marker3D" parent="." unique_id=9825103]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -50)
+
+[node name="Banks" type="Node3D" parent="." unique_id=9825104]
+
+[node name="Palm_Left" type="Node3D" parent="Banks" unique_id=9825105 instance=ExtResource("2_palm")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1.2, 0, 8.74228e-08, 0, -1, -9.5, 0, -14)
+
+[node name="Rocks_Left" type="Node3D" parent="Banks" unique_id=9825106 instance=ExtResource("3_rocks")]
+transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, -10.5, 0, -32)
+
+[node name="Palm_Right" type="Node3D" parent="Banks" unique_id=9825107 instance=ExtResource("2_palm")]
+transform = Transform3D(1, 0, 0, 0, 1.2, 0, 0, 0, 1, 9.5, 0, -24)
+
+[node name="Rocks_Right" type="Node3D" parent="Banks" unique_id=9825108 instance=ExtResource("3_rocks")]
+transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, 10.5, 0, -42)
+
+[node name="Entities" type="Node3D" parent="." unique_id=9825109]
+
+# Safe 20m start buffer (first reef is at z = -20m)
+[node name="Reef_Gate1_Left" parent="Entities" unique_id=9825110 instance=ExtResource("4_reef")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 0, -20)
+
+[node name="Reef_Gate1_Right" parent="Entities" unique_id=9825111 instance=ExtResource("4_reef")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, -28)
+
+[node name="Barrel_Midway" type="Area3D" parent="Entities" unique_id=9825114 groups=["destructible"] instance=ExtResource("5_barrel")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0.05, -24)
+script = ExtResource("6_barrel_script")
+obstacle_type = 0
+
+[node name="Reef_Mid_CenterLeft" parent="Entities" unique_id=9825112 instance=ExtResource("4_reef")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 0, -35)
+
+[node name="TideCutter_Sentry" type="Area3D" parent="Entities" unique_id=9825115 groups=["destructible", "enemies"] instance=ExtResource("7_cutter")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 0.1, -38)
+
+[node name="Reef_Far_Right" parent="Entities" unique_id=9825113 instance=ExtResource("4_reef")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0, -44)
+
+[node name="Gate_Opener" type="Area3D" parent="Entities" unique_id=9825118 groups=["multiplier_gate"] instance=ExtResource("9_gate")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0, 0, -46)
+script = ExtResource("10_gate_script")
+value = 10
+custom_text = "+10"
+gate_action = "add_fleet_1"

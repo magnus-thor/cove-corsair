@@ -1,7 +1,7 @@
 ---
 level_id: 14
 level_title: "Level 14: Siren's Shoals (Hazard Nav)"
-biome_name: "pirate_citadel"
+biome_name: "tropical"
 base_scroll_speed: 8.5
 completion_doubloon_reward: 220
 river_width_world: 12.0

@@ -49,6 +49,6 @@ hardpoint_scales = {
 socket_weapons = {
 "BowMount": "res://src/data/resources/user_crew/weapon_ironclad_battery.tres"
 }
-upgrade_costs = Array[int]([1500, 500, 1000, 1800, 3200, 5500, 9000, 14000, 22000, 32000])
+upgrade_costs = Array[int]([1500, 700, 1500, 2800, 5000, 8500, 14000, 22000, 34000, 48000])
 tier_descriptions = Array[String](["Armored Plating (8 HP, Triple Heavy Battery)", "Tempered Rivets (8 HP, 8.7 m/s, +5% Firepower)", "Dual Crew Stations (9 HP, 8.9 m/s, +Deck Crew Sockets)", "Blast Bulkheads (9 HP, 9.1 m/s, +15% Firepower)", "Steam Injectors (9 HP, 9.3 m/s, +20% Firepower)", "Flank Gunports (10 HP, 9.5 m/s, +Dual Swivel Mounts)", "Cast Iron Prow (10 HP, 9.7 m/s, +30% Firepower)", "Reinforced Boiler (10 HP, 9.9 m/s, +35% Firepower)", "Full Battery Array (11 HP, 10.1 m/s, +Quad Swivel Mounts)", "Dreadnought Hull (11 HP, 10.3 m/s, All Mounts Maxed)"])
 tier_sockets = Array[Array]([["BowMount"], ["BowMount"], ["BowMount", "MonkeyCrew"], ["BowMount", "MonkeyCrew"], ["BowMount", "MonkeyCrew"], ["BowMount", "MonkeyCrew", "PortSwivelMount1", "StarboardSwivelMount1"], ["BowMount", "MonkeyCrew", "PortSwivelMount1", "StarboardSwivelMount1"], ["BowMount", "MonkeyCrew", "PortSwivelMount1", "StarboardSwivelMount1"], ["BowMount", "MonkeyCrew", "SkeletonCrew", "PortSwivelMount1", "PortSwivelMount2", "StarboardSwivelMount1", "StarboardSwivelMount2"], ["BowMount", "MonkeyCrew", "SkeletonCrew", "PortSwivelMount1", "PortSwivelMount2", "StarboardSwivelMount1", "StarboardSwivelMount2"]])

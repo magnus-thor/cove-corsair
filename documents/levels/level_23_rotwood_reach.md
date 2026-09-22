@@ -1,7 +1,7 @@
 ---
 level_id: 23
 level_title: "Level 23: Rotwood Reach (Swarm Threat)"
-biome_name: "black_tide_bayou"
+biome_name: "bayou"
 base_scroll_speed: 9.5
 completion_doubloon_reward: 342
 river_width_world: 12.0

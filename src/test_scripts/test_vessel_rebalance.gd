@@ -43,8 +43,8 @@ func _ready() -> void:
 	var bombard_res: ShipData = load("res://src/data/resources/user_vessels/bombard_skiff_ship.tres") as ShipData
 	assert_test(bombard_res != null, "bombard_skiff_ship.tres loads successfully")
 	assert_test(bombard_res.max_health == 4, "Bombard Skiff max_health is 4 HP")
-	assert_test(bombard_res.move_speed == 6.5, "Bombard Skiff move_speed is 6.5 m/s (slowest)")
-	assert_test(bombard_res.fire_rate == 1.5, "Bombard Skiff fire_rate is 1.5s")
+	assert_test(bombard_res.move_speed == 7.6, "Bombard Skiff move_speed is buffed to 7.6 m/s")
+	assert_test(bombard_res.fire_rate == 0.95, "Bombard Skiff fire_rate is buffed to 0.95s")
 
 	# 2. Verify Weapons & Ammo Tuning
 	print("\n--- 2. Testing Weapons and Ammo Tuning ---")
@@ -52,12 +52,12 @@ func _ready() -> void:
 	assert_test(heavy_shot != null, "ammo_heavy_shot.tres loads successfully")
 	assert_test(heavy_shot.damage == 4, "Heavy Shot damage is 4")
 	assert_test(heavy_shot.aoe_damage == 2, "Heavy Shot AoE damage tuned to 2")
-	assert_test(heavy_shot.splash_radius == 1.6, "Heavy Shot splash radius narrowed to 1.6m single-lane focus")
+	assert_test(heavy_shot.splash_radius == 2.8, "Heavy Shot splash radius expanded to 2.8m AoE")
 
 	var mortar_w: WeaponData = load("res://src/data/resources/user_crew/weapon_bow_mortar.tres") as WeaponData
 	assert_test(mortar_w != null, "weapon_bow_mortar.tres loads successfully")
 	assert_test(mortar_w.max_range == 18.5, "Heavy Mortar range tuned to 18.5m to reach boss")
-	assert_test(mortar_w.fire_rate == 1.5, "Heavy Mortar fire_rate tuned to 1.5s deliberate siege cooldown")
+	assert_test(mortar_w.fire_rate == 0.95, "Heavy Mortar fire_rate tuned to 0.95s agile siege firing")
 
 	var ironclad_battery: WeaponData = load("res://src/data/resources/user_crew/weapon_ironclad_battery.tres") as WeaponData
 	assert_test(ironclad_battery != null, "weapon_ironclad_battery.tres loads successfully")
@@ -137,14 +137,15 @@ func _ready() -> void:
 	# Check exponential upgrade curve
 	var sloop_costs: Dictionary = GameState.VESSEL_CATALOG["sloop"]["tier_prices"]
 	assert_test(sloop_costs.size() == 9, "Sloop has 9 upgrade tiers (L2-L10)")
-	assert_test(sloop_costs[2] == 200, "Sloop L2 upgrade is 200 doubloons")
-	assert_test(sloop_costs[5] == 1500, "Sloop L5 upgrade is 1500 doubloons")
-	assert_test(sloop_costs[10] == 16000, "Sloop L10 capstone upgrade is 16000 doubloons")
+	assert_test(sloop_costs[2] == 250, "Sloop L2 upgrade is 250 doubloons")
+	assert_test(sloop_costs[5] == 2400, "Sloop L5 upgrade is 2400 doubloons")
+	assert_test(sloop_costs[10] == 25000, "Sloop L10 capstone upgrade is 25000 doubloons")
 
 	# Crew progression
 	assert_test(GameState.CREW_CATALOG["monkey_bomber"]["unlock_price"] == 350, "Monkey Bomber unlock cost is 350 doubloons")
 	assert_test(GameState.get_crew_upgrade_cost("monkey_bomber", 2) == 500, "Monkey Bomber L2 upgrade is 500 doubloons")
 	assert_test(GameState.get_crew_upgrade_cost("monkey_bomber", 5) == 5000, "Monkey Bomber L5 upgrade is 5000 doubloons")
+	assert_test(GameState.CREW_CATALOG["grease_monkey"]["unlock_price"] == 500, "Grease Monkey unlock cost is 500 doubloons")
 
 	# 5. Verify Mobile Optimizations
 	print("\n--- 5. Testing Mobile Optimizations ---")

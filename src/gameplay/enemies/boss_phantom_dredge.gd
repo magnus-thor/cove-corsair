@@ -59,11 +59,11 @@ func _ready() -> void:
 		if "current_level" in gs:
 			var lvl: int = int(gs.get("current_level"))
 			if lvl <= 10:
-				max_hp = 550
+				max_hp = 1400
 			elif lvl <= 25:
-				max_hp = 1100
+				max_hp = 2800
 			else:
-				max_hp = 1600
+				max_hp = 4500
 				
 	current_hp = max_hp
 	_base_y = 1.45
@@ -101,6 +101,7 @@ func _process_approaching(delta: float) -> void:
 	global_position.z = move_toward(global_position.z, _target_z, approach_speed * delta)
 	if absf(global_position.z - _target_z) < 1.0:
 		current_state = State.COMBAT
+		_cannon_timer = 1.0
 		AudioManager.play_sfx("water_splashes", 0.7, 0.9, 2.0)
 
 func _process_combat(delta: float) -> void:

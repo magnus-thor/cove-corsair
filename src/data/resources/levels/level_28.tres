@@ -1,24 +1,25 @@
 [gd_resource type="Resource" script_class="LevelData" format=3]
 
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_warmup.tscn" id="chunk_1"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_opener_slalom.tscn" id="chunk_1"]
 [ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_mine_gauntlet.tscn" id="chunk_2"]
 [ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_reef_slalom.tscn" id="chunk_3"]
 [ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_barricade_siege.tscn" id="chunk_4"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_vanguard_climax.tscn" id="chunk_5"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_finish_line.tscn" id="chunk_6"]
-[ext_resource type="Texture2D" path="res://assets/textures/horizon_citadel.png" id="ext_horizon"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_gunner_ambush.tscn" id="chunk_5"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_vanguard_climax.tscn" id="chunk_6"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_finish_line.tscn" id="chunk_7"]
+[ext_resource type="Texture2D" path="res://assets/textures/horizon_bayou.png" id="ext_horizon"]
 [ext_resource type="Script" path="res://src/data/resources/level_data.gd" id="ext_script"]
 
 [resource]
 script = ExtResource("ext_script")
 level_id = 28
 level_title = "Level 28: Dead Man's Bayou (Hazard Nav)"
-biome_name = "pirate_citadel"
+biome_name = "bayou"
 base_scroll_speed = 10.1
-chunk_scenes = Array[PackedScene]([ExtResource("chunk_1"), ExtResource("chunk_2"), ExtResource("chunk_3"), ExtResource("chunk_4"), ExtResource("chunk_2"), ExtResource("chunk_3"), ExtResource("chunk_4"), ExtResource("chunk_2"), ExtResource("chunk_5"), ExtResource("chunk_6")])
+chunk_scenes = Array[PackedScene]([ExtResource("chunk_1"), ExtResource("chunk_2"), ExtResource("chunk_3"), ExtResource("chunk_4"), ExtResource("chunk_5"), ExtResource("chunk_2"), ExtResource("chunk_3"), ExtResource("chunk_4"), ExtResource("chunk_6"), ExtResource("chunk_7")])
 completion_doubloon_reward = 410
 horizon_texture = ExtResource("ext_horizon")
-water_albedo = Color(0.10, 0.28, 0.46, 0.90)
-fog_color = Color(0.72, 0.48, 0.30, 1.0)
-fog_density = 0.01
+water_albedo = Color(0.12, 0.32, 0.22, 0.92)
+fog_color = Color(0.20, 0.38, 0.30, 1.0)
+fog_density = 0.02
 river_width_world = 12.0

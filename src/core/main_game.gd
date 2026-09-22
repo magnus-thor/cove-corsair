@@ -58,6 +58,8 @@ func _setup_harbor_mode() -> void:
 func _start_game_immediately() -> void:
 	GameState.is_game_active = true
 	GameState.set_performance_mode(true)
+	if EventBus and EventBus.has_signal("level_started"):
+		EventBus.level_started.emit(GameState.current_level)
 	var level_ctrl := get_tree().get_first_node_in_group("level_controller") as LevelController
 	if level_ctrl:
 		level_ctrl.visible = true
@@ -110,6 +112,8 @@ func _on_endless_mode_started() -> void:
 func _on_game_started() -> void:
 	GameState.is_game_active = true
 	GameState.set_performance_mode(true)
+	if EventBus and EventBus.has_signal("level_started"):
+		EventBus.level_started.emit(GameState.current_level)
 	print("[RIVER RUN STARTED] River Level %d | Active Vessel: %s (Tier %d) | Vault: %d 🪙" % [
 		GameState.current_level,
 		GameState.active_vessel,

@@ -1,7 +1,7 @@
 ---
 level_id: 41
 level_title: "Level 41: Inferno Gate (Swarm Threat)"
-biome_name: "brimstone_bastion"
+biome_name: "brimstone"
 base_scroll_speed: 11.6
 completion_doubloon_reward: 585
 river_width_world: 12.0

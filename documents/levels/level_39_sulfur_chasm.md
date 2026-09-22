@@ -1,7 +1,7 @@
 ---
 level_id: 39
 level_title: "Level 39: Sulfur Chasm (Swarm Threat)"
-biome_name: "brimstone_bastion"
+biome_name: "brimstone"
 base_scroll_speed: 11.3
 completion_doubloon_reward: 558
 river_width_world: 12.0

@@ -1,7 +1,7 @@
 ---
 level_id: 12
 level_title: "Level 12: Smuggler's Gate (Hazard Nav)"
-biome_name: "pirate_citadel"
+biome_name: "tropical"
 base_scroll_speed: 8.3
 completion_doubloon_reward: 194
 river_width_world: 12.0

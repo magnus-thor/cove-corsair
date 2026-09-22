@@ -1,7 +1,7 @@
 ---
 level_id: 10
 level_title: "Level 10: The Phantom Dredge (Boss Threat)"
-biome_name: "black_tide_bayou"
+biome_name: "tropical"
 base_scroll_speed: 8.1
 completion_doubloon_reward: 346
 river_width_world: 12.0

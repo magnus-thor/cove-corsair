@@ -69,3 +69,22 @@ signal run_extracted(score: int, doubloons: int)
 ## Fired when the player chooses Corsair's Gamble at a wager fork to increase stakes.
 @warning_ignore("unused_signal")
 signal wager_pushed(new_multiplier: float, new_speed: float)
+
+## ── Telemetry & Playtest Balancing ──────────────────────────────────────────
+
+## Fired when the player takes damage, with source name and river distance.
+@warning_ignore("unused_signal")
+signal player_hit_taken(amount: int, current_hp: int, max_hp: int, source_info: String, distance: float)
+
+## Fired when doubloons are awarded, specifying the source (e.g. "coin", "chest", "barrel", "gate_multiplier", "level_bonus").
+@warning_ignore("unused_signal")
+signal doubloon_awarded(amount: int, source: String, total_run: int)
+
+## Fired when an enemy mob escapes past the bottom of the river screen.
+@warning_ignore("unused_signal")
+signal mob_escaped(mob_name: String, total_leaked: int)
+
+## Fired when player attempts or views an item in shipyard/upgrade UI.
+@warning_ignore("unused_signal")
+signal shipyard_item_action(item_id: String, item_type: String, cost: int, player_vault: int, success: bool, reason: String)
+

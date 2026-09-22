@@ -14,7 +14,7 @@
 script = ExtResource("ext_script")
 level_id = 45
 level_title = "Level 45: Bonebeard's Throne (Boss Threat)"
-biome_name = "brimstone_bastion"
+biome_name = "brimstone"
 base_scroll_speed = 12.0
 chunk_scenes = Array[PackedScene]([ExtResource("chunk_1"), ExtResource("chunk_2"), ExtResource("chunk_3"), ExtResource("chunk_4"), ExtResource("chunk_5"), ExtResource("chunk_6"), ExtResource("chunk_2"), ExtResource("chunk_4"), ExtResource("chunk_7")])
 completion_doubloon_reward = 1134

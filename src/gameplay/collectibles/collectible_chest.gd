@@ -107,10 +107,11 @@ func collect_chest() -> void:
 	
 	# 4. Economy reward
 	if GameState:
-		GameState.add_doubloons(chest_value)
-	var player = get_tree().get_first_node_in_group("player")
+		GameState.add_doubloons(chest_value, "chest")
+	var player := get_tree().get_first_node_in_group("player") as Node
 	if player and player.has_method("add_doubloons"):
-		player.add_doubloons(chest_value)
+		player.call("add_doubloons", chest_value)
+
 		
 	# Give short window for tween/sounds then queue_free
 	await get_tree().create_timer(0.75, false).timeout

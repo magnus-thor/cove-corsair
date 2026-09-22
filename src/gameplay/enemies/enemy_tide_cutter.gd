@@ -40,6 +40,21 @@ func _apply_level_tuning() -> void:
 		current_hp = 10
 		forward_speed = 4.5
 		steer_speed = 2.5
+	elif cur_lvl <= 15:
+		max_hp = 20
+		current_hp = 20
+		forward_speed = 6.0
+		steer_speed = 3.2
+	elif cur_lvl <= 30:
+		max_hp = 32
+		current_hp = 32
+		forward_speed = 7.0
+		steer_speed = 3.8
+	else:
+		max_hp = 48
+		current_hp = 48
+		forward_speed = 8.0
+		steer_speed = 4.5
 
 func _physics_process(delta: float) -> void:
 	if _is_dead or not GameState.is_game_active:

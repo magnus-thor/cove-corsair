@@ -63,7 +63,7 @@ var vessel_ids: Array[String] = ["dinghy", "sloop", "bombard_skiff", "ironclad"]
 var card_instances: Dictionary = {} # vessel_id -> VesselCard
 var selected_vessel_id: String = "dinghy"
 
-var crew_ids: Array[String] = ["monkey_bomber", "skeleton_tosser"]
+var crew_ids: Array[String] = ["monkey_bomber", "skeleton_tosser", "grease_monkey"]
 var crew_card_instances: Dictionary = {} # crew_id -> CrewCard
 var outfitting_card_instances: Dictionary = {} # item_id -> OutfittingCard
 
@@ -119,6 +119,8 @@ func _ready() -> void:
 	_build_grid_cards()
 	_update_purse_display()
 	_update_inspection_drawer()
+	print("[TELEMETRY:SHIPYARD] ⚓ Shipyard Opened | Vault Balance: %d 🪙" % (GameState.doubloons if GameState else 0))
+
 
 func _init_perk_chip_style() -> void:
 	_style_perk_chip = StyleBoxFlat.new()
@@ -765,8 +767,10 @@ func _on_outfitting_equip_requested(item_id: String) -> void:
 
 func _on_back_pressed() -> void:
 	AudioManager.play_sfx("gate_passes")
+	print("[TELEMETRY:SHIPYARD] ⚓ Shipyard Closed | Vault Balance: %d 🪙" % (GameState.doubloons if GameState else 0))
 	shipyard_closed.emit()
 	queue_free()
+
 
 func _format_number(val: int) -> String:
 	var s: String = str(absi(val))

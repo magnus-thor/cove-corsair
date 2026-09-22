@@ -573,6 +573,10 @@ func take_hit(amount: int = 1, source_info: String = "") -> void:
 	if camera and camera.has_method("add_trauma"):
 		camera.call("add_trauma", 0.55)
 
+	var dist: float = GameState.distance_traveled if GameState else 0.0
+	if EventBus and EventBus.has_signal("player_hit_taken"):
+		EventBus.player_hit_taken.emit(amount, current_health, max_health, source_info, dist)
+
 	# Sensory Polish: 3D Hit Flash & Kinetic Hull Shudder
 	if _movement:
 		_movement.apply_shudder()

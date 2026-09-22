@@ -43,6 +43,6 @@ hardpoint_scales = {
 socket_weapons = {
 "BowMount": "res://src/data/resources/user_crew/weapon_sloop_twin_chaser.tres"
 }
-upgrade_costs = Array[int]([400, 200, 450, 850, 1500, 2600, 4200, 6800, 10500, 16000])
+upgrade_costs = Array[int]([400, 250, 550, 1200, 2400, 4200, 7000, 11000, 16500, 25000])
 tier_descriptions = Array[String](["Standard Oak (4 HP, Twin Bow Chasers)", "Tuned Rigging (4 HP, 11.8 m/s, +5% Firepower)", "Reinforced Planks (5 HP, 12.1 m/s, +Mid Crew Socket)", "Copper Fasteners (5 HP, 12.4 m/s, +15% Firepower)", "Hardened Gunwales (5 HP, 12.8 m/s, +20% Firepower)", "Broadside Carronades (6 HP, 13.2 m/s, +Dual Swivel Mounts)", "Storm Sails (6 HP, 13.6 m/s, +30% Firepower)", "Reinforced Keel (6 HP, 14.0 m/s, +35% Firepower)", "Flagship Quarters (7 HP, 14.3 m/s, +Aft Crew Socket)", "Fleet Flagship (7 HP, 14.5 m/s, All Sockets Maxed)"])
 tier_sockets = Array[Array]([["BowMount"], ["BowMount"], ["BowMount", "MidDeckCrew"], ["BowMount", "MidDeckCrew"], ["BowMount", "MidDeckCrew"], ["BowMount", "MidDeckCrew", "PortSwivelMount", "StarboardSwivelMount"], ["BowMount", "MidDeckCrew", "PortSwivelMount", "StarboardSwivelMount"], ["BowMount", "MidDeckCrew", "PortSwivelMount", "StarboardSwivelMount"], ["BowMount", "MidDeckCrew", "AftDeckCrew", "PortSwivelMount", "StarboardSwivelMount"], ["BowMount", "MidDeckCrew", "AftDeckCrew", "PortSwivelMount", "StarboardSwivelMount"]])

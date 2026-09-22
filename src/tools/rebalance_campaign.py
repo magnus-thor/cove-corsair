@@ -27,21 +27,14 @@ BIOMES = {
         "fog_density": 0.005,
     },
     "bayou": {
-        "name": "black_tide_bayou",
+        "name": "bayou",
         "horizon": "res://assets/textures/horizon_bayou.png",
         "water": "Color(0.12, 0.32, 0.22, 0.92)",
         "fog_color": "Color(0.20, 0.38, 0.30, 1.0)",
         "fog_density": 0.02,
     },
-    "citadel": {
-        "name": "pirate_citadel",
-        "horizon": "res://assets/textures/horizon_citadel.png",
-        "water": "Color(0.10, 0.28, 0.46, 0.90)",
-        "fog_color": "Color(0.72, 0.48, 0.30, 1.0)",
-        "fog_density": 0.01,
-    },
     "brimstone": {
-        "name": "brimstone_bastion",
+        "name": "brimstone",
         "horizon": "res://assets/textures/horizon_brimstone.png",
         "water": "Color(0.28, 0.14, 0.12, 0.92)",
         "fog_color": "Color(0.45, 0.22, 0.18, 1.0)",
@@ -99,22 +92,10 @@ LEVEL_TITLES = {
 }
 
 def get_biome_key(lvl: int) -> str:
-    if 1 <= lvl <= 5:
+    if 1 <= lvl <= 15:
         return "tropical"
-    elif 6 <= lvl <= 10:
+    elif 16 <= lvl <= 30:
         return "bayou"
-    elif 11 <= lvl <= 15:
-        return "citadel"
-    elif 16 <= lvl <= 20:
-        return "brimstone"
-    elif 21 <= lvl <= 25:
-        return "bayou"
-    elif 26 <= lvl <= 30:
-        return "citadel"
-    elif 31 <= lvl <= 35:
-        return "tropical"
-    elif 36 <= lvl <= 40:
-        return "brimstone"
     else:
         return "brimstone"
 
@@ -149,6 +130,10 @@ def get_level_title(lvl: int) -> str:
 def get_chunk_sequence(lvl: int) -> list:
     # Base chunk pools
     C_WARMUP = "res://src/gameplay/chunks/chunk_warmup.tscn"
+    C_OPENER_AMBUSH = "res://src/gameplay/chunks/chunk_opener_ambush.tscn"
+    C_OPENER_GAUNTLET = "res://src/gameplay/chunks/chunk_opener_gauntlet.tscn"
+    C_OPENER_SLALOM = "res://src/gameplay/chunks/chunk_opener_slalom.tscn"
+
     C_MINE = "res://src/gameplay/chunks/chunk_mine_gauntlet.tscn"
     C_BARRICADE = "res://src/gameplay/chunks/chunk_barricade_siege.tscn"
     C_REEF = "res://src/gameplay/chunks/chunk_reef_slalom.tscn"
@@ -165,27 +150,33 @@ def get_chunk_sequence(lvl: int) -> list:
         # Level 2: Sea Mines & Armada Multiplier (5 chunks: Warmup -> Mine Gauntlet -> Fodder Swarm -> Barricade -> Finish Line)
         return [C_WARMUP, C_MINE, C_FODDER, C_BARRICADE, C_FINISH]
     elif lvl == 3:
-        # Level 3: Gunner Skirmish & Reefs (5 chunks: Reef Slalom -> Gunner Ambush -> Mine Gauntlet -> Vanguard Climax -> Finish Line)
-        # Direct reef start - no warmup dock!
-        return [C_REEF, C_GUNNER, C_MINE, C_CLIMAX, C_FINISH]
+        # Level 3: Reef Slalom Opener with safe 20m buffer
+        return [C_OPENER_SLALOM, C_GUNNER, C_MINE, C_CLIMAX, C_FINISH]
     elif lvl == 4:
-        # Level 4: Combined Hazard Gauntlet (6 chunks: Mine Gauntlet -> Barricade Siege -> Reef Slalom -> Fodder Swarm -> Vanguard Climax -> Finish Line)
-        # Direct minefield start!
-        return [C_MINE, C_BARRICADE, C_REEF, C_FODDER, C_CLIMAX, C_FINISH]
+        # Level 4: Mine Gauntlet Opener with safe 20m buffer
+        return [C_OPENER_GAUNTLET, C_BARRICADE, C_REEF, C_FODDER, C_CLIMAX, C_FINISH]
     elif lvl == 5:
         # Level 5: Captain Ironjaw Milestone Boss
         boss_chunk = get_boss_chunk(lvl)
-        return [C_WARMUP, C_REEF, C_MINE, C_BARRICADE, C_GUNNER, boss_chunk]
+        return [C_OPENER_AMBUSH, C_REEF, C_MINE, C_BARRICADE, C_GUNNER, boss_chunk]
+    elif lvl == 19:
+        # Level 19: Devil's Slalom (mine gauntlet & reefs)
+        return [C_OPENER_GAUNTLET, C_MINE, C_REEF, C_MINE, C_GUNNER, C_REEF, C_MINE, C_CLIMAX, C_FINISH]
 
     is_boss = (lvl % 5 == 0)
+    
+    # Pick opener with safe 20m buffer so player always has time to adjust as map starts
+    openers = [C_OPENER_AMBUSH, C_OPENER_GAUNTLET, C_OPENER_SLALOM, C_WARMUP]
+    opener = openers[(lvl - 6) % len(openers)]
+
     if is_boss:
         boss_chunk = get_boss_chunk(lvl)
         if lvl <= 15:
-            return [C_WARMUP, C_MINE, C_REEF, C_BARRICADE, C_FODDER, C_GUNNER, boss_chunk]
+            return [opener, C_MINE, C_REEF, C_BARRICADE, C_FODDER, C_GUNNER, boss_chunk]
         elif lvl <= 30:
-            return [C_WARMUP, C_REEF, C_MINE, C_BARRICADE, C_FODDER, C_GUNNER, C_BARRICADE, boss_chunk]
+            return [opener, C_REEF, C_MINE, C_BARRICADE, C_FODDER, C_GUNNER, C_BARRICADE, boss_chunk]
         else:
-            return [C_WARMUP, C_MINE, C_REEF, C_BARRICADE, C_FODDER, C_GUNNER, C_MINE, C_BARRICADE, boss_chunk]
+            return [opener, C_MINE, C_REEF, C_BARRICADE, C_FODDER, C_GUNNER, C_MINE, C_BARRICADE, boss_chunk]
 
     # Non-Boss level: 8 to 12 chunks
     if lvl < 15:
@@ -195,30 +186,34 @@ def get_chunk_sequence(lvl: int) -> list:
     else:
         target_len = 10 if lvl <= 37 else 12
 
-    mid_count = target_len - 3 # Subtract Warmup, Climax, Finish
+    mid_count = target_len - 3 # Subtract Opener, Climax, Finish
     mid_chunks = []
     
     is_swarm = (lvl % 2 == 1)
     if is_swarm:
-        # Swarm Assault: dense fodder skiff waves alternating with barricades (with mid-level multiplier gates)
+        # Swarm Assault: dense fodder skiff waves alternating with barricades, gunners, and reefs
         for i in range(mid_count):
-            if i % 3 == 0:
+            if i % 4 == 0:
                 mid_chunks.append(C_FODDER)
-            elif i % 3 == 1:
-                mid_chunks.append(C_BARRICADE) # Contains mid-level multiplier gate!
+            elif i % 4 == 1:
+                mid_chunks.append(C_BARRICADE)
+            elif i % 4 == 2:
+                mid_chunks.append(C_GUNNER)
             else:
-                mid_chunks.append(C_FODDER if lvl > 8 else C_REEF)
+                mid_chunks.append(C_REEF if lvl > 8 else C_MINE)
     else:
         # Obstacle Gauntlet: dense mines, reefs, and barricades testing agility and short-range high firepower
         for i in range(mid_count):
-            if i % 3 == 0:
+            if i % 4 == 0:
                 mid_chunks.append(C_MINE)
-            elif i % 3 == 1:
+            elif i % 4 == 1:
                 mid_chunks.append(C_REEF)
-            else:
+            elif i % 4 == 2:
                 mid_chunks.append(C_BARRICADE)
+            else:
+                mid_chunks.append(C_GUNNER)
 
-    return [C_WARMUP] + mid_chunks + [C_CLIMAX, C_FINISH]
+    return [opener] + mid_chunks + [C_CLIMAX, C_FINISH]
 
 def calculate_speed(lvl: int) -> float:
     if lvl == 1:

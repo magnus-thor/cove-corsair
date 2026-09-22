@@ -1,7 +1,7 @@
 ---
 level_id: 40
 level_title: "Level 40: Molten Bulwark (Boss Threat)"
-biome_name: "brimstone_bastion"
+biome_name: "brimstone"
 base_scroll_speed: 11.4
 completion_doubloon_reward: 1022
 river_width_world: 12.0

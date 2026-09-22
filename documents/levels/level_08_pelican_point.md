@@ -1,7 +1,7 @@
 ---
 level_id: 8
 level_title: "Level 8: Pelican Point (Hazard Nav)"
-biome_name: "black_tide_bayou"
+biome_name: "tropical"
 base_scroll_speed: 7.8
 completion_doubloon_reward: 140
 river_width_world: 12.0

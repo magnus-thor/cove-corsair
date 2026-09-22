@@ -24,6 +24,7 @@ EventBus="*res://src/core/event_bus.gd"
 AudioManager="*res://src/core/audio_manager.gd"
 GameState="*res://src/core/game_state.gd"
 VFXManager="*res://src/core/vfx_manager.gd"
+PlaytestTelemetry="*res://src/core/playtest_telemetry.gd"
 
 [debug]
 

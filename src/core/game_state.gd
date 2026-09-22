@@ -155,7 +155,7 @@ const VESSEL_CATALOG: Dictionary = {
 		"resource_path": "res://src/data/resources/user_vessels/sloop_ship.tres",
 		"purchase_price": 400,
 		"max_level": 10,
-		"tier_prices": { 2: 200, 3: 450, 4: 850, 5: 1500, 6: 2600, 7: 4200, 8: 6800, 9: 10500, 10: 16000 },
+		"tier_prices": { 2: 250, 3: 550, 4: 1200, 5: 2400, 6: 4200, 7: 7000, 8: 11000, 9: 16500, 10: 25000 },
 		"tier_descriptions": {
 			1: "Standard Oak (4 HP, Twin Bow Chasers)",
 			2: "Tuned Rigging (4 HP, 11.8 m/s, +5% Firepower)",
@@ -180,7 +180,7 @@ const VESSEL_CATALOG: Dictionary = {
 		"resource_path": "res://src/data/resources/user_vessels/ironclad_ship.tres",
 		"purchase_price": 1500,
 		"max_level": 10,
-		"tier_prices": { 2: 500, 3: 1000, 4: 1800, 5: 3200, 6: 5500, 7: 9000, 8: 14000, 9: 22000, 10: 32000 },
+		"tier_prices": { 2: 700, 3: 1500, 4: 2800, 5: 5000, 6: 8500, 7: 14000, 8: 22000, 9: 34000, 10: 48000 },
 		"tier_descriptions": {
 			1: "Armored Plating (8 HP, Triple Heavy Battery)",
 			2: "Tempered Rivets (8 HP, 8.7 m/s, +5% Firepower)",
@@ -205,22 +205,22 @@ const VESSEL_CATALOG: Dictionary = {
 		"resource_path": "res://src/data/resources/user_vessels/bombard_skiff_ship.tres",
 		"purchase_price": 800,
 		"max_level": 10,
-		"tier_prices": { 2: 300, 3: 650, 4: 1200, 5: 2200, 6: 3800, 7: 6000, 8: 9500, 9: 15000, 10: 22000 },
+		"tier_prices": { 2: 400, 3: 900, 4: 1800, 5: 3400, 6: 5800, 7: 9500, 8: 15000, 9: 23000, 10: 33000 },
 		"tier_descriptions": {
 			1: "Artillery Skiff (4 HP, Siege Mortar)",
-			2: "Balanced Pontoons (4 HP, 6.8 m/s, +5% Firepower)",
-			3: "Quarterdeck Station (5 HP, 7.1 m/s, +Quarterdeck Crew Socket)",
-			4: "Reinforced Hull (5 HP, 7.4 m/s, +15% Firepower)",
-			5: "Quick-Load Hoists (5 HP, 7.7 m/s, +20% Firepower)",
-			6: "Flank Scattershot (6 HP, 8.0 m/s, +Dual Scattershot Carronades)",
-			7: "Heavy Caliber Bore (6 HP, 8.3 m/s, +30% Firepower)",
-			8: "Reinforced Transom (6 HP, 8.6 m/s, +35% Firepower)",
-			9: "Dreadnought Mortar (7 HP, 8.9 m/s, +Expanded Shell Spread)",
-			10: "Siege Dreadnought (7 HP, 9.2 m/s, All Mounts Maxed)"
+			2: "Flank Gunwales (4 HP, 7.8 m/s, +Dual Rail Mounts)",
+			3: "Quarterdeck Station (5 HP, 8.0 m/s, +Quarterdeck Crew Socket)",
+			4: "Reinforced Hull (5 HP, 8.2 m/s, +15% Firepower)",
+			5: "Quick-Load Hoists (5 HP, 8.5 m/s, +20% Firepower)",
+			6: "Twin Heavy Mortars (6 HP, 8.8 m/s, +Heavy Caliber)",
+			7: "Heavy Caliber Bore (6 HP, 9.0 m/s, +30% Firepower)",
+			8: "Reinforced Transom (6 HP, 9.3 m/s, +35% Firepower)",
+			9: "Dreadnought Mortar (7 HP, 9.5 m/s, +Expanded Shell Spread)",
+			10: "Siege Dreadnought (7 HP, 9.8 m/s, All Mounts Maxed)"
 		},
 		"base_hp": 4,
-		"base_speed": 6.5,
-		"fire_rate": 1.3,
+		"base_speed": 7.6,
+		"fire_rate": 0.95,
 		"preview_texture": "res://assets/sprites/user_vessels/The Bombard Skiff.png"
 	}
 }
@@ -256,6 +256,22 @@ const CREW_CATALOG: Dictionary = {
 			3: { "damage": 6, "cooldown": 1.0, "description": "Lingering napalm effect on water surface" },
 			4: { "damage": 7, "cooldown": 0.9, "description": "7 damage, persistent blaze" },
 			5: { "damage": 8, "cooldown": 0.8, "description": "8 damage, inferno tempest" }
+		}
+	},
+	"grease_monkey": {
+		"id": "grease_monkey",
+		"name": "Grease Monkey",
+		"role": "ARTILLERY MECHANIC",
+		"resource_path": "res://src/data/resources/user_crew/crew_grease_monkey.tres",
+		"preview_texture": "res://assets/sprites/user_crew/grease_monkey.png",
+		"unlock_price": 500,
+		"upgrade_prices": { 2: 750, 3: 1600, 4: 3200, 5: 6500 },
+		"levels": {
+			1: { "damage": 4, "cooldown": 1.2, "description": "Artillery Specialist: +25% Mortar RoF, +20% AoE Blast Radius, 4 DMG explosive support" },
+			2: { "damage": 5, "cooldown": 1.1, "description": "+30% Mortar RoF, +25% AoE Blast, +15% Shell Velocity, 5 DMG support" },
+			3: { "damage": 6, "cooldown": 1.0, "description": "+35% Mortar RoF, +30% AoE Blast, +25% Shell Velocity, 6 DMG support" },
+			4: { "damage": 7, "cooldown": 0.9, "description": "+40% Mortar RoF, +35% AoE Blast, +30% Shell Velocity, 7 DMG support" },
+			5: { "damage": 8, "cooldown": 0.8, "description": "+50% Mortar RoF, +50% AoE Blast, +40% Shell Velocity, 8 DMG support" }
 		}
 	}
 }
@@ -591,6 +607,8 @@ func buy_vessel(vessel_id: String) -> bool:
 		return false
 	var cost: int = int(VESSEL_CATALOG[vessel_id]["purchase_price"])
 	if doubloons < cost:
+		if EventBus and EventBus.has_signal("shipyard_item_action"):
+			EventBus.shipyard_item_action.emit(vessel_id, "vessel", cost, doubloons, false, "insufficient_funds")
 		return false
 	doubloons -= cost
 	owned_vessels.append(vessel_id)
@@ -598,6 +616,8 @@ func buy_vessel(vessel_id: String) -> bool:
 	active_vessel = vessel_id
 	save_game()
 	print("[PURCHASE] Bought Vessel: %s | Cost: %d 🪙 | River Level: %d | Vault Remaining: %d 🪙" % [vessel_id, cost, current_level, doubloons])
+	if EventBus and EventBus.has_signal("shipyard_item_action"):
+		EventBus.shipyard_item_action.emit(vessel_id, "vessel", cost, doubloons + cost, true, "purchased")
 	doubloons_changed.emit(doubloons)
 	active_vessel_changed.emit(active_vessel)
 	return true
@@ -628,13 +648,18 @@ func upgrade_vessel_tier(vessel_id: String) -> bool:
 	var next_tier := cur_tier + 1
 	var cost := get_upgrade_cost(vessel_id, next_tier)
 	if doubloons < cost:
+		if EventBus and EventBus.has_signal("shipyard_item_action"):
+			EventBus.shipyard_item_action.emit("%s_t%d" % [vessel_id, next_tier], "vessel_upgrade", cost, doubloons, false, "insufficient_funds")
 		return false
 	doubloons -= cost
 	vessel_tiers[vessel_id] = next_tier
 	save_game()
 	print("[UPGRADE] Upgraded Vessel: %s to Tier %d | Cost: %d 🪙 | River Level: %d | Vault Remaining: %d 🪙" % [vessel_id, next_tier, cost, current_level, doubloons])
+	if EventBus and EventBus.has_signal("shipyard_item_action"):
+		EventBus.shipyard_item_action.emit("%s_t%d" % [vessel_id, next_tier], "vessel_upgrade", cost, doubloons + cost, true, "upgraded")
 	doubloons_changed.emit(doubloons)
 	return true
+
 
 func equip_vessel(vessel_id: String) -> bool:
 	if not is_vessel_owned(vessel_id):
@@ -682,11 +707,15 @@ func buy_crew(crew_id: String) -> bool:
 		return false
 	var cost := get_crew_unlock_cost(crew_id)
 	if doubloons < cost:
+		if EventBus and EventBus.has_signal("shipyard_item_action"):
+			EventBus.shipyard_item_action.emit(crew_id, "crew", cost, doubloons, false, "insufficient_funds")
 		return false
 	doubloons -= cost
 	unlocked_crew[crew_id] = 1
 	save_game()
 	print("[PURCHASE] Hired Crew: %s (Tier 1) | Cost: %d 🪙 | River Level: %d | Vault Remaining: %d 🪙" % [crew_id, cost, current_level, doubloons])
+	if EventBus and EventBus.has_signal("shipyard_item_action"):
+		EventBus.shipyard_item_action.emit(crew_id, "crew", cost, doubloons + cost, true, "hired")
 	doubloons_changed.emit(doubloons)
 	crew_unlocked.emit(crew_id, 1)
 	return true
@@ -695,19 +724,29 @@ func upgrade_crew_level(crew_id: String) -> bool:
 	if not is_crew_unlocked(crew_id):
 		return false
 	var cur_lvl := get_crew_level(crew_id)
-	if cur_lvl >= 3:
+	var max_lvl: int = 5
+	if CREW_CATALOG.has(crew_id):
+		var c_dict: Dictionary = CREW_CATALOG[crew_id] as Dictionary
+		if c_dict.has("levels"):
+			max_lvl = (c_dict["levels"] as Dictionary).size()
+	if cur_lvl >= max_lvl:
 		return false
 	var next_lvl := cur_lvl + 1
 	var cost := get_crew_upgrade_cost(crew_id, next_lvl)
 	if doubloons < cost:
+		if EventBus and EventBus.has_signal("shipyard_item_action"):
+			EventBus.shipyard_item_action.emit("%s_lvl%d" % [crew_id, next_lvl], "crew_upgrade", cost, doubloons, false, "insufficient_funds")
 		return false
 	doubloons -= cost
 	unlocked_crew[crew_id] = next_lvl
 	save_game()
 	print("[UPGRADE] Promoted Crew: %s to Tier %d | Cost: %d 🪙 | River Level: %d | Vault Remaining: %d 🪙" % [crew_id, next_lvl, cost, current_level, doubloons])
+	if EventBus and EventBus.has_signal("shipyard_item_action"):
+		EventBus.shipyard_item_action.emit("%s_lvl%d" % [crew_id, next_lvl], "crew_upgrade", cost, doubloons + cost, true, "promoted")
 	doubloons_changed.emit(doubloons)
 	crew_unlocked.emit(crew_id, next_lvl)
 	return true
+
 
 func get_crew_sockets_for_ship(ship_id: String, tier: int = -1) -> Array[String]:
 	var ship_res := get_vessel_resource(ship_id)
@@ -832,14 +871,19 @@ func buy_outfitting(item_id: String) -> bool:
 	var item_dict: Dictionary = OUTFITTING_CATALOG[item_id] as Dictionary
 	var price: int = int(item_dict.get("price", 0))
 	if doubloons < price:
+		if EventBus and EventBus.has_signal("shipyard_item_action"):
+			EventBus.shipyard_item_action.emit(item_id, "outfitting", price, doubloons, false, "insufficient_funds")
 		return false
 	doubloons -= price
 	unlocked_outfitting[item_id] = true
 	save_game()
 	print("[PURCHASE] Bought Outfitting: %s | Cost: %d 🪙 | River Level: %d | Vault Remaining: %d 🪙" % [item_id, price, current_level, doubloons])
+	if EventBus and EventBus.has_signal("shipyard_item_action"):
+		EventBus.shipyard_item_action.emit(item_id, "outfitting", price, doubloons + price, true, "purchased")
 	doubloons_changed.emit(doubloons)
 	outfitting_unlocked.emit(item_id)
 	return true
+
 
 func equip_ammo(ship_id: String, ammo_id: String) -> bool:
 	if not is_outfitting_unlocked(ammo_id):
@@ -885,17 +929,22 @@ func record_fodder_kill() -> void:
 
 
 
-func add_doubloons(amount: int) -> void:
+func add_doubloons(amount: int, source: String = "general") -> void:
 	if is_game_active:
-		add_run_doubloons(amount)
+		add_run_doubloons(amount, source)
 	else:
 		doubloons += amount
 		save_game()
 		doubloons_changed.emit(doubloons)
+		if EventBus and EventBus.has_signal("doubloon_awarded"):
+			EventBus.doubloon_awarded.emit(amount, source, doubloons)
 
-func add_run_doubloons(amount: int) -> void:
+func add_run_doubloons(amount: int, source: String = "general") -> void:
 	run_doubloons += amount
 	doubloons_changed.emit(doubloons + run_doubloons)
+	if EventBus and EventBus.has_signal("doubloon_awarded"):
+		EventBus.doubloon_awarded.emit(amount, source, run_doubloons)
+
 
 func bank_run_doubloons(completion_bonus: int = 0) -> int:
 	if run_doubloons_banked:
@@ -956,8 +1005,11 @@ func record_level_stars(level_num: int, stars: int) -> void:
 func record_hit() -> void:
 	hits_taken += 1
 
-func record_mob_leaked() -> void:
+func record_mob_leaked(mob_name: String = "Enemy Mob") -> void:
 	mobs_leaked += 1
+	if EventBus and EventBus.has_signal("mob_escaped"):
+		EventBus.mob_escaped.emit(mob_name, mobs_leaked)
+
 
 func calculate_stars() -> int:
 	var stars: int = 1 # Star 1: Cove Cleared / Boss Defeated
@@ -1014,6 +1066,22 @@ func reset_save_data() -> void:
 	save_game()
 	doubloons_changed.emit(doubloons)
 	active_vessel_changed.emit(active_vessel)
+
+func init_playtest_fresh_save() -> void:
+	if FileAccess.file_exists(SAVE_PATH):
+		var backup_path: String = "user://cove_corsair_save.backup.json"
+		var r_file := FileAccess.open(SAVE_PATH, FileAccess.READ)
+		if r_file:
+			var txt: String = r_file.get_as_text()
+			r_file.close()
+			var w_file := FileAccess.open(backup_path, FileAccess.WRITE)
+			if w_file:
+				w_file.store_string(txt)
+				w_file.close()
+				print("💾 [BACKUP] Saved user save backup to %s" % backup_path)
+	reset_save_data()
+	print("🏴‍☠️ [PLAYTEST] Fresh save initialized: Level 1, 0 🪙, Starter Dinghy T1")
+
 
 func save_game() -> void:
 	var save_dict: Dictionary = {

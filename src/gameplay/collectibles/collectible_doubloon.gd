@@ -152,8 +152,9 @@ func collect_coin(_player_ref: Node = null) -> void:
 		if child is CollisionShape3D:
 			child.set_deferred("disabled", true)
 			
-	GameState.add_doubloons(value)
+	GameState.add_doubloons(value, "coin_pickup")
 	if EventBus and EventBus.has_signal("gold_collected"):
+
 		EventBus.gold_collected.emit(value)
 	
 	var player: Node = get_tree().get_first_node_in_group("player")
