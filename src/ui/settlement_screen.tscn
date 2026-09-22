@@ -446,3 +446,12 @@ theme_override_font_sizes/font_size = 17
 theme_override_colors/font_color = Color(0.9, 0.85, 0.8, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_map")
 text = "RIVER MAP"
+
+[node name="CopyTelemetryButton" type="Button" parent="CenterContainer/ModalPanel/MainVBox" unique_id=19284741]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.75, 0.70, 0.65, 0.85)
+flat = true
+text = "📋 COPY TELEMETRY"

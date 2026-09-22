@@ -32,6 +32,7 @@ signal map_requested
 @onready var shipyard_badge: PanelContainer = %ShipyardBadge
 @onready var shipyard_badge_label: Label = %ShipyardBadgeLabel
 @onready var map_button: Button = %MapButton
+@onready var copy_telemetry_button: Button = get_node_or_null("%CopyTelemetryButton")
 
 var _is_victory: bool = false
 var _is_extraction: bool = false
@@ -67,6 +68,8 @@ func _ready() -> void:
 		shipyard_button.pressed.connect(_on_shipyard_pressed)
 	if map_button:
 		map_button.pressed.connect(_on_map_pressed)
+	if copy_telemetry_button:
+		copy_telemetry_button.pressed.connect(_on_copy_telemetry_pressed)
 
 	if GameState and GameState.has_signal("doubloons_changed"):
 		if not GameState.doubloons_changed.is_connected(_on_doubloons_changed):
@@ -417,3 +420,18 @@ func _on_map_pressed() -> void:
 	get_tree().paused = false
 	GameState.should_auto_start = false
 	GameState.change_scene_with_loading("res://src/features/hub/pirate_lair_hub.tscn", "Pirate Lair")
+
+func _on_copy_telemetry_pressed() -> void:
+	if AudioManager and AudioManager.has_method("play_sfx"):
+		AudioManager.play_sfx("gate_passes")
+	var telemetry: Node = get_tree().root.get_node_or_null("PlaytestTelemetry")
+	if telemetry and telemetry.has_method("copy_session_json_to_clipboard"):
+		telemetry.call("copy_session_json_to_clipboard")
+		if copy_telemetry_button:
+			copy_telemetry_button.text = "COPIED TO CLIPBOARD! ✓"
+			var t: Tween = create_tween()
+			t.tween_interval(2.0)
+			t.tween_callback(func() -> void:
+				if is_instance_valid(copy_telemetry_button):
+					copy_telemetry_button.text = "📋 COPY TELEMETRY"
+			)

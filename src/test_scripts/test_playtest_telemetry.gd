@@ -108,7 +108,16 @@ func _ready() -> void:
 	(telemetry.get("lifetime_coins_by_source") as Dictionary).clear()
 	telemetry.set("total_doubloons_earned_session", 0)
 	telemetry.set("total_doubloons_spent_session", 0)
-	telemetry.call("save_telemetry_to_disk")
+	
+	var s_proj: String = str(telemetry.get("session_file_project"))
+	var s_user: String = str(telemetry.get("session_file_user"))
+	if "playtest_session_" in s_proj:
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(s_proj))
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(s_user))
+	if FileAccess.file_exists("res://playtest_session_latest.json"):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path("res://playtest_session_latest.json"))
+	if FileAccess.file_exists("user://playtest_session_latest.json"):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path("user://playtest_session_latest.json"))
 
 	print("\n========================================================")
 	print("  TESTS FINISHED: %d / %d PASSED" % [passed_count, total_count])

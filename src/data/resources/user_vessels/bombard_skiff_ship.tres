@@ -21,7 +21,7 @@ fire_rate = 0.95
 hardpoint_offsets = {
 "BowMortarMount": Vector3(-0.04, 1.35, -0.53),
 "PortRailMount": Vector3(-0.53, 1.12, -1.51),
-"QuarterdeckCrew": Vector3(0.2, 2.14, 2.14),
+"QuarterdeckCrew": Vector3(-0.31, 1.45, 0.58),
 "StarboardRailMount": Vector3(0.48, 1.12, -1.51)
 }
 hardpoint_rotations = {

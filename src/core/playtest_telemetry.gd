@@ -8,6 +8,12 @@ extends Node
 
 const TELEMETRY_FILE_USER: String = "user://playtest_session.json"
 const TELEMETRY_FILE_PROJECT: String = "res://playtest_session.json"
+const TELEMETRY_LATEST_USER: String = "user://playtest_session_latest.json"
+const TELEMETRY_LATEST_PROJECT: String = "res://playtest_session_latest.json"
+
+var session_index: int = 1
+var session_file_user: String = TELEMETRY_FILE_USER
+var session_file_project: String = TELEMETRY_FILE_PROJECT
 
 var session_start_epoch: int = 0
 var session_start_time_str: String = ""
@@ -16,24 +22,86 @@ var current_run: Dictionary = {}
 var is_run_active: bool = false
 var run_start_ticks: float = 0.0
 
+# Frame rate performance metrics
+var run_fps_accum: float = 0.0
+var run_fps_samples: int = 0
+var run_min_fps: float = 999.0
+var run_max_fps: float = 0.0
+var _fps_sample_timer: float = 0.0
+
 var shipyard_events: Array[Dictionary] = []
 var lifetime_damage_sources: Dictionary = {}
 var lifetime_coins_by_source: Dictionary = {}
 var total_doubloons_earned_session: int = 0
 var total_doubloons_spent_session: int = 0
 
+func _init_session_files() -> void:
+	var base_exists := false
+	if FileAccess.file_exists(TELEMETRY_FILE_USER):
+		var f := FileAccess.open(TELEMETRY_FILE_USER, FileAccess.READ)
+		if f and f.get_length() > 5:
+			base_exists = true
+	if not base_exists and FileAccess.file_exists(TELEMETRY_FILE_PROJECT):
+		var f := FileAccess.open(TELEMETRY_FILE_PROJECT, FileAccess.READ)
+		if f and f.get_length() > 5:
+			base_exists = true
+			
+	if base_exists:
+		var idx: int = 2
+		while idx < 1000:
+			var u_cand: String = "user://playtest_session_%d.json" % idx
+			var p_cand: String = "res://playtest_session_%d.json" % idx
+			var cand_exists := false
+			if FileAccess.file_exists(u_cand):
+				var f := FileAccess.open(u_cand, FileAccess.READ)
+				if f and f.get_length() > 5:
+					cand_exists = true
+			if not cand_exists and FileAccess.file_exists(p_cand):
+				var f := FileAccess.open(p_cand, FileAccess.READ)
+				if f and f.get_length() > 5:
+					cand_exists = true
+			if not cand_exists:
+				session_index = idx
+				session_file_user = u_cand
+				session_file_project = p_cand
+				break
+			idx += 1
+	else:
+		session_index = 1
+		session_file_user = TELEMETRY_FILE_USER
+		session_file_project = TELEMETRY_FILE_PROJECT
+
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	session_start_epoch = int(Time.get_unix_time_from_system())
 	session_start_time_str = Time.get_datetime_string_from_system(false, true)
 	
+	_init_session_files()
 	_connect_event_bus()
 	
 	print("================================================================================")
 	print("🏴‍☠️ [COVE CORSAIR] PLAYTEST TELEMETRY RECORDER INITIALIZED")
+	print("   Session #     : %d" % session_index)
 	print("   Session Start : %s" % session_start_time_str)
-	print("   Output Path   : %s" % TELEMETRY_FILE_USER)
+	print("   User Output   : %s" % session_file_user)
+	print("   Project Mirror: %s" % session_file_project)
 	print("================================================================================")
+
+func _process(delta: float) -> void:
+	if not is_run_active:
+		return
+	_fps_sample_timer += delta
+	if _fps_sample_timer >= 0.1:
+		_fps_sample_timer = 0.0
+		var current_fps := Engine.get_frames_per_second()
+		if current_fps > 0:
+			run_fps_accum += float(current_fps)
+			run_fps_samples += 1
+			if float(current_fps) < run_min_fps:
+				run_min_fps = float(current_fps)
+			if float(current_fps) > run_max_fps:
+				run_max_fps = float(current_fps)
+
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_PREDELETE:
@@ -242,6 +310,17 @@ func _on_boss_health_changed(current: int, _max_val: int) -> void:
 		])
 	current_run["boss_encounter"] = boss_dict
 
+func _calc_run_fps_metrics() -> Dictionary:
+	var avg_fps: float = snappedf(run_fps_accum / float(maxi(1, run_fps_samples)), 0.1) if run_fps_samples > 0 else float(Engine.get_frames_per_second())
+	var min_fps: int = int(run_min_fps) if (run_fps_samples > 0 and run_min_fps < 900.0) else int(avg_fps)
+	var max_fps: int = int(run_max_fps) if run_fps_samples > 0 else int(avg_fps)
+	return {
+		"avg_fps": avg_fps,
+		"min_fps": min_fps,
+		"max_fps": max_fps,
+		"samples": run_fps_samples
+	}
+
 func _on_level_completed(_doubloons: int, _targets: int) -> void:
 	if not is_run_active:
 		return
@@ -256,6 +335,7 @@ func _on_level_completed(_doubloons: int, _targets: int) -> void:
 	var leaks: int = int(current_run.get("mobs_leaked", 0))
 	var lvl_idx: int = int(current_run.get("level_index", 1))
 	var dist: float = GameState.distance_traveled if GameState else 250.0
+	var fps_info := _calc_run_fps_metrics()
 	
 	current_run["status"] = "VICTORY"
 	current_run["duration_seconds"] = snappedf(run_duration, 0.1)
@@ -264,6 +344,9 @@ func _on_level_completed(_doubloons: int, _targets: int) -> void:
 	current_run["completion_bonus"] = bonus
 	current_run["total_earned"] = total_earned
 	current_run["stars_awarded"] = stars
+	current_run["fps_metrics"] = fps_info
+	current_run["avg_fps"] = fps_info["avg_fps"]
+	current_run["min_fps"] = fps_info["min_fps"]
 	
 	runs.append(current_run)
 	is_run_active = false
@@ -275,6 +358,7 @@ func _on_level_completed(_doubloons: int, _targets: int) -> void:
 	print("   Star Rating : %s (%d Stars)" % ["★".repeat(stars) + "☆".repeat(3 - stars), stars])
 	print("   Earnings    : %d in-run + %d clear bonus = %d 🪙 total" % [run_coins, bonus, total_earned])
 	print("   Vault Total : %d 🪙" % (GameState.doubloons if GameState else 0))
+	print("   Performance : Avg %.1f FPS (Min %d, Max %d)" % [float(fps_info["avg_fps"]), int(fps_info["min_fps"]), int(fps_info["max_fps"])])
 	print("   Hits Taken  : %d (%d dmg total)" % [hits_count, int(current_run.get("total_damage_received", 0))])
 	print("   Mobs Leaked : %d" % leaks)
 	print("================================================================================\n")
@@ -292,6 +376,7 @@ func _on_run_failed(coins_collected: int, distance_reached: float) -> void:
 	if not hits_arr.is_empty():
 		var last_hit: Dictionary = hits_arr[hits_arr.size() - 1] as Dictionary
 		last_hit_source = str(last_hit.get("source", "Unknown"))
+	var fps_info := _calc_run_fps_metrics()
 	
 	current_run["status"] = "DEFEAT"
 	current_run["duration_seconds"] = snappedf(run_duration, 0.1)
@@ -301,6 +386,9 @@ func _on_run_failed(coins_collected: int, distance_reached: float) -> void:
 	current_run["total_earned"] = coins_collected
 	current_run["fatal_source"] = last_hit_source
 	current_run["stars_awarded"] = 0
+	current_run["fps_metrics"] = fps_info
+	current_run["avg_fps"] = fps_info["avg_fps"]
+	current_run["min_fps"] = fps_info["min_fps"]
 	
 	runs.append(current_run)
 	is_run_active = false
@@ -312,6 +400,7 @@ func _on_run_failed(coins_collected: int, distance_reached: float) -> void:
 	print("   Duration    : %.1fs" % run_duration)
 	print("   Coins Saved : %d 🪙" % coins_collected)
 	print("   Vault Total : %d 🪙" % (GameState.doubloons if GameState else 0))
+	print("   Performance : Avg %.1f FPS (Min %d, Max %d)" % [float(fps_info["avg_fps"]), int(fps_info["min_fps"]), int(fps_info["max_fps"])])
 	print("================================================================================\n")
 	
 	save_telemetry_to_disk()
@@ -319,8 +408,12 @@ func _on_run_failed(coins_collected: int, distance_reached: float) -> void:
 func _finalize_active_run_if_any(exit_status: String) -> void:
 	if is_run_active:
 		var run_duration: float = (float(Time.get_ticks_msec()) / 1000.0) - run_start_ticks
+		var fps_info := _calc_run_fps_metrics()
 		current_run["status"] = exit_status
 		current_run["duration_seconds"] = snappedf(run_duration, 0.1)
+		current_run["fps_metrics"] = fps_info
+		current_run["avg_fps"] = fps_info["avg_fps"]
+		current_run["min_fps"] = fps_info["min_fps"]
 		runs.append(current_run)
 		is_run_active = false
 
@@ -329,6 +422,11 @@ func generate_session_summary() -> Dictionary:
 	var victories: int = 0
 	var defeats: int = 0
 	var level_outcomes: Dictionary = {}
+	
+	var total_fps_sum: float = 0.0
+	var total_fps_runs: int = 0
+	var session_min_fps: int = 999
+	var session_max_fps: int = 0
 	
 	for r: Dictionary in runs:
 		var st: String = str(r.get("status", ""))
@@ -345,15 +443,41 @@ func generate_session_summary() -> Dictionary:
 			outcome["defeats"] = int(outcome.get("defeats", 0)) + 1
 		outcome["total_coins"] = int(outcome.get("total_coins", 0)) + int(r.get("total_earned", 0))
 		level_outcomes[lvl] = outcome
+		
+		# Performance roll-up
+		if r.has("avg_fps"):
+			var r_fps: float = float(r["avg_fps"])
+			if r_fps > 0.0:
+				total_fps_sum += r_fps
+				total_fps_runs += 1
+				var r_min: int = int(r.get("min_fps", 0))
+				var r_max: int = int(r.get("max_fps", 0))
+				if r_min > 0 and r_min < session_min_fps:
+					session_min_fps = r_min
+				if r_max > session_max_fps:
+					session_max_fps = r_max
+
+	var session_avg_fps: float = snappedf(total_fps_sum / float(maxi(1, total_fps_runs)), 0.1) if total_fps_runs > 0 else 0.0
 
 	return {
 		"session_metadata": {
+			"session_index": session_index,
+			"session_file": session_file_user,
 			"session_start": session_start_time_str,
 			"last_updated": Time.get_datetime_string_from_system(false, true),
 			"total_attempts": total_runs_count,
 			"victories": victories,
 			"defeats": defeats,
-			"win_rate_pct": snappedf((float(victories) / float(max(1, total_runs_count))) * 100.0, 0.1)
+			"win_rate_pct": snappedf((float(victories) / float(max(1, total_runs_count))) * 100.0, 0.1),
+			"session_avg_fps": session_avg_fps,
+			"session_min_fps": (session_min_fps if session_min_fps < 900 else 0),
+			"session_max_fps": session_max_fps
+		},
+		"performance_overview": {
+			"session_avg_fps": session_avg_fps,
+			"session_min_fps": (session_min_fps if session_min_fps < 900 else 0),
+			"session_max_fps": session_max_fps,
+			"target_framerate": Engine.max_fps
 		},
 		"economy_overview": {
 			"total_doubloons_earned": total_doubloons_earned_session,
@@ -373,13 +497,30 @@ func save_telemetry_to_disk() -> void:
 	var payload: Dictionary = generate_session_summary()
 	var json_str: String = JSON.stringify(payload, "  ")
 	
-	var user_file := FileAccess.open(TELEMETRY_FILE_USER, FileAccess.WRITE)
+	# 1. Primary indexed session file (preserves all previous session logs)
+	var user_file := FileAccess.open(session_file_user, FileAccess.WRITE)
 	if user_file:
 		user_file.store_string(json_str)
 		user_file.close()
 		
-	# Mirror to workspace for convenient instant agent review
-	var proj_file := FileAccess.open(TELEMETRY_FILE_PROJECT, FileAccess.WRITE)
+	var proj_file := FileAccess.open(session_file_project, FileAccess.WRITE)
 	if proj_file:
 		proj_file.store_string(json_str)
 		proj_file.close()
+		
+	# 2. Latest convenience mirror (always points to most recent play session)
+	var latest_user := FileAccess.open(TELEMETRY_LATEST_USER, FileAccess.WRITE)
+	if latest_user:
+		latest_user.store_string(json_str)
+		latest_user.close()
+		
+	var latest_proj := FileAccess.open(TELEMETRY_LATEST_PROJECT, FileAccess.WRITE)
+	if latest_proj:
+		latest_proj.store_string(json_str)
+		latest_proj.close()
+
+func copy_session_json_to_clipboard() -> void:
+	var payload: Dictionary = generate_session_summary()
+	var json_str: String = JSON.stringify(payload, "  ")
+	DisplayServer.clipboard_set(json_str)
+	print("[TELEMETRY] 📋 Copied session telemetry to device clipboard (%d bytes)." % json_str.length())
