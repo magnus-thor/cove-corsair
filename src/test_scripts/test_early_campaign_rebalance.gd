@@ -225,7 +225,7 @@ func test_live_dinghy_cannon_shatter_level_1() -> void:
 	add_child(player)
 	var dinghy_data := load("res://src/data/resources/user_vessels/dinghy_ship.tres") as ShipData
 	player.apply_ship_data(dinghy_data)
-	assert_test(player.current_health == 3, "Dinghy hull HP is 3 (forgiving starter health)")
+	assert_test(player.current_health == dinghy_data.max_health, "Dinghy hull HP matches ship_data max_health (%d)" % dinghy_data.max_health)
 	
 	# Instantiate a Level 1 BarricadeSegment
 	var slat_scene := load("res://src/gameplay/obstacles/barricade_segment.tscn") as PackedScene

@@ -1,0 +1,27 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/vfx/telegraph_ironjaw_mortar.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/hud_skull_icon.svg" id="2_skull"]
+
+[node name="TelegraphIronjawMortar" type="Node3D" groups=["ironjaw_telegraphs"]]
+script = ExtResource("1_script")
+
+[node name="WaterChurn" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.015, 0)
+
+[node name="CrosshairH" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, 0)
+
+[node name="CrosshairV" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, 0)
+
+[node name="OuterRing" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+
+[node name="ContractingRing" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.035, 0)
+
+[node name="CenterSkull" type="Sprite3D" parent="."]
+transform = Transform3D(0.45, 0, 0, 0, -1.96701e-08, 0.45, 0, -0.45, -1.96701e-08, 0, 0.04, 0)
+pixel_size = 0.008
+texture = ExtResource("2_skull")

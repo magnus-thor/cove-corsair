@@ -8,6 +8,10 @@ extends BaseTrackChunk
 
 var _is_finished: bool = false
 
+const ENEMY_MOB_SCENE: PackedScene = preload("res://src/gameplay/enemies/enemy_mob.tscn")
+const BARREL_SCENE: PackedScene = preload("res://src/gameplay/obstacles/destructible_barrel.tscn")
+const ROWER_DATA: Resource = preload("res://src/data/resources/enemy_vessels/skeleton_rower.tres")
+
 func _ready() -> void:
 	super._ready()
 	chunk_id = "finish_line"
@@ -16,6 +20,23 @@ func _ready() -> void:
 			finish_trigger.area_entered.connect(_on_finish_area_entered)
 		if not finish_trigger.body_entered.is_connected(_on_finish_body_entered):
 			finish_trigger.body_entered.connect(_on_finish_body_entered)
+	_spawn_finish_wave()
+
+func _spawn_finish_wave() -> void:
+	var entities: Node = get_node_or_null("Entities")
+	if not entities:
+		return
+	var lanes: Array[float] = [-1.8, -0.6, 0.6, 1.8]
+	for lx: float in lanes:
+		var mob: Area3D = ENEMY_MOB_SCENE.instantiate() as Area3D
+		entities.add_child(mob)
+		mob.position = Vector3(lx, 0.1, -10.0)
+		if mob.has_method("apply_enemy_data"):
+			mob.call("apply_enemy_data", ROWER_DATA)
+		mob.set("max_hp", 2)
+		mob.set("current_hp", 2)
+		mob.set("forward_speed", 1.2)
+		mob.set("doubloons_drop", 1)
 
 func _on_finish_area_entered(area: Area3D) -> void:
 	if _is_finished:

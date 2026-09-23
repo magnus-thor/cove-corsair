@@ -19,8 +19,11 @@ enum OperationType { ADD, MULTIPLY }
 @export var cannonball_scene: PackedScene = preload("res://src/gameplay/projectiles/cannonball.tscn")
 
 @export var choice_group: String = ""
-@export var custom_text: String = ""
 @export var gate_action: String = ""
+@export var custom_text: String = ""
+
+const OVERCHARGE_HITS_NEEDED: int = 2
+var overcharge_hits: int = 0
 
 @onready var visuals: Node3D = $Visuals
 @onready var label_3d: Label3D = $Visuals/Label3D
@@ -28,8 +31,10 @@ enum OperationType { ADD, MULTIPLY }
 
 func _ready() -> void:
 	add_to_group("multiplier_gate")
-	area_entered.connect(_on_area_entered)
-	body_entered.connect(_on_body_entered)
+	if not area_entered.is_connected(_on_area_entered):
+		area_entered.connect(_on_area_entered)
+	if not body_entered.is_connected(_on_body_entered):
+		body_entered.connect(_on_body_entered)
 	value = clamp(value, 1, 100)
 		
 	# Apply water calibration offset, pixel size, and scale
@@ -158,6 +163,89 @@ func on_shot_hit(_cannonball: Node = null) -> void:
 				label_3d.modulate = flash_col
 				var end_col: Color = _get_value_color(cur_val)
 				tween.tween_property(label_3d, "modulate", end_col, 0.22)
+	else:
+		# Already at 100% MAX! Subsequent hits overcharge and detonate the gate!
+		var hit_power: int = 2 if (_cannonball and _cannonball.get("damage") and int(_cannonball.get("damage")) > 1) else 1
+		overcharge_hits += hit_power
+		AudioManager.play_sfx("gate_passes", 1.85, 2.0)
+		AudioManager.play_sfx("coin_pickup", 1.6, 1.8)
+		
+		if visuals:
+			var tween: Tween = create_tween().set_parallel(true)
+			visuals.scale = Vector3(1.55, 1.55, 1.55)
+			tween.tween_property(visuals, "scale", Vector3(1.09, 1.09, 1.09), 0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+			if label_3d:
+				label_3d.modulate = Color(2.5, 2.2, 0.5, 1.0)
+				tween.tween_property(label_3d, "modulate", Color(1.0, 0.9, 0.2), 0.18)
+
+		if overcharge_hits >= OVERCHARGE_HITS_NEEDED:
+			_detonate_overcharged_gate()
+
+func _detonate_overcharged_gate() -> void:
+	if not is_active:
+		return
+	is_active = false
+	
+	# 1. Sound & VFX
+	AudioManager.play_sfx("barrel_breaks", 0.9, 1.1)
+	AudioManager.play_sfx("coin_pickup", 1.4, 1.7)
+	
+	var explosion_scene: PackedScene = preload("res://src/vfx/barrel_explosion.tscn")
+	if explosion_scene:
+		var vfx: Node3D = explosion_scene.instantiate() as Node3D
+		var root: Node = get_tree().current_scene
+		if root and vfx:
+			root.add_child(vfx)
+			vfx.global_position = global_position + Vector3(0.0, 1.0, 0.0)
+			vfx.scale = Vector3(2.5, 2.5, 2.5)
+
+	# 2. Camera punch shake
+	var camera: Node = get_tree().get_first_node_in_group("game_camera")
+	if camera and camera.has_method("shake"):
+		camera.call("shake", 0.25, 0.35)
+
+	# 3. Award Player Rewards (+2 escorts, Overdrive 2x fire rate for 6s, +25 doubloons)
+	var player_node: Node = get_tree().get_first_node_in_group("player")
+	if player_node:
+		if "doubloons" in player_node:
+			player_node.set("doubloons", int(player_node.get("doubloons")) + 25)
+		if player_node.has_method("add_follower_ships"):
+			player_node.call("add_follower_ships", 2)
+		if player_node.has_method("trigger_armada_overdrive"):
+			player_node.call("trigger_armada_overdrive")
+		if player_node.has_method("spawn_floating_text_at_position"):
+			player_node.call("spawn_floating_text_at_position", "💥 GATE DETONATED! OVERDRIVE UNLEASHED! 💥", Color(1.0, 0.85, 0.1))
+
+	if GameState:
+		GameState.add_doubloons(25, "multiplier_gate")
+
+	# 4. AoE Shockwave: Clear immediate frontline mines or fodder in front of the gate (radius 4.5m)
+	var space_state: PhysicsDirectSpaceState3D = get_world_3d().direct_space_state
+	if space_state:
+		var shape_query: PhysicsShapeQueryParameters3D = PhysicsShapeQueryParameters3D.new()
+		var sphere: SphereShape3D = SphereShape3D.new()
+		sphere.radius = 4.5
+		shape_query.shape = sphere
+		shape_query.transform = global_transform
+		shape_query.collide_with_areas = true
+		shape_query.collide_with_bodies = true
+		var results: Array[Dictionary] = space_state.intersect_shape(shape_query, 16)
+		for res: Dictionary in results:
+			var collider: Node = res.get("collider") as Node
+			if collider and collider != self and is_instance_valid(collider):
+				if collider.is_in_group("destructible") or collider.is_in_group("fodder") or collider.is_in_group("sea_mine"):
+					if collider.has_method("take_hit"):
+						collider.call("take_hit", 5, "gate_detonation")
+					elif collider.has_method("take_damage"):
+						collider.call("take_damage", 5)
+
+	# 5. Disable colliders immediately and queue free so cannonballs pass straight through
+	collision_layer = 0
+	collision_mask = 0
+	set_deferred("monitoring", false)
+	set_deferred("monitorable", false)
+	visible = false
+	queue_free()
 
 func _get_value_color(val: int) -> Color:
 	if val >= 100:

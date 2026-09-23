@@ -13,29 +13,30 @@ func _ready() -> void:
 
 func _apply_level_tuning() -> void:
 	var cur_lvl: int = 1
-	var gs = get_node_or_null("/root/GameState")
+	var gs: Node = get_node_or_null("/root/GameState")
 	if gs and "current_level" in gs:
-		cur_lvl = int(gs.current_level)
-	if cur_lvl <= 3:
+		cur_lvl = int(gs.get("current_level"))
+	if cur_lvl <= 5:
 		_spawn_escort_rowers()
 
 func _spawn_escort_rowers() -> void:
-	var entities = get_node_or_null("Entities")
+	var entities: Node = get_node_or_null("Entities")
 	if not entities:
 		return
-	var spawns = [
-		Vector3(-2.8, 0.1, -14.0),
-		Vector3(2.8, 0.1, -20.0),
-		Vector3(-1.8, 0.1, -32.0),
+	var spawns: Array[Vector3] = [
+		Vector3(-1.8, 0.1, -12.0),
+		Vector3(1.8, 0.1, -18.0),
+		Vector3(-1.2, 0.1, -30.0),
+		Vector3(1.5, 0.1, -38.0),
 	]
-	for i in range(spawns.size()):
-		var rower = ENEMY_SCENE.instantiate() as Area3D
+	for i: int in range(spawns.size()):
+		var rower: Area3D = ENEMY_SCENE.instantiate() as Area3D
 		rower.name = "EscortRower_%d" % (i + 1)
 		entities.add_child(rower)
 		rower.position = spawns[i]
 		if rower.has_method("apply_enemy_data"):
-			rower.apply_enemy_data(ROWER_DATA)
-		rower.max_hp = 2
-		rower.current_hp = 2
-		rower.forward_speed = 1.6
-		rower.doubloons_drop = 1
+			rower.call("apply_enemy_data", ROWER_DATA)
+		rower.set("max_hp", 2)
+		rower.set("current_hp", 2)
+		rower.set("forward_speed", 1.6)
+		rower.set("doubloons_drop", 1)

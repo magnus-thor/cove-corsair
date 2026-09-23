@@ -984,11 +984,11 @@ func unlock_next_level() -> void:
 	if current_level >= highest_unlocked_level:
 		highest_unlocked_level = min(45, current_level + 1)
 		just_cleared_level = true
-		current_selected_level = highest_unlocked_level
 	unlocked_levels = highest_unlocked_level
-	current_level = current_selected_level
+	current_level = min(45, last_cleared_level + 1)
+	current_selected_level = current_level
 	save_game()
-	print("[RIVER LEVEL] Unlocked River Level %d" % highest_unlocked_level)
+	print("[RIVER LEVEL] Unlocked River Level %d, Next Selected Level is %d" % [highest_unlocked_level, current_level])
 
 func record_level_score(level_num: int, score: int) -> void:
 	var cur_best: int = int(level_high_scores.get(level_num, 0))

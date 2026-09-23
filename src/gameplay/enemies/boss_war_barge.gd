@@ -31,6 +31,7 @@ var is_barrage_active: bool = false
 @export var doubloon_scene: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
 @export var explosion_scene: PackedScene = preload("res://src/vfx/barrel_explosion.tscn")
 @export var enemy_mob_scene: PackedScene = preload("res://src/gameplay/enemies/enemy_mob.tscn")
+@export var telegraph_mortar_scene: PackedScene = preload("res://src/vfx/telegraph_ironjaw_mortar.tscn")
 
 @onready var left_cannon_node: Node3D = $LeftCannon
 @onready var right_cannon_node: Node3D = $RightCannon
@@ -267,33 +268,26 @@ func _fire_targeted_mortar() -> void:
 				target_node = active_f.pick_random() as Node3D
 	var target_pos := target_node.global_position
 	var target_x := clampf(target_pos.x, -2.8, 2.8)
-	var circle := MeshInstance3D.new()
-	var disc := CylinderMesh.new()
-	disc.top_radius = 1.8
-	disc.bottom_radius = 1.8
-	disc.height = 0.01
-	circle.mesh = disc
-	var mat := StandardMaterial3D.new()
-	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.albedo_color = Color(1.0, 0.1, 0.1, 0.35)
-	circle.material_override = mat
-	get_tree().current_scene.add_child(circle)
-	circle.global_position = Vector3(target_x, 0.02, target_pos.z)
-	
-	# Minimum 1.6s telegraph duration with clear warning indicator
+	var spawn_pos := Vector3(target_x, 0.02, target_pos.z)
 	var tele_duration := maxf(1.6, hazard_telegraph_time)
-	var tween := create_tween()
-	var steps := 4
-	var step_time := tele_duration / float(steps * 2)
-	for i in range(steps):
-		tween.tween_property(mat, "albedo_color:a", 0.15, step_time)
-		tween.tween_property(mat, "albedo_color:a", 0.70, step_time)
-	tween.tween_callback(func() -> void:
-		_explode_mortar_at(circle.global_position)
-		circle.queue_free()
-		is_barrage_active = false
-	)
+
+	if telegraph_mortar_scene:
+		var marker: Node3D = telegraph_mortar_scene.instantiate() as Node3D
+		get_tree().current_scene.add_child(marker)
+		marker.global_position = spawn_pos
+		if marker.has_method("setup"):
+			marker.call("setup", tele_duration, 1.8)
+		if marker.has_signal("countdown_finished"):
+			marker.connect("countdown_finished", func(hit_pos: Vector3) -> void:
+				_explode_mortar_at(hit_pos)
+				is_barrage_active = false
+			)
+	else:
+		var timer := get_tree().create_timer(tele_duration)
+		timer.timeout.connect(func() -> void:
+			_explode_mortar_at(spawn_pos)
+			is_barrage_active = false
+		)
 
 func _explode_mortar_at(pos: Vector3) -> void:
 	if explosion_scene:
@@ -695,6 +689,12 @@ func boss_defeat() -> void:
 	if is_instance_valid(bow_crest):
 		bow_crest.visible = false
 	
+	# Cleanup any active mortar telegraphs immediately
+	var telegraphs: Array[Node] = get_tree().get_nodes_in_group("ironjaw_telegraphs")
+	for tele: Node in telegraphs:
+		if tele.has_method("cancel_and_cleanup"):
+			tele.call("cancel_and_cleanup")
+
 	# Explode dramatically
 	var tween := create_tween()
 	for i in range(15):

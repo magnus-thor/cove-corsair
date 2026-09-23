@@ -37,35 +37,29 @@ transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, 10.5, 0, -42)
 [node name="Entities" type="Node3D" parent="." unique_id=9823109]
 
 [node name="Reef_Gate1_Left" parent="Entities" unique_id=9823110 instance=ExtResource("4_reef")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0, -14)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8, 0, -22)
 
 [node name="Barrel_Slalom1" type="Area3D" parent="Entities" unique_id=9823114 groups=["destructible"] instance=ExtResource("5_barrel")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 0.05, -19)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0.05, -18)
 script = ExtResource("6_barrel_script")
 obstacle_type = 0
-
-[node name="Reef_Gate1_Right" parent="Entities" unique_id=9823111 instance=ExtResource("4_reef")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, -25)
 
 [node name="TideCutter_AmbushL" type="Area3D" parent="Entities" unique_id=9823115 groups=["destructible", "enemies"] instance=ExtResource("7_cutter")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 0.1, -30)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -24)
 
 [node name="Barrel_Slalom2" type="Area3D" parent="Entities" unique_id=9823116 groups=["destructible"] instance=ExtResource("5_barrel")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0.05, -34)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0.05, -30)
 script = ExtResource("6_barrel_script")
 obstacle_type = 0
 
-[node name="Reef_Mid_CenterLeft" parent="Entities" unique_id=9823112 instance=ExtResource("4_reef")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 0, -36)
-
 [node name="IronGunner_Perch" type="Area3D" parent="Entities" unique_id=9823117 groups=["destructible", "enemies"] instance=ExtResource("8_gunner")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6, 0.1, -40)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.1, -34)
 
 [node name="Reef_Mid_Right" parent="Entities" unique_id=9823113 instance=ExtResource("4_reef")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 0, -43)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8, 0, -38)
 
 [node name="Gate_Modest" type="Area3D" parent="Entities" unique_id=9823118 groups=["multiplier_gate"] instance=ExtResource("9_gate")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0, -47)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -46)
 script = ExtResource("10_gate_script")
 value = 25
 custom_text = "+25"

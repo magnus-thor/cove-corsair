@@ -178,7 +178,7 @@ func _on_next_level_pressed() -> void:
 	if AudioManager and AudioManager.has_method("play_sfx"):
 		AudioManager.play_sfx("gate_passes")
 	get_tree().paused = false
-	GameState.should_auto_start = false
+	GameState.should_auto_start = true
 	GameState.reset_level()
 	get_tree().reload_current_scene()
 

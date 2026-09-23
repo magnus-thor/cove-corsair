@@ -129,91 +129,72 @@ def get_level_title(lvl: int) -> str:
 
 def get_chunk_sequence(lvl: int) -> list:
     # Base chunk pools
-    C_WARMUP = "res://src/gameplay/chunks/chunk_warmup.tscn"
+    C_WARMUP = "res://src/gameplay/chunks/chunk_warmup.tscn"              # Contains Gate 1
     C_OPENER_AMBUSH = "res://src/gameplay/chunks/chunk_opener_ambush.tscn"
     C_OPENER_GAUNTLET = "res://src/gameplay/chunks/chunk_opener_gauntlet.tscn"
     C_OPENER_SLALOM = "res://src/gameplay/chunks/chunk_opener_slalom.tscn"
 
     C_MINE = "res://src/gameplay/chunks/chunk_mine_gauntlet.tscn"
-    C_BARRICADE = "res://src/gameplay/chunks/chunk_barricade_siege.tscn"
+    C_BARRICADE = "res://src/gameplay/chunks/chunk_barricade_siege.tscn"    # Contains Gate 2
     C_REEF = "res://src/gameplay/chunks/chunk_reef_slalom.tscn"
     C_GUNNER = "res://src/gameplay/chunks/chunk_gunner_ambush.tscn"
     C_FODDER = "res://src/gameplay/chunks/chunk_fodder_swarm.tscn"
     C_CLIMAX = "res://src/gameplay/chunks/chunk_vanguard_climax.tscn"
     C_FINISH = "res://src/gameplay/chunks/chunk_finish_line.tscn"
 
-    # Specific handcrafted pacing for early campaign levels (Levels 1-5):
+    # Handcrafted early campaign levels (Levels 1-5):
+    # Enforces: Part 1 easy start -> Gate 1 (~33%) -> Part 2 escalation -> Gate 2 (~66%) -> Part 3 swarm horde
     if lvl == 1:
-        # Level 1: Gentle Introduction & Navigation (4 chunks: Warmup -> Reef Slalom -> Barricade -> Finish Line)
-        return [C_WARMUP, C_REEF, C_BARRICADE, C_FINISH]
+        # 5 chunks: Opener -> Gate 1 (~33%) -> Gunner -> Gate 2 (~66%) -> Finish
+        return [C_OPENER_AMBUSH, C_WARMUP, C_GUNNER, C_BARRICADE, C_FINISH]
     elif lvl == 2:
-        # Level 2: Sea Mines & Armada Multiplier (5 chunks: Warmup -> Mine Gauntlet -> Fodder Swarm -> Barricade -> Finish Line)
-        return [C_WARMUP, C_MINE, C_FODDER, C_BARRICADE, C_FINISH]
+        # 6 chunks: Opener -> Gate 1 (~33%) -> Mine -> Gate 2 (~66%) -> Fodder Swarm -> Finish
+        return [C_OPENER_AMBUSH, C_WARMUP, C_MINE, C_BARRICADE, C_FODDER, C_FINISH]
     elif lvl == 3:
-        # Level 3: Reef Slalom Opener with safe 20m buffer
-        return [C_OPENER_SLALOM, C_GUNNER, C_MINE, C_CLIMAX, C_FINISH]
+        # 7 chunks: Opener -> Opener Ambush -> Gate 1 (~33%) -> Gunner -> Gate 2 (~66%) -> Fodder Swarm -> Finish
+        return [C_OPENER_AMBUSH, C_GUNNER, C_WARMUP, C_MINE, C_BARRICADE, C_FODDER, C_FINISH]
     elif lvl == 4:
-        # Level 4: Mine Gauntlet Opener with safe 20m buffer
-        return [C_OPENER_GAUNTLET, C_BARRICADE, C_REEF, C_FODDER, C_CLIMAX, C_FINISH]
+        # 7 chunks: Opener Ambush -> Gunner Skirmish -> Gate 1 (~33%) -> Reef Slalom (gentle 2-reef intro) -> Gate 2 (~66%) -> Fodder Swarm -> Finish
+        return [C_OPENER_AMBUSH, C_GUNNER, C_WARMUP, C_REEF, C_BARRICADE, C_FODDER, C_FINISH]
     elif lvl == 5:
-        # Level 5: Captain Ironjaw Milestone Boss
+        # 7 chunks: Opener -> Gunner -> Gate 1 (~33%) -> Mine -> Gate 2 (~66%) -> Fodder Swarm -> Boss Ironjaw
         boss_chunk = get_boss_chunk(lvl)
-        return [C_OPENER_AMBUSH, C_REEF, C_MINE, C_BARRICADE, C_GUNNER, boss_chunk]
+        return [C_OPENER_AMBUSH, C_GUNNER, C_WARMUP, C_MINE, C_BARRICADE, C_FODDER, boss_chunk]
     elif lvl == 19:
         # Level 19: Devil's Slalom (mine gauntlet & reefs)
-        return [C_OPENER_GAUNTLET, C_MINE, C_REEF, C_MINE, C_GUNNER, C_REEF, C_MINE, C_CLIMAX, C_FINISH]
+        return [C_OPENER_GAUNTLET, C_MINE, C_WARMUP, C_REEF, C_GUNNER, C_BARRICADE, C_FODDER, C_CLIMAX, C_FINISH]
 
     is_boss = (lvl % 5 == 0)
-    
-    # Pick opener with safe 20m buffer so player always has time to adjust as map starts
-    openers = [C_OPENER_AMBUSH, C_OPENER_GAUNTLET, C_OPENER_SLALOM, C_WARMUP]
-    opener = openers[(lvl - 6) % len(openers)]
 
     if is_boss:
         boss_chunk = get_boss_chunk(lvl)
+        # Universal 3-Part Boss Layout:
+        # Part 1: Opener + Warmup (Gate 1 at ~33%)
+        # Part 2: Escalation + Barricade (Gate 2 at ~66%)
+        # Part 3: Overpower Fodder Swarm + Climax -> Boss!
         if lvl <= 15:
-            return [opener, C_MINE, C_REEF, C_BARRICADE, C_FODDER, C_GUNNER, boss_chunk]
+            # 8 chunks: Gate 1 at index 2 (25%-37.5%), Gate 2 at index 5 (62.5%-75%)
+            return [C_OPENER_AMBUSH, C_MINE, C_WARMUP, C_GUNNER, C_REEF, C_BARRICADE, C_FODDER, boss_chunk]
         elif lvl <= 30:
-            return [opener, C_REEF, C_MINE, C_BARRICADE, C_FODDER, C_GUNNER, C_BARRICADE, boss_chunk]
+            # 9 chunks: Gate 1 at index 2 (~30%), Gate 2 at index 6 (~66%)
+            return [C_OPENER_GAUNTLET, C_GUNNER, C_WARMUP, C_REEF, C_MINE, C_GUNNER, C_BARRICADE, C_FODDER, boss_chunk]
         else:
-            return [opener, C_MINE, C_REEF, C_BARRICADE, C_FODDER, C_GUNNER, C_MINE, C_BARRICADE, boss_chunk]
+            # 10 chunks: Gate 1 at index 2 (~28%), Gate 2 at index 7 (~70%)
+            return [C_OPENER_GAUNTLET, C_MINE, C_WARMUP, C_REEF, C_GUNNER, C_MINE, C_REEF, C_BARRICADE, C_FODDER, boss_chunk]
 
-    # Non-Boss level: 8 to 12 chunks
+    # Universal 3-Part Non-Boss Levels:
+    # Part 1 (0% to ~33%): Easy start opener + Gate 1 (Warmup)
+    # Part 2 (~33% to ~66%): Combat & hazard escalation + Gate 2 (Barricade Siege)
+    # Part 3 (~66% to 100%): Swarm Horde (Fodder Swarm) + Vanguard Climax + Finish Line
     if lvl < 15:
-        target_len = 8 if lvl <= 6 else 9
+        # 8 chunks: Gate 1 at index 2 (2/8 = 25%-37.5%), Gate 2 at index 5 (5/8 = 62.5%-75%)
+        return [C_OPENER_AMBUSH, C_GUNNER, C_WARMUP, C_MINE, C_REEF, C_BARRICADE, C_FODDER, C_FINISH]
     elif lvl < 30:
-        target_len = 9 if lvl <= 22 else 10
+        # 9 chunks: Gate 1 at index 2 (~30%), Gate 2 at index 6 (~66%)
+        return [C_OPENER_GAUNTLET, C_MINE, C_WARMUP, C_REEF, C_GUNNER, C_MINE, C_BARRICADE, C_FODDER, C_FINISH]
     else:
-        target_len = 10 if lvl <= 37 else 12
-
-    mid_count = target_len - 3 # Subtract Opener, Climax, Finish
-    mid_chunks = []
-    
-    is_swarm = (lvl % 2 == 1)
-    if is_swarm:
-        # Swarm Assault: dense fodder skiff waves alternating with barricades, gunners, and reefs
-        for i in range(mid_count):
-            if i % 4 == 0:
-                mid_chunks.append(C_FODDER)
-            elif i % 4 == 1:
-                mid_chunks.append(C_BARRICADE)
-            elif i % 4 == 2:
-                mid_chunks.append(C_GUNNER)
-            else:
-                mid_chunks.append(C_REEF if lvl > 8 else C_MINE)
-    else:
-        # Obstacle Gauntlet: dense mines, reefs, and barricades testing agility and short-range high firepower
-        for i in range(mid_count):
-            if i % 4 == 0:
-                mid_chunks.append(C_MINE)
-            elif i % 4 == 1:
-                mid_chunks.append(C_REEF)
-            elif i % 4 == 2:
-                mid_chunks.append(C_BARRICADE)
-            else:
-                mid_chunks.append(C_GUNNER)
-
-    return [opener] + mid_chunks + [C_CLIMAX, C_FINISH]
+        # 10 chunks: Gate 1 at index 3 (~30%), Gate 2 at index 7 (~70%)
+        return [C_OPENER_GAUNTLET, C_MINE, C_REEF, C_WARMUP, C_GUNNER, C_MINE, C_REEF, C_BARRICADE, C_FODDER, C_FINISH]
 
 def calculate_speed(lvl: int) -> float:
     if lvl == 1:

@@ -71,9 +71,9 @@ func _physics_process(delta: float) -> void:
 	# Aggressive tracking toward player
 	var player := get_tree().get_first_node_in_group("player")
 	if player and is_instance_valid(player):
-		var target_x: float = player.global_position.x
+		var target_x: float = clampf(player.global_position.x, -2.6, 2.6)
 		global_position.x = move_toward(global_position.x, target_x, steer_speed * delta)
-		global_position.x = clampf(global_position.x, -4.8, 4.8)
+		global_position.x = clampf(global_position.x, -2.6, 2.6)
 		
 		# Slight bank tilt
 		var diff: Variant = target_x - global_position.x
