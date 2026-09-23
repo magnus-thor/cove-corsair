@@ -179,6 +179,8 @@ func _setup_victory_screen() -> void:
 		GameState.level_completed.connect(_on_level_completed)
 
 func _on_level_completed(_doubloons: int, _targets: int) -> void:
+	if get_node_or_null("EndlessMode") != null:
+		return # In Endless Mode, defeating a boss awards rewards without halting the run!
 	GameState.set_performance_mode(false)
 	var stars: int = GameState.calculate_stars()
 	var level_res := GameState.get_current_level_resource()

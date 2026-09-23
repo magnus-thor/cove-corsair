@@ -32,6 +32,7 @@ var _target_z: float = -18.0
 var _current_base_y: float = 0.0
 var _is_defeated: bool = false
 var is_arena_active: bool = false
+var has_triggered_boarding: bool = false
 
 func activate_arena() -> void:
 	is_arena_active = true
@@ -43,8 +44,24 @@ func take_damage(amount: int) -> void:
 	EventBus.boss_health_changed.emit(current_hp, max_hp)
 	_flash_red()
 	_update_health_bar()
-	if current_hp <= 0:
-		boss_defeat()
+	
+	if current_hp <= int(max_hp * 0.25) and not has_triggered_boarding:
+		_initiate_desperation_boarding()
+	elif current_hp <= 0:
+		if has_triggered_boarding and not _is_defeated:
+			current_hp = 1
+		else:
+			boss_defeat()
+
+func _initiate_desperation_boarding() -> void:
+	if has_triggered_boarding or _is_defeated:
+		return
+	has_triggered_boarding = true
+	var player: Node3D = get_tree().get_first_node_in_group("player") as Node3D
+	if is_instance_valid(player):
+		var adapter: InRunBoardingAdapter = InRunBoardingAdapter.new()
+		add_child(adapter)
+		adapter.start_in_run_boarding(self, player)
 
 func _ready() -> void:
 	_clean_shadow_nodes(self)

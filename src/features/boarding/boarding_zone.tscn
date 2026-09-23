@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/features/boarding/boarding_zone.gd" id="1_script"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_zone"]
+size = Vector3(4.5, 3.0, 5.0)
+
+[node name="BoardingZone" type="Area3D" node_paths=PackedStringArray("grapple_anchor", "station_marker")]
+collision_layer = 1
+collision_mask = 4
+script = ExtResource("1_script")
+grapple_anchor = NodePath("GrappleAnchor")
+station_marker = NodePath("StationMarker")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+shape = SubResource("BoxShape3D_zone")
+
+[node name="GrappleAnchor" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.0, 1.0, 0)
+
+[node name="StationMarker" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)

@@ -1,0 +1,101 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/features/boarding/ui/boarding_hud.gd" id="1_hud_script"]
+
+[node name="BoardingHUD" type="CanvasLayer"]
+script = ExtResource("1_hud_script")
+
+[node name="TopBar" type="VBoxContainer" parent="."]
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 32.0
+offset_top = 16.0
+offset_right = -32.0
+offset_bottom = 110.0
+grow_horizontal = 2
+
+[node name="LabelWave" type="Label" parent="TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "BOARDING DEFENSE — WAVE 1 / 3"
+horizontal_alignment = 1
+
+[node name="ZoneMeters" type="HBoxContainer" parent="TopBar"]
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="BowGroup" type="VBoxContainer" parent="TopBar/ZoneMeters"]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+
+[node name="LabelBow" type="Label" parent="TopBar/ZoneMeters/BowGroup"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "BOW: 0%"
+horizontal_alignment = 1
+
+[node name="BarBow" type="ProgressBar" parent="TopBar/ZoneMeters/BowGroup"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="MidGroup" type="VBoxContainer" parent="TopBar/ZoneMeters"]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+
+[node name="LabelMid" type="Label" parent="TopBar/ZoneMeters/MidGroup"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "MIDSHIP: 0%"
+horizontal_alignment = 1
+
+[node name="BarMid" type="ProgressBar" parent="TopBar/ZoneMeters/MidGroup"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="SternGroup" type="VBoxContainer" parent="TopBar/ZoneMeters"]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+
+[node name="LabelStern" type="Label" parent="TopBar/ZoneMeters/SternGroup"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "STERN: 0%"
+horizontal_alignment = 1
+
+[node name="BarStern" type="ProgressBar" parent="TopBar/ZoneMeters/SternGroup"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="BottomControls" type="Label" parent="."]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -42.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Tap / Left Click: Move to Zone / Fire Blunderbuss  |  Right Click: Heavy Breaker Axe (Cut Ropes)"
+horizontal_alignment = 1
+
+[node name="Banner" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -50.0
+offset_right = 200.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LabelBanner" type="Label" parent="Banner"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "VICTORY!"
+horizontal_alignment = 1
+vertical_alignment = 1

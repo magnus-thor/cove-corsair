@@ -36,7 +36,6 @@ transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, 10.5, 0, -42)
 
 [node name="Entities" type="Node3D" parent="." unique_id=9825109]
 
-# Safe 20m start buffer (first reef is at z = -20m)
 [node name="Reef_Gate1_Left" parent="Entities" unique_id=9825110 instance=ExtResource("4_reef")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 0, -20)
 

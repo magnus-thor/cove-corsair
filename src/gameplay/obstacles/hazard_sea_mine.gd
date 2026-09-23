@@ -114,4 +114,3 @@ func _apply_blast_damage(explosion_pos: Vector3) -> void:
 					area.call("take_hit", 20, "sea_mine_explosion")
 				elif area.has_method("take_damage"):
 					area.call("take_damage", 20)
-

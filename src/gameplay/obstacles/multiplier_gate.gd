@@ -97,7 +97,9 @@ func _trigger_gate_collect(node: Node) -> void:
 		player_node = get_tree().get_first_node_in_group("player")
 		
 	# Balanced fleet reward: 1 gate gives +1 ship (+2 if maxed to 100), never full armada in 1 gate!
-	var ships_to_add: int = 2 if final_value >= 100 else 1
+	# Balanced fleet reward: 1 gate gives +1 ship (+2 and overdrive if major gate or add_fleet_2)
+	var is_major_gate: bool = final_value >= 25 or gate_action == "add_fleet_2" or final_value >= 100
+	var ships_to_add: int = 2 if is_major_gate else 1
 	var doubloons_to_add: int = 15 if final_value >= 100 else clampi(int(round(final_value * 0.1)), 2, 8)
 	
 	if GameState:
@@ -108,10 +110,10 @@ func _trigger_gate_collect(node: Node) -> void:
 			player_node.set("doubloons", int(player_node.get("doubloons")) + doubloons_to_add)
 		if player_node.has_method("add_follower_ships"):
 			player_node.call("add_follower_ships", ships_to_add)
-		if final_value >= 100 and player_node.has_method("trigger_armada_overdrive"):
+		if is_major_gate and player_node.has_method("trigger_armada_overdrive"):
 			player_node.call("trigger_armada_overdrive")
-		if player_node.has_method("spawn_floating_text_at_position"):
-			var msg: String = "+%d SLOOP ESCORT!" % ships_to_add if final_value < 100 else "★ 100 MAX! +2 ESCORTS! ★"
+		elif player_node.has_method("spawn_floating_text_at_position"):
+			var msg: String = "+%d SLOOP ESCORT!" % ships_to_add
 			player_node.call("spawn_floating_text_at_position", msg, Color(0.2, 0.95, 1.0))
 		
 	_play_disappear_animation()

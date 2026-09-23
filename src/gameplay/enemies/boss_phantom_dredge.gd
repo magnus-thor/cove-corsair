@@ -29,6 +29,7 @@ var _mortar_timer: float = 0.0
 var _cannon_timer: float = 0.0
 var is_barrage_active: bool = false
 var _is_defeated: bool = false
+var has_triggered_boarding: bool = false
 var current_state: State = State.APPROACHING
 var _base_y: float = 1.45
 var _flash_tween: Tween
@@ -444,10 +445,31 @@ func take_damage(amount: int) -> void:
 			if fct.has_method("setup"):
 				fct.call("setup", "-" + str(amount), Color(0.2, 1.0, 0.6))
 			
-	if current_hp <= 0:
-		boss_defeat()
+	if current_hp <= int(max_hp * 0.25) and not has_triggered_boarding:
+		_initiate_desperation_boarding()
+	elif current_hp <= 0:
+		if has_triggered_boarding and not _is_defeated:
+			current_hp = 1
+		else:
+			boss_defeat()
 	else:
 		_check_phase()
+
+func _initiate_desperation_boarding() -> void:
+	if has_triggered_boarding or _is_defeated:
+		return
+	has_triggered_boarding = true
+	# Force surface if submerged
+	if current_state == State.SUBMERGED:
+		current_state = State.COMBAT
+		visible = true
+	is_barrage_active = false
+	
+	var player: Node3D = get_tree().get_first_node_in_group("player") as Node3D
+	if is_instance_valid(player):
+		var adapter: InRunBoardingAdapter = InRunBoardingAdapter.new()
+		add_child(adapter)
+		adapter.start_in_run_boarding(self, player)
 
 func _flash_boss() -> void:
 	if not visual_container:

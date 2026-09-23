@@ -35,6 +35,7 @@ var _ram_timer: float = 0.0
 var _minion_timer: float = 0.0
 var is_barrage_active: bool = false
 var _is_defeated: bool = false
+var has_triggered_boarding: bool = false
 var _charge_dir: int = 1
 var _y_base: float = 0.5
 var _flash_tweens: Dictionary = {}
@@ -385,10 +386,27 @@ func damage_component(comp_name: String, amount: int, _from_bow: bool = false) -
 			_flash_node(furnace_core_node)
 			_flash_boss_main()
 			
-	if current_hp <= 0:
-		boss_defeat()
+	if current_hp <= int(max_hp * 0.25) and not has_triggered_boarding:
+		_initiate_desperation_boarding()
+	elif current_hp <= 0:
+		if has_triggered_boarding and not _is_defeated:
+			current_hp = 1
+		else:
+			boss_defeat()
 	else:
 		_check_phase()
+
+func _initiate_desperation_boarding() -> void:
+	if has_triggered_boarding or _is_defeated:
+		return
+	has_triggered_boarding = true
+	is_barrage_active = false
+	
+	var player: Node3D = get_tree().get_first_node_in_group("player") as Node3D
+	if is_instance_valid(player):
+		var adapter: InRunBoardingAdapter = InRunBoardingAdapter.new()
+		add_child(adapter)
+		adapter.start_in_run_boarding(self, player)
 
 func _flash_node(_node: Variant) -> void:
 	_flash_boss_main()

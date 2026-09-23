@@ -32,7 +32,6 @@ transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 10.5, 0, -24)
 
 [node name="Entities" type="Node3D" parent="." unique_id=9836108]
 
-# Safe 20m start buffer (first enemy is at z = -20m)
 [node name="BrimstoneRaft_Scout" type="Area3D" parent="Entities" unique_id=9836114 groups=["destructible", "enemies"] instance=ExtResource("6_raft")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0.1, -20)
 

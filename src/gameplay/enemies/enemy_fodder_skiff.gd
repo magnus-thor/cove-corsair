@@ -66,8 +66,6 @@ func _physics_process(delta: float) -> void:
 	var player_z: float = player.global_position.z if player else 0.0
 	if global_position.z > (player_z + 3.0):
 		GameState.record_mob_leaked()
-		if player:
-			player.leak_threat(self)
 		queue_free()
 
 func _on_area_entered(area: Area3D) -> void:

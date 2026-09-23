@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/features/boarding/boarding_grapple_rope.gd" id="1_rope_script"]
+
+[node name="BoardingGrappleRope" type="Node3D"]
+script = ExtResource("1_rope_script")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+
+[node name="HitArea" type="Area3D" parent="."]
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HitArea"]

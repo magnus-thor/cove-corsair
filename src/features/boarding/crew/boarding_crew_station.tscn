@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/features/boarding/crew/boarding_crew_station.gd" id="1_station_script"]
+
+[node name="BoardingCrewStation" type="Node3D"]
+script = ExtResource("1_station_script")
+
+[node name="ModelContainer" type="Node3D" parent="."]

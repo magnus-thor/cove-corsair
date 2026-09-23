@@ -8,6 +8,7 @@ signal speed_changed(new_speed: float)
 signal multiplier_changed(new_multiplier: float)
 signal wager_checkpoint_reached(checkpoint_distance: float)
 signal run_extracted(distance_score: int, doubloons_banked: int)
+signal doubloons_updated(new_amount: int)
 
 @export var base_speed: float = 7.0
 @export var max_speed: float = 24.0
@@ -60,9 +61,19 @@ var warmup_chunk_scene: PackedScene = preload("res://src/gameplay/chunks/chunk_w
 var reef_slalom_scene: PackedScene = preload("res://src/gameplay/chunks/chunk_reef_slalom.tscn")
 
 # Continuous lane filler prefabs for dense, active gameplay without empty dead spells
+var fodder_scene: PackedScene = preload("res://src/gameplay/enemies/enemy_fodder_skiff.tscn")
 var doubloon_scene: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
 var barrel_scene: PackedScene = preload("res://src/gameplay/obstacles/destructible_barrel.tscn")
-var fodder_scene: PackedScene = preload("res://src/gameplay/enemies/enemy_fodder_skiff.tscn")
+
+var boss_scenes: Array[PackedScene] = [
+	preload("res://src/gameplay/enemies/boss_war_barge.tscn"),
+	preload("res://src/gameplay/enemies/boss_bone_beard.tscn"),
+	preload("res://src/gameplay/enemies/boss_phantom_dredge.tscn"),
+	preload("res://src/gameplay/enemies/boss_siege_fortress.tscn")
+]
+var random_boss_target_distance: float = 0.0
+var has_spawned_endless_boss: bool = false
+var active_endless_boss: Node3D = null
 
 var _chunk_assembler: ChunkAssembler = null
 
@@ -75,6 +86,8 @@ func _ready() -> void:
 			EventBus.gold_collected.connect(_on_gold_collected)
 		if EventBus.has_signal("player_sunk") and not EventBus.player_sunk.is_connected(_on_player_sunk):
 			EventBus.player_sunk.connect(_on_player_sunk)
+		if EventBus.has_signal("level_completed") and not EventBus.level_completed.is_connected(_on_endless_boss_defeated):
+			EventBus.level_completed.connect(_on_endless_boss_defeated)
 
 func start_run() -> void:
 	is_active = true
@@ -85,6 +98,9 @@ func start_run() -> void:
 	unbanked_doubloons = 0
 	next_checkpoint_distance = wager_interval_meters
 	current_speed = calculate_speed(0.0)
+	random_boss_target_distance = randf_range(450.0, 750.0)
+	has_spawned_endless_boss = false
+	active_endless_boss = null
 	
 	GameState.is_game_active = true
 	GameState.run_doubloons = 0
@@ -108,6 +124,10 @@ func _physics_process(delta: float) -> void:
 	# Distance accumulation (can also be synced with ChunkAssembler)
 	var move_delta: float = current_speed * delta
 	distance_traveled += move_delta
+	
+	# Check random gauntlet boss encounter trigger
+	if not has_spawned_endless_boss and is_active and distance_traveled >= random_boss_target_distance:
+		_spawn_random_endless_boss()
 	
 	# Speed formula: current_speed = min(max_speed, base_speed + (distance_traveled / 250.0) * 0.5) + speed_boost
 	var new_speed: float = calculate_speed(distance_traveled)
@@ -430,3 +450,92 @@ func _random_from_array(scenes: Array[PackedScene]) -> PackedScene:
 		return null
 	var idx: int = randi() % scenes.size()
 	return scenes[idx]
+
+func _spawn_random_endless_boss() -> void:
+	has_spawned_endless_boss = true
+	if boss_scenes.is_empty():
+		return
+		
+	var selected_scene: PackedScene = boss_scenes[randi() % boss_scenes.size()]
+	if not selected_scene:
+		return
+		
+	var boss: Node3D = selected_scene.instantiate() as Node3D
+	if not boss:
+		return
+		
+	active_endless_boss = boss
+	
+	var spawn_parent: Node = get_parent()
+	if not spawn_parent or not is_instance_valid(spawn_parent):
+		spawn_parent = get_tree().current_scene
+	if not spawn_parent:
+		spawn_parent = self
+		
+	spawn_parent.add_child(boss)
+	boss.global_position = Vector3(0.0, 0.0, -18.0)
+	
+	if "current_state" in boss:
+		boss.set("current_state", 1) # State.COMBAT
+	if "_target_z" in boss:
+		boss.set("_target_z", -18.0)
+		
+	if boss.has_method("activate_arena"):
+		boss.call("activate_arena")
+	elif "is_arena_active" in boss:
+		boss.set("is_arena_active", true)
+		
+	var camera: Node = get_tree().get_first_node_in_group("game_camera")
+	if camera and camera.has_method("start_boss_focus"):
+		camera.call("start_boss_focus", boss)
+		
+	var hud: Node = get_tree().get_first_node_in_group("top_hud")
+	if hud and "level_title" in hud and hud.get("level_title"):
+		var title_label: Label = hud.get("level_title") as Label
+		if title_label:
+			title_label.text = "⚠️ DREAD CORSAIR APPROACHING! PREPARE DEFENSES! ⚠️"
+			title_label.add_theme_color_override("font_color", Color(1.0, 0.2, 0.2, 1.0))
+			
+	print("[ENDLESS MODE] Spawned random dread boss '%s' at distance %.1fm!" % [boss.name, distance_traveled])
+
+func _on_endless_boss_defeated(_doubloons: int = 0, _targets: int = 0) -> void:
+	if not is_active or has_cashed_out:
+		return
+	if not has_spawned_endless_boss:
+		return
+		
+	# Re-enable active gameplay since boss death sequences emit level_completed & set is_game_active = false
+	GameState.is_game_active = true
+	
+	# Award massive bounties for defeating the gauntlet boss
+	var doubloon_bounty: int = 250
+	var mult_boost: float = 1.5
+	unbanked_doubloons += doubloon_bounty
+	multiplier += mult_boost
+	
+	GameState.run_doubloons = unbanked_doubloons
+	GameState.set_multiplier(multiplier, "x")
+	multiplier_changed.emit(multiplier)
+	doubloons_updated.emit(unbanked_doubloons)
+	
+	active_endless_boss = null
+	
+	# Inform the player via HUD telegraph
+	var hud: Node = get_tree().get_first_node_in_group("top_hud")
+	if hud and "level_title" in hud and hud.get("level_title"):
+		var title_label: Label = hud.get("level_title") as Label
+		if title_label:
+			title_label.text = "☠ GAUNTLET BOSS SLAIN! +250 🪙 | +1.5x MULTIPLIER ☠"
+			title_label.add_theme_color_override("font_color", Color(1.0, 0.84, 0.0, 1.0))
+			
+			var revert_timer: SceneTreeTimer = get_tree().create_timer(5.0)
+			revert_timer.timeout.connect(func() -> void:
+				if is_instance_valid(title_label) and is_active and not has_cashed_out:
+					title_label.text = "CORSAIR GAUNTLET"
+					title_label.add_theme_color_override("font_color", Color(0.98, 0.95, 0.89, 1.0))
+			)
+			
+	if AudioManager:
+		AudioManager.play_sfx("coin_pickups", 0.9, 1.1, 4.0)
+		AudioManager.play_music()
+

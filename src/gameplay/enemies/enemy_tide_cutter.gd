@@ -35,7 +35,12 @@ func _apply_level_tuning() -> void:
 		current_hp = 3
 		forward_speed = 2.4
 		steer_speed = 1.6
-	elif cur_lvl <= 6:
+	elif cur_lvl <= 5:
+		max_hp = 4
+		current_hp = 4
+		forward_speed = 2.8
+		steer_speed = 1.8
+	elif cur_lvl <= 9:
 		max_hp = 10
 		current_hp = 10
 		forward_speed = 4.5
@@ -43,7 +48,7 @@ func _apply_level_tuning() -> void:
 	elif cur_lvl <= 15:
 		max_hp = 20
 		current_hp = 20
-		forward_speed = 6.0
+		forward_speed = 6.8
 		steer_speed = 3.2
 	elif cur_lvl <= 30:
 		max_hp = 32

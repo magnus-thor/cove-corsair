@@ -40,7 +40,12 @@ func _apply_level_tuning() -> void:
 		current_hp = 4
 		forward_speed = 1.8
 		shoot_interval = 2.8
-	elif cur_lvl <= 6:
+	elif cur_lvl <= 5:
+		max_hp = 5
+		current_hp = 5
+		forward_speed = 2.0
+		shoot_interval = 2.6
+	elif cur_lvl <= 9:
 		max_hp = 10
 		current_hp = 10
 		forward_speed = 2.2

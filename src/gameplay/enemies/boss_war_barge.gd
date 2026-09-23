@@ -63,6 +63,7 @@ var ram_timer: float = 0.0
 var ram_cooldown: float = 6.0
 var is_charging: bool = false
 var charge_direction: int = 1 # 1 = forward, -1 = retreating
+var has_triggered_boarding: bool = false
 var original_combat_z: float = -18.0
 var is_arena_active: bool = false
 var _base_mesh_scale: Vector3 = Vector3.ONE
@@ -599,10 +600,29 @@ func take_damage(amount: int) -> void:
 	EventBus.boss_health_changed.emit(current_hp, max_hp)
 	_flash_boss_main()
 	
-	if current_hp <= 0:
-		boss_defeat()
+	if current_hp <= int(max_hp * 0.25) and not has_triggered_boarding:
+		_initiate_desperation_boarding()
+	elif current_hp <= 0:
+		if has_triggered_boarding and not _is_defeated:
+			current_hp = 1 # Keep boss in desperation state until boarding party is cleared
+		else:
+			boss_defeat()
 	else:
 		_check_phase_transition()
+
+func _initiate_desperation_boarding() -> void:
+	if has_triggered_boarding or _is_defeated:
+		return
+	has_triggered_boarding = true
+	_stop_steam_venting()
+	is_charging = false
+	is_barrage_active = false
+	
+	var player: Node3D = get_tree().get_first_node_in_group("player") as Node3D
+	if is_instance_valid(player):
+		var adapter: InRunBoardingAdapter = InRunBoardingAdapter.new()
+		add_child(adapter)
+		adapter.start_in_run_boarding(self, player)
 
 func damage_component(_comp_name: String, amount: int, _from_bow: bool) -> void:
 	take_damage(amount)
