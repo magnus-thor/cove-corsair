@@ -9,7 +9,7 @@ signal plank_hit(plank: BoardingPlank, current_hp: float, max_hp: float)
 
 @export var max_health: float = 30.0
 @export var cross_duration_sec: float = 3.5
-@export var plank_width: float = 0.85
+@export var plank_width: float = 0.41
 @export var plank_thickness: float = 0.12
 
 var current_health: float = 30.0

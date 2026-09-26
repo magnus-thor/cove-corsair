@@ -81,14 +81,14 @@ transform = Transform3D(0.99000007, 0, 0, 0, 0.99000007, 0, 0, 0, 0.99000007, -2
 transform = Transform3D(1.0101007, 0, 0, 0, 1.0101007, 0, 0, 0, 1.0101007, 0, 0, 0)
 
 [node name="ZoneBow" parent="PlayerShipContainer/DeckZones" unique_id=1358686327 instance=ExtResource("2_zone_scene")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29444742, 0.110226095, -1.2142587)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6419401, -0.70695084, -0.9400308)
 zone_id = "bow"
 
 [node name="ZoneMidship" parent="PlayerShipContainer/DeckZones" unique_id=586870636 instance=ExtResource("2_zone_scene")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35191298, 0.114231974, -0.046703592)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5269938, -0.8561472, -0.046703592)
 
 [node name="ZoneStern" parent="PlayerShipContainer/DeckZones" unique_id=483988857 instance=ExtResource("2_zone_scene")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29930735, 0.28, 0.7259306)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.7819757, -0.65186054, 0.62764955)
 zone_id = "stern"
 
 [node name="DeckMarker" type="Marker3D" parent="PlayerShipContainer" unique_id=2119981779]
@@ -151,13 +151,13 @@ transform = Transform3D(-0.31290805, -0.8244233, 3.407758, 0, 3.4213028, 0.82770
 [node name="EnemyShipMarkers" type="Node3D" parent="EnemyShipContainer" unique_id=848155043]
 
 [node name="MarkerBow" type="Marker3D" parent="EnemyShipContainer/EnemyShipMarkers" unique_id=1635680208]
-transform = Transform3D(0.9999995, 0, 0, 0, 0.9999995, 0, 0, 0, 0.9999995, -12.806007, 0.56825686, -1.8804611)
+transform = Transform3D(0.99999934, 0, 0, 0, 0.99999934, 0, 0, 0, 0.99999934, -13.068624, 1.1870035, -1.8804607)
 
 [node name="MarkerMid" type="Marker3D" parent="EnemyShipContainer/EnemyShipMarkers" unique_id=1794103791]
-transform = Transform3D(0.99999976, 0, 0, 0, 0.99999976, 0, 0, 0, 0.99999976, -12.151449, 0, 0)
+transform = Transform3D(0.9999995, 0, 0, 0, 0.9999995, 0, 0, 0, 0.9999995, -12.614456, 0.26471028, -0.17524332)
 
 [node name="MarkerStern" type="Marker3D" parent="EnemyShipContainer/EnemyShipMarkers" unique_id=2145981458]
-transform = Transform3D(0.99999964, 0, 0, 0, 0.99999964, 0, 0, 0, 0.99999964, -11.96171, 0, 1.2803268)
+transform = Transform3D(0.9999987, 0, 0, 0, 0.9999987, 0, 0, 0, 0.9999987, -12.687212, 0.40418908, 0.4926853)
 
 [node name="EnemyBoatWake" parent="EnemyShipContainer" unique_id=822192309 instance=ExtResource("10_wake_scene")]
 transform = Transform3D(0.3528645, 0, -4.415924, 0, 4.43, 0, 4.415924, 0, 0.3528645, -14.444548, -0.9119203, 0.111222744)

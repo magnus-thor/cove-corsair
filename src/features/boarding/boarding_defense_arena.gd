@@ -41,7 +41,7 @@ const APPROACH_DURATION_SEC: float = 1.8
 @export var overrun_damage_per_sec: float = 5.0
 @export var total_waves_to_win: int = 3
 @export var wave_interval_sec: float = 8.0
-@export var debug_disable_spawns: bool = true
+@export var debug_disable_spawns: bool = false
 
 var zones: Array[BoardingZone] = []
 var current_wave: int = 0
