@@ -10,7 +10,7 @@ func _ready() -> void:
 	print("========================================================\n")
 	
 	_test_boarding_zone()
-	_test_grapple_rope()
+	_test_boarding_plank()
 	_test_boarder_climbing_and_fall()
 	_test_player_weapons_and_targeting()
 	_test_crew_station_roles()
@@ -72,52 +72,52 @@ func _test_boarding_zone() -> void:
 	zone.queue_free()
 	print("[PASS] BoardingZone infestation and overrun state machine verified.")
 
-func _test_grapple_rope() -> void:
-	print("--- 2. Testing BoardingGrappleRope Catenary & Severing ---")
-	var rope_scene: PackedScene = load("res://src/features/boarding/boarding_grapple_rope.tscn") as PackedScene
-	assert(rope_scene != null, "boarding_grapple_rope.tscn must exist")
-	var rope: BoardingGrappleRope = rope_scene.instantiate() as BoardingGrappleRope
-	add_child(rope)
+func _test_boarding_plank() -> void:
+	print("--- 2. Testing BoardingPlank Geometry & Severing ---")
+	var plank_scene: PackedScene = load("res://src/features/boarding/boarding_plank.tscn") as PackedScene
+	assert(plank_scene != null, "boarding_plank.tscn must exist")
+	var plank: BoardingPlank = plank_scene.instantiate() as BoardingPlank
+	add_child(plank)
 	
 	var zone: BoardingZone = BoardingZone.new()
 	add_child(zone)
 	
 	var p_start: Vector3 = Vector3(6.0, 2.0, 0.0)
 	var p_end: Vector3 = Vector3(0.0, 1.0, 0.0)
-	rope.setup_grapple(p_start, p_end, zone)
+	plank.setup_plank(p_start, p_end, zone)
 	
-	assert(rope.is_latched, "Rope must be latched after setup")
-	assert(zone.active_grapples.has(rope), "Zone must register latched rope")
+	assert(plank.is_latched, "Plank must be latched after setup")
+	assert(zone.active_planks.has(plank), "Zone must register latched plank")
 	
-	# Test Catenary Sag at midpoint (t = 0.5)
-	var mid_point: Vector3 = rope.get_point_along_rope(0.5)
+	# Test Walking surface height at midpoint (t = 0.5)
+	var mid_point: Vector3 = plank.get_point_along_plank(0.5)
 	var linear_mid_y: float = lerpf(p_start.y, p_end.y, 0.5)
-	assert(mid_point.y < linear_mid_y, "Midpoint must sag below linear interpolation (sag: %f vs linear: %f)" % [mid_point.y, linear_mid_y])
+	assert(mid_point.y >= linear_mid_y, "Plank walking point must be atop the plank surface")
 	
 	# Test damage and severing
 	var severed_emitted: Array[bool] = [false]
-	rope.rope_severed.connect(func(_r: BoardingGrappleRope) -> void: severed_emitted[0] = true)
+	plank.plank_severed.connect(func(_p: BoardingPlank) -> void: severed_emitted[0] = true)
 	
-	rope.take_damage(10.0)
-	assert(rope.current_health == 20.0, "Rope health should be 20 after 10 damage")
-	assert(rope.is_latched, "Rope must remain latched while HP > 0")
+	plank.take_damage(10.0)
+	assert(plank.current_health == 20.0, "Plank health should be 20 after 10 damage")
+	assert(plank.is_latched, "Plank must remain latched while HP > 0")
 	
-	rope.take_damage(25.0) # Lethal damage
-	assert(severed_emitted[0], "rope_severed signal must be emitted upon destruction")
-	assert(not zone.active_grapples.has(rope), "Zone must unregister severed rope")
+	plank.take_damage(25.0) # Lethal damage
+	assert(severed_emitted[0], "plank_severed signal must be emitted upon destruction")
+	assert(not zone.active_planks.has(plank), "Zone must unregister severed plank")
 	
 	zone.queue_free()
-	print("[PASS] Grapple rope catenary sag and sever mechanics verified.")
+	print("[PASS] Boarding plank geometry and sever mechanics verified.")
 
 func _test_boarder_climbing_and_fall() -> void:
 	print("--- 3. Testing Boarder Climber Progression & Overboard Fall ---")
-	var rope_scene: PackedScene = load("res://src/features/boarding/boarding_grapple_rope.tscn") as PackedScene
-	var rope: BoardingGrappleRope = rope_scene.instantiate() as BoardingGrappleRope
-	add_child(rope)
+	var plank_scene: PackedScene = load("res://src/features/boarding/boarding_plank.tscn") as PackedScene
+	var plank: BoardingPlank = plank_scene.instantiate() as BoardingPlank
+	add_child(plank)
 	
 	var zone: BoardingZone = BoardingZone.new()
 	add_child(zone)
-	rope.setup_grapple(Vector3(6.0, 2.0, 0.0), Vector3(0.0, 1.0, 0.0), zone)
+	plank.setup_plank(Vector3(6.0, 2.0, 0.0), Vector3(0.0, 1.0, 0.0), zone)
 	
 	var enemy_scene: PackedScene = load("res://src/features/boarding/boarder_enemy.tscn") as PackedScene
 	assert(enemy_scene != null, "boarder_enemy.tscn must exist")
@@ -125,7 +125,7 @@ func _test_boarder_climbing_and_fall() -> void:
 	# Case A: Normal climb to deck
 	var enemy_a: BoarderEnemy = enemy_scene.instantiate() as BoarderEnemy
 	add_child(enemy_a)
-	enemy_a.start_climbing(rope, zone)
+	enemy_a.start_crossing(plank, zone)
 	
 	assert(enemy_a.is_in_group("boarder"), "Enemy must belong to 'boarder' group")
 	assert(not enemy_a.is_on_deck, "Enemy must not be on deck at start of climb")
@@ -135,17 +135,17 @@ func _test_boarder_climbing_and_fall() -> void:
 	assert(enemy_a.is_on_deck, "Enemy must reach deck after climb duration completes")
 	assert(zone.active_boarders.has(enemy_a), "Zone must register enemy when landed on deck")
 	
-	# Case B: Cut rope mid-climb -> triggers overboard tumble
+	# Case B: Cut plank mid-crossing -> triggers overboard tumble
 	var enemy_b: BoarderEnemy = enemy_scene.instantiate() as BoarderEnemy
 	add_child(enemy_b)
-	enemy_b.start_climbing(rope, zone)
-	enemy_b._process_climbing(1.0) # Halfway up
-	assert(enemy_b.rope_progress > 0.0 and enemy_b.rope_progress < 1.0, "Enemy must be mid-climb")
+	enemy_b.start_crossing(plank, zone)
+	enemy_b._process_crossing(1.0) # Halfway across
+	assert(enemy_b.plank_progress > 0.0 and enemy_b.plank_progress < 1.0, "Enemy must be mid-crossing")
 	
-	# Sever rope
-	rope.sever()
-	enemy_b._process_climbing(0.1) # Ticks fall
-	assert(enemy_b.is_falling, "Enemy must transition to is_falling when rope is severed")
+	# Sever plank
+	plank.sever()
+	enemy_b._process_crossing(0.1) # Ticks fall
+	assert(enemy_b.is_falling, "Enemy must transition to is_falling when plank is severed")
 	
 	enemy_a.queue_free()
 	zone.queue_free()
@@ -169,18 +169,18 @@ func _test_player_weapons_and_targeting() -> void:
 	player.fire_blunderbuss()
 	assert(target_enemy.current_hp < initial_hp, "Blunderbuss must damage enemy within forward cone")
 	
-	# Test Heavy Breaker Axe on Grapple Rope
-	var rope_scene: PackedScene = load("res://src/features/boarding/boarding_grapple_rope.tscn") as PackedScene
-	var rope: BoardingGrappleRope = rope_scene.instantiate() as BoardingGrappleRope
-	add_child(rope)
+	# Test Heavy Breaker Axe on Boarding Plank
+	var plank_scene: PackedScene = load("res://src/features/boarding/boarding_plank.tscn") as PackedScene
+	var plank: BoardingPlank = plank_scene.instantiate() as BoardingPlank
+	add_child(plank)
 	var dummy_zone: BoardingZone = BoardingZone.new()
 	add_child(dummy_zone)
-	rope.setup_grapple(Vector3(5, 1, 0), Vector3(0, 1, 0), dummy_zone)
+	plank.setup_plank(Vector3(5, 1, 0), Vector3(0, 1, 0), dummy_zone)
 	
-	player.current_target_node = rope
-	var rope_hp_before: float = rope.current_health
+	player.current_target_node = plank
+	var plank_hp_before: float = plank.current_health
 	player.fire_heavy_breaker()
-	assert(rope.current_health <= 0.0 or rope.is_queued_for_deletion(), "Heavy Breaker must deal lethal 35 damage to 30 HP rope")
+	assert(plank.current_health <= 0.0 or plank.is_queued_for_deletion(), "Heavy Breaker must deal lethal 35 damage to 30 HP plank")
 	
 	target_enemy.queue_free()
 	dummy_zone.queue_free()
@@ -232,9 +232,26 @@ func _test_defense_arena_orchestration() -> void:
 	assert(is_instance_valid(arena.zone_midship), "Midship zone must be valid")
 	assert(is_instance_valid(arena.zone_stern), "Stern zone must be valid")
 	
-	# Test grapple wave launch
-	arena.launch_grapple_to_zone(1) # Midship
-	assert(arena.total_ropes_launched == 1, "Rope launch counter must increment to 1")
+	# 1. Verify Vessel Containers & Crew Node Structure
+	assert(is_instance_valid(arena.player_ship_container), "player_ship_container must be valid")
+	assert(is_instance_valid(arena.enemy_ship_container), "enemy_ship_container must be valid")
+	assert(arena.player_controller.has_node("DeckMarker"), "Player controller must have explicit DeckMarker node")
+	assert(arena.crew_station_bow.has_node("DeckMarker"), "Bow crew station must have explicit DeckMarker node")
+	assert(arena.crew_station_stern.has_node("DeckMarker"), "Stern crew station must have explicit DeckMarker node")
+	
+	# 2. Verify Dedicated BoardingCamera3D
+	assert(is_instance_valid(arena.boarding_camera), "BoardingCamera3D must be assigned")
+	assert(arena.boarding_camera.current, "BoardingCamera3D must be active/current")
+	
+	# 3. Verify Enemy Approach & Docking Sequence
+	assert(arena.is_approaching, "Enemy ship must be approaching on scene start")
+	assert(arena.enemy_ship_container.position.x >= 14.0, "Enemy ship must start at >= 14.0m lateral offset (got %f)" % arena.enemy_ship_container.position.x)
+	
+	# Enable spawns for test simulation of approach tween
+	arena.debug_disable_spawns = false
+	arena._on_docking_complete()
+	assert(not arena.is_approaching, "Approach must be complete after docking")
+	assert(arena.total_planks_launched == 3, "Docking sequence must launch 3 boarding planks into Bow, Midship, Stern (got %d)" % arena.total_planks_launched)
 	
 	arena.queue_free()
-	print("[PASS] BoardingDefenseArena setup and wave launch verified.")
+	print("[PASS] BoardingDefenseArena deck elevation, camera, and docking sequence verified.")

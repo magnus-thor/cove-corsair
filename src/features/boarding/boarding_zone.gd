@@ -10,6 +10,7 @@ signal infestation_changed(zone_id: String, current_pct: float)
 
 @export var zone_id: String = "midship" # "bow", "midship", "stern"
 @export var grapple_anchor: Marker3D = null
+@export var plank_anchor: Marker3D = null
 @export var station_marker: Marker3D = null
 @export var max_infestation: float = 100.0
 @export var infestation_per_enemy_per_sec: float = 4.0
@@ -18,9 +19,12 @@ signal infestation_changed(zone_id: String, current_pct: float)
 var current_infestation: float = 0.0
 var active_boarders: Array[Node3D] = []
 var active_grapples: Array[Node3D] = []
+var active_planks: Array[Node3D] = []
 var is_overrun: bool = false
 
 func _ready() -> void:
+	if not is_instance_valid(plank_anchor) and is_instance_valid(grapple_anchor):
+		plank_anchor = grapple_anchor
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
 
@@ -44,13 +48,23 @@ func _process(delta: float) -> void:
 		is_overrun = false
 		zone_cleared.emit(zone_id)
 
+func register_plank(plank: Node3D) -> void:
+	if is_instance_valid(plank) and not active_planks.has(plank):
+		active_planks.append(plank)
+	if is_instance_valid(plank) and not active_grapples.has(plank):
+		active_grapples.append(plank)
+
+func unregister_plank(plank: Node3D) -> void:
+	if active_planks.has(plank):
+		active_planks.erase(plank)
+	if active_grapples.has(plank):
+		active_grapples.erase(plank)
+
 func register_grapple(rope: Node3D) -> void:
-	if is_instance_valid(rope) and not active_grapples.has(rope):
-		active_grapples.append(rope)
+	register_plank(rope)
 
 func unregister_grapple(rope: Node3D) -> void:
-	if active_grapples.has(rope):
-		active_grapples.erase(rope)
+	unregister_plank(rope)
 
 func register_boarder(boarder: Node3D) -> void:
 	if is_instance_valid(boarder) and not active_boarders.has(boarder):

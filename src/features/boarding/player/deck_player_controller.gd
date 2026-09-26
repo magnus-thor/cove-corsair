@@ -29,11 +29,20 @@ var is_moving_to_station: bool = false
 var fire_timer: float = 0.0
 var heavy_timer: float = 0.0
 
-@onready var model_container: Node3D = $ModelContainer
-@onready var placeholder_mesh: MeshInstance3D = $MeshInstance3D
+@onready var deck_marker: Marker3D = (get_node_or_null("DeckMarker") as Marker3D)
+@onready var model_container: Node3D = ($DeckMarker/ModelContainer if has_node("DeckMarker/ModelContainer") else get_node_or_null("ModelContainer")) as Node3D
+@onready var placeholder_mesh: MeshInstance3D = ($DeckMarker/MeshInstance3D if has_node("DeckMarker/MeshInstance3D") else get_node_or_null("MeshInstance3D")) as MeshInstance3D
 @onready var muzzle_point: Marker3D = %MuzzlePoint
 @onready var muzzle_light: OmniLight3D = %MuzzleLight
 
+@export var crew_scale: Vector3 = Vector3(0.55, 0.55, 0.55)
+
+const CREW_MODELS: Dictionary = {
+	"monkey_bomber": "res://assets/models/user/crew/monkey_crew.glb",
+	"skeleton_tosser": "res://assets/models/user/crew/skeleton_crew.glb",
+	"grease_monkey": "res://assets/models/user/crew/artillery_grease__monkey.glb",
+	"deckhand_sniper": "res://assets/models/user/crew/weapon_deckhand_sniper.glb"
+}
 const PLAYER_MODEL_PATH: String = "res://assets/models/user/crew/weapon_deckhand_sniper.glb"
 
 func _ready() -> void:
@@ -43,12 +52,24 @@ func _ready() -> void:
 	target_station_position = global_position
 	_load_player_model()
 
-func _load_player_model() -> void:
-	if ResourceLoader.exists(PLAYER_MODEL_PATH):
-		var scene: PackedScene = load(PLAYER_MODEL_PATH) as PackedScene
-		if scene and is_instance_valid(model_container):
+func setup_defender_model(crew_id: String) -> void:
+	var glb_path: String = CREW_MODELS.get(crew_id, "") as String
+	if glb_path.is_empty():
+		glb_path = PLAYER_MODEL_PATH
+	_load_player_model(glb_path)
+
+func _load_player_model(glb_path: String = "") -> void:
+	if glb_path.is_empty():
+		glb_path = PLAYER_MODEL_PATH
+	if not is_instance_valid(model_container):
+		return
+	for child: Node in model_container.get_children():
+		child.queue_free()
+	if ResourceLoader.exists(glb_path):
+		var scene: PackedScene = load(glb_path) as PackedScene
+		if scene:
 			var model: Node3D = scene.instantiate() as Node3D
-			model.scale = Vector3(0.55, 0.55, 0.55)
+			model.scale = crew_scale
 			model_container.add_child(model)
 			if is_instance_valid(placeholder_mesh):
 				placeholder_mesh.visible = false
@@ -150,15 +171,15 @@ func fire_heavy_breaker() -> void:
 		camera.call("add_trauma", 0.4)
 	
 	if is_instance_valid(current_target_node):
-		if current_target_node is BoardingGrappleRope:
-			var rope: BoardingGrappleRope = current_target_node as BoardingGrappleRope
-			rope.take_damage(axe_sever_damage)
+		if current_target_node is BoardingPlank:
+			var plank: BoardingPlank = current_target_node as BoardingPlank
+			plank.take_damage(axe_sever_damage)
 		elif current_target_node is BoarderEnemy:
 			var enemy: BoarderEnemy = current_target_node as BoarderEnemy
 			enemy.take_damage(axe_sever_damage * 2.0)
-		elif current_target_node.get_parent() is BoardingGrappleRope:
-			var p_rope: BoardingGrappleRope = current_target_node.get_parent() as BoardingGrappleRope
-			p_rope.take_damage(axe_sever_damage)
+		elif current_target_node.get_parent() is BoardingPlank:
+			var p_plank: BoardingPlank = current_target_node.get_parent() as BoardingPlank
+			p_plank.take_damage(axe_sever_damage)
 
 func _on_target_acquired(target_node: Node3D, world_pos: Vector3) -> void:
 	current_target_node = target_node
@@ -169,12 +190,12 @@ func _on_target_acquired(target_node: Node3D, world_pos: Vector3) -> void:
 		reticle_visual.visible = true
 		
 	if is_instance_valid(target_node):
-		# Target is rope or enemy -> swivel and fire immediately
+		# Target is plank or enemy -> swivel and fire immediately
 		var flat_pos: Vector3 = Vector3(world_pos.x, global_position.y, world_pos.z)
 		if not global_position.is_equal_approx(flat_pos):
 			look_at(flat_pos, Vector3.UP)
 			
-		if target_node is BoardingGrappleRope or target_node.get_parent() is BoardingGrappleRope:
+		if target_node is BoardingPlank or target_node.get_parent() is BoardingPlank:
 			fire_heavy_breaker()
 		else:
 			fire_blunderbuss()

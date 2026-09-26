@@ -49,9 +49,9 @@ func _cast_selection_ray(screen_pos: Vector2) -> void:
 		var n: Node3D = hit_collider as Node3D
 		if n is BoarderEnemy or n.is_in_group("boarder"):
 			resolved_node = n
-		elif n is BoardingGrappleRope:
+		elif n is BoardingPlank:
 			resolved_node = n
-		elif n.get_parent() is BoardingGrappleRope:
+		elif n.get_parent() is BoardingPlank:
 			resolved_node = n.get_parent() as Node3D
 		elif n is BoardingZone:
 			var zone: BoardingZone = n as BoardingZone
@@ -67,8 +67,13 @@ func _cast_selection_ray(screen_pos: Vector2) -> void:
 	target_acquired.emit(resolved_node, hit_pos)
 
 func _select_priority_in_zone(zone: BoardingZone, fallback_pos: Vector3) -> void:
-	# Priority 1: Active grapple rope on this zone
-	if not zone.active_grapples.is_empty():
+	# Priority 1: Active boarding plank on this zone
+	if not zone.active_planks.is_empty():
+		var plank: Node3D = zone.active_planks[0]
+		if is_instance_valid(plank):
+			target_acquired.emit(plank, plank.global_position)
+			return
+	elif not zone.active_grapples.is_empty():
 		var rope: Node3D = zone.active_grapples[0]
 		if is_instance_valid(rope):
 			target_acquired.emit(rope, rope.global_position)

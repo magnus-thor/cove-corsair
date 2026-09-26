@@ -11,9 +11,14 @@ signal reached_deck(enemy: BoarderEnemy, zone: BoardingZone)
 @export var deck_wander_speed: float = 2.5
 
 var current_hp: float = 25.0
-var active_rope: BoardingGrappleRope = null
+var active_plank: BoardingPlank = null
+var active_rope: BoardingPlank = null # Backward compatibility alias
 var current_zone: BoardingZone = null
-var rope_progress: float = 0.0
+var rope_progress: float = 0.0:
+	set(val):
+		rope_progress = val
+		plank_progress = val
+var plank_progress: float = 0.0
 var is_on_deck: bool = false
 var is_falling: bool = false
 
@@ -41,14 +46,18 @@ func _load_visual_model() -> void:
 			if is_instance_valid(placeholder_mesh):
 				placeholder_mesh.visible = false
 
-func start_climbing(rope: BoardingGrappleRope, zone: BoardingZone) -> void:
-	active_rope = rope
+func start_crossing(plank: BoardingPlank, zone: BoardingZone) -> void:
+	active_plank = plank
+	active_rope = plank
 	current_zone = zone
 	rope_progress = 0.0
 	is_on_deck = false
 	is_falling = false
-	if is_instance_valid(rope):
-		global_position = rope.get_point_along_rope(0.0)
+	if is_instance_valid(plank):
+		global_position = plank.get_point_along_plank(0.0)
+
+func start_climbing(rope: BoardingPlank, zone: BoardingZone) -> void:
+	start_crossing(rope, zone)
 
 func _physics_process(delta: float) -> void:
 	if is_falling:
@@ -59,14 +68,18 @@ func _physics_process(delta: float) -> void:
 	else:
 		_process_deck_combat(delta)
 
+func _process_crossing(delta: float) -> void:
+	_process_climbing(delta)
+
 func _process_climbing(delta: float) -> void:
-	if not is_instance_valid(active_rope) or not active_rope.is_latched:
+	var plank: BoardingPlank = active_plank if is_instance_valid(active_plank) else active_rope
+	if not is_instance_valid(plank) or not plank.is_latched:
 		_fall_overboard()
 		return
 		
-	var duration: float = maxf(active_rope.climb_duration_sec, 0.1)
+	var duration: float = maxf(plank.cross_duration_sec, 0.1)
 	rope_progress += delta / duration
-	global_position = active_rope.get_point_along_rope(rope_progress)
+	global_position = plank.get_point_along_plank(rope_progress)
 	
 	if rope_progress >= 1.0:
 		is_on_deck = true
@@ -91,9 +104,11 @@ func _process_deck_combat(delta: float) -> void:
 	velocity = _wander_dir * deck_wander_speed
 	move_and_slide()
 	
-	if velocity.length_squared() > 0.01:
-		var look_pt: Vector3 = global_position + Vector3(velocity.x, 0.0, velocity.z)
-		look_at(look_pt, Vector3.UP)
+	var flat_vel: Vector3 = Vector3(velocity.x, 0.0, velocity.z)
+	if flat_vel.length_squared() > 0.05:
+		var look_pt: Vector3 = global_position + flat_vel
+		if not global_position.is_equal_approx(look_pt):
+			look_at(look_pt, Vector3.UP)
 
 func take_damage(amount: float) -> void:
 	if is_falling or current_hp <= 0.0:

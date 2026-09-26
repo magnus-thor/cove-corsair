@@ -5,4 +5,6 @@
 [node name="BoardingCrewStation" type="Node3D"]
 script = ExtResource("1_station_script")
 
-[node name="ModelContainer" type="Node3D" parent="."]
+[node name="DeckMarker" type="Marker3D" parent="."]
+
+[node name="ModelContainer" type="Node3D" parent="DeckMarker"]

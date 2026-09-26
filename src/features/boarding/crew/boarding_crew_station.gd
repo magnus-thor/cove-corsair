@@ -9,12 +9,14 @@ signal crew_action_triggered(crew_id: String, action_name: String, target_pos: V
 @export var station_id: String = "bow" # "bow", "midship", "stern"
 @export var assigned_zone: BoardingZone = null
 @export var action_interval_sec: float = 3.5
+@export var crew_scale: Vector3 = Vector3(0.55, 0.55, 0.55)
 
 var crew_id: String = ""
 var crew_role: String = "deckhand" # "bomber", "sniper", "tosser", "mechanic", "deckhand"
 var action_timer: float = 0.0
 
-@onready var model_container: Node3D = $ModelContainer
+@onready var deck_marker: Marker3D = (get_node_or_null("DeckMarker") as Marker3D)
+@onready var model_container: Node3D = ($DeckMarker/ModelContainer if has_node("DeckMarker/ModelContainer") else get_node_or_null("ModelContainer")) as Node3D
 
 const CREW_MODELS: Dictionary = {
 	"monkey_bomber": "res://assets/models/user/crew/monkey_crew.glb",
@@ -62,7 +64,7 @@ func _load_crew_model() -> void:
 			var scene: PackedScene = load(glb_path) as PackedScene
 			if scene:
 				var inst: Node3D = scene.instantiate() as Node3D
-				inst.scale = Vector3(0.55, 0.55, 0.55)
+				inst.scale = crew_scale
 				model_container.add_child(inst)
 
 func _process(delta: float) -> void:
@@ -104,22 +106,25 @@ func _execute_bomber() -> void:
 		crew_action_triggered.emit(crew_id, "cluster_bomb", blast_pos)
 
 func _execute_sniper() -> void:
-	# Snipe nearest attached grapple rope to sever it
-	var ropes: Array[Node] = get_tree().get_nodes_in_group("grapple_rope")
-	var closest_rope: BoardingGrappleRope = null
+	# Snipe nearest attached boarding plank to sever it
+	var planks: Array[Node] = get_tree().get_nodes_in_group("boarding_plank")
+	if planks.is_empty():
+		planks = get_tree().get_nodes_in_group("grapple_rope")
+	var closest_plank: BoardingPlank = null
 	var min_dist: float = 999.0
 	
-	for r_node: Node in ropes:
-		var rope: BoardingGrappleRope = r_node as BoardingGrappleRope
-		if is_instance_valid(rope) and rope.is_latched:
-			var d: float = global_position.distance_to(rope.global_position)
-			if d < min_dist:
-				min_dist = d
-				closest_rope = rope
+	for p_node: Node in planks:
+		if p_node is BoardingPlank:
+			var plank: BoardingPlank = p_node as BoardingPlank
+			if is_instance_valid(plank) and plank.is_latched:
+				var d: float = global_position.distance_to(plank.global_position)
+				if d < min_dist:
+					min_dist = d
+					closest_plank = plank
 				
-	if is_instance_valid(closest_rope):
-		closest_rope.take_damage(35.0) # Instant cut
-		crew_action_triggered.emit(crew_id, "rope_snipe", closest_rope.global_position)
+	if is_instance_valid(closest_plank):
+		closest_plank.take_damage(35.0) # Instant cut
+		crew_action_triggered.emit(crew_id, "plank_snipe", closest_plank.global_position)
 
 func _execute_tosser() -> void:
 	# Area denial: burns active boarders in assigned zone
