@@ -85,7 +85,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6419401, -0.70695084, -0.9
 zone_id = "bow"
 
 [node name="ZoneMidship" parent="PlayerShipContainer/DeckZones" unique_id=586870636 instance=ExtResource("2_zone_scene")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5269938, -0.8561472, -0.046703592)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.647296, -0.77675766, -0.046703592)
 
 [node name="ZoneStern" parent="PlayerShipContainer/DeckZones" unique_id=483988857 instance=ExtResource("2_zone_scene")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.7819757, -0.65186054, 0.62764955)
