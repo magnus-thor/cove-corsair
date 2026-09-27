@@ -1,14 +1,19 @@
 class_name BoarderEnemy
 extends CharacterBody3D
 
-## Swarmer enemy unit that traverses a grappling rope, lands in a ship zone,
-## drives zone infestation, and falls overboard if their rope is cut.
+## Swarmer enemy unit that traverses a boarding plank, lands in a ship zone,
+## drives zone infestation, and falls overboard if their plank is severed.
 
 signal died(enemy: BoarderEnemy)
 signal reached_deck(enemy: BoarderEnemy, zone: BoardingZone)
 
+const DEFAULT_ENEMY_MODEL_PATH: String = "res://assets/models/enemy/crew/frontline_pirate.glb"
+const FALLBACK_RAIDER_SCENE: String = "res://src/features/boarding/enemies/pirate_raider_visual.tscn"
+
 @export var max_hp: float = 25.0
 @export var deck_wander_speed: float = 2.5
+@export var enemy_model_path: String = DEFAULT_ENEMY_MODEL_PATH
+@export var model_scale: Vector3 = Vector3(0.55, 0.55, 0.55)
 
 var current_hp: float = 25.0
 var active_plank: BoardingPlank = null
@@ -26,9 +31,6 @@ var _deck_wander_timer: float = 0.0
 var _wander_dir: Vector3 = Vector3.ZERO
 
 @onready var model_container: Node3D = $ModelContainer
-@onready var placeholder_mesh: MeshInstance3D = $MeshInstance3D
-
-const ENEMY_MODEL_PATH: String = "res://assets/models/user/crew/skeleton_crew.glb"
 
 func _ready() -> void:
 	add_to_group("boarder")
@@ -37,14 +39,53 @@ func _ready() -> void:
 	_load_visual_model()
 
 func _load_visual_model() -> void:
-	if ResourceLoader.exists(ENEMY_MODEL_PATH):
-		var scene: PackedScene = load(ENEMY_MODEL_PATH) as PackedScene
-		if scene and is_instance_valid(model_container):
+	if not is_instance_valid(model_container):
+		return
+		
+	# If frontline pirate model is already present in the scene and path is default, ensure scale and ground alignment
+	if model_container.has_node("FrontlinePirate") and enemy_model_path == DEFAULT_ENEMY_MODEL_PATH:
+		var existing: Node3D = model_container.get_node("FrontlinePirate") as Node3D
+		if is_instance_valid(existing):
+			existing.scale = model_scale
+			_align_feet_to_ground(existing)
+			return
+
+	var path_to_load: String = enemy_model_path
+	if path_to_load.is_empty() or not ResourceLoader.exists(path_to_load):
+		path_to_load = DEFAULT_ENEMY_MODEL_PATH
+		
+	if ResourceLoader.exists(path_to_load):
+		for child: Node in model_container.get_children():
+			child.queue_free()
+		var scene: PackedScene = load(path_to_load) as PackedScene
+		if scene:
 			var model: Node3D = scene.instantiate() as Node3D
-			model.scale = Vector3(0.5, 0.5, 0.5)
+			model.scale = model_scale
 			model_container.add_child(model)
-			if is_instance_valid(placeholder_mesh):
-				placeholder_mesh.visible = false
+			_align_feet_to_ground(model)
+			return
+
+	# Fallback if glb is missing
+	if model_container.get_child_count() == 0 and ResourceLoader.exists(FALLBACK_RAIDER_SCENE):
+		var fallback_packed: PackedScene = load(FALLBACK_RAIDER_SCENE) as PackedScene
+		if fallback_packed:
+			var fallback_inst: Node3D = fallback_packed.instantiate() as Node3D
+			model_container.add_child(fallback_inst)
+
+func _align_feet_to_ground(model: Node3D) -> void:
+	var min_y: float = 0.0
+	var found_mesh: bool = false
+	var meshes: Array[Node] = model.find_children("*", "MeshInstance3D", true, false)
+	for m_node: Node in meshes:
+		var mi: MeshInstance3D = m_node as MeshInstance3D
+		if is_instance_valid(mi) and mi.mesh:
+			var aabb: AABB = mi.mesh.get_aabb()
+			var local_min: float = (mi.position.y + aabb.position.y) * model.scale.y
+			if not found_mesh or local_min < min_y:
+				min_y = local_min
+				found_mesh = true
+	if found_mesh and min_y < 0.0:
+		model.position.y = -min_y
 
 func start_crossing(plank: BoardingPlank, zone: BoardingZone) -> void:
 	active_plank = plank
@@ -55,6 +96,7 @@ func start_crossing(plank: BoardingPlank, zone: BoardingZone) -> void:
 	is_falling = false
 	if is_instance_valid(plank):
 		global_position = plank.get_point_along_plank(0.0)
+		_orient_along_plank(plank)
 
 func start_climbing(rope: BoardingPlank, zone: BoardingZone) -> void:
 	start_crossing(rope, zone)
@@ -80,13 +122,30 @@ func _process_climbing(delta: float) -> void:
 	var duration: float = maxf(plank.cross_duration_sec, 0.1)
 	rope_progress += delta / duration
 	global_position = plank.get_point_along_plank(rope_progress)
+	_orient_along_plank(plank)
+
+	# Dynamic running stride bobbing while crossing
+	if is_instance_valid(model_container):
+		model_container.position.y = absf(sin(rope_progress * PI * 14.0)) * 0.04
 	
 	if rope_progress >= 1.0:
 		is_on_deck = true
 		velocity = Vector3.ZERO
+		if is_instance_valid(model_container):
+			model_container.position.y = 0.0
 		if is_instance_valid(current_zone):
 			current_zone.register_boarder(self)
 			reached_deck.emit(self, current_zone)
+
+func _orient_along_plank(plank: BoardingPlank) -> void:
+	if not is_instance_valid(plank):
+		return
+	var forward_dir: Vector3 = plank.target_pos - plank.origin_pos
+	forward_dir.y = 0.0
+	if forward_dir.length_squared() > 0.001:
+		var look_target: Vector3 = global_position + forward_dir.normalized()
+		if not global_position.is_equal_approx(look_target):
+			look_at(look_target, Vector3.UP)
 
 func _process_deck_combat(delta: float) -> void:
 	_deck_wander_timer -= delta
