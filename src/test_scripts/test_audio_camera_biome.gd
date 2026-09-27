@@ -34,6 +34,7 @@ func _test_audio_manager_sfx_registration() -> void:
 	print("--- 1. Audio Asset Mapping (AudioManager.gd) ---")
 	assert_test(AudioManager != null, "AudioManager autoload singleton is active")
 	
+	@warning_ignore("UNTYPED_DECLARATION")
 	var expected_sfx = [
 		"sfx_mortar_fire",
 		"sfx_mortar_impact",
@@ -42,6 +43,7 @@ func _test_audio_manager_sfx_registration() -> void:
 		"sfx_mine_detonate"
 	]
 	
+	@warning_ignore("UNTYPED_DECLARATION")
 	for key in expected_sfx:
 		assert_test(AudioManager.sfx_library.has(key), "sfx_library contains key '%s'" % key)
 		var streams: Array = AudioManager.sfx_library.get(key, [])
@@ -58,6 +60,7 @@ func _test_music_streams_and_redundant_crossfade_guard() -> void:
 	assert_test(AudioManager.current_music_key == "music_tropical", "Current music key set to 'music_tropical'")
 	assert_test(AudioManager.current_music_player != null and AudioManager.current_music_player.playing, "Music player is actively playing")
 	
+	@warning_ignore("UNTYPED_DECLARATION")
 	var initial_player = AudioManager.current_music_player
 	
 	# Test Mandatory Rule 1: Redundant Biome Crossfade Guard
@@ -67,10 +70,12 @@ func _test_music_streams_and_redundant_crossfade_guard() -> void:
 
 func _test_level_controller_biome_transitions() -> void:
 	print("\n--- 3. Dynamic Biome Music Transition (Levels 1-45) ---")
+	@warning_ignore("UNTYPED_DECLARATION")
 	var level_ctrl = LevelController.new()
 	add_child(level_ctrl)
 	
 	# Test Level 1 (Tropical) -> music_tropical
+	@warning_ignore("UNTYPED_DECLARATION")
 	var l1_res = load("res://src/data/resources/levels/level_01.tres") as LevelData
 	if l1_res:
 		level_ctrl.load_level_resource(l1_res)
@@ -78,6 +83,7 @@ func _test_level_controller_biome_transitions() -> void:
 		assert_test(AudioManager.current_music_key == "music_tropical", "Level 1 triggered 'music_tropical'")
 		
 	# Test Level 16 (Bayou) -> music_bayou
+	@warning_ignore("UNTYPED_DECLARATION")
 	var l16_res = load("res://src/data/resources/levels/level_16.tres") as LevelData
 	if l16_res:
 		level_ctrl.load_level_resource(l16_res)
@@ -85,6 +91,7 @@ func _test_level_controller_biome_transitions() -> void:
 		assert_test(AudioManager.current_music_key == "music_bayou", "Level 16 crossfaded to 'music_bayou'")
 		
 	# Test Level 31 (Brimstone) -> music_brimstone
+	@warning_ignore("UNTYPED_DECLARATION")
 	var l31_res = load("res://src/data/resources/levels/level_31.tres") as LevelData
 	if l31_res:
 		level_ctrl.load_level_resource(l31_res)
@@ -95,6 +102,7 @@ func _test_level_controller_biome_transitions() -> void:
 
 func _test_procedural_camera_shake_matrix() -> void:
 	print("\n--- 4. Camera Shake Matrix (game_camera.gd) ---")
+	@warning_ignore("UNTYPED_DECLARATION")
 	var camera = GameCamera.new()
 	add_child(camera)
 	camera.set_harbor_mode(false)
@@ -121,21 +129,27 @@ func _test_weapon_sfx_and_camera_trauma() -> void:
 	for old_cam in get_tree().get_nodes_in_group("game_camera"):
 		old_cam.queue_free()
 	
+	@warning_ignore("UNTYPED_DECLARATION")
 	var camera = GameCamera.new()
 	add_child(camera)
 	camera._ready()
 	camera.set_harbor_mode(false)
 	
+	@warning_ignore("UNTYPED_DECLARATION")
 	var weapon_scene = load("res://src/gameplay/player/attached_weapon.tscn") as PackedScene
+	@warning_ignore("UNTYPED_DECLARATION")
 	var weapon_mount = weapon_scene.instantiate() as AttachedWeapon
+	@warning_ignore("UNTYPED_DECLARATION")
 	var socket = Node3D.new()
 	socket.name = "BowMortarMount"
 	socket.add_child(weapon_mount)
 	add_child(socket)
 	
+	@warning_ignore("UNTYPED_DECLARATION")
 	var weapon_res = load("res://src/data/resources/user_crew/weapon_bow_mortar.tres") as WeaponData
 	weapon_mount.setup_weapon(weapon_res)
 	
+	@warning_ignore("UNTYPED_DECLARATION")
 	var world_node = Node3D.new()
 	add_child(world_node)
 	
@@ -145,6 +159,7 @@ func _test_weapon_sfx_and_camera_trauma() -> void:
 	assert_test(is_equal_approx(camera.trauma, 0.25), "Mortar launch added 0.25 trauma")
 	
 	# Mortar AoE explosion
+	@warning_ignore("UNTYPED_DECLARATION")
 	var spawned_balls = []
 	for c in world_node.get_children():
 		if c is Cannonball:
@@ -158,7 +173,9 @@ func _test_weapon_sfx_and_camera_trauma() -> void:
 		assert_test(is_equal_approx(camera.trauma, 0.45), "Mortar AoE explosion nearby added 0.45 trauma")
 		
 	# Test Scattershot (Mandatory Rule 2)
+	@warning_ignore("UNTYPED_DECLARATION")
 	var scatter_weapon = weapon_scene.instantiate() as AttachedWeapon
+	@warning_ignore("UNTYPED_DECLARATION")
 	var scatter_res = load("res://src/data/resources/user_crew/weapon_scattershot.tres") as WeaponData
 	scatter_weapon.setup_weapon(scatter_res)
 	add_child(scatter_weapon)
@@ -175,11 +192,14 @@ func _test_weapon_sfx_and_camera_trauma() -> void:
 
 func _test_barricade_and_sea_mine_impacts() -> void:
 	print("\n--- 6. Barricade Ramming & Sea Mine Detonation SFX ---")
+	@warning_ignore("UNTYPED_DECLARATION")
 	var camera = GameCamera.new()
 	add_child(camera)
 	camera.set_harbor_mode(false)
 	
+	@warning_ignore("UNTYPED_DECLARATION")
 	var seg_scene = load("res://src/gameplay/obstacles/barricade_segment.tscn") as PackedScene
+	@warning_ignore("UNTYPED_DECLARATION")
 	var seg = seg_scene.instantiate() as BarricadeSegment
 	add_child(seg)
 	assert_test(seg.is_in_group("barricade"), "BarricadeSegment added to 'barricade' group")
@@ -189,7 +209,9 @@ func _test_barricade_and_sea_mine_impacts() -> void:
 	assert_test(seg._is_destroyed, "BarricadeSegment marked as destroyed")
 	
 	# Test Sea Mine detonation
+	@warning_ignore("UNTYPED_DECLARATION")
 	var mine_scene = load("res://src/gameplay/obstacles/hazard_sea_mine.tscn") as PackedScene
+	@warning_ignore("UNTYPED_DECLARATION")
 	var mine = mine_scene.instantiate() as HazardSeaMine
 	add_child(mine)
 	mine.die()

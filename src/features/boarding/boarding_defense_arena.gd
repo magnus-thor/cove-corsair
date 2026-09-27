@@ -36,6 +36,8 @@ const APPROACH_DURATION_SEC: float = 1.8
 
 @export var plank_scene: PackedScene = preload("res://src/features/boarding/boarding_plank.tscn")
 @export var boarder_scene: PackedScene = preload("res://src/features/boarding/boarder_enemy.tscn")
+@export var boarder_raider_scene: PackedScene = preload("res://src/features/boarding/enemies/boarder_raider.tscn")
+@export var boarder_brute_scene: PackedScene = preload("res://src/features/boarding/enemies/boarder_brute.tscn")
 @export var splash_scene: PackedScene = preload("res://src/vfx/hit_splash.tscn")
 
 @export var overrun_damage_per_sec: float = 5.0
@@ -426,16 +428,16 @@ func _launch_wave(wave_num: int) -> void:
 		hud.update_wave(wave_num, total_waves_to_win)
 	match wave_num:
 		1:
-			launch_plank_to_zone(1) # Midship
+			launch_plank_to_zone(1, wave_num) # Midship
 		2:
-			launch_plank_to_zone(0) # Bow
-			launch_plank_to_zone(2) # Stern
+			launch_plank_to_zone(0, wave_num) # Bow
+			launch_plank_to_zone(2, wave_num) # Stern
 		3:
-			launch_plank_to_zone(0) # Bow
-			launch_plank_to_zone(1) # Midship
-			launch_plank_to_zone(2) # Stern
+			launch_plank_to_zone(0, wave_num) # Bow
+			launch_plank_to_zone(1, wave_num) # Midship
+			launch_plank_to_zone(2, wave_num) # Stern
 
-func launch_plank_to_zone(zone_index: int) -> void:
+func launch_plank_to_zone(zone_index: int, wave_num: int = 1) -> void:
 	if debug_disable_spawns:
 		return
 
@@ -452,18 +454,37 @@ func launch_plank_to_zone(zone_index: int) -> void:
 	plank.setup_plank(start_marker.global_position, anchor_pos, target_zone)
 	total_planks_launched += 1
 	
-	_spawn_plank_swarm(plank, target_zone, 3)
+	_spawn_plank_swarm(plank, target_zone, 3, wave_num)
 
-func _spawn_plank_swarm(plank: BoardingPlank, zone: BoardingZone, count: int) -> void:
+func _spawn_plank_swarm(plank: BoardingPlank, zone: BoardingZone, count: int, wave_num: int = 1) -> void:
 	for i: int in count:
 		await get_tree().create_timer(i * 1.05).timeout
 		if not is_instance_valid(plank) or not plank.is_latched:
 			break
-		if not is_instance_valid(boarder_scene):
+		var chosen_scene: PackedScene = _get_enemy_scene_for_swarm(wave_num, i)
+		if not is_instance_valid(chosen_scene):
+			chosen_scene = boarder_scene
+		if not is_instance_valid(chosen_scene):
 			break
-		var enemy: BoarderEnemy = boarder_scene.instantiate() as BoarderEnemy
+		var enemy: BoarderEnemy = chosen_scene.instantiate() as BoarderEnemy
 		add_child(enemy)
 		enemy.start_crossing(plank, zone)
+
+func _get_enemy_scene_for_swarm(wave_num: int, swarm_index: int) -> PackedScene:
+	var raider_scn: PackedScene = boarder_raider_scene if is_instance_valid(boarder_raider_scene) else boarder_scene
+	var brute_scn: PackedScene = boarder_brute_scene if is_instance_valid(boarder_brute_scene) else boarder_scene
+
+	match wave_num:
+		1:
+			return raider_scn
+		2:
+			if swarm_index == 2:
+				return brute_scn
+			return raider_scn
+		_:
+			if swarm_index % 2 == 1:
+				return brute_scn
+			return raider_scn
 
 func _damage_vessel_hull(amount: float) -> void:
 	var player: PlayerSwerve = get_tree().get_first_node_in_group("player") as PlayerSwerve

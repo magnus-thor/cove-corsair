@@ -1,5 +1,11 @@
 extends Node3D
 
+@warning_ignore("untyped_declaration")
+@warning_ignore("unsafe_property_access")
+@warning_ignore("unsafe_method_access")
+@warning_ignore("unsafe_cast")
+@warning_ignore("unused_variable")
+
 ## Integration & Unit Test Harness for the 3-Zone Deck Defense Boarding System.
 ## Validates ropes, catenary curves, boarder climbing, zone infestation,
 ## player weapons, and automated crew synergies.
@@ -147,9 +153,50 @@ func _test_boarder_climbing_and_fall() -> void:
 	enemy_b._process_crossing(0.1) # Ticks fall
 	assert(enemy_b.is_falling, "Enemy must transition to is_falling when plank is severed")
 	
+	# Case C: Standalone deck placement without plank (e.g. Free Roam / Event)
+	var enemy_c: BoarderEnemy = enemy_scene.instantiate() as BoarderEnemy
+	add_child(enemy_c)
+	@warning_ignore("unsafe_method_access")
+	enemy_c.spawn_on_deck(Vector3(0.0, 1.0, 0.0), null)
+	assert(enemy_c.is_on_deck, "Enemy spawned on deck must be immediately on deck")
+	assert(not enemy_c.is_falling, "Enemy spawned on deck must not fall")
+	enemy_c._physics_process(0.1) # Ticks free roam movement
+	assert(not enemy_c.is_falling, "Standalone enemy without plank must not fall overboard")
+	
+	# Case D: Archetype scene variants (Raider vs Brute)
+	var raider_scene: PackedScene = load("res://src/features/boarding/enemies/boarder_raider.tscn") as PackedScene
+	assert(raider_scene != null, "boarder_raider.tscn must exist")
+	var raider: BoarderEnemy = raider_scene.instantiate() as BoarderEnemy
+	add_child(raider)
+	assert(raider.archetype_name == "Raider", "Raider archetype name must be Raider")
+	assert(raider.max_hp == 25.0, "Raider HP must be 25.0")
+	assert(raider.infestation_weight == 1.0, "Raider infestation weight must be 1.0")
+
+	var brute_scene: PackedScene = load("res://src/features/boarding/enemies/boarder_brute.tscn") as PackedScene
+	assert(brute_scene != null, "boarder_brute.tscn must exist")
+	var brute: BoarderEnemy = brute_scene.instantiate() as BoarderEnemy
+	add_child(brute)
+	assert(brute.archetype_name == "Brute", "Brute archetype name must be Brute")
+	assert(brute.max_hp == 70.0, "Brute HP must be 70.0")
+	assert(brute.infestation_weight == 2.5, "Brute infestation weight must be 2.5")
+	assert(brute.cross_speed_mult < 1.0, "Brute cross speed must be slower than standard")
+
+	# Test Brute heavier infestation weight in zone
+	var test_zone_brute: BoardingZone = BoardingZone.new()
+	test_zone_brute.max_infestation = 100.0
+	test_zone_brute.infestation_per_enemy_per_sec = 10.0
+	add_child(test_zone_brute)
+	test_zone_brute.register_boarder(brute)
+	test_zone_brute._process(1.0) # 1 sec * 10 rate * 2.5 weight = 25.0
+	assert(is_equal_approx(test_zone_brute.current_infestation, 25.0), "Brute must cause 25 infestation in 1s with weight 2.5 (got %f)" % test_zone_brute.current_infestation)
+
+	enemy_c.queue_free()
+	raider.queue_free()
+	brute.queue_free()
+	test_zone_brute.queue_free()
 	enemy_a.queue_free()
 	zone.queue_free()
-	print("[PASS] Boarder climbing progression and mid-climb fall verified.")
+	print("[PASS] Boarder climbing progression, standalone placement, and archetype variants verified.")
 
 func _test_player_weapons_and_targeting() -> void:
 	print("--- 4. Testing Deck Player Weapons & Targeting ---")
@@ -178,7 +225,7 @@ func _test_player_weapons_and_targeting() -> void:
 	plank.setup_plank(Vector3(5, 1, 0), Vector3(0, 1, 0), dummy_zone)
 	
 	player.current_target_node = plank
-	var plank_hp_before: float = plank.current_health
+	var _plank_hp_before: float = plank.current_health
 	player.fire_heavy_breaker()
 	assert(plank.current_health <= 0.0 or plank.is_queued_for_deletion(), "Heavy Breaker must deal lethal 35 damage to 30 HP plank")
 	

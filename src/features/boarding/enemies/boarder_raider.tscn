@@ -1,0 +1,30 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://src/features/boarding/boarder_enemy.gd" id="1_enemy_script"]
+[ext_resource type="PackedScene" path="res://assets/models/enemy/crew/frontline_pirate.glb" id="2_frontline_pirate"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_raider"]
+radius = 0.35
+height = 1.2
+
+[node name="BoarderRaider" type="CharacterBody3D"]
+collision_layer = 4
+collision_mask = 3
+script = ExtResource("1_enemy_script")
+archetype_name = "Raider"
+max_hp = 25.0
+deck_wander_speed = 2.6
+cross_speed_mult = 1.0
+infestation_weight = 1.0
+impact_sfx = "barrel_hits"
+death_sfx = "barrel_breaks"
+model_scale = Vector3(0.55, 0.55, 0.55)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+shape = SubResource("CapsuleShape3D_raider")
+
+[node name="ModelContainer" type="Node3D" parent="."]
+
+[node name="FrontlinePirate" parent="ModelContainer" instance=ExtResource("2_frontline_pirate")]
+transform = Transform3D(0.55, 0, 0, 0, 0.55, 0, 0, 0, 0.55, 0, 0.5232, 0)

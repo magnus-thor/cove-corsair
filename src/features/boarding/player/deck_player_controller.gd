@@ -95,7 +95,7 @@ func _update_timers(delta: float) -> void:
 		heavy_timer = maxf(heavy_timer - delta, 0.0)
 		cooldown_updated.emit(heavy_timer, axe_cooldown)
 
-func _update_movement(delta: float) -> void:
+func _update_movement(_delta: float) -> void:
 	if not is_moving_to_station:
 		return
 		

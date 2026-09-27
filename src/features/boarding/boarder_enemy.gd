@@ -1,17 +1,36 @@
 class_name BoarderEnemy
 extends CharacterBody3D
 
-## Swarmer enemy unit that traverses a boarding plank, lands in a ship zone,
-## drives zone infestation, and falls overboard if their plank is severed.
+## Enemy crew unit capable of crossing boarding planks, fighting on deck,
+## driving zone infestation, or functioning in standalone/free-roam encounters.
 
 signal died(enemy: BoarderEnemy)
 signal reached_deck(enemy: BoarderEnemy, zone: BoardingZone)
 
+enum BoarderState {
+	CROSSING,
+	ON_DECK,
+	FREE_ROAM,
+	FALLING,
+	DEAD
+}
+
 const DEFAULT_ENEMY_MODEL_PATH: String = "res://assets/models/enemy/crew/frontline_pirate.glb"
 const FALLBACK_RAIDER_SCENE: String = "res://src/features/boarding/enemies/pirate_raider_visual.tscn"
 
+@export_group("Archetype & Stats")
+@export var archetype_name: String = "Raider"
 @export var max_hp: float = 25.0
 @export var deck_wander_speed: float = 2.5
+@export var cross_speed_mult: float = 1.0
+@export var infestation_weight: float = 1.0
+@export var start_on_deck: bool = false
+
+@export_group("Audio Feedback")
+@export var impact_sfx: String = "barrel_hits"
+@export var death_sfx: String = "barrel_breaks"
+
+@export_group("Visuals")
 @export var enemy_model_path: String = DEFAULT_ENEMY_MODEL_PATH
 @export var model_scale: Vector3 = Vector3(0.55, 0.55, 0.55)
 
@@ -19,13 +38,16 @@ var current_hp: float = 25.0
 var active_plank: BoardingPlank = null
 var active_rope: BoardingPlank = null # Backward compatibility alias
 var current_zone: BoardingZone = null
+
+var current_state: BoarderState = BoarderState.CROSSING
+var is_on_deck: bool = false
+var is_falling: bool = false
+
 var rope_progress: float = 0.0:
 	set(val):
 		rope_progress = val
 		plank_progress = val
 var plank_progress: float = 0.0
-var is_on_deck: bool = false
-var is_falling: bool = false
 
 var _deck_wander_timer: float = 0.0
 var _wander_dir: Vector3 = Vector3.ZERO
@@ -37,14 +59,20 @@ func _ready() -> void:
 	add_to_group("enemies")
 	current_hp = max_hp
 	_load_visual_model()
+	
+	if start_on_deck:
+		current_state = BoarderState.FREE_ROAM
+		is_on_deck = true
+		is_falling = false
 
 func _load_visual_model() -> void:
 	if not is_instance_valid(model_container):
 		return
 		
-	# If frontline pirate model is already present in the scene and path is default, ensure scale and ground alignment
-	if model_container.has_node("FrontlinePirate") and enemy_model_path == DEFAULT_ENEMY_MODEL_PATH:
-		var existing: Node3D = model_container.get_node("FrontlinePirate") as Node3D
+	# If a visual model is already instantiated as a child node (e.g. in an inherited scene or custom prefab),
+	# reuse it directly, apply scaling, and align feet without tearing it down.
+	if model_container.get_child_count() > 0:
+		var existing: Node3D = model_container.get_child(0) as Node3D
 		if is_instance_valid(existing):
 			existing.scale = model_scale
 			_align_feet_to_ground(existing)
@@ -88,6 +116,7 @@ func _align_feet_to_ground(model: Node3D) -> void:
 		model.position.y = -min_y
 
 func start_crossing(plank: BoardingPlank, zone: BoardingZone) -> void:
+	current_state = BoarderState.CROSSING
 	active_plank = plank
 	active_rope = plank
 	current_zone = zone
@@ -101,14 +130,31 @@ func start_crossing(plank: BoardingPlank, zone: BoardingZone) -> void:
 func start_climbing(rope: BoardingPlank, zone: BoardingZone) -> void:
 	start_crossing(rope, zone)
 
-func _physics_process(delta: float) -> void:
-	if is_falling:
-		return
-		
-	if not is_on_deck:
-		_process_climbing(delta)
+func spawn_on_deck(deck_pos: Vector3, zone: BoardingZone = null) -> void:
+	global_position = deck_pos
+	active_plank = null
+	active_rope = null
+	rope_progress = 1.0
+	current_zone = zone
+	is_falling = false
+	is_on_deck = true
+	if is_instance_valid(zone):
+		current_state = BoarderState.ON_DECK
+		zone.register_boarder(self)
+		reached_deck.emit(self, zone)
 	else:
-		_process_deck_combat(delta)
+		current_state = BoarderState.FREE_ROAM
+
+func _physics_process(delta: float) -> void:
+	match current_state:
+		BoarderState.FALLING, BoarderState.DEAD:
+			return
+		BoarderState.CROSSING:
+			_process_climbing(delta)
+		BoarderState.ON_DECK:
+			_process_deck_combat(delta)
+		BoarderState.FREE_ROAM:
+			_process_free_roam(delta)
 
 func _process_crossing(delta: float) -> void:
 	_process_climbing(delta)
@@ -119,7 +165,8 @@ func _process_climbing(delta: float) -> void:
 		_fall_overboard()
 		return
 		
-	var duration: float = maxf(plank.cross_duration_sec, 0.1)
+	var base_dur: float = plank.cross_duration_sec
+	var duration: float = maxf(base_dur / maxf(cross_speed_mult, 0.1), 0.1)
 	rope_progress += delta / duration
 	global_position = plank.get_point_along_plank(rope_progress)
 	_orient_along_plank(plank)
@@ -129,6 +176,7 @@ func _process_climbing(delta: float) -> void:
 		model_container.position.y = absf(sin(rope_progress * PI * 14.0)) * 0.04
 	
 	if rope_progress >= 1.0:
+		current_state = BoarderState.ON_DECK
 		is_on_deck = true
 		velocity = Vector3.ZERO
 		if is_instance_valid(model_container):
@@ -154,7 +202,7 @@ func _process_deck_combat(delta: float) -> void:
 		var angle: float = randf_range(0.0, TAU)
 		_wander_dir = Vector3(cos(angle), 0.0, sin(angle)).normalized()
 	
-	# Stay anchored around zone area
+	# Stay anchored around zone area if assigned
 	if is_instance_valid(current_zone) and is_instance_valid(current_zone.station_marker):
 		var to_zone: Vector3 = current_zone.station_marker.global_position - global_position
 		if to_zone.length() > 3.0:
@@ -169,32 +217,53 @@ func _process_deck_combat(delta: float) -> void:
 		if not global_position.is_equal_approx(look_pt):
 			look_at(look_pt, Vector3.UP)
 
+func _process_free_roam(delta: float) -> void:
+	_deck_wander_timer -= delta
+	if _deck_wander_timer <= 0.0:
+		_deck_wander_timer = randf_range(1.5, 3.5)
+		var angle: float = randf_range(0.0, TAU)
+		_wander_dir = Vector3(cos(angle), 0.0, sin(angle)).normalized()
+
+	velocity = _wander_dir * deck_wander_speed
+	move_and_slide()
+
+	var flat_vel: Vector3 = Vector3(velocity.x, 0.0, velocity.z)
+	if flat_vel.length_squared() > 0.05:
+		var look_pt: Vector3 = global_position + flat_vel
+		if not global_position.is_equal_approx(look_pt):
+			look_at(look_pt, Vector3.UP)
+
 func take_damage(amount: float) -> void:
-	if is_falling or current_hp <= 0.0:
+	if current_state == BoarderState.FALLING or current_state == BoarderState.DEAD or current_hp <= 0.0:
 		return
 	current_hp -= amount
 	
 	# Visual & Audio hit feedback
 	HitFlashComponent.flash_node(self, 0.08)
-	if AudioManager and AudioManager.has_method("play_sfx"):
-		AudioManager.play_sfx("barrel_hits", 1.0, 1.25)
+	if AudioManager and AudioManager.has_method("play_sfx") and not impact_sfx.is_empty():
+		AudioManager.play_sfx(impact_sfx, 1.0, 1.25)
 	_spawn_damage_text(int(round(amount)))
 	
 	if current_hp <= 0.0:
 		die()
 
 func die() -> void:
-	if AudioManager and AudioManager.has_method("play_sfx"):
-		AudioManager.play_sfx("barrel_breaks", 1.0, 1.2)
+	if current_state == BoarderState.DEAD:
+		return
+	current_state = BoarderState.DEAD
+	if AudioManager and AudioManager.has_method("play_sfx") and not death_sfx.is_empty():
+		AudioManager.play_sfx(death_sfx, 1.0, 1.2)
 	if is_instance_valid(current_zone):
 		current_zone.unregister_boarder(self)
 	died.emit(self)
 	queue_free()
 
 func _fall_overboard() -> void:
-	if is_falling:
+	if current_state == BoarderState.FALLING or current_state == BoarderState.DEAD:
 		return
+	current_state = BoarderState.FALLING
 	is_falling = true
+	is_on_deck = false
 	set_physics_process(false)
 	
 	if is_instance_valid(current_zone):

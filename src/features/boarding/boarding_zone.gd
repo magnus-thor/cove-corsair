@@ -31,9 +31,17 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	_clean_invalid_entries()
 	
-	var boarder_count: int = active_boarders.size()
-	if boarder_count > 0:
-		var delta_infest: float = float(boarder_count) * infestation_per_enemy_per_sec * delta
+	var total_infest_weight: float = 0.0
+	for b: Node3D in active_boarders:
+		if is_instance_valid(b):
+			var w_val: Variant = b.get("infestation_weight")
+			if w_val != null:
+				total_infest_weight += float(w_val)
+			else:
+				total_infest_weight += 1.0
+
+	if total_infest_weight > 0.0:
+		var delta_infest: float = total_infest_weight * infestation_per_enemy_per_sec * delta
 		current_infestation = minf(current_infestation + delta_infest, max_infestation)
 	elif current_infestation > 0.0:
 		current_infestation = maxf(current_infestation - (recovery_per_sec * delta), 0.0)

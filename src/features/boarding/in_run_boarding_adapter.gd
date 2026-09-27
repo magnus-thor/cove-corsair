@@ -66,7 +66,7 @@ func start_in_run_boarding(boss: Node3D, player: Node3D) -> void:
 	active_arena.encounter_won.connect(_on_arena_won)
 	active_arena.encounter_lost.connect(_on_arena_lost)
 
-	boarding_started.emit(active_boss.name if is_instance_valid(active_boss) else "")
+	boarding_started.emit(String(active_boss.name) if is_instance_valid(active_boss) else "")
 
 
 func _apply_biome_to_arena() -> void:
@@ -74,11 +74,13 @@ func _apply_biome_to_arena() -> void:
 		return
 	var b_name: String = ""
 	if GameState and GameState.has_method("get_current_level_resource"):
-		var lres: Variant = GameState.get_current_level_resource()
-		if lres and "biome_name" in lres and str(lres.get("biome_name")) != "":
-			b_name = str(lres.get("biome_name"))
-		elif lres and "biome" in lres and str(lres.get("biome")) != "":
-			b_name = str(lres.get("biome"))
+		var lres: Resource = GameState.get_current_level_resource() as Resource
+		if is_instance_valid(lres):
+			var res_obj: Object = lres as Object
+			if "biome_name" in res_obj and not str(res_obj.get("biome_name")).is_empty():
+				b_name = str(res_obj.get("biome_name"))
+			elif "biome" in res_obj and not str(res_obj.get("biome")).is_empty():
+				b_name = str(res_obj.get("biome"))
 	if b_name != "":
 		active_arena.apply_biome_visuals(b_name)
 
@@ -251,8 +253,11 @@ func _on_arena_won() -> void:
 
 
 func _on_arena_lost() -> void:
-	if is_instance_valid(active_player) and active_player.has_method("game_over"):
-		active_player.game_over(false)
+	if is_instance_valid(active_player):
+		if active_player is PlayerSwerve:
+			(active_player as PlayerSwerve).game_over(false)
+		elif active_player.has_method("game_over"):
+			active_player.call("game_over", false)
 	elif EventBus and EventBus.has_signal("player_sunk"):
 		EventBus.player_sunk.emit()
 
