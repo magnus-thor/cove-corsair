@@ -135,9 +135,14 @@ func _test_boarder_climbing_and_fall() -> void:
 	
 	assert(enemy_a.is_in_group("boarder"), "Enemy must belong to 'boarder' group")
 	assert(not enemy_a.is_on_deck, "Enemy must not be on deck at start of climb")
+	assert(enemy_a.anim_player != null, "BoarderEnemy must have AnimationPlayer configured")
+	assert(enemy_a.anim_player.has_animation("Walking"), "AnimationPlayer must contain 'Walking'")
+	assert(enemy_a.anim_player.has_animation("Running"), "AnimationPlayer must contain 'Running'")
+	assert(enemy_a.anim_player.has_animation("Attack"), "AnimationPlayer must contain 'Attack'")
+	assert(enemy_a.anim_player.has_animation("Dead"), "AnimationPlayer must contain 'Dead'")
 	
-	# Advance climbing by 4 seconds (rope climb duration is 3.5s)
-	enemy_a._process_climbing(4.0)
+	# Advance climbing by 6.0 seconds (cross duration is 4.2s with cross speed)
+	enemy_a._process_climbing(6.0)
 	assert(enemy_a.is_on_deck, "Enemy must reach deck after climb duration completes")
 	assert(zone.active_boarders.has(enemy_a), "Zone must register enemy when landed on deck")
 	
@@ -169,7 +174,7 @@ func _test_boarder_climbing_and_fall() -> void:
 	var raider: BoarderEnemy = raider_scene.instantiate() as BoarderEnemy
 	add_child(raider)
 	assert(raider.archetype_name == "Raider", "Raider archetype name must be Raider")
-	assert(raider.max_hp == 25.0, "Raider HP must be 25.0")
+	assert(raider.max_hp == 18.0, "Raider HP must be 18.0")
 	assert(raider.infestation_weight == 1.0, "Raider infestation weight must be 1.0")
 
 	var brute_scene: PackedScene = load("res://src/features/boarding/enemies/boarder_brute.tscn") as PackedScene
@@ -225,14 +230,74 @@ func _test_player_weapons_and_targeting() -> void:
 	plank.setup_plank(Vector3(5, 1, 0), Vector3(0, 1, 0), dummy_zone)
 	
 	player.current_target_node = plank
-	var _plank_hp_before: float = plank.current_health
 	player.fire_heavy_breaker()
 	assert(plank.current_health <= 0.0 or plank.is_queued_for_deletion(), "Heavy Breaker must deal lethal 35 damage to 30 HP plank")
 	
+	# Test Clicking Plank positions crew at deck connection point without damaging plank
+	var plank2: BoardingPlank = plank_scene.instantiate() as BoardingPlank
+	add_child(plank2)
+	var deck_zone: BoardingZone = BoardingZone.new()
+	var station_mark: Marker3D = Marker3D.new()
+	station_mark.position = Vector3(1.2, 0.0, 0.5)
+	deck_zone.add_child(station_mark)
+	deck_zone.station_marker = station_mark
+	add_child(deck_zone)
+	plank2.setup_plank(Vector3(6.0, 1.0, 0.5), Vector3(1.8, 1.0, 0.5), deck_zone)
+	
+	var hp_plank2_before: float = plank2.current_health
+	player._on_target_acquired(plank2, Vector3(4.0, 1.0, 0.5))
+	assert(plank2.current_health == hp_plank2_before, "Clicking plank must NOT damage or sever plank")
+	assert(player.selected_plank == plank2, "Clicking plank must set selected_plank on crew defender")
+	assert(is_equal_approx(player.global_position.x, player.initial_deck_position.x), "Crew member must stay in the same place always")
+	
+	plank2.queue_free()
+	deck_zone.queue_free()
 	target_enemy.queue_free()
+	player.select_plank(null)
+
+	# Test Crew turns towards targeted spot while staying in place always
+	var initial_crew_pos: Vector3 = player.global_position
+	player._on_target_acquired(null, Vector3(1.5, 0.0, -1.0))
+	player._physics_process(0.1)
+	assert(player.global_position.is_equal_approx(initial_crew_pos), "Crew member must remain in the same place always")
+	assert(player.aim_target_point.is_equal_approx(Vector3(1.5, 0.0, -1.0)), "Crew member must face targeted spot")
+	
+	# Test Auto-Attack on Nearest Boarder
+	var auto_target: BoarderEnemy = enemy_scene.instantiate() as BoarderEnemy
+	add_child(auto_target)
+	auto_target.spawn_on_deck(player.global_position + Vector3(0.0, 0.0, 2.0), null)
+	var hp_before_auto: float = auto_target.current_hp
+	player.auto_attack_timer = 0.0
+	player._process_auto_attack(0.1)
+	assert(auto_target.current_hp < hp_before_auto, "Crew auto-attack must automatically damage nearest boarder within range")
+	
+	# Test Crew Special Attacks (Bomber AoE, Sniper Pierce, Swordsman Cleave, Mechanic Tar)
+	player.setup_defender_model("monkey_bomber")
+	assert(player.crew_role == "bomber", "Crew role must be bomber")
+	player.special_timer = 0.0
+	player.fire_special_attack()
+	assert(player.special_timer > 0.0, "Bomber special attack must trigger cooldown")
+	
+	player.setup_defender_model("deckhand_sniper")
+	assert(player.crew_role == "sniper", "Crew role must be sniper")
+	player.special_timer = 0.0
+	player.fire_special_attack()
+	assert(player.special_timer > 0.0, "Sniper special attack must trigger cooldown")
+	
+	# Test Boarder approaching and attacking crew member
+	var attacker: BoarderEnemy = enemy_scene.instantiate() as BoarderEnemy
+	add_child(attacker)
+	attacker.spawn_on_deck(player.global_position + Vector3(0.0, 0.0, 1.0), null) # Within 1.35m attack range
+	attacker._attack_timer = 0.0
+	var player_hp_before: float = player.current_health
+	attacker._process_deck_combat(0.1)
+	assert(player.current_health < player_hp_before, "Boarder must damage crew defender in melee range")
+	attacker.queue_free()
+	
+	auto_target.queue_free()
 	dummy_zone.queue_free()
 	player.queue_free()
-	print("[PASS] Blunderbuss conical cleave and Heavy Breaker axe mechanics verified.")
+	print("[PASS] Blunderbuss, Heavy Breaker, Tap-to-Move, Auto-Attack, and Crew Special Attacks verified.")
 
 func _test_crew_station_roles() -> void:
 	print("--- 5. Testing Automated Crew Station Roles ---")
@@ -300,5 +365,23 @@ func _test_defense_arena_orchestration() -> void:
 	assert(not arena.is_approaching, "Approach must be complete after docking")
 	assert(arena.total_planks_launched == 3, "Docking sequence must launch 3 boarding planks into Bow, Midship, Stern (got %d)" % arena.total_planks_launched)
 	
+	# 4. Verify Boss Tier 1 2-Plank Mode
+	var arena_tier1: BoardingDefenseArena = arena_scene.instantiate() as BoardingDefenseArena
+	add_child(arena_tier1)
+	arena_tier1.boss_tier = 1
+	arena_tier1.debug_disable_spawns = false
+	arena_tier1._on_docking_complete()
+	assert(arena_tier1.total_planks_launched == 2, "Boss Tier 1 must launch exactly 2 planks from the start (got %d)" % arena_tier1.total_planks_launched)
+	
+	# 5. Verify Stern Breach triggers Encounter Lost
+	var test_enemy: BoarderEnemy = BoarderEnemy.new()
+	arena_tier1.add_child(test_enemy)
+	var lost_emitted: Array[bool] = [false]
+	arena_tier1.encounter_lost.connect(func() -> void: lost_emitted[0] = true)
+	arena_tier1._on_enemy_breached_stern(test_enemy)
+	assert(lost_emitted[0], "Stern breach must immediately trigger encounter_lost")
+	
+	test_enemy.queue_free()
+	arena_tier1.queue_free()
 	arena.queue_free()
-	print("[PASS] BoardingDefenseArena deck elevation, camera, and docking sequence verified.")
+	print("[PASS] BoardingDefenseArena deck elevation, camera, single-plank scaling, and stern breach verified.")

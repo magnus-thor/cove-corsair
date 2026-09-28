@@ -44,12 +44,15 @@ const APPROACH_DURATION_SEC: float = 1.8
 @export var total_waves_to_win: int = 3
 @export var wave_interval_sec: float = 8.0
 @export var debug_disable_spawns: bool = false
+@export var boss_tier: int = 0 # 0 = default/test broadside, 1 = Level 15 (1 plank), 2 = Level 30 (2 planks), 3 = Level 45 (3 planks)
+@export var single_plank_mode: bool = false
 
 var zones: Array[BoardingZone] = []
 var current_wave: int = 0
 var wave_timer: float = 3.0 # Initial grace period
 var is_encounter_active: bool = true
 var total_planks_launched: int = 0
+var active_spawners_count: int = 0
 var is_approaching: bool = true
 var approach_tween: Tween = null
 
@@ -67,8 +70,14 @@ func _ready() -> void:
 		encounter_won.connect(hud.show_victory)
 		encounter_lost.connect(hud.show_defeat)
 		hud.update_wave(1, total_waves_to_win)
+		if is_instance_valid(player_controller):
+			hud.special_attack_requested.connect(player_controller.fire_special_attack)
+			player_controller.special_cooldown_updated.connect(hud.update_special_cooldown)
+			player_controller.crew_role_changed.connect(hud.set_special_ability_name)
+			hud.set_special_ability_name(player_controller.crew_role, player_controller.special_ability_name)
 			
 	if is_instance_valid(player_controller):
+		player_controller.player_defeated.connect(_on_crew_defeated)
 		player_controller.station_markers = {
 			"bow": zone_bow.station_marker if is_instance_valid(zone_bow) else null,
 			"midship": zone_midship.station_marker if is_instance_valid(zone_midship) else null,
@@ -264,10 +273,26 @@ func _launch_initial_planks() -> void:
 	current_wave = 1
 	if is_instance_valid(hud):
 		hud.update_wave(current_wave, total_waves_to_win)
-	launch_plank_to_zone(0) # Bow
-	launch_plank_to_zone(1) # Midship
-	launch_plank_to_zone(2) # Stern
+	if boss_tier == 1 or single_plank_mode:
+		# 2 planks from the start (Bow and Stern), with staggered swarm spawn
+		launch_plank_to_zone(0, current_wave, 0.0)
+		launch_plank_to_zone(2, current_wave, 3.2)
+	elif boss_tier == 2:
+		launch_plank_to_zone(0, current_wave, 0.0)
+		launch_plank_to_zone(2, current_wave, 3.2)
+	else:
+		launch_plank_to_zone(0, current_wave, 0.0)
+		launch_plank_to_zone(1, current_wave, 2.5)
+		launch_plank_to_zone(2, current_wave, 5.0)
+		
+	call_deferred("_select_initial_plank")
 	wave_timer = wave_interval_sec
+
+func _select_initial_plank() -> void:
+	if is_instance_valid(zone_bow) and not zone_bow.active_planks.is_empty():
+		var p: BoardingPlank = zone_bow.active_planks[0] as BoardingPlank
+		if is_instance_valid(p) and is_instance_valid(player_controller):
+			player_controller.select_plank(p)
 
 func setup_enemy_vessel(boss_name: String = "") -> void:
 	if not is_instance_valid(enemy_ship_container):
@@ -405,39 +430,63 @@ func _process_overrun_attrition(delta: float) -> void:
 			_damage_vessel_hull(overrun_damage_per_sec * delta)
 
 func _process_wave_director(delta: float) -> void:
-	if is_approaching or debug_disable_spawns:
+	if is_approaching or debug_disable_spawns or not is_encounter_active:
 		return
 		
-	wave_timer -= delta
-	if wave_timer <= 0.0:
-		if current_wave < total_waves_to_win:
+	if current_wave < total_waves_to_win:
+		wave_timer -= delta
+		if wave_timer <= 0.0:
 			current_wave += 1
 			_launch_wave(current_wave)
 			wave_timer = wave_interval_sec
-		else:
-			# Check victory: all waves launched, no active planks, no active boarders
-			var planks: Array[Node] = get_tree().get_nodes_in_group("boarding_plank")
-			if planks.is_empty():
-				planks = get_tree().get_nodes_in_group("grapple_rope")
-			var boarders: Array[Node] = get_tree().get_nodes_in_group("boarder")
-			if planks.is_empty() and boarders.is_empty():
-				_trigger_victory()
+	else:
+		_check_victory_condition()
+
+func _check_victory_condition() -> void:
+	if not is_encounter_active:
+		return
+	if current_wave < total_waves_to_win or active_spawners_count > 0:
+		return
+		
+	var living_boarders: int = 0
+	for node: Node in get_tree().get_nodes_in_group("boarder"):
+		var enemy: BoarderEnemy = node as BoarderEnemy
+		if is_instance_valid(enemy) and not enemy.is_queued_for_deletion() and not enemy.is_dead and not enemy.is_falling:
+			living_boarders += 1
+			
+	if living_boarders == 0:
+		_trigger_victory()
 
 func _launch_wave(wave_num: int) -> void:
 	if is_instance_valid(hud):
 		hud.update_wave(wave_num, total_waves_to_win)
-	match wave_num:
-		1:
-			launch_plank_to_zone(1, wave_num) # Midship
-		2:
-			launch_plank_to_zone(0, wave_num) # Bow
-			launch_plank_to_zone(2, wave_num) # Stern
-		3:
-			launch_plank_to_zone(0, wave_num) # Bow
-			launch_plank_to_zone(1, wave_num) # Midship
-			launch_plank_to_zone(2, wave_num) # Stern
+	if boss_tier == 1 or single_plank_mode:
+		if wave_num % 2 == 1:
+			launch_plank_to_zone(0, wave_num, 0.0)
+			launch_plank_to_zone(2, wave_num, 3.2)
+		else:
+			launch_plank_to_zone(2, wave_num, 0.0)
+			launch_plank_to_zone(0, wave_num, 3.2)
+	elif boss_tier == 2:
+		if wave_num % 2 == 1:
+			launch_plank_to_zone(0, wave_num, 0.0)
+			launch_plank_to_zone(2, wave_num, 3.2)
+		else:
+			launch_plank_to_zone(2, wave_num, 0.0)
+			launch_plank_to_zone(0, wave_num, 3.2)
+	else:
+		match wave_num:
+			1:
+				launch_plank_to_zone(1, wave_num, 0.0)
+			2:
+				launch_plank_to_zone(0, wave_num, 0.0)
+				launch_plank_to_zone(2, wave_num, 3.0)
+			3:
+				launch_plank_to_zone(0, wave_num, 0.0)
+				launch_plank_to_zone(1, wave_num, 2.5)
+				launch_plank_to_zone(2, wave_num, 5.0)
 
-func launch_plank_to_zone(zone_index: int, wave_num: int = 1) -> void:
+func launch_plank_to_zone(zone_index: int, wave_num: int = 1, spawn_delay_sec: float = 0.0) -> void:
 	if debug_disable_spawns:
 		return
 
@@ -448,18 +497,46 @@ func launch_plank_to_zone(zone_index: int, wave_num: int = 1) -> void:
 	if not is_instance_valid(plank_scene) or not is_instance_valid(start_marker) or not is_instance_valid(target_zone):
 		return
 		
+	# If zone already has an active latched plank, reuse it for the new swarm instead of duplicating
+	var existing_plank: BoardingPlank = null
+	for p: Node3D in target_zone.active_planks:
+		if is_instance_valid(p) and p is BoardingPlank and (p as BoardingPlank).is_latched:
+			existing_plank = p as BoardingPlank
+			break
+			
+	var count: int = _get_swarm_count_for_tier(wave_num)
+	if is_instance_valid(existing_plank):
+		_spawn_plank_swarm(existing_plank, target_zone, count, wave_num, spawn_delay_sec)
+		return
+
 	var plank: BoardingPlank = plank_scene.instantiate() as BoardingPlank
 	add_child(plank)
 	var anchor_pos: Vector3 = target_zone.plank_anchor.global_position if is_instance_valid(target_zone.plank_anchor) else target_zone.grapple_anchor.global_position
 	plank.setup_plank(start_marker.global_position, anchor_pos, target_zone)
 	total_planks_launched += 1
 	
-	_spawn_plank_swarm(plank, target_zone, 3, wave_num)
+	_spawn_plank_swarm(plank, target_zone, count, wave_num, spawn_delay_sec)
 
-func _spawn_plank_swarm(plank: BoardingPlank, zone: BoardingZone, count: int, wave_num: int = 1) -> void:
+func _get_swarm_count_for_tier(wave_num: int) -> int:
+	if boss_tier <= 1 or single_plank_mode:
+		# Early levels: 1 enemy per plank for waves 1-2, 2 for final wave
+		if wave_num <= 2:
+			return 1
+		return 2
+	elif boss_tier == 2:
+		return 2
+	else:
+		return 3
+
+func _spawn_plank_swarm(plank: BoardingPlank, zone: BoardingZone, count: int, wave_num: int = 1, initial_delay_sec: float = 0.0) -> void:
+	active_spawners_count += 1
+	if initial_delay_sec > 0.0:
+		await get_tree().create_timer(initial_delay_sec).timeout
+		
 	for i: int in count:
-		await get_tree().create_timer(i * 1.05).timeout
-		if not is_instance_valid(plank) or not plank.is_latched:
+		if i > 0:
+			await get_tree().create_timer(1.35).timeout
+		if not is_instance_valid(plank) or not plank.is_latched or not is_encounter_active:
 			break
 		var chosen_scene: PackedScene = _get_enemy_scene_for_swarm(wave_num, i)
 		if not is_instance_valid(chosen_scene):
@@ -468,11 +545,55 @@ func _spawn_plank_swarm(plank: BoardingPlank, zone: BoardingZone, count: int, wa
 			break
 		var enemy: BoarderEnemy = chosen_scene.instantiate() as BoarderEnemy
 		add_child(enemy)
+		if boss_tier <= 1 or single_plank_mode:
+			enemy.max_hp = 18.0
+			enemy.current_hp = 18.0
+			enemy.attack_damage = 3.5
+			enemy.cross_speed_mult = 0.85
+			enemy.deck_wander_speed = 0.85
+			enemy.breach_z = 6.2
+		enemy.breached_stern.connect(_on_enemy_breached_stern)
+		enemy.tree_exited.connect(_on_enemy_removed)
+		if enemy.has_signal("died"):
+			enemy.connect("died", _on_enemy_died)
 		enemy.start_crossing(plank, zone)
+		
+	active_spawners_count = maxi(0, active_spawners_count - 1)
+	_check_victory_condition()
+
+func _on_enemy_died() -> void:
+	call_deferred("_check_victory_condition")
+
+func _on_enemy_removed() -> void:
+	call_deferred("_check_victory_condition")
+
+func _on_enemy_breached_stern(_enemy: BoarderEnemy) -> void:
+	if not is_encounter_active:
+		return
+	is_encounter_active = false
+	if is_instance_valid(hud):
+		hud.show_defeat("STERN BREACHED! GAME OVER")
+	encounter_lost.emit()
+	if AudioManager and AudioManager.has_method("play_sfx"):
+		AudioManager.play_sfx("barrel_breaks", 0.9, 1.1)
+
+func _on_crew_defeated() -> void:
+	if not is_encounter_active:
+		return
+	is_encounter_active = false
+	if is_instance_valid(hud):
+		hud.show_defeat("CREW MEMBER DEFEATED!")
+	encounter_lost.emit()
+	if AudioManager and AudioManager.has_method("play_sfx"):
+		AudioManager.play_sfx("barrel_breaks", 0.9, 1.1)
 
 func _get_enemy_scene_for_swarm(wave_num: int, swarm_index: int) -> PackedScene:
 	var raider_scn: PackedScene = boarder_raider_scene if is_instance_valid(boarder_raider_scene) else boarder_scene
 	var brute_scn: PackedScene = boarder_brute_scene if is_instance_valid(boarder_brute_scene) else boarder_scene
+
+	# Boss 1 only uses the frontline pirate raider!
+	if boss_tier <= 1:
+		return raider_scn
 
 	match wave_num:
 		1:
@@ -512,9 +633,21 @@ func _on_zone_infestation_changed(zone_id: String, pct: float) -> void:
 	zone_status_updated.emit(zone_id, pct, pct >= 1.0)
 
 func _trigger_victory() -> void:
+	if not is_encounter_active:
+		return
 	is_encounter_active = false
-	encounter_won.emit()
+	if is_instance_valid(hud):
+		hud.show_victory()
+	if AudioManager and AudioManager.has_method("play_sfx"):
+		AudioManager.play_sfx("gate_passes", 1.0, 1.2)
+	var tw: Tween = create_tween()
+	tw.tween_interval(1.8)
+	tw.tween_callback(func() -> void:
+		encounter_won.emit()
+	)
 
 func _trigger_defeat() -> void:
+	if not is_encounter_active:
+		return
 	is_encounter_active = false
 	encounter_lost.emit()

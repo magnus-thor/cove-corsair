@@ -16,7 +16,6 @@ enum OperationType { ADD, MULTIPLY }
 			update_visuals()
 
 @export var is_active: bool = true
-@export var cannonball_scene: PackedScene = preload("res://src/gameplay/projectiles/cannonball.tscn")
 
 @export var choice_group: String = ""
 @export var gate_action: String = ""

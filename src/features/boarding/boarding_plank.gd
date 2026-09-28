@@ -8,7 +8,7 @@ signal plank_severed(plank: BoardingPlank)
 signal plank_hit(plank: BoardingPlank, current_hp: float, max_hp: float)
 
 @export var max_health: float = 30.0
-@export var cross_duration_sec: float = 3.5
+@export var cross_duration_sec: float = 4.2
 @export var plank_width: float = 0.41
 @export var plank_thickness: float = 0.12
 
@@ -95,6 +95,19 @@ func get_point_along_plank(progress_t: float) -> Vector3:
 func get_point_along_rope(progress_t: float) -> Vector3:
 	return get_point_along_plank(progress_t)
 
+var is_selected: bool = false
+var border_container: Node3D = null
+
+func set_selected(selected: bool) -> void:
+	is_selected = selected
+	if is_instance_valid(border_container):
+		border_container.visible = is_selected
+
+func _process(_delta: float) -> void:
+	if is_selected and is_instance_valid(border_container):
+		var pulse: float = 1.0 + sin(float(Time.get_ticks_msec()) * 0.008) * 0.12
+		border_container.scale = Vector3(1.0 + pulse * 0.05, 1.0, 1.0 + pulse * 0.02)
+
 func _update_visual_and_collision() -> void:
 	var mid_p: Vector3 = (origin_pos + target_pos) * 0.5
 	global_position = mid_p
@@ -112,6 +125,7 @@ func _update_visual_and_collision() -> void:
 		hit_area.rotation = Vector3.ZERO
 	
 	_draw_plank_mesh()
+	_create_or_update_selection_border(length)
 
 func _draw_plank_mesh() -> void:
 	if not is_instance_valid(mesh_instance):
@@ -127,3 +141,60 @@ func _draw_plank_mesh() -> void:
 	mesh_instance.mesh = box
 	mesh_instance.position = Vector3.ZERO
 	mesh_instance.rotation = Vector3.ZERO
+
+func _create_or_update_selection_border(length: float) -> void:
+	if not is_instance_valid(border_container):
+		border_container = Node3D.new()
+		border_container.name = "SelectionBorder"
+		add_child(border_container)
+	
+	for child: Node in border_container.get_children():
+		child.queue_free()
+		
+	var border_mat: StandardMaterial3D = StandardMaterial3D.new()
+	border_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	border_mat.albedo_color = Color(1.0, 0.15, 0.15, 1.0) # Vibrant red border
+	
+	var border_w: float = 0.05
+	var border_h: float = 0.035
+	var top_y: float = plank_thickness * 0.5 + (border_h * 0.5)
+	var half_w: float = plank_width * 0.5
+	var half_l: float = length * 0.5
+	
+	# Left strip (along length)
+	var left_mesh: MeshInstance3D = MeshInstance3D.new()
+	var left_box: BoxMesh = BoxMesh.new()
+	left_box.size = Vector3(border_w, border_h, length + border_w * 2.0)
+	left_box.material = border_mat
+	left_mesh.mesh = left_box
+	left_mesh.position = Vector3(-half_w - (border_w * 0.5), top_y, 0.0)
+	border_container.add_child(left_mesh)
+	
+	# Right strip (along length)
+	var right_mesh: MeshInstance3D = MeshInstance3D.new()
+	var right_box: BoxMesh = BoxMesh.new()
+	right_box.size = Vector3(border_w, border_h, length + border_w * 2.0)
+	right_box.material = border_mat
+	right_mesh.mesh = right_box
+	right_mesh.position = Vector3(half_w + (border_w * 0.5), top_y, 0.0)
+	border_container.add_child(right_mesh)
+	
+	# Start strip (crosswise at origin)
+	var start_mesh: MeshInstance3D = MeshInstance3D.new()
+	var start_box: BoxMesh = BoxMesh.new()
+	start_box.size = Vector3(plank_width + border_w * 2.0, border_h, border_w)
+	start_box.material = border_mat
+	start_mesh.mesh = start_box
+	start_mesh.position = Vector3(0.0, top_y, -half_l - (border_w * 0.5))
+	border_container.add_child(start_mesh)
+	
+	# End strip (crosswise at ship railing)
+	var end_mesh: MeshInstance3D = MeshInstance3D.new()
+	var end_box: BoxMesh = BoxMesh.new()
+	end_box.size = Vector3(plank_width + border_w * 2.0, border_h, border_w)
+	end_box.material = border_mat
+	end_mesh.mesh = end_box
+	end_mesh.position = Vector3(0.0, top_y, half_l + (border_w * 0.5))
+	border_container.add_child(end_mesh)
+	
+	border_container.visible = is_selected

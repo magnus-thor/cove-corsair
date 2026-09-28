@@ -46,11 +46,24 @@ func start_in_run_boarding(boss: Node3D, player: Node3D) -> void:
 
 	# ── 4. Instantiate Boarding Defense Arena at isolated staging altitude ─
 	active_arena = ARENA_SCENE.instantiate() as BoardingDefenseArena
+	active_arena.global_position = STAGING_POSITION
+	
+	# Configure single-plank scaling based on campaign level (Level 5 = 1 plank)
+	var cur_lvl: int = 1
+	if GameState and "current_level" in GameState:
+		cur_lvl = int(GameState.current_level)
+	if cur_lvl <= 15:
+		active_arena.boss_tier = 1
+		active_arena.single_plank_mode = false
+	elif cur_lvl <= 30:
+		active_arena.boss_tier = 2
+	else:
+		active_arena.boss_tier = 3
+
 	var root: Node = get_tree().current_scene
 	if not root:
 		root = active_player.get_parent()
 	root.add_child(active_arena)
-	active_arena.global_position = STAGING_POSITION
 
 	# Configure matching enemy ship model
 	if is_instance_valid(active_arena) and active_arena.has_method("setup_enemy_vessel"):

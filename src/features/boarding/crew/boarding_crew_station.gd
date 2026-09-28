@@ -27,6 +27,7 @@ const CREW_MODELS: Dictionary = {
 
 func _ready() -> void:
 	action_timer = randf_range(1.0, 2.5) # Stagger initial actions
+	set_process(false) # Inactive until assigned equipped crew in setup_crew
 
 func setup_crew(new_crew_id: String) -> void:
 	crew_id = new_crew_id
@@ -106,25 +107,22 @@ func _execute_bomber() -> void:
 		crew_action_triggered.emit(crew_id, "cluster_bomb", blast_pos)
 
 func _execute_sniper() -> void:
-	# Snipe nearest attached boarding plank to sever it
-	var planks: Array[Node] = get_tree().get_nodes_in_group("boarding_plank")
-	if planks.is_empty():
-		planks = get_tree().get_nodes_in_group("grapple_rope")
-	var closest_plank: BoardingPlank = null
-	var min_dist: float = 999.0
+	# Snipe priority: highest health active enemy boarder on deck or plank
+	var enemies: Array[Node] = get_tree().get_nodes_in_group("boarder")
+	var target_enemy: BoarderEnemy = null
+	var highest_hp: float = 0.0
 	
-	for p_node: Node in planks:
-		if p_node is BoardingPlank:
-			var plank: BoardingPlank = p_node as BoardingPlank
-			if is_instance_valid(plank) and plank.is_latched:
-				var d: float = global_position.distance_to(plank.global_position)
-				if d < min_dist:
-					min_dist = d
-					closest_plank = plank
+	for e_node: Node in enemies:
+		var enemy: BoarderEnemy = e_node as BoarderEnemy
+		if is_instance_valid(enemy) and not enemy.is_queued_for_deletion() and not enemy.is_falling:
+			if enemy.current_hp > highest_hp:
+				highest_hp = enemy.current_hp
+				target_enemy = enemy
 				
-	if is_instance_valid(closest_plank):
-		closest_plank.take_damage(35.0) # Instant cut
-		crew_action_triggered.emit(crew_id, "plank_snipe", closest_plank.global_position)
+	if is_instance_valid(target_enemy):
+		target_enemy.take_damage(28.0)
+		target_enemy.apply_stagger(0.35)
+		crew_action_triggered.emit(crew_id, "sniper_shot", target_enemy.global_position)
 
 func _execute_tosser() -> void:
 	# Area denial: burns active boarders in assigned zone

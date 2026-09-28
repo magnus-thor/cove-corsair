@@ -6,7 +6,7 @@
 size = Vector3(4.5, 3.0, 5.0)
 
 [node name="BoardingZone" type="Area3D" node_paths=PackedStringArray("grapple_anchor", "station_marker")]
-collision_layer = 1
+collision_layer = 16
 collision_mask = 4
 script = ExtResource("1_script")
 grapple_anchor = NodePath("GrappleAnchor")

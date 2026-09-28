@@ -67,6 +67,27 @@ horizontal_alignment = 1
 unique_name_in_owner = true
 layout_mode = 2
 
+[node name="SpecialAttackContainer" type="MarginContainer" parent="."]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -120.0
+offset_bottom = -48.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/margin_right = 24
+
+[node name="HBox" type="HBoxContainer" parent="SpecialAttackContainer"]
+layout_mode = 2
+alignment = 2
+
+[node name="ButtonSpecial" type="Button" parent="SpecialAttackContainer/HBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 56)
+layout_mode = 2
+text = "SPECIAL: PIERCING FLINTLOCK"
+
 [node name="BottomControls" type="Label" parent="."]
 anchors_preset = 12
 anchor_top = 1.0
@@ -75,7 +96,7 @@ anchor_bottom = 1.0
 offset_top = -42.0
 grow_horizontal = 2
 grow_vertical = 0
-text = "Tap / Left Click: Move to Zone / Fire Blunderbuss  |  Right Click: Heavy Breaker Axe (Cut Ropes)"
+text = "Tap Deck: Move Crew (Auto-Attacks Nearby)  |  Special Button / Space: Crew Ability"
 horizontal_alignment = 1
 
 [node name="Banner" type="PanelContainer" parent="."]
@@ -86,9 +107,9 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -200.0
+offset_left = -220.0
 offset_top = -50.0
-offset_right = 200.0
+offset_right = 220.0
 offset_bottom = 50.0
 grow_horizontal = 2
 grow_vertical = 2

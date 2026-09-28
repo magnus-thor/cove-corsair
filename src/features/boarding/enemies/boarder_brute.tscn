@@ -4,8 +4,8 @@
 [ext_resource type="PackedScene" path="res://assets/models/enemy/crew/large_pirate_brute.glb" id="2_large_brute"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_brute"]
-radius = 0.5
-height = 1.5
+radius = 0.32
+height = 0.95
 
 [node name="BoarderBrute" type="CharacterBody3D"]
 collision_layer = 4
@@ -13,18 +13,18 @@ collision_mask = 3
 script = ExtResource("1_enemy_script")
 archetype_name = "Brute"
 max_hp = 70.0
-deck_wander_speed = 1.8
+deck_wander_speed = 0.85
 cross_speed_mult = 0.7
 infestation_weight = 2.5
 impact_sfx = "barrel_hits"
 death_sfx = "sfx_wood_smash"
-model_scale = Vector3(0.65, 0.65, 0.65)
+model_scale = Vector3(0.39, 0.39, 0.39)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.48, 0)
 shape = SubResource("CapsuleShape3D_brute")
 
 [node name="ModelContainer" type="Node3D" parent="."]
 
 [node name="LargePirateBrute" parent="ModelContainer" instance=ExtResource("2_large_brute")]
-transform = Transform3D(0.65, 0, 0, 0, 0.65, 0, 0, 0, 0.65, 0, 0, 0)
+transform = Transform3D(0.39, 0, 0, 0, 0.39, 0, 0, 0, 0.39, 0, 0, 0)
