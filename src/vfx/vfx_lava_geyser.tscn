@@ -1,0 +1,151 @@
+[gd_scene load_steps=14 format=3]
+
+; Persistent ambient lava-geyser VFX for brimstone biome lane-side scenery.
+; Place as a child of the geyser rock mesh at the vent opening (Y ~ top of rock).
+; All particles run looping — no auto-destroy.
+
+; ── Fire column ─────────────────────────────────────────────────────────────
+[sub_resource type="Gradient" id="Gradient_fire"]
+offsets = PackedFloat32Array(0, 0.25, 0.65, 1)
+colors = PackedColorArray(1.0, 0.95, 0.1, 0.9, 1.0, 0.45, 0.05, 0.75, 0.55, 0.1, 0.0, 0.35, 0.1, 0.0, 0.0, 0.0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_fire"]
+gradient = SubResource("Gradient_fire")
+
+[sub_resource type="Curve" id="Curve_fire_scale"]
+_data = [Vector2(0, 0.15), 0.0, 1.2, 0, 0, Vector2(0.35, 0.45), 0.0, 0.0, 0, 0, Vector2(1, 0.05), -1.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_fire_scale"]
+curve = SubResource("Curve_fire_scale")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fire"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(1, 0.5, 0.1, 0.85)
+billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_fire"]
+material = SubResource("StandardMaterial3D_fire")
+size = Vector2(0.55, 0.55)
+
+; ── Ember sparks ─────────────────────────────────────────────────────────────
+[sub_resource type="Gradient" id="Gradient_embers"]
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(1.0, 0.9, 0.3, 1.0, 1.0, 0.4, 0.05, 0.7, 0.2, 0.0, 0.0, 0.0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_embers"]
+gradient = SubResource("Gradient_embers")
+
+[sub_resource type="Curve" id="Curve_ember_scale"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.7, 0.6), 0.0, 0.0, 0, 0, Vector2(1, 0), -2.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_ember_scale"]
+curve = SubResource("Curve_ember_scale")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_embers"]
+shading_mode = 0
+albedo_color = Color(2.2, 0.8, 0.1, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_ember"]
+material = SubResource("StandardMaterial3D_embers")
+radius = 0.04
+height = 0.08
+
+; ── Smoke puff ───────────────────────────────────────────────────────────────
+[sub_resource type="Gradient" id="Gradient_smoke"]
+offsets = PackedFloat32Array(0, 0.4, 1)
+colors = PackedColorArray(0.25, 0.12, 0.08, 0.55, 0.15, 0.10, 0.08, 0.25, 0.08, 0.06, 0.05, 0.0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_smoke"]
+gradient = SubResource("Gradient_smoke")
+
+[sub_resource type="Curve" id="Curve_smoke_scale"]
+_data = [Vector2(0, 0.2), 0.0, 1.5, 0, 0, Vector2(0.5, 0.8), 0.0, 0.0, 0, 0, Vector2(1, 1.2), 0.5, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_smoke_scale"]
+curve = SubResource("Curve_smoke_scale")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_smoke"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.2, 0.12, 0.08, 0.5)
+billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_smoke"]
+material = SubResource("StandardMaterial3D_smoke")
+size = Vector2(0.7, 0.7)
+
+; ─────────────────────────────────────────────────────────────────────────────
+
+[node name="VFXLavaGeyser" type="Node3D"]
+
+[node name="FireColumn" type="CPUParticles3D" parent="."]
+local_coords = true
+emitting = true
+amount = 14
+lifetime = 0.9
+one_shot = false
+explosiveness = 0.0
+randomness = 0.35
+mesh = SubResource("QuadMesh_fire")
+emission_shape = 1
+emission_sphere_radius = 0.12
+direction = Vector3(0, 1, 0)
+spread = 18.0
+gravity = Vector3(0, 0, 0)
+initial_velocity_min = 1.2
+initial_velocity_max = 2.0
+scale_amount_curve = SubResource("CurveTexture_fire_scale")
+color_ramp = SubResource("GradientTexture1D_fire")
+
+[node name="EmberSparks" type="CPUParticles3D" parent="."]
+local_coords = true
+emitting = true
+amount = 10
+lifetime = 1.4
+one_shot = false
+explosiveness = 0.0
+randomness = 0.6
+mesh = SubResource("SphereMesh_ember")
+emission_shape = 1
+emission_sphere_radius = 0.08
+direction = Vector3(0, 1, 0)
+spread = 55.0
+gravity = Vector3(0, -4.5, 0)
+initial_velocity_min = 1.8
+initial_velocity_max = 3.5
+angular_velocity_min = -360.0
+angular_velocity_max = 720.0
+scale_amount_curve = SubResource("CurveTexture_ember_scale")
+color_ramp = SubResource("GradientTexture1D_embers")
+
+[node name="SmokePuff" type="CPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+local_coords = true
+emitting = true
+amount = 6
+lifetime = 2.2
+one_shot = false
+explosiveness = 0.0
+randomness = 0.5
+mesh = SubResource("QuadMesh_smoke")
+emission_shape = 1
+emission_sphere_radius = 0.15
+direction = Vector3(0, 1, 0)
+spread = 25.0
+gravity = Vector3(0, 0, 0)
+initial_velocity_min = 0.4
+initial_velocity_max = 0.9
+scale_amount_curve = SubResource("CurveTexture_smoke_scale")
+color_ramp = SubResource("GradientTexture1D_smoke")
