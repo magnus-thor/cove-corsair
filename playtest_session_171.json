@@ -1,0 +1,4041 @@
+{
+  "all_runs": [
+    {
+      "ammo": "standard_iron",
+      "avg_fps": 57.6,
+      "boss_encounter": {
+        "boss_name": "",
+        "defeated": false,
+        "fight_duration": 0.0,
+        "final_health": 0,
+        "max_health": 0
+      },
+      "chunks_entered": [
+        {
+          "chunk": "warmup",
+          "river_dist_m": 8.4
+        },
+        {
+          "chunk": "gunner_ambush",
+          "river_dist_m": 58.4
+        },
+        {
+          "chunk": "chunk_barricade_siege",
+          "river_dist_m": 108.4
+        },
+        {
+          "chunk": "finish_line",
+          "river_dist_m": 158.4
+        }
+      ],
+      "coins_by_source": {
+        "coin_pickup": 93,
+        "multiplier_gate": 50
+      },
+      "coins_collected": 143,
+      "completion_bonus": 45,
+      "distance_reached": 233.8,
+      "duration_seconds": 37.3,
+      "fps_metrics": {
+        "avg_fps": 57.6,
+        "max_fps": 60,
+        "min_fps": 16,
+        "samples": 323
+      },
+      "hits_taken": [],
+      "level_index": 1,
+      "min_fps": 16,
+      "mob_kills": [
+        {
+          "kill_dist_m": 5.3,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 10.0
+        },
+        {
+          "kill_dist_m": 27.3,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 13.1
+        },
+        {
+          "kill_dist_m": 7.4,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 16.1
+        },
+        {
+          "kill_dist_m": 27.0,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 54.0
+        },
+        {
+          "kill_dist_m": 17.3,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 91.5
+        },
+        {
+          "kill_dist_m": 18.4,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 98.5
+        },
+        {
+          "kill_dist_m": 32.2,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 100.2
+        },
+        {
+          "kill_dist_m": 37.4,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 170.4
+        },
+        {
+          "kill_dist_m": 36.6,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 171.1
+        },
+        {
+          "kill_dist_m": 35.9,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 171.6
+        },
+        {
+          "kill_dist_m": 35.4,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 172.0
+        },
+        {
+          "kill_dist_m": 38.3,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 173.1
+        },
+        {
+          "kill_dist_m": 20.0,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 187.1
+        }
+      ],
+      "mobs_leaked": 0,
+      "obstacles_destroyed": [
+        {
+          "river_dist_m": 18.4,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 21.8,
+          "shots": 1,
+          "type": "rune_barrel"
+        },
+        {
+          "river_dist_m": 33.9,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 37.8,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 38.4,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 40.6,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 45.8,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 50.6,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 102.1,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 103.2,
+          "shots": 1,
+          "type": "rune_barrel"
+        },
+        {
+          "river_dist_m": 104.4,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 113.5,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 114.1,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 124.4,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 131.0,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 132.6,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 133.4,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 135.0,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 139.0,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 141.3,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 141.6,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 142.1,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 143.1,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 154.8,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 162.8,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 163.1,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 165.1,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 165.7,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 188.6,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 190.8,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 191.1,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 196.9,
+          "shots": 1,
+          "type": "wooden_barrel"
+        }
+      ],
+      "plating": "none",
+      "run_number": 1,
+      "ship_id": "dinghy",
+      "ship_tier": 1,
+      "shot_expirations": 596,
+      "shots_hit_water": 596,
+      "stars_awarded": 3,
+      "start_time_iso": "2026-09-29 18:34:20",
+      "status": "VICTORY",
+      "total_damage_received": 0,
+      "total_earned": 188,
+      "vault_at_start": 0
+    },
+    {
+      "ammo": "standard_iron",
+      "avg_fps": 58.1,
+      "boss_encounter": {
+        "boss_name": "",
+        "defeated": false,
+        "fight_duration": 0.0,
+        "final_health": 0,
+        "max_health": 0
+      },
+      "chunks_entered": [
+        {
+          "chunk": "warmup",
+          "river_dist_m": 8.4
+        },
+        {
+          "chunk": "mine_gauntlet",
+          "river_dist_m": 58.4
+        },
+        {
+          "chunk": "chunk_barricade_siege",
+          "river_dist_m": 108.4
+        },
+        {
+          "chunk": "fodder_swarm",
+          "river_dist_m": 158.4
+        },
+        {
+          "chunk": "finish_line",
+          "river_dist_m": 208.4
+        }
+      ],
+      "coins_by_source": {
+        "chest": 25,
+        "coin_pickup": 63,
+        "multiplier_gate": 50
+      },
+      "coins_collected": 138,
+      "completion_bonus": 58,
+      "distance_reached": 284.0,
+      "duration_seconds": 43.0,
+      "fps_metrics": {
+        "avg_fps": 58.1,
+        "max_fps": 61,
+        "min_fps": 16,
+        "samples": 689
+      },
+      "hits_taken": [],
+      "level_index": 2,
+      "min_fps": 16,
+      "mob_kills": [
+        {
+          "kill_dist_m": 7.5,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 8.3
+        },
+        {
+          "kill_dist_m": 29.0,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 11.9
+        },
+        {
+          "kill_dist_m": 7.8,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 16.0
+        },
+        {
+          "kill_dist_m": 28.8,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 53.0
+        },
+        {
+          "kill_dist_m": 39.2,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 219.0
+        },
+        {
+          "kill_dist_m": 39.0,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 219.1
+        },
+        {
+          "kill_dist_m": 38.4,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 219.6
+        },
+        {
+          "kill_dist_m": 38.1,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 219.9
+        },
+        {
+          "kill_dist_m": 39.2,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 222.6
+        },
+        {
+          "kill_dist_m": 37.5,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 224.0
+        }
+      ],
+      "mobs_leaked": 0,
+      "obstacles_destroyed": [
+        {
+          "river_dist_m": 17.6,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 21.4,
+          "shots": 1,
+          "type": "rune_barrel"
+        },
+        {
+          "river_dist_m": 23.5,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 24.4,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 35.1,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 36.9,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 37.6,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 42.7,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 54.6,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 124.3,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 130.6,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 131.9,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 133.7,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 134.6,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 140.0,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 140.4,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 141.6,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 142.2,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 142.7,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 151.2,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 156.5,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 157.0,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 163.4,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 163.7,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 167.7,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 232.9,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 233.8,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 234.2,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 236.2,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 240.0,
+          "shots": 2,
+          "type": "wooden_barrel"
+        }
+      ],
+      "plating": "none",
+      "run_number": 2,
+      "ship_id": "dinghy",
+      "ship_tier": 2,
+      "shot_expirations": 733,
+      "shots_hit_water": 733,
+      "stars_awarded": 3,
+      "start_time_iso": "2026-09-29 18:35:12",
+      "status": "VICTORY",
+      "total_damage_received": 0,
+      "total_earned": 196,
+      "vault_at_start": 226
+    },
+    {
+      "ammo": "standard_iron",
+      "avg_fps": 58.0,
+      "boss_encounter": {
+        "boss_name": "",
+        "defeated": false,
+        "fight_duration": 0.0,
+        "final_health": 0,
+        "max_health": 0
+      },
+      "chunks_entered": [
+        {
+          "chunk": "gunner_ambush",
+          "river_dist_m": 8.4
+        },
+        {
+          "chunk": "warmup",
+          "river_dist_m": 58.5
+        },
+        {
+          "chunk": "mine_gauntlet",
+          "river_dist_m": 108.4
+        },
+        {
+          "chunk": "chunk_barricade_siege",
+          "river_dist_m": 158.4
+        },
+        {
+          "chunk": "fodder_swarm",
+          "river_dist_m": 208.5
+        },
+        {
+          "chunk": "finish_line",
+          "river_dist_m": 258.4
+        }
+      ],
+      "coins_by_source": {
+        "chest": 25,
+        "coin_pickup": 96,
+        "multiplier_gate": 40
+      },
+      "coins_collected": 161,
+      "completion_bonus": 72,
+      "distance_reached": 334.1,
+      "duration_seconds": 48.9,
+      "fps_metrics": {
+        "avg_fps": 58.0,
+        "max_fps": 61,
+        "min_fps": 13,
+        "samples": 1110
+      },
+      "hits_taken": [],
+      "level_index": 3,
+      "min_fps": 13,
+      "mob_kills": [
+        {
+          "kill_dist_m": 8.2,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 7.8
+        },
+        {
+          "kill_dist_m": 8.8,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 15.3
+        },
+        {
+          "kill_dist_m": 22.6,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 17.0
+        },
+        {
+          "kill_dist_m": 34.8,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 36.1
+        },
+        {
+          "kill_dist_m": 15.7,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 43.3
+        },
+        {
+          "kill_dist_m": 18.0,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 62.2
+        },
+        {
+          "kill_dist_m": 38.2,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 96.0
+        },
+        {
+          "kill_dist_m": 37.8,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 270.2
+        },
+        {
+          "kill_dist_m": 38.8,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 273.0
+        },
+        {
+          "kill_dist_m": 26.7,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 279.6
+        },
+        {
+          "kill_dist_m": 25.6,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 280.6
+        },
+        {
+          "kill_dist_m": 24.4,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 281.6
+        },
+        {
+          "kill_dist_m": 25.8,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 283.1
+        }
+      ],
+      "mobs_leaked": 0,
+      "obstacles_destroyed": [
+        {
+          "river_dist_m": 16.2,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 20.2,
+          "shots": 1,
+          "type": "rune_barrel"
+        },
+        {
+          "river_dist_m": 22.2,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 31.4,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 36.1,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 49.0,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 62.8,
+          "shots": 1,
+          "type": "rune_barrel"
+        },
+        {
+          "river_dist_m": 64.9,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 72.8,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 79.8,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 81.0,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 82.1,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 95.2,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 108.7,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 173.7,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 174.2,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 177.2,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 183.0,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 183.7,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 187.1,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 187.7,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 191.4,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 191.9,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 192.1,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 196.3,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 206.6,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 207.3,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 210.5,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 211.4,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 223.5,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 283.1,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 283.4,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 286.1,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 287.5,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 297.5,
+          "shots": 2,
+          "type": "wooden_barrel"
+        }
+      ],
+      "plating": "none",
+      "run_number": 3,
+      "ship_id": "dinghy",
+      "ship_tier": 2,
+      "shot_expirations": 813,
+      "shots_hit_water": 813,
+      "stars_awarded": 3,
+      "start_time_iso": "2026-09-29 18:36:07",
+      "status": "VICTORY",
+      "total_damage_received": 0,
+      "total_earned": 233,
+      "vault_at_start": 268
+    },
+    {
+      "ammo": "standard_iron",
+      "avg_fps": 55.9,
+      "boss_encounter": {
+        "boss_name": "",
+        "defeated": false,
+        "fight_duration": 0.0,
+        "final_health": 0,
+        "max_health": 0
+      },
+      "chunks_entered": [
+        {
+          "chunk": "gunner_ambush",
+          "river_dist_m": 8.4
+        },
+        {
+          "chunk": "warmup",
+          "river_dist_m": 58.4
+        },
+        {
+          "chunk": "reef_slalom",
+          "river_dist_m": 108.4
+        },
+        {
+          "chunk": "chunk_barricade_siege",
+          "river_dist_m": 158.4
+        },
+        {
+          "chunk": "fodder_swarm",
+          "river_dist_m": 208.4
+        },
+        {
+          "chunk": "finish_line",
+          "river_dist_m": 258.4
+        }
+      ],
+      "coins_by_source": {
+        "chest": 25,
+        "coin_pickup": 112,
+        "multiplier_gate": 75
+      },
+      "coins_collected": 212,
+      "completion_bonus": 86,
+      "distance_reached": 334.2,
+      "duration_seconds": 46.7,
+      "fps_metrics": {
+        "avg_fps": 55.9,
+        "max_fps": 61,
+        "min_fps": 7,
+        "samples": 1526
+      },
+      "hits_taken": [
+        {
+          "current_hp": 2,
+          "damage": 1,
+          "distance": 49.4,
+          "max_hp": 3,
+          "source": "brimstone_raft_ram",
+          "time": 6.9
+        },
+        {
+          "current_hp": 1,
+          "damage": 1,
+          "distance": 57.7,
+          "max_hp": 3,
+          "source": "brimstone_raft_ram",
+          "time": 8.0
+        }
+      ],
+      "level_index": 4,
+      "min_fps": 7,
+      "mob_kills": [
+        {
+          "kill_dist_m": 32.3,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 101.0
+        },
+        {
+          "kill_dist_m": 23.5,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 133.1
+        },
+        {
+          "kill_dist_m": 35.8,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 137.7
+        },
+        {
+          "kill_dist_m": 16.1,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 144.1
+        },
+        {
+          "kill_dist_m": 31.4,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 147.9
+        },
+        {
+          "kill_dist_m": 40.2,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 168.9
+        },
+        {
+          "kill_dist_m": 38.8,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 171.6
+        },
+        {
+          "kill_dist_m": 23.5,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 183.6
+        },
+        {
+          "kill_dist_m": 36.2,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 199.5
+        },
+        {
+          "kill_dist_m": 35.6,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 200.8
+        },
+        {
+          "kill_dist_m": 32.9,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 202.1
+        },
+        {
+          "kill_dist_m": 32.8,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 202.2
+        },
+        {
+          "kill_dist_m": 32.2,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 203.4
+        },
+        {
+          "kill_dist_m": 28.9,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 205.3
+        },
+        {
+          "kill_dist_m": 24.8,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 208.4
+        },
+        {
+          "kill_dist_m": 35.1,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 272.5
+        },
+        {
+          "kill_dist_m": 34.5,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 273.0
+        },
+        {
+          "kill_dist_m": 34.1,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 273.4
+        },
+        {
+          "kill_dist_m": 34.1,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 273.4
+        },
+        {
+          "kill_dist_m": 35.1,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 276.1
+        },
+        {
+          "kill_dist_m": 33.4,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 277.4
+        }
+      ],
+      "mobs_leaked": 0,
+      "obstacles_destroyed": [
+        {
+          "river_dist_m": 18.6,
+          "shots": 1,
+          "type": "rune_barrel"
+        },
+        {
+          "river_dist_m": 22.3,
+          "shots": 4,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 33.0,
+          "shots": 4,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 38.3,
+          "shots": 4,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 65.8,
+          "shots": 1,
+          "type": "rune_barrel"
+        },
+        {
+          "river_dist_m": 67.9,
+          "shots": 4,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 71.1,
+          "shots": 4,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 80.5,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 83.3,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 94.7,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 94.9,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 102.2,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 145.0,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 148.8,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 184.8,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 185.2,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 188.5,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 194.3,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 194.4,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 202.3,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 285.9,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 289.9,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 291.9,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 292.2,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 298.0,
+          "shots": 6,
+          "type": "wooden_barrel"
+        }
+      ],
+      "plating": "none",
+      "run_number": 4,
+      "ship_id": "dinghy",
+      "ship_tier": 2,
+      "shot_expirations": 869,
+      "shots_hit_water": 869,
+      "stars_awarded": 2,
+      "start_time_iso": "2026-09-29 18:37:22",
+      "status": "VICTORY",
+      "total_damage_received": 2,
+      "total_earned": 298,
+      "vault_at_start": 84
+    },
+    {
+      "ammo": "standard_iron",
+      "avg_fps": 56.8,
+      "boss_encounter": {
+        "boss_name": "Captain Ironjaw's War-Barge",
+        "defeated": false,
+        "fight_duration": 0.0,
+        "final_health": 186,
+        "max_health": 850,
+        "spawn_time": 318.301
+      },
+      "chunks_entered": [
+        {
+          "chunk": "gunner_ambush",
+          "river_dist_m": 8.4
+        },
+        {
+          "chunk": "warmup",
+          "river_dist_m": 58.4
+        },
+        {
+          "chunk": "mine_gauntlet",
+          "river_dist_m": 108.4
+        },
+        {
+          "chunk": "chunk_barricade_siege",
+          "river_dist_m": 158.5
+        },
+        {
+          "chunk": "fodder_swarm",
+          "river_dist_m": 208.4
+        },
+        {
+          "chunk": "boss_intro_buffer",
+          "river_dist_m": 258.4
+        },
+        {
+          "chunk": "boss_ironjaw",
+          "river_dist_m": 308.4
+        }
+      ],
+      "coins_by_source": {
+        "chest": 140,
+        "coin_pickup": 114,
+        "multiplier_gate": 50
+      },
+      "coins_collected": 304,
+      "completion_bonus": 234,
+      "distance_reached": 350.0,
+      "duration_seconds": 92.2,
+      "fps_metrics": {
+        "avg_fps": 56.8,
+        "max_fps": 61,
+        "min_fps": 7,
+        "samples": 2306
+      },
+      "hits_taken": [
+        {
+          "current_hp": 4,
+          "damage": 1,
+          "distance": 49.9,
+          "max_hp": 5,
+          "source": "brimstone_raft_ram",
+          "time": 6.7
+        },
+        {
+          "current_hp": 3,
+          "damage": 1,
+          "distance": 58.3,
+          "max_hp": 5,
+          "source": "brimstone_raft_ram",
+          "time": 7.9
+        }
+      ],
+      "level_index": 5,
+      "min_fps": 7,
+      "mob_kills": [
+        {
+          "kill_dist_m": 35.9,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 98.4
+        },
+        {
+          "kill_dist_m": 39.5,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 169.5
+        },
+        {
+          "kill_dist_m": 36.2,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 173.7
+        },
+        {
+          "kill_dist_m": 32.3,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 176.7
+        },
+        {
+          "kill_dist_m": 38.9,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 198.4
+        },
+        {
+          "kill_dist_m": 27.3,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 206.7
+        },
+        {
+          "kill_dist_m": 22.4,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 210.6
+        },
+        {
+          "kill_dist_m": 21.5,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 211.4
+        },
+        {
+          "kill_dist_m": 19.9,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 212.6
+        },
+        {
+          "kill_dist_m": 19.9,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 212.6
+        },
+        {
+          "kill_dist_m": 20.9,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 212.6
+        },
+        {
+          "kill_dist_m": 36.5,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 284.5
+        },
+        {
+          "kill_dist_m": 33.0,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 288.9
+        },
+        {
+          "kill_dist_m": 15.5,
+          "max_hp": 5,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 350.0
+        },
+        {
+          "kill_dist_m": 15.2,
+          "max_hp": 5,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 350.0
+        },
+        {
+          "kill_dist_m": 15.4,
+          "max_hp": 5,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 350.0
+        },
+        {
+          "kill_dist_m": 13.7,
+          "max_hp": 5,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 350.0
+        },
+        {
+          "kill_dist_m": 12.2,
+          "max_hp": 5,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 350.0
+        },
+        {
+          "kill_dist_m": 15.3,
+          "max_hp": 5,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 350.0
+        },
+        {
+          "kill_dist_m": 15.3,
+          "max_hp": 5,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 350.0
+        },
+        {
+          "kill_dist_m": 12.5,
+          "max_hp": 5,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 350.0
+        },
+        {
+          "kill_dist_m": 12.8,
+          "max_hp": 5,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 350.0
+        },
+        {
+          "kill_dist_m": 10.2,
+          "max_hp": 5,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 350.0
+        },
+        {
+          "kill_dist_m": 15.5,
+          "max_hp": 5,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 350.0
+        },
+        {
+          "kill_dist_m": 13.0,
+          "max_hp": 5,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 350.0
+        }
+      ],
+      "mobs_leaked": 0,
+      "obstacles_destroyed": [
+        {
+          "river_dist_m": 24.1,
+          "shots": 5,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 25.4,
+          "shots": 4,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 31.5,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 41.9,
+          "shots": 1,
+          "type": "rune_barrel"
+        },
+        {
+          "river_dist_m": 67.8,
+          "shots": 1,
+          "type": "rune_barrel"
+        },
+        {
+          "river_dist_m": 72.5,
+          "shots": 5,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 78.5,
+          "shots": 4,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 81.0,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 86.4,
+          "shots": 3,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 88.9,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 89.3,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 102.5,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 186.6,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 189.0,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 196.9,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 199.2,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 203.7,
+          "shots": 4,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 210.1,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 278.0,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 280.1,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 331.2,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 333.1,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 348.7,
+          "shots": 1,
+          "type": "fuse_barrel"
+        },
+        {
+          "river_dist_m": 348.7,
+          "shots": 1,
+          "type": "fuse_barrel"
+        },
+        {
+          "river_dist_m": 350.0,
+          "shots": 1,
+          "type": "fuse_barrel"
+        },
+        {
+          "river_dist_m": 350.0,
+          "shots": 1,
+          "type": "fuse_barrel"
+        },
+        {
+          "river_dist_m": 350.0,
+          "shots": 1,
+          "type": "fuse_barrel"
+        },
+        {
+          "river_dist_m": 350.0,
+          "shots": 1,
+          "type": "fuse_barrel"
+        }
+      ],
+      "plating": "none",
+      "run_number": 5,
+      "ship_id": "sloop",
+      "ship_tier": 3,
+      "shot_expirations": 829,
+      "shots_hit_water": 829,
+      "stars_awarded": 2,
+      "start_time_iso": "2026-09-29 18:38:37",
+      "status": "VICTORY",
+      "total_damage_received": 2,
+      "total_earned": 538,
+      "vault_at_start": 130
+    },
+    {
+      "ammo": "standard_iron",
+      "avg_fps": 56.0,
+      "boss_encounter": {
+        "boss_name": "",
+        "defeated": false,
+        "fight_duration": 0.0,
+        "final_health": 0,
+        "max_health": 0
+      },
+      "chunks_entered": [
+        {
+          "chunk": "gunner_ambush",
+          "river_dist_m": 8.4
+        },
+        {
+          "chunk": "warmup",
+          "river_dist_m": 58.4
+        },
+        {
+          "chunk": "mine_gauntlet",
+          "river_dist_m": 108.4
+        },
+        {
+          "chunk": "reef_slalom",
+          "river_dist_m": 158.4
+        },
+        {
+          "chunk": "chunk_barricade_siege",
+          "river_dist_m": 208.5
+        },
+        {
+          "chunk": "fodder_swarm",
+          "river_dist_m": 258.4
+        },
+        {
+          "chunk": "finish_line",
+          "river_dist_m": 308.4
+        }
+      ],
+      "coins_by_source": {
+        "chest": 140,
+        "coin_pickup": 94,
+        "multiplier_gate": 75
+      },
+      "coins_collected": 309,
+      "completion_bonus": 112,
+      "distance_reached": 384.2,
+      "duration_seconds": 51.7,
+      "fps_metrics": {
+        "avg_fps": 56.0,
+        "max_fps": 61,
+        "min_fps": 7,
+        "samples": 2761
+      },
+      "hits_taken": [
+        {
+          "current_hp": 4,
+          "damage": 1,
+          "distance": 47.6,
+          "max_hp": 5,
+          "source": "brimstone_raft_ram",
+          "time": 6.4
+        },
+        {
+          "current_hp": 3,
+          "damage": 1,
+          "distance": 58.5,
+          "max_hp": 5,
+          "source": "brimstone_raft_ram",
+          "time": 7.8
+        }
+      ],
+      "level_index": 6,
+      "min_fps": 7,
+      "mob_kills": [
+        {
+          "kill_dist_m": 36.3,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 98.2
+        },
+        {
+          "kill_dist_m": 38.8,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 220.1
+        },
+        {
+          "kill_dist_m": 24.8,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 232.8
+        },
+        {
+          "kill_dist_m": 12.6,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 242.4
+        },
+        {
+          "kill_dist_m": 40.2,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 246.7
+        },
+        {
+          "kill_dist_m": 39.2,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 248.3
+        },
+        {
+          "kill_dist_m": 37.6,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 248.8
+        },
+        {
+          "kill_dist_m": 38.0,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 249.3
+        },
+        {
+          "kill_dist_m": 34.9,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 250.9
+        },
+        {
+          "kill_dist_m": 34.1,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 251.5
+        },
+        {
+          "kill_dist_m": 31.7,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 253.4
+        },
+        {
+          "kill_dist_m": 39.4,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 318.9
+        },
+        {
+          "kill_dist_m": 39.4,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 318.9
+        },
+        {
+          "kill_dist_m": 38.8,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 319.4
+        },
+        {
+          "kill_dist_m": 36.7,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 324.9
+        },
+        {
+          "kill_dist_m": 29.1,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 327.8
+        },
+        {
+          "kill_dist_m": 31.3,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 329.2
+        }
+      ],
+      "mobs_leaked": 2,
+      "obstacles_destroyed": [
+        {
+          "river_dist_m": 29.1,
+          "shots": 5,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 29.1,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 32.8,
+          "shots": 1,
+          "type": "rune_barrel"
+        },
+        {
+          "river_dist_m": 35.0,
+          "shots": 5,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 35.0,
+          "shots": 4,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 66.2,
+          "shots": 1,
+          "type": "rune_barrel"
+        },
+        {
+          "river_dist_m": 71.2,
+          "shots": 5,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 76.9,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 81.3,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 88.9,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 96.3,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 108.8,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 183.5,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 190.7,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 233.2,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 238.0,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 240.0,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 242.0,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 243.3,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 247.2,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 335.8,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 339.8,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 343.1,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 344.4,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 345.8,
+          "shots": 6,
+          "type": "wooden_barrel"
+        }
+      ],
+      "plating": "none",
+      "run_number": 6,
+      "ship_id": "sloop",
+      "ship_tier": 4,
+      "shot_expirations": 1187,
+      "shots_hit_water": 1187,
+      "stars_awarded": 1,
+      "start_time_iso": "2026-09-29 18:40:17",
+      "status": "VICTORY",
+      "total_damage_received": 2,
+      "total_earned": 421,
+      "vault_at_start": 6
+    },
+    {
+      "ammo": "standard_iron",
+      "avg_fps": 55.4,
+      "boss_encounter": {
+        "boss_name": "",
+        "defeated": false,
+        "fight_duration": 0.0,
+        "final_health": 0,
+        "max_health": 0
+      },
+      "chunks_entered": [
+        {
+          "chunk": "gunner_ambush",
+          "river_dist_m": 8.5
+        },
+        {
+          "chunk": "warmup",
+          "river_dist_m": 58.4
+        },
+        {
+          "chunk": "mine_gauntlet",
+          "river_dist_m": 108.4
+        },
+        {
+          "chunk": "reef_slalom",
+          "river_dist_m": 158.4
+        },
+        {
+          "chunk": "chunk_barricade_siege",
+          "river_dist_m": 208.4
+        },
+        {
+          "chunk": "fodder_swarm",
+          "river_dist_m": 258.4
+        },
+        {
+          "chunk": "finish_line",
+          "river_dist_m": 308.5
+        }
+      ],
+      "coins_by_source": {
+        "chest": 140,
+        "coin_pickup": 93,
+        "multiplier_gate": 75
+      },
+      "coins_collected": 308,
+      "completion_bonus": 126,
+      "distance_reached": 384.4,
+      "duration_seconds": 51.0,
+      "fps_metrics": {
+        "avg_fps": 55.4,
+        "max_fps": 61,
+        "min_fps": 6,
+        "samples": 3212
+      },
+      "hits_taken": [
+        {
+          "current_hp": 4,
+          "damage": 1,
+          "distance": 35.8,
+          "max_hp": 5,
+          "source": "brimstone_raft_ram",
+          "time": 4.8
+        },
+        {
+          "current_hp": 3,
+          "damage": 1,
+          "distance": 49.7,
+          "max_hp": 5,
+          "source": "brimstone_raft_ram",
+          "time": 6.5
+        },
+        {
+          "current_hp": 2,
+          "damage": 1,
+          "distance": 62.6,
+          "max_hp": 5,
+          "source": "leak_threat",
+          "time": 8.2
+        }
+      ],
+      "level_index": 7,
+      "min_fps": 6,
+      "mob_kills": [
+        {
+          "kill_dist_m": 36.3,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 98.3
+        },
+        {
+          "kill_dist_m": 38.2,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 220.6
+        },
+        {
+          "kill_dist_m": 28.8,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 229.7
+        },
+        {
+          "kill_dist_m": 26.2,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 231.7
+        },
+        {
+          "kill_dist_m": 39.8,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 247.1
+        },
+        {
+          "kill_dist_m": 33.2,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 253.2
+        },
+        {
+          "kill_dist_m": 31.7,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 253.5
+        },
+        {
+          "kill_dist_m": 31.1,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 254.1
+        },
+        {
+          "kill_dist_m": 31.1,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 254.1
+        },
+        {
+          "kill_dist_m": 32.1,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 254.1
+        },
+        {
+          "kill_dist_m": 31.1,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 254.1
+        },
+        {
+          "kill_dist_m": 32.7,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 324.8
+        },
+        {
+          "kill_dist_m": 30.3,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 326.8
+        },
+        {
+          "kill_dist_m": 30.0,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 327.1
+        },
+        {
+          "kill_dist_m": 32.9,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 328.0
+        },
+        {
+          "kill_dist_m": 25.8,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 333.6
+        },
+        {
+          "kill_dist_m": 21.1,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 334.8
+        }
+      ],
+      "mobs_leaked": 2,
+      "obstacles_destroyed": [
+        {
+          "river_dist_m": 26.3,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 29.3,
+          "shots": 1,
+          "type": "rune_barrel"
+        },
+        {
+          "river_dist_m": 42.3,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 68.0,
+          "shots": 1,
+          "type": "rune_barrel"
+        },
+        {
+          "river_dist_m": 71.7,
+          "shots": 4,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 71.7,
+          "shots": 5,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 81.2,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 83.5,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 94.3,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 108.8,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 110.5,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 178.1,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 196.4,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 234.0,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 234.7,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 235.6,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 240.5,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 244.7,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 253.5,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 336.8,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 339.7,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 342.3,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 342.7,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 350.7,
+          "shots": 6,
+          "type": "wooden_barrel"
+        }
+      ],
+      "plating": "none",
+      "run_number": 7,
+      "ship_id": "sloop",
+      "ship_tier": 4,
+      "shot_expirations": 1124,
+      "shots_hit_water": 1124,
+      "stars_awarded": 1,
+      "start_time_iso": "2026-09-29 18:41:13",
+      "status": "VICTORY",
+      "total_damage_received": 3,
+      "total_earned": 434,
+      "vault_at_start": 848
+    },
+    {
+      "ammo": "standard_iron",
+      "avg_fps": 55.0,
+      "boss_encounter": {
+        "boss_name": "",
+        "defeated": false,
+        "fight_duration": 0.0,
+        "final_health": 0,
+        "max_health": 0
+      },
+      "chunks_entered": [
+        {
+          "chunk": "gunner_ambush",
+          "river_dist_m": 8.4
+        },
+        {
+          "chunk": "warmup",
+          "river_dist_m": 58.4
+        },
+        {
+          "chunk": "mine_gauntlet",
+          "river_dist_m": 108.4
+        },
+        {
+          "chunk": "reef_slalom",
+          "river_dist_m": 158.4
+        },
+        {
+          "chunk": "chunk_barricade_siege",
+          "river_dist_m": 208.4
+        },
+        {
+          "chunk": "fodder_swarm",
+          "river_dist_m": 258.4
+        },
+        {
+          "chunk": "finish_line",
+          "river_dist_m": 308.5
+        }
+      ],
+      "coins_by_source": {
+        "chest": 140,
+        "coin_pickup": 98,
+        "multiplier_gate": 75
+      },
+      "coins_collected": 313,
+      "completion_bonus": 140,
+      "distance_reached": 384.3,
+      "duration_seconds": 50.4,
+      "fps_metrics": {
+        "avg_fps": 55.0,
+        "max_fps": 61,
+        "min_fps": 6,
+        "samples": 3657
+      },
+      "hits_taken": [
+        {
+          "current_hp": 4,
+          "damage": 1,
+          "distance": 41.0,
+          "max_hp": 5,
+          "source": "brimstone_raft_ram",
+          "time": 5.4
+        },
+        {
+          "current_hp": 3,
+          "damage": 1,
+          "distance": 49.9,
+          "max_hp": 5,
+          "source": "brimstone_raft_ram",
+          "time": 6.5
+        },
+        {
+          "current_hp": 2,
+          "damage": 1,
+          "distance": 62.8,
+          "max_hp": 5,
+          "source": "leak_threat",
+          "time": 8.2
+        }
+      ],
+      "level_index": 8,
+      "min_fps": 6,
+      "mob_kills": [
+        {
+          "kill_dist_m": 17.7,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 113.2
+        },
+        {
+          "kill_dist_m": 38.3,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 222.1
+        },
+        {
+          "kill_dist_m": 35.1,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 223.0
+        },
+        {
+          "kill_dist_m": 33.6,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 225.9
+        },
+        {
+          "kill_dist_m": 39.8,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 247.2
+        },
+        {
+          "kill_dist_m": 39.3,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 248.4
+        },
+        {
+          "kill_dist_m": 34.2,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 251.6
+        },
+        {
+          "kill_dist_m": 34.2,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 251.6
+        },
+        {
+          "kill_dist_m": 34.2,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 251.6
+        },
+        {
+          "kill_dist_m": 34.2,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 251.6
+        },
+        {
+          "kill_dist_m": 35.2,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 251.6
+        },
+        {
+          "kill_dist_m": 31.7,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 325.6
+        },
+        {
+          "kill_dist_m": 31.4,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 325.9
+        },
+        {
+          "kill_dist_m": 30.1,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 327.0
+        },
+        {
+          "kill_dist_m": 25.0,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 331.5
+        },
+        {
+          "kill_dist_m": 28.3,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 331.7
+        },
+        {
+          "kill_dist_m": 27.4,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 332.4
+        }
+      ],
+      "mobs_leaked": 1,
+      "obstacles_destroyed": [
+        {
+          "river_dist_m": 26.9,
+          "shots": 5,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 26.9,
+          "shots": 1,
+          "type": "rune_barrel"
+        },
+        {
+          "river_dist_m": 27.0,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 67.5,
+          "shots": 1,
+          "type": "rune_barrel"
+        },
+        {
+          "river_dist_m": 69.7,
+          "shots": 3,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 69.7,
+          "shots": 3,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 75.5,
+          "shots": 4,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 77.5,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 88.8,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 90.9,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 100.1,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 110.6,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 182.6,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 197.7,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 233.3,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 235.4,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 237.0,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 238.1,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 251.8,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 254.1,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 336.5,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 341.5,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 343.3,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 349.5,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 353.4,
+          "shots": 6,
+          "type": "wooden_barrel"
+        }
+      ],
+      "plating": "none",
+      "run_number": 8,
+      "ship_id": "sloop",
+      "ship_tier": 4,
+      "shot_expirations": 1150,
+      "shots_hit_water": 1150,
+      "stars_awarded": 1,
+      "start_time_iso": "2026-09-29 18:42:18",
+      "status": "VICTORY",
+      "total_damage_received": 3,
+      "total_earned": 453,
+      "vault_at_start": 116
+    },
+    {
+      "ammo": "standard_iron",
+      "avg_fps": 54.6,
+      "boss_encounter": {
+        "boss_name": "",
+        "defeated": false,
+        "fight_duration": 0.0,
+        "final_health": 0,
+        "max_health": 0
+      },
+      "chunks_entered": [
+        {
+          "chunk": "gunner_ambush",
+          "river_dist_m": 8.4
+        },
+        {
+          "chunk": "warmup",
+          "river_dist_m": 58.4
+        },
+        {
+          "chunk": "mine_gauntlet",
+          "river_dist_m": 108.4
+        },
+        {
+          "chunk": "reef_slalom",
+          "river_dist_m": 158.5
+        },
+        {
+          "chunk": "chunk_barricade_siege",
+          "river_dist_m": 208.4
+        },
+        {
+          "chunk": "fodder_swarm",
+          "river_dist_m": 258.4
+        },
+        {
+          "chunk": "finish_line",
+          "river_dist_m": 308.4
+        }
+      ],
+      "coins_by_source": {
+        "chest": 140,
+        "coin_pickup": 97,
+        "multiplier_gate": 75
+      },
+      "coins_collected": 312,
+      "completion_bonus": 153,
+      "distance_reached": 384.4,
+      "duration_seconds": 49.2,
+      "fps_metrics": {
+        "avg_fps": 54.6,
+        "max_fps": 61,
+        "min_fps": 6,
+        "samples": 4093
+      },
+      "hits_taken": [
+        {
+          "current_hp": 4,
+          "damage": 1,
+          "distance": 41.3,
+          "max_hp": 5,
+          "source": "brimstone_raft_ram",
+          "time": 5.3
+        },
+        {
+          "current_hp": 3,
+          "damage": 1,
+          "distance": 50.5,
+          "max_hp": 5,
+          "source": "brimstone_raft_ram",
+          "time": 6.4
+        },
+        {
+          "current_hp": 2,
+          "damage": 1,
+          "distance": 63.1,
+          "max_hp": 5,
+          "source": "leak_threat",
+          "time": 8.0
+        }
+      ],
+      "level_index": 9,
+      "min_fps": 6,
+      "mob_kills": [
+        {
+          "kill_dist_m": 35.2,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 99.5
+        },
+        {
+          "kill_dist_m": 39.6,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 219.6
+        },
+        {
+          "kill_dist_m": 25.3,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 232.6
+        },
+        {
+          "kill_dist_m": 21.6,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 235.6
+        },
+        {
+          "kill_dist_m": 39.4,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 247.7
+        },
+        {
+          "kill_dist_m": 38.9,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 248.9
+        },
+        {
+          "kill_dist_m": 37.1,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 250.4
+        },
+        {
+          "kill_dist_m": 36.1,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 250.4
+        },
+        {
+          "kill_dist_m": 36.1,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 250.4
+        },
+        {
+          "kill_dist_m": 36.1,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 250.4
+        },
+        {
+          "kill_dist_m": 36.1,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 250.4
+        },
+        {
+          "kill_dist_m": 38.7,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 319.6
+        },
+        {
+          "kill_dist_m": 38.7,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 319.6
+        },
+        {
+          "kill_dist_m": 34.1,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 323.6
+        },
+        {
+          "kill_dist_m": 30.1,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 330.4
+        },
+        {
+          "kill_dist_m": 16.0,
+          "max_hp": 2,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 339.3
+        },
+        {
+          "kill_dist_m": 14.6,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 342.8
+        }
+      ],
+      "mobs_leaked": 1,
+      "obstacles_destroyed": [
+        {
+          "river_dist_m": 26.8,
+          "shots": 5,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 26.8,
+          "shots": 1,
+          "type": "rune_barrel"
+        },
+        {
+          "river_dist_m": 27.1,
+          "shots": 2,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 66.1,
+          "shots": 1,
+          "type": "rune_barrel"
+        },
+        {
+          "river_dist_m": 70.4,
+          "shots": 4,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 70.4,
+          "shots": 4,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 79.7,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 85.5,
+          "shots": 3,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 91.9,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 95.3,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 100.3,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 181.6,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 202.5,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 233.4,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 236.4,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 240.5,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 241.0,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 243.3,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 254.0,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 335.2,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 337.2,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 341.6,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 351.6,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 357.7,
+          "shots": 6,
+          "type": "wooden_barrel"
+        }
+      ],
+      "plating": "none",
+      "run_number": 9,
+      "ship_id": "sloop",
+      "ship_tier": 4,
+      "shot_expirations": 1148,
+      "shots_hit_water": 1148,
+      "stars_awarded": 1,
+      "start_time_iso": "2026-09-29 18:43:20",
+      "status": "VICTORY",
+      "total_damage_received": 3,
+      "total_earned": 465,
+      "vault_at_start": 1022
+    },
+    {
+      "ammo": "standard_iron",
+      "avg_fps": 54.8,
+      "boss_encounter": {
+        "boss_name": "The Phantom Dredge",
+        "defeated": false,
+        "fight_duration": 0.0,
+        "final_health": 307,
+        "max_health": 1400,
+        "spawn_time": 662.389
+      },
+      "chunks_entered": [
+        {
+          "chunk": "mine_gauntlet",
+          "river_dist_m": 8.4
+        },
+        {
+          "chunk": "warmup",
+          "river_dist_m": 58.4
+        },
+        {
+          "chunk": "gunner_ambush",
+          "river_dist_m": 108.4
+        },
+        {
+          "chunk": "reef_slalom",
+          "river_dist_m": 158.5
+        },
+        {
+          "chunk": "chunk_barricade_siege",
+          "river_dist_m": 208.4
+        },
+        {
+          "chunk": "fodder_swarm",
+          "river_dist_m": 258.4
+        },
+        {
+          "chunk": "boss_intro_buffer",
+          "river_dist_m": 308.5
+        },
+        {
+          "chunk": "boss_phantom_dredge",
+          "river_dist_m": 358.4
+        }
+      ],
+      "coins_by_source": {
+        "chest": 140,
+        "coin_pickup": 85,
+        "multiplier_gate": 58
+      },
+      "coins_collected": 283,
+      "completion_bonus": 180,
+      "distance_reached": 400.0,
+      "duration_seconds": 105.1,
+      "fps_metrics": {
+        "avg_fps": 54.8,
+        "max_fps": 61,
+        "min_fps": 1,
+        "samples": 4999
+      },
+      "hits_taken": [
+        {
+          "current_hp": 4,
+          "damage": 1,
+          "distance": 42.4,
+          "max_hp": 5,
+          "source": "Collision with Sea Mine",
+          "time": 5.5
+        },
+        {
+          "current_hp": 4,
+          "damage": 1,
+          "distance": 136.5,
+          "max_hp": 5,
+          "source": "brimstone_raft_ram",
+          "time": 17.3
+        }
+      ],
+      "level_index": 10,
+      "min_fps": 1,
+      "mob_kills": [
+        {
+          "kill_dist_m": 27.9,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 105.4
+        },
+        {
+          "kill_dist_m": 38.7,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 221.9
+        },
+        {
+          "kill_dist_m": 36.0,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 222.5
+        },
+        {
+          "kill_dist_m": 36.2,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 224.0
+        },
+        {
+          "kill_dist_m": 39.4,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 247.9
+        },
+        {
+          "kill_dist_m": 37.7,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 250.0
+        },
+        {
+          "kill_dist_m": 36.2,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 251.2
+        },
+        {
+          "kill_dist_m": 35.2,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 251.2
+        },
+        {
+          "kill_dist_m": 35.2,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 251.2
+        },
+        {
+          "kill_dist_m": 35.2,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 251.2
+        },
+        {
+          "kill_dist_m": 35.2,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 251.2
+        },
+        {
+          "kill_dist_m": 35.0,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 336.1
+        },
+        {
+          "kill_dist_m": 34.5,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 338.2
+        }
+      ],
+      "mobs_leaked": 0,
+      "obstacles_destroyed": [
+        {
+          "river_dist_m": 28.1,
+          "shots": 5,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 28.1,
+          "shots": 1,
+          "type": "rune_barrel"
+        },
+        {
+          "river_dist_m": 32.3,
+          "shots": 5,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 38.0,
+          "shots": 4,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 40.8,
+          "shots": 4,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 83.7,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 85.9,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 95.3,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 98.0,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 157.0,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 159.2,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 162.1,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 162.1,
+          "shots": 1,
+          "type": "rune_barrel"
+        },
+        {
+          "river_dist_m": 169.3,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 170.6,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 184.7,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 190.5,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 233.1,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 237.2,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 240.0,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 242.5,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 244.3,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 254.5,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 326.7,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 330.5,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 374.9,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 379.3,
+          "shots": 1,
+          "type": "wooden_barrel"
+        }
+      ],
+      "plating": "none",
+      "run_number": 10,
+      "ship_id": "sloop",
+      "ship_tier": 4,
+      "shot_expirations": 1528,
+      "shots_hit_water": 1528,
+      "stars_awarded": 2,
+      "start_time_iso": "2026-09-29 18:44:18",
+      "status": "VICTORY",
+      "total_damage_received": 2,
+      "total_earned": 463,
+      "vault_at_start": 1952
+    },
+    {
+      "ammo": "standard_iron",
+      "avg_fps": 52.4,
+      "boss_encounter": {
+        "boss_name": "Captain Ironjaw's War-Barge",
+        "defeated": false,
+        "fight_duration": 0.0,
+        "final_health": 831,
+        "max_health": 2400,
+        "spawn_time": 947.231
+      },
+      "chunks_entered": [
+        {
+          "chunk": "warmup",
+          "river_dist_m": 0.0
+        },
+        {
+          "chunk": "reef_slalom",
+          "river_dist_m": 8.4
+        },
+        {
+          "chunk": "reef_slalom",
+          "river_dist_m": 58.5
+        },
+        {
+          "chunk": "fodder_swarm",
+          "river_dist_m": 108.4
+        },
+        {
+          "chunk": "chunk_barricade_siege",
+          "river_dist_m": 158.4
+        },
+        {
+          "chunk": "fodder_swarm",
+          "river_dist_m": 208.4
+        },
+        {
+          "chunk": "mine_gauntlet",
+          "river_dist_m": 258.4
+        },
+        {
+          "chunk": "fodder_swarm",
+          "river_dist_m": 308.4
+        },
+        {
+          "chunk": "gunner_ambush",
+          "river_dist_m": 358.4
+        },
+        {
+          "chunk": "fodder_swarm",
+          "river_dist_m": 408.4
+        },
+        {
+          "chunk": "reef_slalom",
+          "river_dist_m": 458.4
+        },
+        {
+          "chunk": "gunner_ambush",
+          "river_dist_m": 508.4
+        },
+        {
+          "chunk": "reef_slalom",
+          "river_dist_m": 558.4
+        },
+        {
+          "chunk": "chunk_barricade_siege",
+          "river_dist_m": 608.5
+        },
+        {
+          "chunk": "gunner_ambush",
+          "river_dist_m": 658.5
+        },
+        {
+          "chunk": "mine_gauntlet",
+          "river_dist_m": 708.4
+        },
+        {
+          "chunk": "gunner_ambush",
+          "river_dist_m": 758.4
+        },
+        {
+          "chunk": "mine_gauntlet",
+          "river_dist_m": 808.4
+        },
+        {
+          "chunk": "reef_slalom",
+          "river_dist_m": 858.5
+        },
+        {
+          "chunk": "gunner_ambush",
+          "river_dist_m": 908.5
+        }
+      ],
+      "coins_by_source": {
+        "chest": 165,
+        "coin_pickup": 252,
+        "multiplier_gate": 165
+      },
+      "coins_collected": 252,
+      "completion_bonus": 0,
+      "distance_reached": 937.7,
+      "duration_seconds": 125.2,
+      "fatal_source": "brimstone_raft_ram",
+      "fps_metrics": {
+        "avg_fps": 52.4,
+        "max_fps": 61,
+        "min_fps": 1,
+        "samples": 6047
+      },
+      "hits_taken": [
+        {
+          "current_hp": 4,
+          "damage": 1,
+          "distance": 621.6,
+          "max_hp": 5,
+          "source": "Collision with HitBox ([&\"boss\", &\"destructible\", &\"enemies\"])",
+          "time": 82.4
+        },
+        {
+          "current_hp": 4,
+          "damage": 1,
+          "distance": 811.9,
+          "max_hp": 5,
+          "source": "leak_threat",
+          "time": 105.2
+        },
+        {
+          "current_hp": 3,
+          "damage": 1,
+          "distance": 848.9,
+          "max_hp": 5,
+          "source": "leak_threat",
+          "time": 110.1
+        },
+        {
+          "current_hp": 2,
+          "damage": 1,
+          "distance": 863.4,
+          "max_hp": 5,
+          "source": "leak_threat",
+          "time": 116.6
+        },
+        {
+          "current_hp": 1,
+          "damage": 1,
+          "distance": 894.3,
+          "max_hp": 5,
+          "source": "tide_cutter_ram",
+          "time": 120.2
+        },
+        {
+          "current_hp": 0,
+          "damage": 1,
+          "distance": 937.7,
+          "max_hp": 5,
+          "source": "brimstone_raft_ram",
+          "time": 125.2
+        }
+      ],
+      "level_index": 12,
+      "min_fps": 1,
+      "mob_kills": [
+        {
+          "kill_dist_m": 15.1,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 23.3
+        },
+        {
+          "kill_dist_m": 37.5,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 172.6
+        },
+        {
+          "kill_dist_m": 31.8,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 175.5
+        },
+        {
+          "kill_dist_m": 31.3,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 177.5
+        },
+        {
+          "kill_dist_m": 32.1,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 203.6
+        },
+        {
+          "kill_dist_m": 27.1,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 206.8
+        },
+        {
+          "kill_dist_m": 20.5,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 212.0
+        },
+        {
+          "kill_dist_m": 21.3,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 212.1
+        },
+        {
+          "kill_dist_m": 18.3,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 213.7
+        },
+        {
+          "kill_dist_m": 18.0,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 213.9
+        },
+        {
+          "kill_dist_m": 16.9,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 214.8
+        },
+        {
+          "kill_dist_m": 39.8,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 621.1
+        },
+        {
+          "kill_dist_m": 36.8,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 621.9
+        },
+        {
+          "kill_dist_m": 36.9,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 623.4
+        },
+        {
+          "kill_dist_m": 16.1,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 666.8
+        },
+        {
+          "kill_dist_m": 16.1,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 666.8
+        },
+        {
+          "kill_dist_m": 17.1,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 666.8
+        },
+        {
+          "kill_dist_m": 15.5,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 667.2
+        },
+        {
+          "kill_dist_m": 14.3,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 668.2
+        },
+        {
+          "kill_dist_m": 11.9,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 670.1
+        },
+        {
+          "kill_dist_m": 11.5,
+          "max_hp": 3,
+          "mob": "Skeleton Rower",
+          "river_dist_m": 671.3
+        }
+      ],
+      "mobs_leaked": 3,
+      "obstacles_destroyed": [
+        {
+          "river_dist_m": 7.0,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 9.6,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 14.1,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 18.8,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 31.3,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 53.1,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 78.1,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 83.7,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 97.8,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 191.6,
+          "shots": 12,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 191.7,
+          "shots": 12,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 201.7,
+          "shots": 12,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 203.6,
+          "shots": 12,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 205.3,
+          "shots": 12,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 212.6,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 400.6,
+          "shots": 1,
+          "type": "rune_barrel"
+        },
+        {
+          "river_dist_m": 402.5,
+          "shots": 12,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 404.7,
+          "shots": 12,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 410.4,
+          "shots": 12,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 417.6,
+          "shots": 12,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 431.0,
+          "shots": 10,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 487.7,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 509.8,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 551.1,
+          "shots": 1,
+          "type": "rune_barrel"
+        },
+        {
+          "river_dist_m": 551.4,
+          "shots": 12,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 554.7,
+          "shots": 12,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 557.6,
+          "shots": 12,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 563.8,
+          "shots": 12,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 579.3,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 583.3,
+          "shots": 8,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 595.9,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 641.2,
+          "shots": 1,
+          "type": "fuse_barrel"
+        },
+        {
+          "river_dist_m": 641.2,
+          "shots": 1,
+          "type": "fuse_barrel"
+        },
+        {
+          "river_dist_m": 655.7,
+          "shots": 12,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 656.0,
+          "shots": 10,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 657.4,
+          "shots": 6,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 661.7,
+          "shots": 10,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 661.9,
+          "shots": 10,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 663.2,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 686.4,
+          "shots": 1,
+          "type": "fuse_barrel"
+        },
+        {
+          "river_dist_m": 686.4,
+          "shots": 1,
+          "type": "fuse_barrel"
+        },
+        {
+          "river_dist_m": 720.2,
+          "shots": 1,
+          "type": "rune_barrel"
+        },
+        {
+          "river_dist_m": 722.0,
+          "shots": 8,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 722.0,
+          "shots": 5,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 725.0,
+          "shots": 12,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 726.4,
+          "shots": 1,
+          "type": "fuse_barrel"
+        },
+        {
+          "river_dist_m": 726.4,
+          "shots": 1,
+          "type": "fuse_barrel"
+        },
+        {
+          "river_dist_m": 728.4,
+          "shots": 10,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 771.7,
+          "shots": 1,
+          "type": "fuse_barrel"
+        },
+        {
+          "river_dist_m": 771.7,
+          "shots": 1,
+          "type": "fuse_barrel"
+        },
+        {
+          "river_dist_m": 817.6,
+          "shots": 1,
+          "type": "fuse_barrel"
+        },
+        {
+          "river_dist_m": 817.6,
+          "shots": 1,
+          "type": "fuse_barrel"
+        },
+        {
+          "river_dist_m": 823.1,
+          "shots": 1,
+          "type": "rune_barrel"
+        },
+        {
+          "river_dist_m": 833.4,
+          "shots": 7,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 836.3,
+          "shots": 4,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 836.3,
+          "shots": 8,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 864.3,
+          "shots": 1,
+          "type": "fuse_barrel"
+        },
+        {
+          "river_dist_m": 864.3,
+          "shots": 1,
+          "type": "fuse_barrel"
+        },
+        {
+          "river_dist_m": 909.5,
+          "shots": 1,
+          "type": "wooden_barrel"
+        },
+        {
+          "river_dist_m": 911.1,
+          "shots": 1,
+          "type": "fuse_barrel"
+        },
+        {
+          "river_dist_m": 911.1,
+          "shots": 1,
+          "type": "fuse_barrel"
+        },
+        {
+          "river_dist_m": 914.7,
+          "shots": 1,
+          "type": "wooden_barrel"
+        }
+      ],
+      "plating": "none",
+      "run_number": 11,
+      "ship_id": "sloop",
+      "ship_tier": 5,
+      "shot_expirations": 2878,
+      "shots_hit_water": 2878,
+      "stars_awarded": 0,
+      "start_time_iso": "2026-09-29 18:48:25",
+      "status": "DEFEAT",
+      "total_damage_received": 6,
+      "total_earned": 252,
+      "vault_at_start": 478
+    }
+  ],
+  "combat_overview": {
+    "hazard_damage_frequency": {
+      "Collision with HitBox ([&\"boss\", &\"destructible\", &\"enemies\"])": 1,
+      "Collision with Sea Mine": 1,
+      "brimstone_raft_ram": 14,
+      "leak_threat": 6,
+      "tide_cutter_ram": 1
+    }
+  },
+  "economy_overview": {
+    "current_vault": 730,
+    "earnings_by_source": {
+      "chest": 1080,
+      "coin_pickup": 1200,
+      "multiplier_gate": 788
+    },
+    "total_doubloons_earned": 3068,
+    "total_doubloons_spent": 6900
+  },
+  "level_progression_summary": {
+    "1": {
+      "attempts": 1,
+      "clears": 1,
+      "defeats": 0,
+      "total_coins": 188
+    },
+    "2": {
+      "attempts": 1,
+      "clears": 1,
+      "defeats": 0,
+      "total_coins": 196
+    },
+    "3": {
+      "attempts": 1,
+      "clears": 1,
+      "defeats": 0,
+      "total_coins": 233
+    },
+    "4": {
+      "attempts": 1,
+      "clears": 1,
+      "defeats": 0,
+      "total_coins": 298
+    },
+    "5": {
+      "attempts": 1,
+      "clears": 1,
+      "defeats": 0,
+      "total_coins": 538
+    },
+    "6": {
+      "attempts": 1,
+      "clears": 1,
+      "defeats": 0,
+      "total_coins": 421
+    },
+    "7": {
+      "attempts": 1,
+      "clears": 1,
+      "defeats": 0,
+      "total_coins": 434
+    },
+    "8": {
+      "attempts": 1,
+      "clears": 1,
+      "defeats": 0,
+      "total_coins": 453
+    },
+    "9": {
+      "attempts": 1,
+      "clears": 1,
+      "defeats": 0,
+      "total_coins": 465
+    },
+    "10": {
+      "attempts": 1,
+      "clears": 1,
+      "defeats": 0,
+      "total_coins": 463
+    },
+    "12": {
+      "attempts": 1,
+      "clears": 0,
+      "defeats": 1,
+      "total_coins": 252
+    }
+  },
+  "performance_overview": {
+    "session_avg_fps": 55.9,
+    "session_max_fps": 0,
+    "session_min_fps": 1,
+    "target_framerate": 30
+  },
+  "session_metadata": {
+    "defeats": 1,
+    "last_updated": "2026-09-29 18:52:29",
+    "session_avg_fps": 55.9,
+    "session_file": "user://playtest_session_171.json",
+    "session_index": 171,
+    "session_max_fps": 0,
+    "session_min_fps": 1,
+    "session_start": "2026-09-29 18:34:01",
+    "total_attempts": 11,
+    "victories": 10,
+    "win_rate_pct": 90.9
+  },
+  "shipyard_activity": [
+    {
+      "cost": 150,
+      "item_id": "dinghy_t2",
+      "item_type": "vessel_upgrade",
+      "reason": "upgraded",
+      "success": true,
+      "timestamp": "2026-09-29 18:35:08",
+      "vault_balance": 376
+    },
+    {
+      "cost": 350,
+      "item_id": "monkey_bomber",
+      "item_type": "crew",
+      "reason": "hired",
+      "success": true,
+      "timestamp": "2026-09-29 18:36:02",
+      "vault_balance": 618
+    },
+    {
+      "cost": 400,
+      "item_id": "sloop",
+      "item_type": "vessel",
+      "reason": "purchased",
+      "success": true,
+      "timestamp": "2026-09-29 18:37:01",
+      "vault_balance": 734
+    },
+    {
+      "cost": 250,
+      "item_id": "sloop_t2",
+      "item_type": "vessel_upgrade",
+      "reason": "upgraded",
+      "success": true,
+      "timestamp": "2026-09-29 18:37:09",
+      "vault_balance": 334
+    },
+    {
+      "cost": 550,
+      "item_id": "sloop_t3",
+      "item_type": "vessel_upgrade",
+      "reason": "upgraded",
+      "success": true,
+      "timestamp": "2026-09-29 18:38:21",
+      "vault_balance": 680
+    },
+    {
+      "cost": 1200,
+      "item_id": "sloop_t4",
+      "item_type": "vessel_upgrade",
+      "reason": "upgraded",
+      "success": true,
+      "timestamp": "2026-09-29 18:40:13",
+      "vault_balance": 1206
+    },
+    {
+      "cost": 500,
+      "item_id": "monkey_bomber_lvl2",
+      "item_type": "crew_upgrade",
+      "reason": "promoted",
+      "success": true,
+      "timestamp": "2026-09-29 18:42:13",
+      "vault_balance": 1716
+    },
+    {
+      "cost": 1100,
+      "item_id": "monkey_bomber_lvl3",
+      "item_type": "crew_upgrade",
+      "reason": "promoted",
+      "success": true,
+      "timestamp": "2026-09-29 18:42:14",
+      "vault_balance": 1216
+    },
+    {
+      "cost": 2400,
+      "item_id": "sloop_t5",
+      "item_type": "vessel_upgrade",
+      "reason": "upgraded",
+      "success": true,
+      "timestamp": "2026-09-29 18:46:07",
+      "vault_balance": 2878
+    }
+  ]
+}

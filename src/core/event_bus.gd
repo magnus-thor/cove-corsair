@@ -88,3 +88,33 @@ signal mob_escaped(mob_name: String, total_leaked: int)
 @warning_ignore("unused_signal")
 signal shipyard_item_action(item_id: String, item_type: String, cost: int, player_vault: int, success: bool, reason: String)
 
+## ── Engagement Density & Difficulty Logging ─────────────────────────────────
+
+## Fired when an enemy mob is killed by the player.
+## mob_type: the name/type string of the mob (e.g. "GraveSkiff", "IronGunner").
+## mob_max_hp: HP the mob had at spawn — helps gauge how "hard" it was.
+## dist_to_player: Z-distance between mob and player at time of death (how far the shot reached).
+## river_distance: how far along the level the kill happened.
+@warning_ignore("unused_signal")
+signal mob_killed(mob_type: String, mob_max_hp: int, dist_to_player: float, river_distance: float)
+
+## Fired when a modular track chunk enters the camera range and activates its spawners.
+## chunk_id: the chunk's scene/node name identifier.
+## river_distance: level distance at which the chunk activated.
+@warning_ignore("unused_signal")
+signal chunk_activated(chunk_id: String, river_distance: float)
+
+## Fired when a destructible obstacle (barrel, barricade, gate) is destroyed by the player.
+## obstacle_type: human-readable label ("wooden_barrel", "barricade", "sea_mine", "gate", etc.).
+## shots_taken: how many hits it absorbed before dying — proxy for engagement duration.
+## river_distance: level distance at time of destruction.
+@warning_ignore("unused_signal")
+signal obstacle_destroyed_telemetry(obstacle_type: String, shots_taken: int, river_distance: float)
+
+## Fired when a player projectile hits its max_range limit and splashes out harmlessly.
+## weapon_id: weapon/ammo identifier string.
+## max_range_m: the configured max_range in metres.
+## river_distance: level distance when the shot expired.
+@warning_ignore("unused_signal")
+signal shot_expired_at_distance(weapon_id: String, max_range_m: float, river_distance: float)
+

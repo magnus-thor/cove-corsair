@@ -47,6 +47,7 @@ var _base_hp: int = 1
 @onready var health_component: HealthComponent = get_node_or_null("HealthComponent")
 
 var _is_destroyed: bool = false
+var _hits_taken: int = 0
 
 func _ready() -> void:
 	_clean_shadow_nodes(self)
@@ -145,6 +146,7 @@ func update_obstacle_visuals() -> void:
 func take_hit(amount: int, source_info: String = "") -> void:
 	if _is_destroyed:
 		return
+	_hits_taken += 1
 	if health_component:
 		health_component.take_damage(amount, source_info)
 		# Sensory Polish: 3D & Sprite Hit Flash
@@ -228,6 +230,19 @@ func die() -> void:
 			_spawn_doubloons()
 	else:
 		_spawn_doubloons()
+
+	# ── Engagement telemetry ─────────────────────────────────────────────────
+	if EventBus and EventBus.has_signal("obstacle_destroyed_telemetry"):
+		var obs_label: String
+		match obstacle_type:
+			ObstacleType.WOODEN_BARREL: obs_label = "wooden_barrel"
+			ObstacleType.FUSE_BARREL:   obs_label = "fuse_barrel"
+			ObstacleType.RUNE_BARREL:   obs_label = "rune_barrel"
+			ObstacleType.SEA_MINE:      obs_label = "sea_mine"
+			ObstacleType.CORAL_REEF:    obs_label = "coral_reef"
+			_:                          obs_label = "barricade" if is_in_group("barricade") else "obstacle"
+		var river_dist: float = GameState.distance_traveled if GameState else 0.0
+		EventBus.obstacle_destroyed_telemetry.emit(obs_label, _hits_taken, river_dist)
 		if has_meta("spawns_chest"):
 			var chest_scene := load("res://src/gameplay/collectibles/collectible_chest.tscn") as PackedScene
 			if chest_scene:

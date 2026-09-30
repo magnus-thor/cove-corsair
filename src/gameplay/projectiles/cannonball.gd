@@ -459,6 +459,12 @@ func _physics_process(delta: float) -> void:
 		else:
 			AudioManager.play_sfx("water_splashes")
 			_spawn_splash(true)
+			# ── Engagement telemetry: log wasted shots that hit empty water ──────
+			if not (is_hostile or is_in_group("enemy_projectiles") or has_meta("is_hostile")):
+				if EventBus and EventBus.has_signal("shot_expired_at_distance"):
+					var w_id: String = ammo_id if not ammo_id.is_empty() else (ammo_data.ammo_name if ammo_data else "unknown")
+					var river_dist: float = GameState.distance_traveled if GameState else 0.0
+					EventBus.shot_expired_at_distance.emit(w_id, max_range, river_dist)
 		_detach_trail()
 		queue_free()
 		return

@@ -43,6 +43,7 @@ var _time: float = 0.0
 var _is_dead: bool = false
 var _current_base_y: float = 1.25
 var shoot_cooldown_timer: float = 0.0
+var _hits_received: int = 0
 
 ## Read-only passthrough for legacy current_hp reads (e.g. hazard_sea_mine.gd).
 var current_hp: int:
@@ -261,6 +262,7 @@ func take_damage(amount: int) -> void:
 func take_hit(amount: int, source_info: String = "") -> void:
 	if _is_dead:
 		return
+	_hits_received += 1
 	if health_component:
 		health_component.take_damage(amount, source_info)
 		if not _is_dead:
@@ -320,7 +322,17 @@ func die() -> void:
 	var camera := get_tree().get_first_node_in_group("game_camera") as GameCamera
 	if camera:
 		camera.shake(0.18, 0.16)
-	
+
+	# ── Engagement telemetry ─────────────────────────────────────────────────
+	if EventBus and EventBus.has_signal("mob_killed"):
+		var player_node: Node3D = get_tree().get_first_node_in_group("player") as Node3D
+		var dist_to_player: float = 0.0
+		if is_instance_valid(player_node):
+			dist_to_player = absf(global_position.z - player_node.global_position.z)
+		var river_dist: float = GameState.distance_traveled if GameState else 0.0
+		var mob_label: String = enemy_data.mob_name if (enemy_data and not enemy_data.mob_name.is_empty()) else mob_type
+		EventBus.mob_killed.emit(mob_label, max_hp, dist_to_player, river_dist)
+
 	var player: Node = get_tree().get_first_node_in_group("player")
 	if player and player.has_method("upgrade_ship"):
 		player.call("upgrade_ship", 1)

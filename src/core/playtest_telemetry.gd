@@ -139,6 +139,18 @@ func _connect_event_bus() -> void:
 	if EventBus.has_signal("boss_health_changed") and not EventBus.boss_health_changed.is_connected(_on_boss_health_changed):
 		EventBus.boss_health_changed.connect(_on_boss_health_changed)
 
+	if EventBus.has_signal("mob_killed") and not EventBus.mob_killed.is_connected(_on_mob_killed):
+		EventBus.mob_killed.connect(_on_mob_killed)
+
+	if EventBus.has_signal("chunk_activated") and not EventBus.chunk_activated.is_connected(_on_chunk_activated):
+		EventBus.chunk_activated.connect(_on_chunk_activated)
+
+	if EventBus.has_signal("obstacle_destroyed_telemetry") and not EventBus.obstacle_destroyed_telemetry.is_connected(_on_obstacle_destroyed):
+		EventBus.obstacle_destroyed_telemetry.connect(_on_obstacle_destroyed)
+
+	if EventBus.has_signal("shot_expired_at_distance") and not EventBus.shot_expired_at_distance.is_connected(_on_shot_expired):
+		EventBus.shot_expired_at_distance.connect(_on_shot_expired)
+
 func start_level_run(level_index: int) -> void:
 	_finalize_active_run_if_any("SUPERSEDED")
 	
@@ -177,7 +189,12 @@ func start_level_run(level_index: int) -> void:
 			"final_health": 0,
 			"defeated": false,
 			"fight_duration": 0.0
-		}
+		},
+		"chunks_entered": [],
+		"mob_kills": [],
+		"obstacles_destroyed": [],
+		"shot_expirations": 0,
+		"shots_hit_water": 0
 	}
 	
 	print("\n--------------------------------------------------------------------------------")
@@ -250,6 +267,65 @@ func _on_mob_escaped(mob_name: String, total_leaked: int) -> void:
 	if is_run_active:
 		current_run["mobs_leaked"] = total_leaked
 	print("[TELEMETRY:LEAK] ⚠️ Mob Breached River: '%s' | Total Leaks This Run: %d" % [mob_name, total_leaked])
+
+func _on_mob_killed(mob_type: String, mob_max_hp: int, dist_to_player: float, river_distance: float) -> void:
+	if not is_run_active:
+		return
+	var record: Dictionary = {
+		"mob": mob_type,
+		"max_hp": mob_max_hp,
+		"kill_dist_m": snappedf(dist_to_player, 0.1),
+		"river_dist_m": snappedf(river_distance, 0.1)
+	}
+	var kills_arr: Array = current_run.get("mob_kills", []) as Array
+	kills_arr.append(record)
+	current_run["mob_kills"] = kills_arr
+	# Highlight suspiciously easy kills (distance > 30m = killed far away before they get close)
+	var range_flag: String = " 🎯 FAR" if dist_to_player > 30.0 else (" ⚡ CLOSE" if dist_to_player < 10.0 else "")
+	print("[TELEMETRY:KILL] 💀 %s (HP:%d) | Kill dist: %.1fm | River: %.1fm%s" % [
+		mob_type, mob_max_hp, dist_to_player, river_distance, range_flag
+	])
+
+func _on_chunk_activated(chunk_id: String, river_distance: float) -> void:
+	if not is_run_active:
+		return
+	var record: Dictionary = {
+		"chunk": chunk_id,
+		"river_dist_m": snappedf(river_distance, 0.1)
+	}
+	var chunks_arr: Array = current_run.get("chunks_entered", []) as Array
+	chunks_arr.append(record)
+	current_run["chunks_entered"] = chunks_arr
+	print("[TELEMETRY:CHUNK] 🗺️ Chunk '%s' activated at %.1fm" % [chunk_id, river_distance])
+
+func _on_obstacle_destroyed(obstacle_type: String, shots_taken: int, river_distance: float) -> void:
+	if not is_run_active:
+		return
+	var record: Dictionary = {
+		"type": obstacle_type,
+		"shots": shots_taken,
+		"river_dist_m": snappedf(river_distance, 0.1)
+	}
+	var obs_arr: Array = current_run.get("obstacles_destroyed", []) as Array
+	obs_arr.append(record)
+	current_run["obstacles_destroyed"] = obs_arr
+	# Flag thin obstacles (1 shot) vs sustained fights (barricades 20+)
+	var effort_tag: String = "INSTANT" if shots_taken <= 2 else ("SIEGE" if shots_taken >= 15 else "NORMAL")
+	print("[TELEMETRY:OBSTACLE] 💥 %s destroyed | %d shots | %.1fm [%s]" % [
+		obstacle_type, shots_taken, river_distance, effort_tag
+	])
+
+func _on_shot_expired(weapon_id: String, max_range_m: float, river_distance: float) -> void:
+	if not is_run_active:
+		return
+	current_run["shot_expirations"] = int(current_run.get("shot_expirations", 0)) + 1
+	current_run["shots_hit_water"] = int(current_run.get("shots_hit_water", 0)) + 1
+	# Only print every 10th miss to avoid console spam — ratio still captured in JSON
+	var miss_count: int = int(current_run.get("shot_expirations", 0))
+	if miss_count % 10 == 0:
+		print("[TELEMETRY:AMMO] 🌊 %d shots hit water so far (max_range %.1fm) at %.1fm" % [
+			miss_count, max_range_m, river_distance
+		])
 
 func _on_shipyard_item_action(item_id: String, item_type: String, cost: int, player_vault: int, success: bool, reason: String) -> void:
 	var event: Dictionary = {
@@ -361,6 +437,26 @@ func _on_level_completed(_doubloons: int, _targets: int) -> void:
 	print("   Performance : Avg %.1f FPS (Min %d, Max %d)" % [float(fps_info["avg_fps"]), int(fps_info["min_fps"]), int(fps_info["max_fps"])])
 	print("   Hits Taken  : %d (%d dmg total)" % [hits_count, int(current_run.get("total_damage_received", 0))])
 	print("   Mobs Leaked : %d" % leaks)
+	var mob_kills_arr: Array = current_run.get("mob_kills", []) as Array
+	var chunks_arr: Array = current_run.get("chunks_entered", []) as Array
+	var obs_arr: Array = current_run.get("obstacles_destroyed", []) as Array
+	var water_shots: int = int(current_run.get("shots_hit_water", 0))
+	print("   Mob Kills   : %d | Chunks: %d | Obstacles: %d | Wasted Shots: %d" % [
+		mob_kills_arr.size(), chunks_arr.size(), obs_arr.size(), water_shots
+	])
+	if not mob_kills_arr.is_empty():
+		var far_kills: int = 0
+		var close_kills: int = 0
+		var total_kill_dist: float = 0.0
+		for mk: Variant in mob_kills_arr:
+			var d: float = float((mk as Dictionary).get("kill_dist_m", 0.0))
+			total_kill_dist += d
+			if d > 30.0:
+				far_kills += 1
+			elif d < 10.0:
+				close_kills += 1
+		var avg_kill_dist: float = total_kill_dist / float(mob_kills_arr.size())
+		print("   Avg Kill Dist: %.1fm | Far (>30m): %d | Close (<10m): %d" % [avg_kill_dist, far_kills, close_kills])
 	print("================================================================================\n")
 	
 	save_telemetry_to_disk()

@@ -66,6 +66,12 @@ func activate_spawners() -> void:
 	_on_spawners_activated()
 	chunk_activated.emit(self)
 
+	# ── Engagement telemetry ─────────────────────────────────────────────────
+	if EventBus and EventBus.has_signal("chunk_activated"):
+		var c_id: String = chunk_id if not chunk_id.is_empty() else scene_file_path.get_file().get_basename()
+		var river_dist: float = GameState.distance_traveled if GameState else 0.0
+		EventBus.chunk_activated.emit(c_id, river_dist)
+
 ## Virtual method for custom chunk behaviors upon activation
 func _on_spawners_activated() -> void:
 	if is_boss_chunk and boss_scene:
