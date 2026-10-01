@@ -343,7 +343,7 @@ func _setup_crew_from_gamestate() -> void:
 			player_controller.visible = true
 	else:
 		if is_instance_valid(player_controller):
-			player_controller.setup_defender_model("deckhand_sniper")
+			player_controller.setup_defender_model("")
 
 	# 2. Automated crew stations: ONLY active if additional equipped crew exist!
 	# Unequipped crew members are never spawned.

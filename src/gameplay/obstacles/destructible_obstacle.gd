@@ -234,13 +234,19 @@ func die() -> void:
 	# ── Engagement telemetry ─────────────────────────────────────────────────
 	if EventBus and EventBus.has_signal("obstacle_destroyed_telemetry"):
 		var obs_label: String
-		match obstacle_type:
-			ObstacleType.WOODEN_BARREL: obs_label = "wooden_barrel"
-			ObstacleType.FUSE_BARREL:   obs_label = "fuse_barrel"
-			ObstacleType.RUNE_BARREL:   obs_label = "rune_barrel"
-			ObstacleType.SEA_MINE:      obs_label = "sea_mine"
-			ObstacleType.CORAL_REEF:    obs_label = "coral_reef"
-			_:                          obs_label = "barricade" if is_in_group("barricade") else "obstacle"
+		# Check barricade group first — BarricadeSegment inherits obstacle_type
+		# WOODEN_BARREL as its default, so the group check must precede the
+		# obstacle_type match to avoid mis-labelling barricades as wooden_barrel.
+		if is_in_group("barricade"):
+			obs_label = "barricade"
+		else:
+			match obstacle_type:
+				ObstacleType.WOODEN_BARREL: obs_label = "wooden_barrel"
+				ObstacleType.FUSE_BARREL:   obs_label = "fuse_barrel"
+				ObstacleType.RUNE_BARREL:   obs_label = "rune_barrel"
+				ObstacleType.SEA_MINE:      obs_label = "sea_mine"
+				ObstacleType.CORAL_REEF:    obs_label = "coral_reef"
+				_:                          obs_label = "obstacle"
 		var river_dist: float = GameState.distance_traveled if GameState else 0.0
 		EventBus.obstacle_destroyed_telemetry.emit(obs_label, _hits_taken, river_dist)
 		if has_meta("spawns_chest"):

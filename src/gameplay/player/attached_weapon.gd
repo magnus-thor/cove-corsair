@@ -476,7 +476,7 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 		if not is_hostile and player and player.has_method("apply_firing_recoil"):
 			player.call("apply_firing_recoil", 3.5, true)
 		if camera and camera.has_method("add_trauma"):
-			camera.call("add_trauma", 0.25)
+			camera.call("add_trauma", 0.25, 0.35)
 			
 		var ball := proj_scene.instantiate() as Cannonball
 		if ball:

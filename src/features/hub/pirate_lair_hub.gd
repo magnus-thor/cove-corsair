@@ -93,6 +93,11 @@ func _ready() -> void:
 	_refresh_docked_flagship()
 	_update_hud_display()
 
+	# Auto-open the river map if requested (e.g. from settlement screen "Level Map" button).
+	if GameState.should_open_map:
+		GameState.should_open_map = false
+		_open_campaign_map()
+
 	GameState.active_vessel_changed.connect(_on_active_vessel_changed)
 	GameState.doubloons_changed.connect(_on_doubloons_changed)
 

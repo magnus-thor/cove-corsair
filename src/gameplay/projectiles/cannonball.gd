@@ -492,9 +492,6 @@ func _detonate_mortar_impact() -> void:
 	_spawn_splash(true)
 	if VFXManager and VFXManager.has_method("spawn_mortar_splash"):
 		VFXManager.spawn_mortar_splash(global_position)
-	var camera: Node = get_tree().get_first_node_in_group("game_camera") if get_tree() else null
-	if camera and camera.has_method("add_trauma"):
-		camera.call("add_trauma", 0.45)
 		
 	var valid_target: Node = target_node if is_instance_valid(target_node) else null
 	if valid_target:
@@ -664,7 +661,7 @@ func _apply_splash_damage(exclude_target: Variant = null) -> void:
 			VFXManager.spawn_mortar_splash(global_position)
 		var camera := get_tree().get_first_node_in_group("game_camera")
 		if camera and camera.has_method("add_trauma"):
-			camera.call("add_trauma", 0.45)
+			camera.call("add_trauma", 0.45, 0.45)
 
 	var base_radius := ammo_data.splash_radius if (ammo_data and ammo_data.splash_radius > 0.0) else 2.5
 	var radius := base_radius * splash_radius_multiplier

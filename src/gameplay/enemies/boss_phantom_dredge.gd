@@ -98,6 +98,12 @@ func _physics_process(delta: float) -> void:
 		State.SUBMERGED:
 			_process_submerged(delta)
 
+	# Standoff limit guard: ensure the boss never passes the player's standoff threshold
+	if is_instance_valid(player):
+		var min_standoff: float = player_z - 8.0
+		if global_position.z > min_standoff:
+			global_position.z = min_standoff
+
 func _process_approaching(delta: float) -> void:
 	global_position.z = move_toward(global_position.z, _target_z, approach_speed * delta)
 	if absf(global_position.z - _target_z) < 1.0:

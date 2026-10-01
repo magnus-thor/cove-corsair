@@ -135,6 +135,12 @@ func _physics_process(delta: float) -> void:
 		State.COMBAT:
 			_process_combat(delta)
 
+	# Standoff limit guard: ensure the boss never passes the player's standoff threshold
+	if is_instance_valid(player):
+		var min_standoff: float = player_z - 7.5
+		if global_position.z > min_standoff:
+			global_position.z = min_standoff
+
 func _process_combat(delta: float) -> void:
 	combat_time += delta
 	

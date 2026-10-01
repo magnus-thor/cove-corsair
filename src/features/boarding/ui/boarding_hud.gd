@@ -17,29 +17,34 @@ signal special_attack_requested()
 @onready var label_banner: Label = %LabelBanner
 @onready var button_special: Button = %ButtonSpecial
 
-var _ability_name: String = "Piercing Flintlock"
+var _ability_name: String = ""
 
 func _ready() -> void:
 	if is_instance_valid(banner):
 		banner.visible = false
 	if is_instance_valid(button_special):
+		button_special.visible = false
 		button_special.pressed.connect(_on_special_button_pressed)
 	update_wave(1, 3)
 	update_zone("bow", 0.0, false)
 	update_zone("midship", 0.0, false)
 	update_zone("stern", 0.0, false)
-	set_special_ability_name("sniper", "Piercing Flintlock")
 
 func _on_special_button_pressed() -> void:
 	special_attack_requested.emit()
 
 func set_special_ability_name(_role_name: String, ability_name: String) -> void:
 	_ability_name = ability_name
-	if is_instance_valid(button_special):
+	if not is_instance_valid(button_special):
+		return
+	if ability_name.is_empty():
+		button_special.visible = false
+	else:
+		button_special.visible = true
 		button_special.text = "SPECIAL: %s" % ability_name.to_upper()
 
 func update_special_cooldown(current_cd: float, _max_cd: float) -> void:
-	if not is_instance_valid(button_special):
+	if not is_instance_valid(button_special) or not button_special.visible:
 		return
 	if current_cd > 0.05:
 		button_special.text = "%s (%.1fs)" % [_ability_name.to_upper(), current_cd]

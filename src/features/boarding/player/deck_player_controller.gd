@@ -47,9 +47,10 @@ var fire_timer: float = 0.0
 var heavy_timer: float = 0.0
 var auto_attack_timer: float = 0.0
 
-var current_crew_id: String = "deckhand_sniper"
-var crew_role: String = "sniper" # "bomber", "sniper", "swordsman", "mechanic"
-var special_ability_name: String = "Piercing Flintlock"
+var current_crew_id: String = ""
+var crew_role: String = "" # "bomber", "sniper", "swordsman", "mechanic"
+var special_ability_name: String = ""
+var has_crew: bool = false
 
 @onready var deck_marker: Marker3D = (get_node_or_null("DeckMarker") as Marker3D)
 @onready var model_container: Node3D = ($DeckMarker/ModelContainer if has_node("DeckMarker/ModelContainer") else get_node_or_null("ModelContainer")) as Node3D
@@ -88,11 +89,21 @@ func _ready() -> void:
 	if is_instance_valid(targeting_system):
 		targeting_system.target_acquired.connect(_on_target_acquired)
 		targeting_system.zone_focused.connect(_on_zone_focused)
-	_load_player_model()
-	_configure_crew_role(current_crew_id)
+	if not current_crew_id.is_empty():
+		_load_player_model()
+		_configure_crew_role(current_crew_id)
+	else:
+		_clear_player_model()
+		_configure_crew_role("")
 
 func setup_defender_model(new_crew_id: String) -> void:
 	current_crew_id = new_crew_id
+	if new_crew_id.is_empty():
+		has_crew = false
+		_clear_player_model()
+		_configure_crew_role("")
+		return
+	has_crew = true
 	var glb_path: String = CREW_MODELS.get(new_crew_id, "") as String
 	if glb_path.is_empty():
 		glb_path = PLAYER_MODEL_PATH
@@ -100,6 +111,13 @@ func setup_defender_model(new_crew_id: String) -> void:
 	_configure_crew_role(new_crew_id)
 
 func _configure_crew_role(cid: String) -> void:
+	if cid.is_empty():
+		has_crew = false
+		crew_role = ""
+		special_ability_name = ""
+		crew_role_changed.emit("", "")
+		return
+	has_crew = true
 	var c_lower: String = cid.to_lower()
 	if c_lower.contains("bomber") or c_lower.contains("monkey") and not c_lower.contains("grease"):
 		crew_role = "bomber"
@@ -124,6 +142,13 @@ func _configure_crew_role(cid: String) -> void:
 		
 	crew_role_changed.emit(crew_role, special_ability_name)
 
+func _clear_player_model() -> void:
+	if is_instance_valid(model_container):
+		for child: Node in model_container.get_children():
+			child.queue_free()
+	if is_instance_valid(placeholder_mesh):
+		placeholder_mesh.visible = false
+
 func _load_player_model(glb_path: String = "") -> void:
 	if glb_path.is_empty():
 		glb_path = PLAYER_MODEL_PATH
@@ -145,6 +170,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	if is_instance_valid(targeting_system):
 		targeting_system.process_input_event(event)
 		
+	if not has_crew:
+		return
+
 	if event is InputEventMouseButton:
 		var mb: InputEventMouseButton = event as InputEventMouseButton
 		if mb.pressed and mb.button_index == MOUSE_BUTTON_RIGHT:
@@ -331,6 +359,8 @@ func fire_heavy_breaker() -> void:
 			p_plank.take_damage(axe_sever_damage)
 
 func fire_special_attack() -> void:
+	if not has_crew or crew_role.is_empty():
+		return
 	if special_timer > 0.0:
 		return
 		

@@ -473,12 +473,15 @@ func _spawn_random_endless_boss() -> void:
 		spawn_parent = self
 		
 	spawn_parent.add_child(boss)
-	boss.global_position = Vector3(0.0, 0.0, -18.0)
+	var player: Node3D = get_tree().get_first_node_in_group("player") as Node3D if get_tree() else null
+	var player_z: float = player.global_position.z if player and is_instance_valid(player) else 0.0
+	var spawn_z: float = player_z - 18.0 if player else -18.0
+	boss.global_position = Vector3(0.0, 0.0, spawn_z)
 	
 	if "current_state" in boss:
 		boss.set("current_state", 1) # State.COMBAT
 	if "_target_z" in boss:
-		boss.set("_target_z", -18.0)
+		boss.set("_target_z", spawn_z)
 		
 	if boss.has_method("activate_arena"):
 		boss.call("activate_arena")

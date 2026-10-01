@@ -26,31 +26,38 @@ func _ready() -> void:
 		damage_area.monitoring = false
 		if not damage_area.area_entered.is_connected(_on_damage_area_entered):
 			damage_area.area_entered.connect(_on_damage_area_entered)
+		if not damage_area.body_entered.is_connected(_on_damage_body_entered):
+			damage_area.body_entered.connect(_on_damage_body_entered)
 	if telegraph_decal:
 		telegraph_decal.visible = true
 		
 	AudioManager.play_sfx("water_splashes", 1.4, 1.8, -2.0)
 
 func _physics_process(delta: float) -> void:
-	_timer += delta
-	
 	# Move downriver towards player vessel
 	if forward_speed > 0.0 and GameState.is_game_active:
 		global_position.z += forward_speed * delta
 		
-	var player = get_tree().get_first_node_in_group("player")
-	var player_z = player.global_position.z if player and is_instance_valid(player) else 0.0
+	var player: Node3D = get_tree().get_first_node_in_group("player") as Node3D if get_tree() else null
+	var player_z: float = player.global_position.z if player and is_instance_valid(player) else 0.0
 	if auto_destroy_behind_player and global_position.z > (player_z + 4.0):
 		queue_free()
 		return
 	
 	if _state == 0:
+		# Only start telegraph countdown when approaching the player's engagement zone (within 28m)
+		# so the eruption doesn't trigger and expire while 40m away in empty water.
+		if is_instance_valid(player) and global_position.z < (player_z - 28.0):
+			return
+
+		_timer += delta
+
 		# Sprite heat build-up pulse
-		var heat_pulse = 1.0 + sin(_timer * 14.0) * 0.15
+		var heat_pulse: float = 1.0 + sin(_timer * 14.0) * 0.15
 		if geyser_sprite:
 			geyser_sprite.modulate = Color(1.0 + heat_pulse * 0.5, 0.8 + heat_pulse * 0.2, 0.7)
 		if telegraph_decal and telegraph_decal.material_override:
-			var mat = telegraph_decal.material_override as StandardMaterial3D
+			var mat: StandardMaterial3D = telegraph_decal.material_override as StandardMaterial3D
 			if mat:
 				mat.albedo_color.a = clampf(0.3 + sin(_timer * 10.0) * 0.25, 0.15, 0.75)
 			
@@ -60,6 +67,7 @@ func _physics_process(delta: float) -> void:
 			_erupt()
 			
 	elif _state == 1:
+		_timer += delta
 		_check_eruption_hits()
 		if _timer >= eruption_duration:
 			_state = 2
@@ -71,7 +79,7 @@ func _erupt() -> void:
 	if geyser_sprite:
 		geyser_sprite.visible = true
 		geyser_sprite.modulate = Color(2.2, 1.3, 0.5)
-		var tween = create_tween()
+		var tween: Tween = create_tween()
 		tween.tween_property(geyser_sprite, "scale", Vector3(1.3, 1.5, 1.3), 0.20).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		tween.tween_property(geyser_sprite, "scale", Vector3(1.0, 1.0, 1.0), eruption_duration - 0.20)
 
@@ -82,9 +90,9 @@ func _erupt() -> void:
 	AudioManager.play_sfx("water_splashes", 0.7, 0.9, 2.0)
 	
 	# Camera shake
-	var camera = get_tree().get_first_node_in_group("game_camera")
+	var camera: Node = get_tree().get_first_node_in_group("game_camera")
 	if camera and camera.has_method("shake"):
-		camera.shake(0.28, 0.25)
+		camera.call("shake", 0.28, 0.25)
 		
 	_check_eruption_hits()
 
@@ -97,20 +105,28 @@ func _on_damage_area_entered(area: Area3D) -> void:
 		elif (area.is_in_group("enemies") or area.is_in_group("destructible")) and not area.is_in_group("boss"):
 			_damage_enemy(area)
 
+func _on_damage_body_entered(body: Node3D) -> void:
+	if _state == 1:
+		if body.is_in_group("player") or body.is_in_group("follower") or body is PlayerSwerve:
+			_check_eruption_hits()
+		elif (body.is_in_group("enemies") or body.is_in_group("destructible")) and not body.is_in_group("boss"):
+			_damage_enemy(body)
+
 func _damage_enemy(enemy: Node) -> void:
 	if not is_instance_valid(enemy) or enemy.is_queued_for_deletion():
 		return
-	var id = enemy.get_instance_id()
-	if _damaged_enemies.has(id) and (_timer - _damaged_enemies[id]) < 0.35:
+	var id: int = enemy.get_instance_id()
+	if _damaged_enemies.has(id) and (_timer - float(_damaged_enemies[id])) < 0.35:
 		return
 	_damaged_enemies[id] = _timer
 	
 	if enemy.has_method("take_damage"):
-		enemy.take_damage(14)
+		enemy.call("take_damage", 14)
 	elif "current_hp" in enemy:
-		enemy.current_hp -= 14
-		if enemy.current_hp <= 0 and enemy.has_method("die"):
-			enemy.die()
+		var cur_hp: int = int(enemy.get("current_hp")) - 14
+		enemy.set("current_hp", cur_hp)
+		if cur_hp <= 0 and enemy.has_method("die"):
+			enemy.call("die")
 			
 	AudioManager.play_sfx("barrel_breaks", 0.7, 0.9, 2.0)
 	AudioManager.play_sfx("water_splashes", 0.8, 1.1, 1.0)
@@ -118,25 +134,30 @@ func _damage_enemy(enemy: Node) -> void:
 func _check_eruption_hits() -> void:
 	# 1. Player check
 	if not _has_damaged_player:
-		var player = get_tree().get_first_node_in_group("player")
+		var player: Node3D = get_tree().get_first_node_in_group("player") as Node3D if get_tree() else null
 		if player and is_instance_valid(player):
-			var dist = player.global_position.distance_to(global_position)
-			if dist <= eruption_radius:
+			var dist_x: float = player.global_position.x - global_position.x
+			var dist_z: float = player.global_position.z - global_position.z
+			var h_dist: float = sqrt(dist_x * dist_x + dist_z * dist_z)
+			var hit_radius: float = maxf(eruption_radius * 1.5, 2.5)
+			if h_dist <= hit_radius:
 				_has_damaged_player = true
 				if player.has_method("damage_fleet"):
-					player.damage_fleet(damage)
+					player.call("damage_fleet", damage)
+				elif player.has_method("take_hit"):
+					player.call("take_hit", damage, "thermal_geyser")
 				# Horizontal push / knockback
-				var push_dir = (player.global_position - global_position).normalized()
-				var push_x = push_dir.x if abs(push_dir.x) > 0.1 else (1.0 if randf() < 0.5 else -1.0)
+				var push_dir: Vector3 = (player.global_position - global_position).normalized()
+				var push_x: float = push_dir.x if absf(push_dir.x) > 0.1 else (1.0 if randf() < 0.5 else -1.0)
 				player.global_position.x += push_x * 2.0
 
 	# 2. Enemy checks: damage any enemies within eruption radius or overlapping DamageArea
 	if damage_area and is_instance_valid(damage_area) and damage_area.monitoring:
-		for overlapping in damage_area.get_overlapping_areas():
+		for overlapping: Area3D in damage_area.get_overlapping_areas():
 			if is_instance_valid(overlapping) and (overlapping.is_in_group("enemies") or overlapping.is_in_group("destructible")) and not overlapping.is_in_group("boss"):
 				_damage_enemy(overlapping)
 				
-	for enemy in get_tree().get_nodes_in_group("enemies"):
+	for enemy: Node in get_tree().get_nodes_in_group("enemies"):
 		if is_instance_valid(enemy) and not enemy.is_in_group("boss") and not enemy.is_queued_for_deletion():
-			if enemy.global_position.distance_to(global_position) <= eruption_radius:
+			if enemy is Node3D and (enemy as Node3D).global_position.distance_to(global_position) <= eruption_radius:
 				_damage_enemy(enemy)

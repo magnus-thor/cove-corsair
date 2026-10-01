@@ -116,6 +116,12 @@ func _physics_process(delta: float) -> void:
 		State.RAMMING:
 			_process_ram_overdrive(delta)
 
+	# Standoff limit guard: ensure the fortress never passes the player's standoff threshold
+	if is_instance_valid(player):
+		var min_standoff: float = player_z - 6.5
+		if global_position.z > min_standoff:
+			global_position.z = min_standoff
+
 func _process_combat(delta: float) -> void:
 	combat_time += delta
 	
@@ -267,11 +273,11 @@ func _process_ram_overdrive(delta: float) -> void:
 	_minion_timer += delta * 0.5
 	
 	if _charge_dir == 1:
-		# Rapid forward thrust
-		global_position.z = move_toward(global_position.z, player_z - 3.0, 22.0 * delta)
+		# Rapid forward thrust to standoff boundary
+		global_position.z = move_toward(global_position.z, player_z - 6.5, 22.0 * delta)
 		
 		# Check hit
-		if abs(global_position.z - (player_z - 3.0)) < 0.8:
+		if abs(global_position.z - (player_z - 6.5)) < 0.8:
 			var player_swerve := player as PlayerSwerve
 			if player_swerve:
 				player_swerve.take_hit(1, "BossSiegeFortress ram")

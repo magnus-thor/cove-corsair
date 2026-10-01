@@ -388,10 +388,18 @@ func _on_primary_pressed() -> void:
 		GameState.reset_level()
 		get_tree().reload_current_scene()
 	elif _is_victory:
-		next_level_requested.emit()
-		GameState.should_auto_start = true
-		GameState.reset_level()
-		get_tree().reload_current_scene()
+		if GameState.is_campaign_complete():
+			# Campaign finished — go to hub and open the river map so the
+			# player can see their full completed map rather than restarting.
+			map_requested.emit()
+			GameState.should_auto_start = false
+			GameState.should_open_map = true
+			GameState.change_scene_with_loading("res://src/features/hub/pirate_lair_hub.tscn", "Pirate Lair")
+		else:
+			next_level_requested.emit()
+			GameState.should_auto_start = true
+			GameState.reset_level()
+			get_tree().reload_current_scene()
 	else:
 		retry_requested.emit()
 		GameState.should_auto_start = true
@@ -423,6 +431,9 @@ func _on_map_pressed() -> void:
 	map_requested.emit()
 	get_tree().paused = false
 	GameState.should_auto_start = false
+	# Signal the hub to auto-open the campaign river map when it loads,
+	# so "Level Map" takes the player directly to the map view.
+	GameState.should_open_map = true
 	GameState.change_scene_with_loading("res://src/features/hub/pirate_lair_hub.tscn", "Pirate Lair")
 
 func _on_copy_telemetry_pressed() -> void:

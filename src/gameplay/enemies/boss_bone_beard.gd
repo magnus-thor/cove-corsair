@@ -133,6 +133,12 @@ func _physics_process(delta: float) -> void:
 				_attack_timer = 0.0
 				_perform_attack()
 
+	# Standoff limit guard: ensure the boss never passes the player's standoff threshold
+	if is_instance_valid(player):
+		var min_standoff: float = player_z - 8.0
+		if global_position.z > min_standoff:
+			global_position.z = min_standoff
+
 func _perform_attack() -> void:
 	if not spawn_hazard_enabled:
 		return
