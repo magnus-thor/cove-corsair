@@ -125,6 +125,18 @@ When a player fails on key campaign milestones, the Settlement Defeat Screen pre
 
 ### Contextual Defeat Prompts
 
+#### Milestone 5–9: The Sloop Difficulty Spike & Endless Farming Directive
+* **Core Design Philosophy:**
+  * Levels following the Sloop acquisition intentionally introduce sharp difficulty jumps (aggressive mob densities, narrower channels, fortified barricades).
+  * **Critical Rule:** The game MUST NOT nerf these level difficulties or artificially inflate Sloop base stats to make the player breeze through. Progression walls are vital to create an organic, compelling reason to play **Endless Voyage**.
+* **Condition:** Player is defeated on Level 5, 6, 7, 8, or 9 while using The Sloop (or fails 2 consecutive runs on any of these levels).
+* **Dialogue:**
+  > *"Captain! The waters ahead grow treacherous and our Sloop's standard timber won't hold against these swarming gunners! Set sail on an **Endless Voyage** to amass doubloons, then visit the Shipyard to reinforce our hull and tune our twin chasers!"*
+* **Action:**
+  * Primary Button: `[ 🌊 SAIL ENDLESS VOYAGE ]` (deep-links directly into Endless Mode).
+  * Secondary Button: `[ 🛠️ UPGRADE AT SHIPYARD ]` (deep-links to Shipyard Sloop upgrades).
+  * Tertiary Button: `[ RETRY LEVEL ]`.
+
 #### Milestone 10–12: Fortified Reefs & Barricades
 * **Condition:** Player defeated on Level 10, 11, or 12 while using The Sloop or The Dinghy.
 * **Dialogue:**
@@ -151,3 +163,4 @@ When a player fails on key campaign milestones, the Settlement Defeat Screen pre
 - [ ] **Auto-Equip System:** Ensure `GameState.buy_crew()` and `GameState.buy_weapon()` automatically bind purchased items to the first available socket.
 - [ ] **UI Overlay Pointer:** Create reusable finger/arrow tutorial callout component for Hub and Shipyard.
 - [ ] **Contextual Defeat Coach Panel:** Add `TacticalAdvicePanel` to `settlement_screen.tscn` displaying milestone hints and deep-linking to the Shipyard.
+- [ ] **Sloop Endless Farming Prompt:** Implement the `[ 🌊 SAIL ENDLESS VOYAGE ]` defeat coach prompt on Levels 5–9 when sailing the Sloop, preserving intentional difficulty spikes.

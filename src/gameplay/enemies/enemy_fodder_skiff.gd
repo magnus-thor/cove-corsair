@@ -111,6 +111,15 @@ func die() -> void:
 	GameState.targets_destroyed += 1
 	GameState.record_fodder_kill()
 	AudioManager.play_sfx("barrel_breaks")
+
+	# ── Engagement telemetry ─────────────────────────────────────────────────
+	if EventBus and EventBus.has_signal("mob_killed"):
+		var player_node: Node3D = get_tree().get_first_node_in_group("player") as Node3D
+		var dist_to_player: float = 0.0
+		if is_instance_valid(player_node):
+			dist_to_player = absf(global_position.z - player_node.global_position.z)
+		var river_dist: float = GameState.distance_traveled if GameState else 0.0
+		EventBus.mob_killed.emit("fodder_skiff", max_hp, dist_to_player, river_dist)
 	
 	if explosion_scene:
 		var vfx := explosion_scene.instantiate() as Node3D

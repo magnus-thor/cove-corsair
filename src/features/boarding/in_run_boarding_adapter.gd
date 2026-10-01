@@ -69,6 +69,13 @@ func start_in_run_boarding(boss: Node3D, player: Node3D) -> void:
 	if is_instance_valid(active_arena) and active_arena.has_method("setup_enemy_vessel"):
 		active_arena.setup_enemy_vessel(active_boss.name)
 
+	# Configure matching player ship model
+	if is_instance_valid(active_arena) and active_arena.has_method("setup_player_vessel"):
+		var p_vessel: String = "sloop"
+		if GameState and "active_vessel" in GameState and not str(GameState.active_vessel).is_empty():
+			p_vessel = str(GameState.active_vessel)
+		active_arena.setup_player_vessel(p_vessel)
+
 	# Configure biome visuals
 	_apply_biome_to_arena()
 

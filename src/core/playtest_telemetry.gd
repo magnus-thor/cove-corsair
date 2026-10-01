@@ -497,6 +497,26 @@ func _on_run_failed(coins_collected: int, distance_reached: float) -> void:
 	print("   Coins Saved : %d 🪙" % coins_collected)
 	print("   Vault Total : %d 🪙" % (GameState.doubloons if GameState else 0))
 	print("   Performance : Avg %.1f FPS (Min %d, Max %d)" % [float(fps_info["avg_fps"]), int(fps_info["min_fps"]), int(fps_info["max_fps"])])
+	var mob_kills_arr: Array = current_run.get("mob_kills", []) as Array
+	var chunks_arr: Array = current_run.get("chunks_entered", []) as Array
+	var obs_arr: Array = current_run.get("obstacles_destroyed", []) as Array
+	var water_shots: int = int(current_run.get("shots_hit_water", 0))
+	print("   Mob Kills   : %d | Chunks: %d | Obstacles: %d | Wasted Shots: %d" % [
+		mob_kills_arr.size(), chunks_arr.size(), obs_arr.size(), water_shots
+	])
+	if not mob_kills_arr.is_empty():
+		var far_kills: int = 0
+		var close_kills: int = 0
+		var total_kill_dist: float = 0.0
+		for mk: Variant in mob_kills_arr:
+			var d: float = float((mk as Dictionary).get("kill_dist_m", 0.0))
+			total_kill_dist += d
+			if d > 30.0:
+				far_kills += 1
+			elif d < 10.0:
+				close_kills += 1
+		var avg_kill_dist: float = total_kill_dist / float(mob_kills_arr.size())
+		print("   Avg Kill Dist: %.1fm | Far (>30m): %d | Close (<10m): %d" % [avg_kill_dist, far_kills, close_kills])
 	print("================================================================================\n")
 	
 	save_telemetry_to_disk()

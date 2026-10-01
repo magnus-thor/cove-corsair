@@ -451,7 +451,10 @@ func take_damage(amount: int) -> void:
 			if fct.has_method("setup"):
 				fct.call("setup", "-" + str(amount), Color(0.2, 1.0, 0.6))
 			
-	if current_hp <= int(max_hp * 0.25) and not has_triggered_boarding:
+	var boarding_threshold: int = max(1, int(round(float(max_hp) * 0.02)))
+	if current_hp <= boarding_threshold and not has_triggered_boarding:
+		if current_hp <= 0:
+			current_hp = 1
 		_initiate_desperation_boarding()
 	elif current_hp <= 0:
 		if has_triggered_boarding and not _is_defeated:

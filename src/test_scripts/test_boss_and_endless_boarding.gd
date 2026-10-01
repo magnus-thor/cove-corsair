@@ -13,6 +13,7 @@ const BONE_BEARD_SCENE: PackedScene = preload("res://src/gameplay/enemies/boss_b
 const PHANTOM_DREDGE_SCENE: PackedScene = preload("res://src/gameplay/enemies/boss_phantom_dredge.tscn")
 const SIEGE_FORTRESS_SCENE: PackedScene = preload("res://src/gameplay/enemies/boss_siege_fortress.tscn")
 const ENDLESS_MODE_SCRIPT: GDScript = preload("res://src/features/modes/endless_mode.gd")
+const ARENA_SCENE: PackedScene = preload("res://src/features/boarding/boarding_defense_arena.tscn")
 
 func _ready() -> void:
 	print("\n========================================================")
@@ -24,6 +25,7 @@ func _ready() -> void:
 	_test_endless_mode_boss_pool_and_target_distance()
 	_test_endless_mode_boss_spawn_at_distance()
 	_test_endless_mode_boss_slain_rewards()
+	_test_dynamic_vessel_and_gangplank_anchors()
 	
 	print("\n========================================================")
 	print("  ALL ROUTE A & ENDLESS BOSS TESTS PASSED SUCCESSFULLY! ")
@@ -43,21 +45,22 @@ func _test_route_a_desperation_threshold_and_clamp() -> void:
 	var max_hp: int = int(boss.get("max_hp"))
 	assert(max_hp > 0, "War-Barge max_hp must be positive (got %d)" % max_hp)
 	
-	# Deal damage above 25% threshold (HP drops to 50% > 25%)
+	# Deal damage above 2% threshold (HP drops to 50% > 2%)
 	var dmg_half: int = int(max_hp * 0.5)
 	boss.call("take_damage", dmg_half)
 	var hp_after_first: int = int(boss.get("current_hp"))
-	assert(hp_after_first > int(max_hp * 0.25), "HP must remain above 25 percent (got %d / %d)" % [hp_after_first, max_hp])
+	var threshold_2pct: int = max(1, int(round(float(max_hp) * 0.02)))
+	assert(hp_after_first > threshold_2pct, "HP must remain above 2 percent (got %d / %d)" % [hp_after_first, max_hp])
 	var has_triggered_1: bool = bool(boss.get("has_triggered_boarding"))
-	assert(not has_triggered_1, "Boarding must NOT trigger above 25% HP threshold")
+	assert(not has_triggered_1, "Boarding must NOT trigger above 2% HP threshold")
 	
-	# Deal damage to drop below 25% threshold (HP drops to ~20% <= 25%)
-	var dmg_desperation: int = int(max_hp * 0.3)
+	# Deal damage to drop below 2% threshold (HP drops to <= 2%)
+	var dmg_desperation: int = max(1, hp_after_first - max(1, int(threshold_2pct * 0.5)))
 	boss.call("take_damage", dmg_desperation)
 	var hp_after_second: int = int(boss.get("current_hp"))
-	assert(hp_after_second <= int(max_hp * 0.25), "HP must be <= 25 percent (got %d / %d)" % [hp_after_second, max_hp])
+	assert(hp_after_second <= threshold_2pct, "HP must be <= 2 percent (got %d / %d, threshold %d)" % [hp_after_second, max_hp, threshold_2pct])
 	var has_triggered_2: bool = bool(boss.get("has_triggered_boarding"))
-	assert(has_triggered_2, "Boarding MUST trigger when HP <= 25%% (got %d / %d)" % [hp_after_second, max_hp])
+	assert(has_triggered_2, "Boarding MUST trigger when HP <= 2%% (got %d / %d)" % [hp_after_second, max_hp])
 	
 	# Deal massive fatal damage (1000) while boarding is active
 	boss.call("take_damage", 1000)
@@ -67,7 +70,7 @@ func _test_route_a_desperation_threshold_and_clamp() -> void:
 	assert(not is_defeated, "Boss must not be defeated prematurely while boarding party is active")
 	
 	boss.queue_free()
-	print("  [PASS] Route A Desperation threshold (<= 25%) and HP clamp at 1 verified.")
+	print("  [PASS] Route A Desperation threshold (<= 2%) and HP clamp at 1 verified.")
 
 func _test_boarding_adapter_defeat_flow() -> void:
 	print("--- 2. Testing InRunBoardingAdapter Arena Victory Cascade ---")
@@ -156,3 +159,34 @@ func _test_endless_mode_boss_slain_rewards() -> void:
 	
 	mode.queue_free()
 	print("  [PASS] Gauntlet boss bounty verified: +250 doubloons, +1.5x multiplier, run continues seamlessly.")
+
+func _test_dynamic_vessel_and_gangplank_anchors() -> void:
+	print("--- 6. Testing Dynamic Vessel Model Swapping & Gangplank Anchors ---")
+	var arena: BoardingDefenseArena = ARENA_SCENE.instantiate() as BoardingDefenseArena
+	add_child(arena)
+	
+	# Test Player Vessel Swapping
+	arena.setup_player_vessel("dinghy")
+	var dinghy_visual: Node = arena.player_ship_container.find_child("PlayerShipVisual", true, false)
+	assert(dinghy_visual != null, "PlayerShipVisual must exist after setup_player_vessel('dinghy')")
+	assert(is_equal_approx(arena.zone_bow.plank_anchor.position.x, 2.0 - 0.25), "Dinghy anchor X must be adjusted for narrow beam")
+	
+	arena.setup_player_vessel("ironclad")
+	var ironclad_visual: Node = arena.player_ship_container.find_child("PlayerShipVisual", true, false)
+	assert(ironclad_visual != null, "PlayerShipVisual must exist after setup_player_vessel('ironclad')")
+	assert(is_equal_approx(arena.zone_bow.plank_anchor.position.x, 2.0 + 0.35), "Ironclad anchor X must be adjusted for wide beam")
+	
+	# Test Boss 2 (Bone-Beard) Gangplank Anchors & Visual
+	arena.setup_enemy_vessel("BossBoneBeard")
+	var bone_beard_visual: Node = arena.enemy_ship_container.find_child("EnemyShipVisual", true, false)
+	assert(bone_beard_visual != null, "EnemyShipVisual must exist for Bone-Beard")
+	assert(arena.enemy_ship_marker_bow.position.is_equal_approx(Vector3(-13.1, 0.55, -1.85)), "Bone-Beard MarkerBow must match calibrated anchor")
+	assert(arena.enemy_ship_marker_mid.position.is_equal_approx(Vector3(-13.1, 0.50, -0.05)), "Bone-Beard MarkerMid must match calibrated anchor")
+	assert(arena.enemy_ship_marker_stern.position.is_equal_approx(Vector3(-13.1, 0.55, 0.65)), "Bone-Beard MarkerStern must match calibrated anchor")
+	
+	# Test Siege Fortress
+	arena.setup_enemy_vessel("BossSiegeFortress")
+	assert(arena.enemy_ship_marker_bow.position.is_equal_approx(Vector3(-13.2, 0.65, -1.90)), "Siege Fortress MarkerBow must match calibrated anchor")
+	
+	arena.queue_free()
+	print("  [PASS] Dynamic player vessel swapping and calibrated boss gangplank anchors verified.")

@@ -15,6 +15,64 @@ const ENEMY_START_OFFSET_X: float = 14.0
 const ENEMY_DOCK_OFFSET_X: float = 4.5
 const APPROACH_DURATION_SEC: float = 1.8
 
+const PLAYER_VESSEL_CONFIGS: Dictionary = {
+	"sloop": {
+		"path": "res://assets/models/user/vessels/the_sloop.glb",
+		"transform": Transform3D(-7.234234e-08, 0.0, 1.655, 0.0, 1.655, 0.0, -1.655, 0.0, -7.234234e-08, 0.0, 0.0054335, 0.0),
+		"rail_offset_x": 0.0
+	},
+	"dinghy": {
+		"path": "res://assets/models/user/vessels/dinghy.glb",
+		"transform": Transform3D(3.8, 0.0, 0.0, 0.0, 3.8, 0.0, 0.0, 0.0, 3.8, -0.35, 0.15, -0.2),
+		"rail_offset_x": -0.25
+	},
+	"bombard_skiff": {
+		"path": "res://assets/models/user/vessels/the_bombard_skiff.glb",
+		"transform": Transform3D(0.0, 0.0, 2.6, 0.0, 2.6, 0.0, -2.6, 0.0, 0.0, 0.05, 0.05, -0.1),
+		"rail_offset_x": 0.25
+	},
+	"ironclad": {
+		"path": "res://assets/models/user/vessels/the_ironclad.glb",
+		"transform": Transform3D(0.0, 0.0, 1.85, 0.0, 1.85, 0.0, -1.85, 0.0, 0.0, 0.1, 0.05, 0.0),
+		"rail_offset_x": 0.35
+	}
+}
+
+const ENEMY_VESSEL_CONFIGS: Dictionary = {
+	"war_barge": {
+		"path": "res://assets/models/enemy/vessels/boss_war_barge.glb",
+		"transform": Transform3D(-0.31290805, -0.8244233, 3.407758, 0.0, 3.4213028, 0.8277002, -3.5060644, 0.07357786, -0.30413443, -11.516914, 0.29983392, 0.17183113),
+		"marker_bow": Vector3(-13.068624, 1.1870035, -1.8804607),
+		"marker_mid": Vector3(-12.614456, 0.26471028, -0.17524332),
+		"marker_stern": Vector3(-12.687212, 0.40418908, 0.4926853),
+		"dock_x": 13.323
+	},
+	"bone_beard": {
+		"path": "res://assets/models/enemy/vessels/captain_bone-beard’s_twin_frigate.glb",
+		"transform": Transform3D(-4.2, 0.0, 0.0, 0.0, 4.2, 0.0, 0.0, 0.0, -4.2, -11.5, 0.25, 0.0),
+		"marker_bow": Vector3(-13.1, 0.55, -1.85),
+		"marker_mid": Vector3(-13.1, 0.50, -0.05),
+		"marker_stern": Vector3(-13.1, 0.55, 0.65),
+		"dock_x": 13.32
+	},
+	"siege_fortress": {
+		"path": "res://assets/models/enemy/vessels/boss_siege_fortress.glb",
+		"transform": Transform3D(-4.2, 0.0, 0.0, 0.0, 4.2, 0.0, 0.0, 0.0, -4.2, -11.4, 0.20, 0.0),
+		"marker_bow": Vector3(-13.2, 0.65, -1.90),
+		"marker_mid": Vector3(-13.15, 0.60, -0.05),
+		"marker_stern": Vector3(-13.2, 0.65, 0.70),
+		"dock_x": 13.5
+	},
+	"ghost_sloop": {
+		"path": "res://assets/models/enemy/vessels/ghost_sloop.glb",
+		"transform": Transform3D(-4.8, 0.0, 0.0, 0.0, 4.8, 0.0, 0.0, 0.0, -4.8, -11.5, 0.35, 0.0),
+		"marker_bow": Vector3(-12.8, 0.60, -1.80),
+		"marker_mid": Vector3(-12.7, 0.55, -0.05),
+		"marker_stern": Vector3(-12.8, 0.60, 0.60),
+		"dock_x": 13.32
+	}
+}
+
 @export var zone_bow: BoardingZone = null
 @export var zone_midship: BoardingZone = null
 @export var zone_stern: BoardingZone = null
@@ -55,6 +113,7 @@ var total_planks_launched: int = 0
 var active_spawners_count: int = 0
 var is_approaching: bool = true
 var approach_tween: Tween = null
+var target_dock_x: float = 13.323
 
 func _ready() -> void:
 	zones = [zone_bow, zone_midship, zone_stern]
@@ -95,6 +154,10 @@ func _ready() -> void:
 	# _setup_deck_elevation()
 	_setup_camera()
 	_setup_crew_from_gamestate()
+	var current_vessel: String = "sloop"
+	if GameState and "active_vessel" in GameState and not str(GameState.active_vessel).is_empty():
+		current_vessel = str(GameState.active_vessel)
+	setup_player_vessel(current_vessel)
 	_start_approach_sequence()
 
 # func _setup_deck_elevation() -> void:
@@ -224,7 +287,10 @@ func _start_approach_sequence() -> void:
 		_on_docking_complete()
 		return
 		
-	var dock_x: float = enemy_ship_container.position.x
+	if approach_tween and approach_tween.is_valid():
+		approach_tween.kill()
+		
+	var dock_x: float = target_dock_x
 	var start_x: float = maxf(dock_x + 8.0, 14.0)
 	is_approaching = true
 	enemy_ship_container.position.x = start_x
@@ -294,35 +360,80 @@ func _select_initial_plank() -> void:
 		if is_instance_valid(p) and is_instance_valid(player_controller):
 			player_controller.select_plank(p)
 
+func setup_player_vessel(vessel_id: String = "") -> void:
+	if not is_instance_valid(player_ship_container):
+		return
+	var v_key: String = vessel_id.to_lower().strip_edges()
+	if v_key.is_empty() or not PLAYER_VESSEL_CONFIGS.has(v_key):
+		v_key = "sloop"
+		
+	var cfg: Dictionary = PLAYER_VESSEL_CONFIGS[v_key] as Dictionary
+	var glb_path: String = str(cfg.get("path", "res://assets/models/user/vessels/the_sloop.glb"))
+	if not ResourceLoader.exists(glb_path):
+		return
+
+	var old_model: Node = player_ship_container.find_child("PlayerShipVisual", true, false)
+	if is_instance_valid(old_model):
+		old_model.queue_free()
+
+	var scene: PackedScene = load(glb_path) as PackedScene
+	if scene:
+		var inst: Node3D = scene.instantiate() as Node3D
+		inst.name = "PlayerShipVisual"
+		inst.transform = cfg.get("transform", Transform3D.IDENTITY) as Transform3D
+		player_ship_container.add_child(inst)
+
+		if v_key == "dinghy":
+			var mask_res: String = "res://assets/models/user/vessels/dinghy_cockpit_mask.tres"
+			if ResourceLoader.exists(mask_res):
+				var mask: MeshInstance3D = MeshInstance3D.new()
+				mask.name = "CockpitWaterMask"
+				mask.mesh = load(mask_res) as Mesh
+				inst.add_child(mask)
+
+	var target_zones: Array[BoardingZone] = zones if not zones.is_empty() else [zone_bow, zone_midship, zone_stern]
+	var rail_offset: float = float(cfg.get("rail_offset_x", 0.0))
+	for z: BoardingZone in target_zones:
+		if is_instance_valid(z) and is_instance_valid(z.plank_anchor):
+			z.plank_anchor.position.x = 2.0 + rail_offset
+
 func setup_enemy_vessel(boss_name: String = "") -> void:
 	if not is_instance_valid(enemy_ship_container):
 		return
 	var b_lower: String = boss_name.to_lower()
-	var glb_path: String = "res://assets/models/enemy/vessels/boss_war_barge.glb"
+	var boss_key: String = "war_barge"
 	if b_lower.contains("fortress"):
-		glb_path = "res://assets/models/enemy/vessels/boss_siege_fortress.glb"
+		boss_key = "siege_fortress"
 	elif b_lower.contains("phantom") or b_lower.contains("dredge") or b_lower.contains("ghost"):
-		glb_path = "res://assets/models/enemy/vessels/ghost_sloop.glb"
+		boss_key = "ghost_sloop"
 	elif b_lower.contains("bone") or b_lower.contains("frigate"):
-		glb_path = "res://assets/models/enemy/vessels/captain_bone-beard’s_twin_frigate.glb"
-		
+		boss_key = "bone_beard"
+
+	var cfg: Dictionary = ENEMY_VESSEL_CONFIGS.get(boss_key, ENEMY_VESSEL_CONFIGS["war_barge"]) as Dictionary
+	var glb_path: String = str(cfg.get("path", ""))
+	
 	if ResourceLoader.exists(glb_path):
-		var old_transform: Transform3D = Transform3D.IDENTITY
-		var had_old: bool = false
 		var old_model: Node = enemy_ship_container.find_child("EnemyShipVisual", true, false)
-		if is_instance_valid(old_model) and old_model is Node3D:
-			old_transform = (old_model as Node3D).transform
-			had_old = true
+		if is_instance_valid(old_model):
 			old_model.queue_free()
 		var scene: PackedScene = load(glb_path) as PackedScene
 		if scene:
 			var inst: Node3D = scene.instantiate() as Node3D
 			inst.name = "EnemyShipVisual"
-			if had_old:
-				inst.transform = old_transform
-			else:
-				inst.scale = Vector3(2.2, 2.2, 2.2)
+			inst.transform = cfg.get("transform", Transform3D.IDENTITY) as Transform3D
 			enemy_ship_container.add_child(inst)
+
+	if is_instance_valid(enemy_ship_marker_bow) and cfg.has("marker_bow"):
+		enemy_ship_marker_bow.position = cfg.get("marker_bow") as Vector3
+	if is_instance_valid(enemy_ship_marker_mid) and cfg.has("marker_mid"):
+		enemy_ship_marker_mid.position = cfg.get("marker_mid") as Vector3
+	if is_instance_valid(enemy_ship_marker_stern) and cfg.has("marker_stern"):
+		enemy_ship_marker_stern.position = cfg.get("marker_stern") as Vector3
+
+	if cfg.has("dock_x"):
+		target_dock_x = float(cfg.get("dock_x", 13.323))
+		if is_approaching:
+			_start_approach_sequence()
 
 func _setup_crew_from_gamestate() -> void:
 	var equipped_ids: Array[String] = []
