@@ -26,6 +26,7 @@ func _ready() -> void:
 	_test_endless_mode_boss_spawn_at_distance()
 	_test_endless_mode_boss_slain_rewards()
 	_test_dynamic_vessel_and_gangplank_anchors()
+	_test_boarding_wave_scaling_and_telemetry()
 	
 	print("\n========================================================")
 	print("  ALL ROUTE A & ENDLESS BOSS TESTS PASSED SUCCESSFULLY! ")
@@ -190,3 +191,80 @@ func _test_dynamic_vessel_and_gangplank_anchors() -> void:
 	
 	arena.queue_free()
 	print("  [PASS] Dynamic player vessel swapping and calibrated boss gangplank anchors verified.")
+
+func _test_boarding_wave_scaling_and_telemetry() -> void:
+	print("--- 7. Testing Boarding Wave Scaling & Telemetry Instrumentation ---")
+	var arena: BoardingDefenseArena = ARENA_SCENE.instantiate() as BoardingDefenseArena
+	add_child(arena)
+
+	# 1. Tier 1 Scaling (Level 5 War Barge)
+	arena.setup_encounter_difficulty(5, false, 0.0)
+	assert(arena.boss_tier == 1, "Level 5 must scale to Tier 1 (got %d)" % arena.boss_tier)
+	assert(arena.total_waves_to_win == 2, "Tier 1 must have 2 waves (got %d)" % arena.total_waves_to_win)
+	assert(is_equal_approx(arena.wave_interval_sec, 9.0), "Tier 1 wave interval must be 9.0s (got %.1f)" % arena.wave_interval_sec)
+	assert(arena._get_swarm_count_for_tier(1) == 1, "Tier 1 Wave 1 swarm count must be 1")
+	assert(arena._get_swarm_count_for_tier(2) == 2, "Tier 1 Wave 2 swarm count must be 2")
+
+	# 2. Tier 2 Scaling (Level 25 Captain Bone-Beard)
+	arena.setup_encounter_difficulty(25, false, 0.0)
+	assert(arena.boss_tier == 2, "Level 25 must scale to Tier 2 (got %d)" % arena.boss_tier)
+	assert(arena.total_waves_to_win == 3, "Tier 2 must have 3 waves (got %d)" % arena.total_waves_to_win)
+	assert(is_equal_approx(arena.wave_interval_sec, 8.0), "Tier 2 wave interval must be 8.0s (got %.1f)" % arena.wave_interval_sec)
+	assert(arena._get_swarm_count_for_tier(1) == 2, "Tier 2 Wave 1 swarm count must be 2")
+
+	# 3. Tier 3 Scaling (Level 42 Dread Boss)
+	arena.setup_encounter_difficulty(42, false, 0.0)
+	assert(arena.boss_tier == 3, "Level 42 must scale to Tier 3 (got %d)" % arena.boss_tier)
+	assert(arena.total_waves_to_win == 4, "Tier 3 must have 4 waves (got %d)" % arena.total_waves_to_win)
+	assert(is_equal_approx(arena.wave_interval_sec, 7.0), "Tier 3 wave interval must be 7.0s (got %.1f)" % arena.wave_interval_sec)
+	assert(arena._get_swarm_count_for_tier(3) == 3, "Tier 3 Wave 3 swarm count must be 3")
+
+	# 4. Endless Mode Scaling (Deep Distance > 2500m)
+	arena.setup_encounter_difficulty(1, true, 3100.0)
+	assert(arena.boss_tier == 4, "Endless > 2500m must scale to Tier 4 (got %d)" % arena.boss_tier)
+	assert(arena.total_waves_to_win == 5, "Endless Tier 4 must have 5 waves (got %d)" % arena.total_waves_to_win)
+	assert(is_equal_approx(arena.wave_interval_sec, 6.0), "Endless Tier 4 wave interval must be 6.0s (got %.1f)" % arena.wave_interval_sec)
+
+	# 5. Telemetry Signal Emission Verification
+	var captured_data: Dictionary = {
+		"start_received": false,
+		"end_received": false,
+		"boss": "",
+		"outcome": "",
+		"waves_cleared": 0
+	}
+
+	var on_start := func(b_name: String, _tier: int, _waves: int, _vessel: String, _crew: String) -> void:
+		captured_data["start_received"] = true
+		captured_data["boss"] = b_name
+
+	var on_end := func(_b_name: String, outcome: String, _dur: float, waves: int, _tot: int, _kills: int, _spawns: int, _dmg: float, _reason: String) -> void:
+		captured_data["end_received"] = true
+		captured_data["outcome"] = outcome
+		captured_data["waves_cleared"] = waves
+
+	EventBus.boarding_encounter_started.connect(on_start)
+	EventBus.boarding_encounter_ended.connect(on_end)
+
+	arena.setup_enemy_vessel("BossWarBarge")
+	arena.setup_player_vessel("sloop")
+	arena.setup_encounter_difficulty(5, false, 0.0)
+	arena.current_wave = 2
+	arena.encounter_mobs_spawned = 3
+
+	arena._emit_encounter_started()
+	assert(bool(captured_data["start_received"]), "EventBus.boarding_encounter_started must be emitted")
+	assert(str(captured_data["boss"]) == "BossWarBarge", "Captured boss name must match setup (got '%s')" % str(captured_data["boss"]))
+
+	arena.encounter_end_reason = "cleared"
+	arena._emit_encounter_ended("VICTORY")
+	assert(bool(captured_data["end_received"]), "EventBus.boarding_encounter_ended must be emitted")
+	assert(str(captured_data["outcome"]) == "VICTORY", "Outcome must be VICTORY (got '%s')" % str(captured_data["outcome"]))
+	assert(int(captured_data["waves_cleared"]) == 2, "Waves cleared must match current_wave (got %d)" % int(captured_data["waves_cleared"]))
+
+	EventBus.boarding_encounter_started.disconnect(on_start)
+	EventBus.boarding_encounter_ended.disconnect(on_end)
+
+	arena.queue_free()
+	print("  [PASS] Boarding wave scaling across 4 tiers and telemetry event emission verified.")
+

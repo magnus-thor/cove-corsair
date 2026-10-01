@@ -18,22 +18,22 @@ const APPROACH_DURATION_SEC: float = 1.8
 const PLAYER_VESSEL_CONFIGS: Dictionary = {
 	"sloop": {
 		"path": "res://assets/models/user/vessels/the_sloop.glb",
-		"transform": Transform3D(-7.234234e-08, 0.0, 1.655, 0.0, 1.655, 0.0, -1.655, 0.0, -7.234234e-08, 0.0, 0.0054335, 0.0),
+		"transform": Transform3D(Vector3(-7.234234e-08, 0.0, 1.655), Vector3(0.0, 1.655, 0.0), Vector3(-1.655, 0.0, -7.234234e-08), Vector3(0.0, 0.0054335, 0.0)),
 		"rail_offset_x": 0.0
 	},
 	"dinghy": {
 		"path": "res://assets/models/user/vessels/dinghy.glb",
-		"transform": Transform3D(3.8, 0.0, 0.0, 0.0, 3.8, 0.0, 0.0, 0.0, 3.8, -0.35, 0.15, -0.2),
+		"transform": Transform3D(Vector3(3.8, 0.0, 0.0), Vector3(0.0, 3.8, 0.0), Vector3(0.0, 0.0, 3.8), Vector3(-0.35, 0.15, -0.2)),
 		"rail_offset_x": -0.25
 	},
 	"bombard_skiff": {
 		"path": "res://assets/models/user/vessels/the_bombard_skiff.glb",
-		"transform": Transform3D(0.0, 0.0, 2.6, 0.0, 2.6, 0.0, -2.6, 0.0, 0.0, 0.05, 0.05, -0.1),
+		"transform": Transform3D(Vector3(0.0, 0.0, 2.6), Vector3(0.0, 2.6, 0.0), Vector3(-2.6, 0.0, 0.0), Vector3(0.05, 0.05, -0.1)),
 		"rail_offset_x": 0.25
 	},
 	"ironclad": {
 		"path": "res://assets/models/user/vessels/the_ironclad.glb",
-		"transform": Transform3D(0.0, 0.0, 1.85, 0.0, 1.85, 0.0, -1.85, 0.0, 0.0, 0.1, 0.05, 0.0),
+		"transform": Transform3D(Vector3(0.0, 0.0, 1.85), Vector3(0.0, 1.85, 0.0), Vector3(-1.85, 0.0, 0.0), Vector3(0.1, 0.05, 0.0)),
 		"rail_offset_x": 0.35
 	}
 }
@@ -41,7 +41,7 @@ const PLAYER_VESSEL_CONFIGS: Dictionary = {
 const ENEMY_VESSEL_CONFIGS: Dictionary = {
 	"war_barge": {
 		"path": "res://assets/models/enemy/vessels/boss_war_barge.glb",
-		"transform": Transform3D(-0.31290805, -0.8244233, 3.407758, 0.0, 3.4213028, 0.8277002, -3.5060644, 0.07357786, -0.30413443, -11.516914, 0.29983392, 0.17183113),
+		"transform": Transform3D(Vector3(-0.31290805, -0.8244233, 3.407758), Vector3(0.0, 3.4213028, 0.8277002), Vector3(-3.5060644, 0.07357786, -0.30413443), Vector3(-11.516914, 0.29983392, 0.17183113)),
 		"marker_bow": Vector3(-13.068624, 1.1870035, -1.8804607),
 		"marker_mid": Vector3(-12.614456, 0.26471028, -0.17524332),
 		"marker_stern": Vector3(-12.687212, 0.40418908, 0.4926853),
@@ -49,7 +49,7 @@ const ENEMY_VESSEL_CONFIGS: Dictionary = {
 	},
 	"bone_beard": {
 		"path": "res://assets/models/enemy/vessels/captain_bone-beard’s_twin_frigate.glb",
-		"transform": Transform3D(-4.2, 0.0, 0.0, 0.0, 4.2, 0.0, 0.0, 0.0, -4.2, -11.5, 0.25, 0.0),
+		"transform": Transform3D(Vector3(-4.2, 0.0, 0.0), Vector3(0.0, 4.2, 0.0), Vector3(0.0, 0.0, -4.2), Vector3(-11.5, 0.25, 0.0)),
 		"marker_bow": Vector3(-13.1, 0.55, -1.85),
 		"marker_mid": Vector3(-13.1, 0.50, -0.05),
 		"marker_stern": Vector3(-13.1, 0.55, 0.65),
@@ -57,7 +57,7 @@ const ENEMY_VESSEL_CONFIGS: Dictionary = {
 	},
 	"siege_fortress": {
 		"path": "res://assets/models/enemy/vessels/boss_siege_fortress.glb",
-		"transform": Transform3D(-4.2, 0.0, 0.0, 0.0, 4.2, 0.0, 0.0, 0.0, -4.2, -11.4, 0.20, 0.0),
+		"transform": Transform3D(Vector3(-4.2, 0.0, 0.0), Vector3(0.0, 4.2, 0.0), Vector3(0.0, 0.0, -4.2), Vector3(-11.4, 0.20, 0.0)),
 		"marker_bow": Vector3(-13.2, 0.65, -1.90),
 		"marker_mid": Vector3(-13.15, 0.60, -0.05),
 		"marker_stern": Vector3(-13.2, 0.65, 0.70),
@@ -65,13 +65,14 @@ const ENEMY_VESSEL_CONFIGS: Dictionary = {
 	},
 	"ghost_sloop": {
 		"path": "res://assets/models/enemy/vessels/ghost_sloop.glb",
-		"transform": Transform3D(-4.8, 0.0, 0.0, 0.0, 4.8, 0.0, 0.0, 0.0, -4.8, -11.5, 0.35, 0.0),
+		"transform": Transform3D(Vector3(-4.8, 0.0, 0.0), Vector3(0.0, 4.8, 0.0), Vector3(0.0, 0.0, -4.8), Vector3(-11.5, 0.35, 0.0)),
 		"marker_bow": Vector3(-12.8, 0.60, -1.80),
 		"marker_mid": Vector3(-12.7, 0.55, -0.05),
 		"marker_stern": Vector3(-12.8, 0.60, 0.60),
 		"dock_x": 13.32
 	}
 }
+
 
 @export var zone_bow: BoardingZone = null
 @export var zone_midship: BoardingZone = null
@@ -114,6 +115,101 @@ var active_spawners_count: int = 0
 var is_approaching: bool = true
 var approach_tween: Tween = null
 var target_dock_x: float = 13.323
+
+var current_level_index: int = 1
+var is_endless_encounter: bool = false
+var endless_encounter_distance: float = 0.0
+
+# Telemetry tracking counters
+var encounter_start_time: float = 0.0
+var encounter_active_boss_name: String = "Boss"
+var encounter_player_vessel: String = "sloop"
+var encounter_crew_role: String = ""
+var encounter_mobs_spawned: int = 0
+var encounter_mobs_killed: int = 0
+var encounter_hull_damage_taken: float = 0.0
+var encounter_end_reason: String = ""
+var encounter_telemetry_started: bool = false
+var encounter_telemetry_ended: bool = false
+
+func setup_encounter_difficulty(level_index: int, is_endless: bool = false, endless_distance: float = 0.0) -> void:
+	current_level_index = level_index
+	is_endless_encounter = is_endless
+	endless_encounter_distance = endless_distance
+
+	if is_endless:
+		if endless_distance < 800.0:
+			boss_tier = 1
+			total_waves_to_win = 2
+			wave_interval_sec = 8.5
+			single_plank_mode = false
+		elif endless_distance < 1600.0:
+			boss_tier = 2
+			total_waves_to_win = 3
+			wave_interval_sec = 7.5
+			single_plank_mode = false
+		elif endless_distance < 2500.0:
+			boss_tier = 3
+			total_waves_to_win = 4
+			wave_interval_sec = 6.5
+			single_plank_mode = false
+		else:
+			boss_tier = 4
+			total_waves_to_win = 5
+			wave_interval_sec = 6.0
+			single_plank_mode = false
+	else:
+		if level_index <= 15:
+			boss_tier = 1
+			total_waves_to_win = 2
+			wave_interval_sec = 9.0
+			single_plank_mode = false
+		elif level_index <= 30:
+			boss_tier = 2
+			total_waves_to_win = 3
+			wave_interval_sec = 8.0
+			single_plank_mode = false
+		else:
+			boss_tier = 3
+			total_waves_to_win = 4
+			wave_interval_sec = 7.0
+			single_plank_mode = false
+
+	if is_instance_valid(hud):
+		hud.update_wave(maxi(1, current_wave), total_waves_to_win)
+
+func _emit_encounter_started() -> void:
+	if encounter_telemetry_started:
+		return
+	encounter_telemetry_started = true
+	encounter_start_time = float(Time.get_ticks_msec()) / 1000.0
+	if EventBus and EventBus.has_signal("boarding_encounter_started"):
+		EventBus.boarding_encounter_started.emit(
+			encounter_active_boss_name,
+			boss_tier,
+			total_waves_to_win,
+			encounter_player_vessel,
+			encounter_crew_role
+		)
+
+func _emit_encounter_ended(outcome: String) -> void:
+	if encounter_telemetry_ended:
+		return
+	encounter_telemetry_ended = true
+	if not EventBus or not EventBus.has_signal("boarding_encounter_ended"):
+		return
+	var duration: float = (float(Time.get_ticks_msec()) / 1000.0) - encounter_start_time
+	EventBus.boarding_encounter_ended.emit(
+		encounter_active_boss_name,
+		outcome,
+		snappedf(duration, 0.1),
+		current_wave,
+		total_waves_to_win,
+		encounter_mobs_killed,
+		encounter_mobs_spawned,
+		snappedf(encounter_hull_damage_taken, 0.1),
+		encounter_end_reason
+	)
 
 func _ready() -> void:
 	zones = [zone_bow, zone_midship, zone_stern]
@@ -337,20 +433,8 @@ func _trigger_docking_splash() -> void:
 
 func _launch_initial_planks() -> void:
 	current_wave = 1
-	if is_instance_valid(hud):
-		hud.update_wave(current_wave, total_waves_to_win)
-	if boss_tier == 1 or single_plank_mode:
-		# 2 planks from the start (Bow and Stern), with staggered swarm spawn
-		launch_plank_to_zone(0, current_wave, 0.0)
-		launch_plank_to_zone(2, current_wave, 3.2)
-	elif boss_tier == 2:
-		launch_plank_to_zone(0, current_wave, 0.0)
-		launch_plank_to_zone(2, current_wave, 3.2)
-	else:
-		launch_plank_to_zone(0, current_wave, 0.0)
-		launch_plank_to_zone(1, current_wave, 2.5)
-		launch_plank_to_zone(2, current_wave, 5.0)
-		
+	_emit_encounter_started()
+	_launch_wave(current_wave)
 	call_deferred("_select_initial_plank")
 	wave_timer = wave_interval_sec
 
@@ -366,6 +450,7 @@ func setup_player_vessel(vessel_id: String = "") -> void:
 	var v_key: String = vessel_id.to_lower().strip_edges()
 	if v_key.is_empty() or not PLAYER_VESSEL_CONFIGS.has(v_key):
 		v_key = "sloop"
+	encounter_player_vessel = v_key
 		
 	var cfg: Dictionary = PLAYER_VESSEL_CONFIGS[v_key] as Dictionary
 	var glb_path: String = str(cfg.get("path", "res://assets/models/user/vessels/the_sloop.glb"))
@@ -408,6 +493,8 @@ func setup_enemy_vessel(boss_name: String = "") -> void:
 		boss_key = "ghost_sloop"
 	elif b_lower.contains("bone") or b_lower.contains("frigate"):
 		boss_key = "bone_beard"
+
+	encounter_active_boss_name = boss_name if not boss_name.is_empty() else boss_key
 
 	var cfg: Dictionary = ENEMY_VESSEL_CONFIGS.get(boss_key, ENEMY_VESSEL_CONFIGS["war_barge"]) as Dictionary
 	var glb_path: String = str(cfg.get("path", ""))
@@ -452,9 +539,11 @@ func _setup_crew_from_gamestate() -> void:
 		if is_instance_valid(player_controller):
 			player_controller.setup_defender_model(defender_crew_id)
 			player_controller.visible = true
+			encounter_crew_role = player_controller.crew_role
 	else:
 		if is_instance_valid(player_controller):
 			player_controller.setup_defender_model("")
+			encounter_crew_role = ""
 
 	# 2. Automated crew stations: ONLY active if additional equipped crew exist!
 	# Unequipped crew members are never spawned.
@@ -569,33 +658,66 @@ func _check_victory_condition() -> void:
 		_trigger_victory()
 
 func _launch_wave(wave_num: int) -> void:
+	_emit_encounter_started()
 	if is_instance_valid(hud):
 		hud.update_wave(wave_num, total_waves_to_win)
-	if boss_tier == 1 or single_plank_mode:
-		if wave_num % 2 == 1:
+
+	if boss_tier <= 1 or single_plank_mode:
+		# Tier 1 (War Barge / L1-15): 2 waves
+		if wave_num <= 1:
+			launch_plank_to_zone(0, wave_num, 0.0)
+		else:
 			launch_plank_to_zone(0, wave_num, 0.0)
 			launch_plank_to_zone(2, wave_num, 3.2)
-		else:
-			launch_plank_to_zone(2, wave_num, 0.0)
-			launch_plank_to_zone(0, wave_num, 3.2)
 	elif boss_tier == 2:
-		if wave_num % 2 == 1:
-			launch_plank_to_zone(0, wave_num, 0.0)
-			launch_plank_to_zone(2, wave_num, 3.2)
-		else:
-			launch_plank_to_zone(2, wave_num, 0.0)
-			launch_plank_to_zone(0, wave_num, 3.2)
-	else:
+		# Tier 2 (Captain Bone-Beard / L16-30): 3 waves
 		match wave_num:
 			1:
 				launch_plank_to_zone(1, wave_num, 0.0)
 			2:
 				launch_plank_to_zone(0, wave_num, 0.0)
-				launch_plank_to_zone(2, wave_num, 3.0)
+				launch_plank_to_zone(2, wave_num, 2.5)
+			_:
+				launch_plank_to_zone(0, wave_num, 0.0)
+				launch_plank_to_zone(2, wave_num, 2.0)
+	elif boss_tier == 3:
+		# Tier 3 (Siege Fortress / Phantom Dredge / L31-45): 4 waves
+		match wave_num:
+			1:
+				launch_plank_to_zone(0, wave_num, 0.0)
+				launch_plank_to_zone(1, wave_num, 1.5)
+			2:
+				launch_plank_to_zone(1, wave_num, 0.0)
+				launch_plank_to_zone(2, wave_num, 1.2)
 			3:
 				launch_plank_to_zone(0, wave_num, 0.0)
-				launch_plank_to_zone(1, wave_num, 2.5)
-				launch_plank_to_zone(2, wave_num, 5.0)
+				launch_plank_to_zone(1, wave_num, 1.5)
+				launch_plank_to_zone(2, wave_num, 3.0)
+			_:
+				launch_plank_to_zone(0, wave_num, 0.0)
+				launch_plank_to_zone(1, wave_num, 1.0)
+				launch_plank_to_zone(2, wave_num, 2.0)
+	else:
+		# Tier 4 (Endless Nightmare / 5 waves)
+		match wave_num:
+			1:
+				launch_plank_to_zone(0, wave_num, 0.0)
+				launch_plank_to_zone(2, wave_num, 1.5)
+			2:
+				launch_plank_to_zone(1, wave_num, 0.0)
+				launch_plank_to_zone(2, wave_num, 1.2)
+			3:
+				launch_plank_to_zone(0, wave_num, 0.0)
+				launch_plank_to_zone(1, wave_num, 1.2)
+				launch_plank_to_zone(2, wave_num, 2.4)
+			4:
+				launch_plank_to_zone(0, wave_num, 0.0)
+				launch_plank_to_zone(1, wave_num, 0.8)
+				launch_plank_to_zone(2, wave_num, 1.6)
+			_:
+				launch_plank_to_zone(0, wave_num, 0.0)
+				launch_plank_to_zone(1, wave_num, 0.5)
+				launch_plank_to_zone(2, wave_num, 1.0)
 
 func launch_plank_to_zone(zone_index: int, wave_num: int = 1, spawn_delay_sec: float = 0.0) -> void:
 	if debug_disable_spawns:
@@ -630,13 +752,20 @@ func launch_plank_to_zone(zone_index: int, wave_num: int = 1, spawn_delay_sec: f
 
 func _get_swarm_count_for_tier(wave_num: int) -> int:
 	if boss_tier <= 1 or single_plank_mode:
-		# Early levels: 1 enemy per plank for waves 1-2, 2 for final wave
-		if wave_num <= 2:
+		if wave_num <= 1:
 			return 1
 		return 2
 	elif boss_tier == 2:
+		if wave_num <= 1:
+			return 2
 		return 2
+	elif boss_tier == 3:
+		if wave_num <= 2:
+			return 2
+		return 3
 	else:
+		if wave_num <= 2:
+			return 2
 		return 3
 
 func _spawn_plank_swarm(plank: BoardingPlank, zone: BoardingZone, count: int, wave_num: int = 1, initial_delay_sec: float = 0.0) -> void:
@@ -654,6 +783,7 @@ func _spawn_plank_swarm(plank: BoardingPlank, zone: BoardingZone, count: int, wa
 			chosen_scene = boarder_scene
 		if not is_instance_valid(chosen_scene):
 			break
+		encounter_mobs_spawned += 1
 		var enemy: BoarderEnemy = chosen_scene.instantiate() as BoarderEnemy
 		add_child(enemy)
 		if boss_tier <= 1 or single_plank_mode:
@@ -662,6 +792,27 @@ func _spawn_plank_swarm(plank: BoardingPlank, zone: BoardingZone, count: int, wa
 			enemy.attack_damage = 3.5
 			enemy.cross_speed_mult = 0.85
 			enemy.deck_wander_speed = 0.85
+			enemy.breach_z = 6.2
+		elif boss_tier == 2:
+			enemy.max_hp = 26.0
+			enemy.current_hp = 26.0
+			enemy.attack_damage = 4.5
+			enemy.cross_speed_mult = 0.95
+			enemy.deck_wander_speed = 0.95
+			enemy.breach_z = 6.2
+		elif boss_tier == 3:
+			enemy.max_hp = 34.0
+			enemy.current_hp = 34.0
+			enemy.attack_damage = 6.0
+			enemy.cross_speed_mult = 1.05
+			enemy.deck_wander_speed = 1.05
+			enemy.breach_z = 6.2
+		else:
+			enemy.max_hp = 42.0
+			enemy.current_hp = 42.0
+			enemy.attack_damage = 7.5
+			enemy.cross_speed_mult = 1.15
+			enemy.deck_wander_speed = 1.15
 			enemy.breach_z = 6.2
 		enemy.breached_stern.connect(_on_enemy_breached_stern)
 		enemy.tree_exited.connect(_on_enemy_removed)
@@ -673,6 +824,7 @@ func _spawn_plank_swarm(plank: BoardingPlank, zone: BoardingZone, count: int, wa
 	_check_victory_condition()
 
 func _on_enemy_died() -> void:
+	encounter_mobs_killed += 1
 	call_deferred("_check_victory_condition")
 
 func _on_enemy_removed() -> void:
@@ -682,6 +834,8 @@ func _on_enemy_breached_stern(_enemy: BoarderEnemy) -> void:
 	if not is_encounter_active:
 		return
 	is_encounter_active = false
+	encounter_end_reason = "stern_breached"
+	_emit_encounter_ended("DEFEAT")
 	if is_instance_valid(hud):
 		hud.show_defeat("STERN BREACHED! GAME OVER")
 	encounter_lost.emit()
@@ -692,6 +846,8 @@ func _on_crew_defeated() -> void:
 	if not is_encounter_active:
 		return
 	is_encounter_active = false
+	encounter_end_reason = "crew_defeated"
+	_emit_encounter_ended("DEFEAT")
 	if is_instance_valid(hud):
 		hud.show_defeat("CREW MEMBER DEFEATED!")
 	encounter_lost.emit()
@@ -702,15 +858,29 @@ func _get_enemy_scene_for_swarm(wave_num: int, swarm_index: int) -> PackedScene:
 	var raider_scn: PackedScene = boarder_raider_scene if is_instance_valid(boarder_raider_scene) else boarder_scene
 	var brute_scn: PackedScene = boarder_brute_scene if is_instance_valid(boarder_brute_scene) else boarder_scene
 
-	# Boss 1 only uses the frontline pirate raider!
+	# Boss Tier 1 only uses the frontline pirate raider!
 	if boss_tier <= 1:
 		return raider_scn
 
+	if boss_tier == 2:
+		match wave_num:
+			1:
+				return raider_scn
+			2:
+				if swarm_index >= 1:
+					return brute_scn
+				return raider_scn
+			_:
+				if swarm_index >= 1:
+					return brute_scn
+				return raider_scn
+
+	# Tier 3 and 4:
 	match wave_num:
 		1:
 			return raider_scn
 		2:
-			if swarm_index == 2:
+			if swarm_index >= 1:
 				return brute_scn
 			return raider_scn
 		_:
@@ -719,6 +889,7 @@ func _get_enemy_scene_for_swarm(wave_num: int, swarm_index: int) -> PackedScene:
 			return raider_scn
 
 func _damage_vessel_hull(amount: float) -> void:
+	encounter_hull_damage_taken += amount
 	var player: PlayerSwerve = get_tree().get_first_node_in_group("player") as PlayerSwerve
 	if is_instance_valid(player):
 		player.take_hit(maxi(1, int(round(amount))), "boarding_overrun")
@@ -747,6 +918,8 @@ func _trigger_victory() -> void:
 	if not is_encounter_active:
 		return
 	is_encounter_active = false
+	encounter_end_reason = "cleared"
+	_emit_encounter_ended("VICTORY")
 	if is_instance_valid(hud):
 		hud.show_victory()
 	if AudioManager and AudioManager.has_method("play_sfx"):
@@ -761,4 +934,7 @@ func _trigger_defeat() -> void:
 	if not is_encounter_active:
 		return
 	is_encounter_active = false
+	if encounter_end_reason.is_empty():
+		encounter_end_reason = "defeated"
+	_emit_encounter_ended("DEFEAT")
 	encounter_lost.emit()

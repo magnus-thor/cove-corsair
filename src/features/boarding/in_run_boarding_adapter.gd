@@ -48,11 +48,15 @@ func start_in_run_boarding(boss: Node3D, player: Node3D) -> void:
 	active_arena = ARENA_SCENE.instantiate() as BoardingDefenseArena
 	active_arena.global_position = STAGING_POSITION
 	
-	# Configure single-plank scaling based on campaign level (Level 5 = 1 plank)
+	# Configure encounter difficulty and wave scaling based on campaign level or endless mode
 	var cur_lvl: int = 1
 	if GameState and "current_level" in GameState:
 		cur_lvl = int(GameState.current_level)
-	if cur_lvl <= 15:
+	var is_endless: bool = bool(GameState.is_endless_mode) if GameState and "is_endless_mode" in GameState else false
+	var endless_dist: float = float(GameState.distance_traveled) if GameState and "distance_traveled" in GameState else 0.0
+	if active_arena.has_method("setup_encounter_difficulty"):
+		active_arena.setup_encounter_difficulty(cur_lvl, is_endless, endless_dist)
+	elif cur_lvl <= 15:
 		active_arena.boss_tier = 1
 		active_arena.single_plank_mode = false
 	elif cur_lvl <= 30:

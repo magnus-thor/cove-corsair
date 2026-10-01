@@ -151,6 +151,12 @@ func _connect_event_bus() -> void:
 	if EventBus.has_signal("shot_expired_at_distance") and not EventBus.shot_expired_at_distance.is_connected(_on_shot_expired):
 		EventBus.shot_expired_at_distance.connect(_on_shot_expired)
 
+	if EventBus.has_signal("boarding_encounter_started") and not EventBus.boarding_encounter_started.is_connected(_on_boarding_encounter_started):
+		EventBus.boarding_encounter_started.connect(_on_boarding_encounter_started)
+
+	if EventBus.has_signal("boarding_encounter_ended") and not EventBus.boarding_encounter_ended.is_connected(_on_boarding_encounter_ended):
+		EventBus.boarding_encounter_ended.connect(_on_boarding_encounter_ended)
+
 func start_level_run(level_index: int) -> void:
 	_finalize_active_run_if_any("SUPERSEDED")
 	
@@ -386,6 +392,43 @@ func _on_boss_health_changed(current: int, _max_val: int) -> void:
 		])
 	current_run["boss_encounter"] = boss_dict
 
+func _on_boarding_encounter_started(boss_name: String, tier: int, total_waves: int, player_vessel: String, crew_role: String) -> void:
+	if not is_run_active:
+		return
+	var b_dict: Dictionary = {
+		"boss_name": boss_name,
+		"tier": tier,
+		"total_waves": total_waves,
+		"player_vessel": player_vessel,
+		"crew_role": crew_role,
+		"start_time": float(Time.get_ticks_msec()) / 1000.0,
+		"outcome": "IN_PROGRESS"
+	}
+	current_run["boarding_encounter"] = b_dict
+	print("[TELEMETRY:BOARDING] ⚓ Boarding Engaged vs '%s' (Tier %d) | Waves: %d | Vessel: %s | Crew: %s" % [
+		boss_name, tier, total_waves, player_vessel, ("none" if crew_role.is_empty() else crew_role)
+	])
+
+func _on_boarding_encounter_ended(boss_name: String, outcome: String, duration_sec: float, waves_cleared: int, total_waves: int, mobs_killed: int, mobs_spawned: int, hull_damage_taken: float, end_reason: String) -> void:
+	if not is_run_active:
+		return
+	var b_dict: Dictionary = current_run.get("boarding_encounter", {}) as Dictionary
+	b_dict["boss_name"] = boss_name
+	b_dict["outcome"] = outcome
+	b_dict["duration_sec"] = snappedf(duration_sec, 0.1)
+	b_dict["waves_cleared"] = waves_cleared
+	b_dict["total_waves"] = total_waves
+	b_dict["mobs_killed"] = mobs_killed
+	b_dict["mobs_spawned"] = mobs_spawned
+	b_dict["hull_damage_taken"] = snappedf(hull_damage_taken, 0.1)
+	b_dict["end_reason"] = end_reason
+	current_run["boarding_encounter"] = b_dict
+
+	var status_icon: String = "🏆" if outcome == "VICTORY" else "💀"
+	print("[TELEMETRY:BOARDING] %s %s vs '%s' in %.1fs | Waves: %d/%d | Kills: %d/%d | Hull DMG: %.1f [%s]" % [
+		status_icon, outcome, boss_name, duration_sec, waves_cleared, total_waves, mobs_killed, mobs_spawned, hull_damage_taken, end_reason
+	])
+
 func _calc_run_fps_metrics() -> Dictionary:
 	var avg_fps: float = snappedf(run_fps_accum / float(maxi(1, run_fps_samples)), 0.1) if run_fps_samples > 0 else float(Engine.get_frames_per_second())
 	var min_fps: int = int(run_min_fps) if (run_fps_samples > 0 and run_min_fps < 900.0) else int(avg_fps)
@@ -457,6 +500,18 @@ func _on_level_completed(_doubloons: int, _targets: int) -> void:
 				close_kills += 1
 		var avg_kill_dist: float = total_kill_dist / float(mob_kills_arr.size())
 		print("   Avg Kill Dist: %.1fm | Far (>30m): %d | Close (<10m): %d" % [avg_kill_dist, far_kills, close_kills])
+	if current_run.has("boarding_encounter"):
+		var b_info: Dictionary = current_run["boarding_encounter"] as Dictionary
+		print("   Boarding    : %s in %.1fs | Waves: %d/%d | Kills: %d/%d | Hull DMG: %.1f [%s]" % [
+			str(b_info.get("outcome", "N/A")),
+			float(b_info.get("duration_sec", 0.0)),
+			int(b_info.get("waves_cleared", 0)),
+			int(b_info.get("total_waves", 0)),
+			int(b_info.get("mobs_killed", 0)),
+			int(b_info.get("mobs_spawned", 0)),
+			float(b_info.get("hull_damage_taken", 0.0)),
+			str(b_info.get("end_reason", "N/A"))
+		])
 	print("================================================================================\n")
 	
 	save_telemetry_to_disk()
@@ -517,6 +572,18 @@ func _on_run_failed(coins_collected: int, distance_reached: float) -> void:
 				close_kills += 1
 		var avg_kill_dist: float = total_kill_dist / float(mob_kills_arr.size())
 		print("   Avg Kill Dist: %.1fm | Far (>30m): %d | Close (<10m): %d" % [avg_kill_dist, far_kills, close_kills])
+	if current_run.has("boarding_encounter"):
+		var b_info: Dictionary = current_run["boarding_encounter"] as Dictionary
+		print("   Boarding    : %s in %.1fs | Waves: %d/%d | Kills: %d/%d | Hull DMG: %.1f [%s]" % [
+			str(b_info.get("outcome", "N/A")),
+			float(b_info.get("duration_sec", 0.0)),
+			int(b_info.get("waves_cleared", 0)),
+			int(b_info.get("total_waves", 0)),
+			int(b_info.get("mobs_killed", 0)),
+			int(b_info.get("mobs_spawned", 0)),
+			float(b_info.get("hull_damage_taken", 0.0)),
+			str(b_info.get("end_reason", "N/A"))
+		])
 	print("================================================================================\n")
 	
 	save_telemetry_to_disk()

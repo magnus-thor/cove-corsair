@@ -118,3 +118,13 @@ signal obstacle_destroyed_telemetry(obstacle_type: String, shots_taken: int, riv
 @warning_ignore("unused_signal")
 signal shot_expired_at_distance(weapon_id: String, max_range_m: float, river_distance: float)
 
+## ── Boarding Defense Telemetry ──────────────────────────────────────────────
+
+## Fired when a boarding defense sequence is initiated.
+@warning_ignore("unused_signal")
+signal boarding_encounter_started(boss_name: String, tier: int, total_waves: int, player_vessel: String, crew_role: String)
+
+## Fired when a boarding defense sequence completes in victory or defeat.
+@warning_ignore("unused_signal")
+signal boarding_encounter_ended(boss_name: String, outcome: String, duration_sec: float, waves_cleared: int, total_waves: int, mobs_killed: int, mobs_spawned: int, hull_damage_taken: float, end_reason: String)
+

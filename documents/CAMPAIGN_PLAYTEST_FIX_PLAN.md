@@ -72,18 +72,24 @@ The boarding mini-game is a signature encounter during boss fights, but currentl
 
 ---
 
-#### Item 5: Dynamic Boarding Difficulty & Mob Scaling (Issue #3)
+#### Item 5: Dynamic Boarding Difficulty & Mob Scaling (Issue #3) — ✅ COMPLETED
 * **Problem**: Boarding defense currently features identical difficulty across the entire game (always 3 waves, 8-second intervals, 1–2 mobs per wave).
 * **Intended Behavior**: Boarding difficulty should scale with world/level tier: higher-level bosses send tougher boarding parties (more raiders, tankier elite mobs, shorter wave delays).
 * **Files Involved**:
   * [`src/features/boarding/boarding_defense_arena.gd`](file:///f:/projects/cove-corsair/src/features/boarding/boarding_defense_arena.gd)
   * [`src/features/boarding/in_run_boarding_adapter.gd`](file:///f:/projects/cove-corsair/src/features/boarding/in_run_boarding_adapter.gd)
-* **Proposed Fix**:
-  * Pass current campaign level or boss tier into `setup_encounter_difficulty(level_index: int)`.
-  * Scale:
-    * `wave_count` (e.g., 2 waves on early levels, 3–4 on mid, 4–5 on late/boss tiers).
-    * `mobs_per_wave` and mob composition (mix in armored boarders or bombers on later levels).
-    * Spawn cadence adjusted by tier.
+  * [`src/core/event_bus.gd`](file:///f:/projects/cove-corsair/src/core/event_bus.gd)
+  * [`src/core/playtest_telemetry.gd`](file:///f:/projects/cove-corsair/src/core/playtest_telemetry.gd)
+  * [`src/test_scripts/test_boss_and_endless_boarding.gd`](file:///f:/projects/cove-corsair/src/test_scripts/test_boss_and_endless_boarding.gd)
+* **Implemented Solution**:
+  * Added `setup_encounter_difficulty(level_index: int, is_endless: bool, endless_distance: float)` in `boarding_defense_arena.gd`.
+  * Scaled across 4 tiers:
+    * **Tier 1 (L1–15 / War Barge)**: 2 waves, 9.0s cadence, 1→2 raiders (18 HP, 3.5 dmg, 0.85 speed), sequential single/double planks.
+    * **Tier 2 (L16–30 / Bone-Beard)**: 3 waves, 8.0s cadence, 2 mobs per plank, Brutes (tanky elites) introduced on waves 2–3.
+    * **Tier 3 (L31–45 / Siege Fortress, Phantom Dredge)**: 4 waves, 7.0s cadence, 2→3 mobs per plank (34 HP, 6.0 dmg, 1.05 speed), simultaneous multi-plank breaches.
+    * **Tier 4 (Endless >2500m Nightmare)**: 5 waves, 6.0s cadence, 3 mobs per plank (42 HP, 7.5 dmg, 1.15 speed), 3 simultaneous planks.
+  * Added dedicated `boarding_encounter_started` and `boarding_encounter_ended` telemetry signals to `EventBus` and `playtest_telemetry.gd`.
+  * Verified with automated headless test suite (`_test_boarding_wave_scaling_and_telemetry`).
 
 ---
 
@@ -226,7 +232,7 @@ graph TD
 ### Phase 4: Pacing, Progression & Scaling (Items 3, 5, 8, 13)
 * **Goal**: Smooth the early-game Sloop difficulty curve and eliminate mid-level downtime.
 * **Tasks**:
-  1. Implement Sloop Endless farming UX prompt.
-  2. Add dynamic boarding wave and mob scaling by level tier.
-  3. Tune cannon range and mob engagement cadence to reduce wasted fire.
+  1. Implement Sloop Endless farming UX prompt. (Designed in `TUTORIAL_ONBOARDING_DESIGN.md`)
+  2. ✅ Add dynamic boarding wave and mob scaling by level tier. (Implemented & tested)
+  3. Tune cannon range and mob engagement cadence to reduce wasted fire. (Telemetry instrumented)
 * **Deliverable**: Balanced progression and active, engaging naval combat.
