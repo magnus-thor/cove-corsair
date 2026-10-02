@@ -46,7 +46,7 @@ func start_in_run_boarding(boss: Node3D, player: Node3D) -> void:
 
 	# ── 4. Instantiate Boarding Defense Arena at isolated staging altitude ─
 	active_arena = ARENA_SCENE.instantiate() as BoardingDefenseArena
-	active_arena.global_position = STAGING_POSITION
+	active_arena.position = STAGING_POSITION
 	
 	# Configure encounter difficulty and wave scaling based on campaign level or endless mode
 	var cur_lvl: int = 1
@@ -68,6 +68,7 @@ func start_in_run_boarding(boss: Node3D, player: Node3D) -> void:
 	if not root:
 		root = active_player.get_parent()
 	root.add_child(active_arena)
+	active_arena.global_position = STAGING_POSITION
 
 	# Configure matching enemy ship model
 	if is_instance_valid(active_arena) and active_arena.has_method("setup_enemy_vessel"):
@@ -136,6 +137,12 @@ func _pause_runner() -> void:
 		lvl_ctrl.set("base_scroll_speed", 0.0)
 		lvl_ctrl.set_physics_process(false)
 		lvl_ctrl.set_process(false)
+
+	# Pause EndlessMode
+	var endless_mode: Node = get_tree().get_first_node_in_group("endless_mode")
+	if endless_mode and is_instance_valid(endless_mode):
+		endless_mode.set_physics_process(false)
+		endless_mode.set_process(false)
 
 	# Freeze lane enemies
 	for enemy: Node in get_tree().get_nodes_in_group("enemies"):
@@ -223,6 +230,12 @@ func _restore_runner() -> void:
 		_level_controller.set_physics_process(true)
 		_level_controller.set_process(true)
 	_level_controller = null
+
+	# Re-enable EndlessMode
+	var endless_mode: Node = get_tree().get_first_node_in_group("endless_mode")
+	if endless_mode and is_instance_valid(endless_mode):
+		endless_mode.set_physics_process(true)
+		endless_mode.set_process(true)
 
 	# Restore run camera
 	if is_instance_valid(_player_camera):

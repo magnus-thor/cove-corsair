@@ -662,10 +662,18 @@ func _launch_wave(wave_num: int) -> void:
 	if is_instance_valid(hud):
 		hud.update_wave(wave_num, total_waves_to_win)
 
-	if boss_tier <= 1 or single_plank_mode:
+	if boss_tier == 0:
+		# Default / Test Broadside: launch 3 planks into Bow, Midship, Stern
+		launch_plank_to_zone(0, wave_num, 0.0)
+		launch_plank_to_zone(1, wave_num, 1.5)
+		launch_plank_to_zone(2, wave_num, 3.0)
+	elif boss_tier == 1 or single_plank_mode:
 		# Tier 1 (War Barge / L1-15): 2 waves
-		if wave_num <= 1:
+		if single_plank_mode:
 			launch_plank_to_zone(0, wave_num, 0.0)
+		elif wave_num <= 1:
+			launch_plank_to_zone(0, wave_num, 0.0)
+			launch_plank_to_zone(2, wave_num, 2.5)
 		else:
 			launch_plank_to_zone(0, wave_num, 0.0)
 			launch_plank_to_zone(2, wave_num, 3.2)
@@ -817,13 +825,13 @@ func _spawn_plank_swarm(plank: BoardingPlank, zone: BoardingZone, count: int, wa
 		enemy.breached_stern.connect(_on_enemy_breached_stern)
 		enemy.tree_exited.connect(_on_enemy_removed)
 		if enemy.has_signal("died"):
-			enemy.connect("died", _on_enemy_died)
+			enemy.died.connect(_on_enemy_died)
 		enemy.start_crossing(plank, zone)
 		
 	active_spawners_count = maxi(0, active_spawners_count - 1)
 	_check_victory_condition()
 
-func _on_enemy_died() -> void:
+func _on_enemy_died(_enemy: BoarderEnemy = null) -> void:
 	encounter_mobs_killed += 1
 	call_deferred("_check_victory_condition")
 

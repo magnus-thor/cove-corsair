@@ -46,22 +46,22 @@ func _test_route_a_desperation_threshold_and_clamp() -> void:
 	var max_hp: int = int(boss.get("max_hp"))
 	assert(max_hp > 0, "War-Barge max_hp must be positive (got %d)" % max_hp)
 	
-	# Deal damage above 2% threshold (HP drops to 50% > 2%)
+	# Deal damage above 20% threshold (HP drops to 50% > 20%)
 	var dmg_half: int = int(max_hp * 0.5)
 	boss.call("take_damage", dmg_half)
 	var hp_after_first: int = int(boss.get("current_hp"))
-	var threshold_2pct: int = max(1, int(round(float(max_hp) * 0.02)))
-	assert(hp_after_first > threshold_2pct, "HP must remain above 2 percent (got %d / %d)" % [hp_after_first, max_hp])
+	var threshold_20pct: int = max(1, int(round(float(max_hp) * 0.20)))
+	assert(hp_after_first > threshold_20pct, "HP must remain above 20 percent (got %d / %d)" % [hp_after_first, max_hp])
 	var has_triggered_1: bool = bool(boss.get("has_triggered_boarding"))
-	assert(not has_triggered_1, "Boarding must NOT trigger above 2% HP threshold")
+	assert(not has_triggered_1, "Boarding must NOT trigger above 20% HP threshold")
 	
-	# Deal damage to drop below 2% threshold (HP drops to <= 2%)
-	var dmg_desperation: int = max(1, hp_after_first - max(1, int(threshold_2pct * 0.5)))
+	# Deal damage to drop below 20% threshold (HP drops to <= 20%)
+	var dmg_desperation: int = max(1, hp_after_first - max(1, int(threshold_20pct * 0.5)))
 	boss.call("take_damage", dmg_desperation)
 	var hp_after_second: int = int(boss.get("current_hp"))
-	assert(hp_after_second <= threshold_2pct, "HP must be <= 2 percent (got %d / %d, threshold %d)" % [hp_after_second, max_hp, threshold_2pct])
+	assert(hp_after_second <= threshold_20pct, "HP must be <= 20 percent (got %d / %d, threshold %d)" % [hp_after_second, max_hp, threshold_20pct])
 	var has_triggered_2: bool = bool(boss.get("has_triggered_boarding"))
-	assert(has_triggered_2, "Boarding MUST trigger when HP <= 2%% (got %d / %d)" % [hp_after_second, max_hp])
+	assert(has_triggered_2, "Boarding MUST trigger when HP <= 20%% (got %d / %d)" % [hp_after_second, max_hp])
 	
 	# Deal massive fatal damage (1000) while boarding is active
 	boss.call("take_damage", 1000)
@@ -71,7 +71,7 @@ func _test_route_a_desperation_threshold_and_clamp() -> void:
 	assert(not is_defeated, "Boss must not be defeated prematurely while boarding party is active")
 	
 	boss.queue_free()
-	print("  [PASS] Route A Desperation threshold (<= 2%) and HP clamp at 1 verified.")
+	print("  [PASS] Route A Desperation threshold (<= 20%) and HP clamp at 1 verified.")
 
 func _test_boarding_adapter_defeat_flow() -> void:
 	print("--- 2. Testing InRunBoardingAdapter Arena Victory Cascade ---")
@@ -102,14 +102,20 @@ func _test_endless_mode_boss_pool_and_target_distance() -> void:
 	var scenes: Array = mode.get("boss_scenes") as Array
 	assert(scenes.size() == 4, "Endless mode must have 4 bosses in boss_scenes pool (got %d)" % scenes.size())
 	
-	var target_dist: float = float(mode.get("random_boss_target_distance"))
-	assert(target_dist >= 450.0 and target_dist <= 750.0, "Random boss target distance must be between 450m and 750m (got %.1fm)" % target_dist)
+	# 1st level (0 - 1000m) guarantee: No boss spawns before user decides to continue run once
+	var target_dist_start: float = float(mode.get("random_boss_target_distance"))
+	assert(target_dist_start <= 0.0, "Boss must NOT be scheduled on 1st level before continuing run (got %.1fm)" % target_dist_start)
 	
-	var has_spawned: bool = bool(mode.get("has_spawned_endless_boss"))
-	assert(not has_spawned, "Boss must not have spawned at run start")
+	var has_spawned_start: bool = bool(mode.get("has_spawned_endless_boss"))
+	assert(not has_spawned_start, "Boss must not have spawned at run start")
+	
+	# Push luck once (user continues run once at 1000m wager fork)
+	mode.call("push_luck")
+	var target_dist_continued: float = float(mode.get("random_boss_target_distance"))
+	assert(target_dist_continued >= 1400.0 and target_dist_continued <= 1700.0, "Boss target distance must be scheduled in continued leg (1400m - 1700m, got %.1fm)" % target_dist_continued)
 	
 	mode.queue_free()
-	print("  [PASS] Endless mode initialized with 4-boss pool and target distance: %.1fm." % target_dist)
+	print("  [PASS] Endless mode 4-boss pool verified; boss safely deferred until user continues run once (target: %.1fm)." % target_dist_continued)
 
 func _test_endless_mode_boss_spawn_at_distance() -> void:
 	print("--- 4. Testing Endless Mode Boss Spawn at Target Distance ---")
@@ -117,23 +123,36 @@ func _test_endless_mode_boss_spawn_at_distance() -> void:
 	add_child(mode)
 	mode.call("start_run")
 	
-	var target_dist: float = float(mode.get("random_boss_target_distance"))
+	# Verify no boss spawns in 1st level even if distance reaches 600m
+	mode.set("distance_traveled", 600.0)
+	mode._physics_process(0.016)
+	assert(not bool(mode.get("has_spawned_endless_boss")), "Boss must NOT spawn on 1st level before pushing luck")
 	
-	# Set distance just past the trigger distance
+	# User pushes luck once to continue run into segment 2 (1000m - 2000m)
+	mode.set("distance_traveled", 1000.0)
+	mode.call("push_luck")
+	var target_dist: float = float(mode.get("random_boss_target_distance"))
+	assert(target_dist > 1000.0, "Boss target distance must be scheduled after 1000m")
+	
+	# Advance distance past the scheduled trigger distance
 	mode.set("distance_traveled", target_dist + 5.0)
 	mode._physics_process(0.016)
 	
 	var has_spawned: bool = bool(mode.get("has_spawned_endless_boss"))
-	assert(has_spawned, "Boss must spawn when distance_traveled >= random_boss_target_distance")
+	assert(has_spawned, "Boss must spawn when distance_traveled >= random_boss_target_distance after continuing run")
 	
 	var active_boss: Node3D = mode.get("active_endless_boss") as Node3D
 	assert(active_boss != null and is_instance_valid(active_boss), "Active endless boss must be instantiated")
 	assert(active_boss.global_position.z == -18.0, "Boss must be positioned at track front Z=-18.0 (got %.1f)" % active_boss.global_position.z)
 	
+	# Verify tuned Endless Mode HP for weaker vessels
+	var boss_hp: int = int(active_boss.get("max_hp"))
+	assert(boss_hp == 650, "First endless boss encounter must have tuned HP (650) for fair pacing with weaker vessels (got %d)" % boss_hp)
+	
 	if is_instance_valid(active_boss):
 		active_boss.queue_free()
 	mode.queue_free()
-	print("  [PASS] Random boss encounter successfully spawned at target distance.")
+	print("  [PASS] Random boss encounter successfully spawned at target distance with tuned HP.")
 
 func _test_endless_mode_boss_slain_rewards() -> void:
 	print("--- 5. Testing Endless Mode Boss Slain Bounties & Run Continuity ---")

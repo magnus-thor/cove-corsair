@@ -45,7 +45,7 @@ func take_damage(amount: int) -> void:
 	_flash_red()
 	_update_health_bar()
 	
-	var boarding_threshold: int = max(1, int(round(float(max_hp) * 0.02)))
+	var boarding_threshold: int = max(1, int(round(float(max_hp) * 0.20)))
 	if current_hp <= boarding_threshold and not has_triggered_boarding:
 		if current_hp <= 0:
 			current_hp = 1

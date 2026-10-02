@@ -408,7 +408,10 @@ func die() -> void:
 		play_animation("Dead", 1.2)
 		var death_tw: Tween = create_tween()
 		death_tw.tween_interval(1.4)
-		death_tw.tween_property(self, "scale", Vector3.ZERO, 0.3)
+		if is_instance_valid(model_container):
+			death_tw.tween_property(model_container, "scale", Vector3.ZERO, 0.3)
+		else:
+			death_tw.tween_property(self, "scale", Vector3(0.001, 0.001, 0.001), 0.3)
 		death_tw.tween_callback(queue_free)
 	else:
 		queue_free()

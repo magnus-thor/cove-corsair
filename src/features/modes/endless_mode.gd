@@ -74,6 +74,7 @@ var boss_scenes: Array[PackedScene] = [
 var random_boss_target_distance: float = 0.0
 var has_spawned_endless_boss: bool = false
 var active_endless_boss: Node3D = null
+var times_pushed_luck: int = 0
 
 var _chunk_assembler: ChunkAssembler = null
 
@@ -98,7 +99,8 @@ func start_run() -> void:
 	unbanked_doubloons = 0
 	next_checkpoint_distance = wager_interval_meters
 	current_speed = calculate_speed(0.0)
-	random_boss_target_distance = randf_range(450.0, 750.0)
+	times_pushed_luck = 0
+	random_boss_target_distance = -1.0
 	has_spawned_endless_boss = false
 	active_endless_boss = null
 	
@@ -125,8 +127,8 @@ func _physics_process(delta: float) -> void:
 	var move_delta: float = current_speed * delta
 	distance_traveled += move_delta
 	
-	# Check random gauntlet boss encounter trigger
-	if not has_spawned_endless_boss and is_active and distance_traveled >= random_boss_target_distance:
+	# Check random gauntlet boss encounter trigger (only after player continues run at least once)
+	if times_pushed_luck >= 1 and not has_spawned_endless_boss and is_active and random_boss_target_distance > 0.0 and distance_traveled >= random_boss_target_distance:
 		_spawn_random_endless_boss()
 	
 	# Speed formula: current_speed = min(max_speed, base_speed + (distance_traveled / 250.0) * 0.5) + speed_boost
@@ -232,10 +234,17 @@ func push_luck() -> void:
 	if not is_active or has_cashed_out:
 		return
 		
+	times_pushed_luck += 1
 	multiplier += 0.5
 	speed_boost += speed_boost_per_push
 	current_speed = calculate_speed(distance_traveled)
+	var prev_checkpoint: float = next_checkpoint_distance
 	next_checkpoint_distance += wager_interval_meters
+	
+	# Schedule boss encounter for this continued segment (halfway into the new 1000m stretch)
+	var segment_mid: float = prev_checkpoint + (wager_interval_meters * 0.5)
+	random_boss_target_distance = randf_range(segment_mid - 100.0, segment_mid + 150.0)
+	has_spawned_endless_boss = false
 	
 	print("[ENDLESS MODE] CORSAIR'S GAMBLE! Multiplier increased to %.1fx, Speed boosted to %.1f m/s" % [multiplier, current_speed])
 	
@@ -432,9 +441,13 @@ func _enforce_start_clearance(chunk: BaseTrackChunk, min_clearance: float = 40.0
 func _pick_chunk_for_distance(proj_dist: float) -> PackedScene:
 	# Check if we should spawn Wager Fork checkpoint (EXACTLY ONCE per checkpoint interval)
 	if proj_dist >= next_checkpoint_distance and _checkpoint_chunk_spawned_for_distance < next_checkpoint_distance and wager_fork_scene:
-		_checkpoint_chunk_spawned_for_distance = next_checkpoint_distance
-		print("[ENDLESS MODE] Checkpoint Wager Fork spawned for target %.1fm (proj_dist: %.1fm)" % [next_checkpoint_distance, proj_dist])
-		return wager_fork_scene
+		if active_endless_boss != null and is_instance_valid(active_endless_boss):
+			# Boss is still actively engaged; hold off checkpoint chunk until encounter finishes
+			pass
+		else:
+			_checkpoint_chunk_spawned_for_distance = next_checkpoint_distance
+			print("[ENDLESS MODE] Checkpoint Wager Fork spawned for target %.1fm (proj_dist: %.1fm)" % [next_checkpoint_distance, proj_dist])
+			return wager_fork_scene
 		
 	if proj_dist < 1000.0:
 		return _random_from_array(tier_1_chunks)
@@ -487,6 +500,12 @@ func _spawn_random_endless_boss() -> void:
 		boss.call("activate_arena")
 	elif "is_arena_active" in boss:
 		boss.set("is_arena_active", true)
+		
+	# Tune boss HP for Endless Mode so weaker vessels can defeat it and trigger boarding
+	var base_boss_hp: int = 650 + (times_pushed_luck - 1) * 250
+	boss.set("max_hp", base_boss_hp)
+	boss.set("current_hp", base_boss_hp)
+	EventBus.boss_health_changed.emit(base_boss_hp, base_boss_hp)
 		
 	var camera: Node = get_tree().get_first_node_in_group("game_camera")
 	if camera and camera.has_method("start_boss_focus"):
