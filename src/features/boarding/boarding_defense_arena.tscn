@@ -48,6 +48,7 @@ size = Vector3(5.8, 0.35, 14.8)
 [node name="BoardingDefenseArena" type="Node3D" unique_id=1052377360 node_paths=PackedStringArray("zone_bow", "zone_midship", "zone_stern", "crew_station_bow", "crew_station_stern", "player_controller", "enemy_ship_marker_bow", "enemy_ship_marker_mid", "enemy_ship_marker_stern", "hud", "boarding_camera", "player_ship_container", "enemy_ship_container", "targeting_system")]
 transform = Transform3D(0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0)
 script = ExtResource("1_arena_script")
+disable_enemies = true
 zone_bow = NodePath("PlayerShipContainer/DeckZones/ZoneBow")
 zone_midship = NodePath("PlayerShipContainer/DeckZones/ZoneMidship")
 zone_stern = NodePath("PlayerShipContainer/DeckZones/ZoneStern")
@@ -94,9 +95,6 @@ zone_id = "stern"
 [node name="DeckMarker" type="Marker3D" parent="PlayerShipContainer" unique_id=2119981779]
 transform = Transform3D(0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0, 0.99999994, -3.5546422, 0, 0.8750085)
 
-[node name="PlayerShipVisual" parent="PlayerShipContainer" unique_id=856327594 instance=ExtResource("8_sloop_model")]
-transform = Transform3D(-7.234234e-08, 0, 1.655, 0, 1.655, 0, -1.655, 0, -7.234234e-08, 0, 0.0054335, 0)
-
 [node name="DeckFloor" type="StaticBody3D" parent="PlayerShipContainer" unique_id=227661753]
 transform = Transform3D(0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0, 0.99999994, -3.5250902, 0, 0.82354444)
 collision_mask = 0
@@ -139,19 +137,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 0, 4)
 station_id = "stern"
 assigned_zone = NodePath("../../DeckZones/ZoneStern")
 
+[node name="PlayerShipVisual" type="Node3D" parent="PlayerShipContainer" unique_id=1920828163 instance=ExtResource("8_sloop_model")]
+transform = Transform3D(-7.2342345e-08, 0, -1.655, 0, 1.655, 0, 1.655, 0, -7.2342345e-08, 0, 0.0054335, 0)
+
 [node name="EnemyShipContainer" type="Node3D" parent="." unique_id=1424343808]
-transform = Transform3D(0.885, 0, 0, 0, 0.885, 0, 0, 0, 0.885, 13.3232765, 0.28704664, 0)
+transform = Transform3D(0.885, 0, 0, 0, 0.885, 0, 0, 0, 0.885, 13.323, 0.28704664, 0)
 
 [node name="DeckMarker" type="Marker3D" parent="EnemyShipContainer" unique_id=200476653]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.9720745, 0, -0.74385214)
 
-[node name="EnemyShipVisual" parent="EnemyShipContainer" unique_id=492122966 instance=ExtResource("9_barge_model")]
-transform = Transform3D(-0.31290805, -0.8244233, 3.407758, 0, 3.4213028, 0.8277002, -3.5060644, 0.07357786, -0.30413443, -11.516914, 0.29983392, 0.17183113)
-
 [node name="EnemyShipMarkers" type="Node3D" parent="EnemyShipContainer" unique_id=848155043]
 
 [node name="MarkerBow" type="Marker3D" parent="EnemyShipContainer/EnemyShipMarkers" unique_id=1635680208]
-transform = Transform3D(0.99999934, 0, 0, 0, 0.99999934, 0, 0, 0, 0.99999934, -13.068624, 1.1870035, -1.8804607)
+transform = Transform3D(0.99999815, 0, 0, 0, 0.99999815, 0, 0, 0, 0.99999815, -12.58975, 0.43076923, -1.497598)
 
 [node name="MarkerMid" type="Marker3D" parent="EnemyShipContainer/EnemyShipMarkers" unique_id=1794103791]
 transform = Transform3D(0.9999995, 0, 0, 0, 0.9999995, 0, 0, 0, 0.9999995, -12.614456, 0.26471028, -0.17524332)
@@ -161,6 +159,9 @@ transform = Transform3D(0.9999987, 0, 0, 0, 0.9999987, 0, 0, 0, 0.9999987, -12.6
 
 [node name="EnemyBoatWake" parent="EnemyShipContainer" unique_id=822192309 instance=ExtResource("10_wake_scene")]
 transform = Transform3D(0.3528645, 0, -4.415924, 0, 4.43, 0, 4.415924, 0, 0.3528645, -14.444548, -0.9119203, 0.111222744)
+
+[node name="EnemyShipVisual" type="Node3D" parent="EnemyShipContainer" unique_id=26997682 instance=ExtResource("9_barge_model")]
+transform = Transform3D(-0.31290796, 0, -3.5060637, 0, 3.5199986, 0, 3.5060632, 0, -0.312908, -11.516914, -0.38194555, 0.17183109)
 
 [node name="DeckTargetingSystem" type="Node" parent="." unique_id=1403729296 node_paths=PackedStringArray("camera")]
 script = ExtResource("5_target_script")

@@ -1,3 +1,4 @@
+@tool
 class_name BoardingPlank
 extends Node3D
 
@@ -24,8 +25,9 @@ var target_zone: BoardingZone = null
 
 func _ready() -> void:
 	current_health = max_health
-	add_to_group("boarding_plank")
-	add_to_group("grapple_rope") # Compatibility group
+	if not Engine.is_editor_hint():
+		add_to_group("boarding_plank")
+		add_to_group("grapple_rope") # Compatibility group
 
 func setup_plank(start_point: Vector3, end_point: Vector3, zone: BoardingZone) -> void:
 	origin_pos = start_point
@@ -104,6 +106,8 @@ func set_selected(selected: bool) -> void:
 		border_container.visible = is_selected
 
 func _process(_delta: float) -> void:
+	if Engine.is_editor_hint():
+		return
 	if is_selected and is_instance_valid(border_container):
 		var pulse: float = 1.0 + sin(float(Time.get_ticks_msec()) * 0.008) * 0.12
 		border_container.scale = Vector3(1.0 + pulse * 0.05, 1.0, 1.0 + pulse * 0.02)
@@ -116,6 +120,11 @@ func _update_visual_and_collision() -> void:
 	if not origin_pos.is_equal_approx(target_pos):
 		look_at(target_pos, Vector3.UP)
 	
+	if not is_instance_valid(hit_area):
+		hit_area = find_child("HitArea", true, false) as Area3D
+	if not is_instance_valid(hit_collision) and is_instance_valid(hit_area):
+		hit_collision = hit_area.find_child("CollisionShape3D", true, false) as CollisionShape3D
+
 	# Position HitArea collision at mid-point spanning distance
 	if is_instance_valid(hit_area) and is_instance_valid(hit_collision):
 		var box: BoxShape3D = BoxShape3D.new()
@@ -129,7 +138,9 @@ func _update_visual_and_collision() -> void:
 
 func _draw_plank_mesh() -> void:
 	if not is_instance_valid(mesh_instance):
-		return
+		mesh_instance = find_child("MeshInstance3D", true, false) as MeshInstance3D
+		if not is_instance_valid(mesh_instance):
+			return
 	
 	var length: float = origin_pos.distance_to(target_pos)
 	var box: BoxMesh = BoxMesh.new()

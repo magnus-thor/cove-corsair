@@ -1,3 +1,4 @@
+@tool
 class_name BoardingDefenseArena
 extends Node3D
 
@@ -18,22 +19,30 @@ const APPROACH_DURATION_SEC: float = 1.8
 const PLAYER_VESSEL_CONFIGS: Dictionary = {
 	"sloop": {
 		"path": "res://assets/models/user/vessels/the_sloop.glb",
-		"transform": Transform3D(Vector3(-7.234234e-08, 0.0, 1.655), Vector3(0.0, 1.655, 0.0), Vector3(-1.655, 0.0, -7.234234e-08), Vector3(0.0, 0.0054335, 0.0)),
+		"position": Vector3(0.0, 0.0054335, 0.0),
+		"rotation_degrees": Vector3(0.0, 90.0, 0.0),
+		"scale": Vector3(1.655, 1.655, 1.655),
 		"rail_offset_x": 0.0
 	},
 	"dinghy": {
 		"path": "res://assets/models/user/vessels/dinghy.glb",
-		"transform": Transform3D(Vector3(3.8, 0.0, 0.0), Vector3(0.0, 3.8, 0.0), Vector3(0.0, 0.0, 3.8), Vector3(-0.35, 0.15, -0.2)),
+		"position": Vector3(-0.35, 0.15, -0.2),
+		"rotation_degrees": Vector3(0.0, 0.0, 0.0),
+		"scale": Vector3(3.8, 3.8, 3.8),
 		"rail_offset_x": -0.25
 	},
 	"bombard_skiff": {
 		"path": "res://assets/models/user/vessels/the_bombard_skiff.glb",
-		"transform": Transform3D(Vector3(0.0, 0.0, 2.6), Vector3(0.0, 2.6, 0.0), Vector3(-2.6, 0.0, 0.0), Vector3(0.05, 0.05, -0.1)),
+		"position": Vector3(0.05, 0.05, -0.1),
+		"rotation_degrees": Vector3(0.0, -90.0, 0.0),
+		"scale": Vector3(2.6, 2.6, 2.6),
 		"rail_offset_x": 0.25
 	},
 	"ironclad": {
 		"path": "res://assets/models/user/vessels/the_ironclad.glb",
-		"transform": Transform3D(Vector3(0.0, 0.0, 1.85), Vector3(0.0, 1.85, 0.0), Vector3(-1.85, 0.0, 0.0), Vector3(0.1, 0.05, 0.0)),
+		"position": Vector3(0.1, 0.05, 0.0),
+		"rotation_degrees": Vector3(0.0, -90.0, 0.0),
+		"scale": Vector3(1.85, 1.85, 1.85),
 		"rail_offset_x": 0.35
 	}
 }
@@ -41,7 +50,9 @@ const PLAYER_VESSEL_CONFIGS: Dictionary = {
 const ENEMY_VESSEL_CONFIGS: Dictionary = {
 	"war_barge": {
 		"path": "res://assets/models/enemy/vessels/boss_war_barge.glb",
-		"transform": Transform3D(Vector3(-0.31290805, -0.8244233, 3.407758), Vector3(0.0, 3.4213028, 0.8277002), Vector3(-3.5060644, 0.07357786, -0.30413443), Vector3(-11.516914, 0.29983392, 0.17183113)),
+		"position": Vector3(-11.516914, -0.38194555, 0.17183109),
+		"rotation_degrees": Vector3(0.0, 95.10, 0.0),
+		"scale": Vector3(3.52, 3.52, 3.52),
 		"marker_bow": Vector3(-13.068624, 1.1870035, -1.8804607),
 		"marker_mid": Vector3(-12.614456, 0.26471028, -0.17524332),
 		"marker_stern": Vector3(-12.687212, 0.40418908, 0.4926853),
@@ -49,7 +60,9 @@ const ENEMY_VESSEL_CONFIGS: Dictionary = {
 	},
 	"bone_beard": {
 		"path": "res://assets/models/enemy/vessels/captain_bone-beard’s_twin_frigate.glb",
-		"transform": Transform3D(Vector3(-4.2, 0.0, 0.0), Vector3(0.0, 4.2, 0.0), Vector3(0.0, 0.0, -4.2), Vector3(-11.5, 0.25, 0.0)),
+		"position": Vector3(-11.5, 0.25, 0.0),
+		"rotation_degrees": Vector3(0.0, 180.0, 0.0),
+		"scale": Vector3(4.2, 4.2, 4.2),
 		"marker_bow": Vector3(-13.1, 0.55, -1.85),
 		"marker_mid": Vector3(-13.1, 0.50, -0.05),
 		"marker_stern": Vector3(-13.1, 0.55, 0.65),
@@ -57,7 +70,9 @@ const ENEMY_VESSEL_CONFIGS: Dictionary = {
 	},
 	"siege_fortress": {
 		"path": "res://assets/models/enemy/vessels/boss_siege_fortress.glb",
-		"transform": Transform3D(Vector3(-4.2, 0.0, 0.0), Vector3(0.0, 4.2, 0.0), Vector3(0.0, 0.0, -4.2), Vector3(-11.4, 0.20, 0.0)),
+		"position": Vector3(-11.4, 0.20, 0.0),
+		"rotation_degrees": Vector3(0.0, 180.0, 0.0),
+		"scale": Vector3(4.2, 4.2, 4.2),
 		"marker_bow": Vector3(-13.2, 0.65, -1.90),
 		"marker_mid": Vector3(-13.15, 0.60, -0.05),
 		"marker_stern": Vector3(-13.2, 0.65, 0.70),
@@ -65,13 +80,95 @@ const ENEMY_VESSEL_CONFIGS: Dictionary = {
 	},
 	"ghost_sloop": {
 		"path": "res://assets/models/enemy/vessels/ghost_sloop.glb",
-		"transform": Transform3D(Vector3(-4.8, 0.0, 0.0), Vector3(0.0, 4.8, 0.0), Vector3(0.0, 0.0, -4.8), Vector3(-11.5, 0.35, 0.0)),
+		"position": Vector3(-11.5, 0.35, 0.0),
+		"rotation_degrees": Vector3(0.0, 180.0, 0.0),
+		"scale": Vector3(4.8, 4.8, 4.8),
 		"marker_bow": Vector3(-12.8, 0.60, -1.80),
 		"marker_mid": Vector3(-12.7, 0.55, -0.05),
 		"marker_stern": Vector3(-12.8, 0.60, 0.60),
 		"dock_x": 13.32
 	}
 }
+
+static func get_config_transform(cfg: Dictionary) -> Transform3D:
+	if cfg.has("transform") and cfg["transform"] is Transform3D:
+		return cfg["transform"] as Transform3D
+	var pos: Vector3 = cfg.get("position", Vector3.ZERO) as Vector3
+	var rot_deg: Vector3 = cfg.get("rotation_degrees", Vector3.ZERO) as Vector3
+	var sc: Vector3 = cfg.get("scale", Vector3.ONE) as Vector3
+	var rot_rad: Vector3 = Vector3(deg_to_rad(rot_deg.x), deg_to_rad(rot_deg.y), deg_to_rad(rot_deg.z))
+	var basis: Basis = Basis.from_euler(rot_rad).scaled(sc)
+	return Transform3D(basis, pos)
+
+@export_category("Vessel Preview & Calibration (Editor Tool)")
+@export_enum("sloop", "dinghy", "bombard_skiff", "ironclad") var preview_player_vessel: String = "sloop":
+	set(value):
+		preview_player_vessel = value
+		if Engine.is_editor_hint() and is_node_ready():
+			setup_player_vessel(preview_player_vessel)
+
+@export_enum("war_barge", "bone_beard", "siege_fortress", "ghost_sloop") var preview_enemy_vessel: String = "war_barge":
+	set(value):
+		preview_enemy_vessel = value
+		if Engine.is_editor_hint() and is_node_ready():
+			setup_enemy_vessel(preview_enemy_vessel)
+
+@export var sync_editor_preview: bool = false:
+	set(value):
+		sync_editor_preview = false
+		if Engine.is_editor_hint() and is_node_ready():
+			var old_p: Node = player_ship_container.find_child("PlayerShipVisual", true, false) if is_instance_valid(player_ship_container) else null
+			if is_instance_valid(old_p):
+				old_p.free()
+			var old_e: Node = enemy_ship_container.find_child("EnemyShipVisual", true, false) if is_instance_valid(enemy_ship_container) else null
+			if is_instance_valid(old_e):
+				old_e.free()
+			setup_player_vessel(preview_player_vessel)
+			setup_enemy_vessel(preview_enemy_vessel)
+			print("[BoardingArena Tool] Refreshed preview models and markers.")
+
+@export var print_current_transforms: bool = false:
+	set(value):
+		print_current_transforms = false
+		_print_current_vessel_transforms()
+
+@export var apply_transforms_to_in_memory_config: bool = false:
+	set(value):
+		apply_transforms_to_in_memory_config = false
+		_apply_current_transforms_to_config()
+
+@export var show_editor_planks: bool = true:
+	set(value):
+		show_editor_planks = value
+		if Engine.is_editor_hint():
+			if show_editor_planks:
+				_update_editor_preview_planks()
+			else:
+				_clear_editor_preview_planks()
+
+@export var disable_enemies: bool = false:
+	set(value):
+		disable_enemies = value
+		if disable_enemies and is_inside_tree():
+			clear_all_boarders()
+
+@export var deploy_test_planks: bool = false:
+	set(value):
+		deploy_test_planks = false
+		if is_inside_tree():
+			if zones.is_empty():
+				zones = [zone_bow, zone_midship, zone_stern]
+			launch_plank_to_zone(0, 1, 0.0)
+			launch_plank_to_zone(1, 1, 0.0)
+			launch_plank_to_zone(2, 1, 0.0)
+
+@export var clear_planks_and_enemies: bool = false:
+	set(value):
+		clear_planks_and_enemies = false
+		if is_inside_tree():
+			clear_all_planks_and_boarders()
+
+@export_category("Arena References & Gameplay")
 
 
 @export var zone_bow: BoardingZone = null
@@ -211,8 +308,29 @@ func _emit_encounter_ended(outcome: String) -> void:
 		encounter_end_reason
 	)
 
+func _get_editor_scene_root() -> Node:
+	if not Engine.is_editor_hint():
+		return null
+	if get_tree() and is_instance_valid(get_tree().edited_scene_root):
+		return get_tree().edited_scene_root
+	if is_instance_valid(owner):
+		return owner
+	return self
+
+func _editor_sync_vessels() -> void:
+	if not Engine.is_editor_hint() or not is_inside_tree():
+		return
+	setup_player_vessel(preview_player_vessel)
+	setup_enemy_vessel(preview_enemy_vessel)
+	if show_editor_planks:
+		_update_editor_preview_planks()
+
 func _ready() -> void:
 	zones = [zone_bow, zone_midship, zone_stern]
+	if Engine.is_editor_hint():
+		call_deferred("_editor_sync_vessels")
+		return
+	_clear_editor_preview_planks()
 	for zone: BoardingZone in zones:
 		if is_instance_valid(zone):
 			zone.add_to_group("boarding_zone")
@@ -250,10 +368,14 @@ func _ready() -> void:
 	# _setup_deck_elevation()
 	_setup_camera()
 	_setup_crew_from_gamestate()
-	var current_vessel: String = "sloop"
+	var current_vessel: String = preview_player_vessel
 	if GameState and "active_vessel" in GameState and not str(GameState.active_vessel).is_empty():
 		current_vessel = str(GameState.active_vessel)
 	setup_player_vessel(current_vessel)
+
+	var current_enemy: String = preview_enemy_vessel
+	setup_enemy_vessel(current_enemy)
+
 	_start_approach_sequence()
 
 # func _setup_deck_elevation() -> void:
@@ -275,11 +397,6 @@ func _ready() -> void:
 # 		if is_instance_valid(zone):
 # 			zone.position.y = DECK_ELEVATION_Y
 
-var is_camera_free_mode: bool = false
-var _is_mmb_dragging: bool = false
-var _last_mouse_pos: Vector2 = Vector2.ZERO
-var _camera_debug_label: Label = null
-
 func _setup_camera() -> void:
 	if is_instance_valid(boarding_camera):
 		# If user has not authored camera rotation (i.e. zero), configure default look-at
@@ -292,52 +409,28 @@ func _setup_camera() -> void:
 				boarding_camera.look_at(global_position + look_target, Vector3.UP)
 		boarding_camera.current = true
 		boarding_camera.make_current()
-		_update_camera_debug_overlay()
 
 func _unhandled_input(event: InputEvent) -> void:
+	if Engine.is_editor_hint():
+		return
 	if not is_instance_valid(boarding_camera):
 		return
 
 	if event is InputEventKey:
 		var ke: InputEventKey = event as InputEventKey
 		if ke.pressed and not ke.echo:
-			if ke.keycode == KEY_C:
-				is_camera_free_mode = not is_camera_free_mode
-				_update_camera_debug_overlay()
-			elif ke.keycode == KEY_P:
-				_print_camera_transform()
-			elif ke.keycode == KEY_H:
-				debug_disable_spawns = not debug_disable_spawns
-				if debug_disable_spawns:
-					clear_all_planks_and_boarders()
-				else:
-					if current_wave == 0 and not is_approaching:
-						_launch_initial_planks()
-				_update_camera_debug_overlay()
+			if ke.keycode == KEY_H:
+				disable_enemies = not disable_enemies
+				if disable_enemies:
+					clear_all_boarders()
+				print("[BoardingArena] Enemies disabled: ", disable_enemies)
 
-	if event is InputEventMouseButton:
-		var mb: InputEventMouseButton = event as InputEventMouseButton
-		if mb.button_index == MOUSE_BUTTON_WHEEL_UP:
-			var fwd: Vector3 = -boarding_camera.global_transform.basis.z.normalized()
-			boarding_camera.global_position += fwd * 0.8
-			_update_camera_debug_overlay()
-		elif mb.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			var back: Vector3 = boarding_camera.global_transform.basis.z.normalized()
-			boarding_camera.global_position += back * 0.8
-			_update_camera_debug_overlay()
-		elif mb.button_index == MOUSE_BUTTON_MIDDLE:
-			_is_mmb_dragging = mb.pressed
-			_last_mouse_pos = mb.position
-		elif is_camera_free_mode and mb.button_index == MOUSE_BUTTON_RIGHT:
-			_is_mmb_dragging = mb.pressed
-			_last_mouse_pos = mb.position
-
-	elif event is InputEventMouseMotion and _is_mmb_dragging:
-		var mm: InputEventMouseMotion = event as InputEventMouseMotion
-		var sensitivity: float = 0.005
-		boarding_camera.rotate_y(-mm.relative.x * sensitivity)
-		boarding_camera.rotate_object_local(Vector3.RIGHT, -mm.relative.y * sensitivity)
-		_update_camera_debug_overlay()
+func clear_all_boarders() -> void:
+	if not is_inside_tree():
+		return
+	var boarders: Array[Node] = get_tree().get_nodes_in_group("boarder")
+	for b: Node in boarders:
+		b.queue_free()
 
 func clear_all_planks_and_boarders() -> void:
 	var planks: Array[Node] = get_tree().get_nodes_in_group("boarding_plank")
@@ -346,36 +439,7 @@ func clear_all_planks_and_boarders() -> void:
 	var legacy_ropes: Array[Node] = get_tree().get_nodes_in_group("grapple_rope")
 	for r: Node in legacy_ropes:
 		r.queue_free()
-	var boarders: Array[Node] = get_tree().get_nodes_in_group("boarder")
-	for b: Node in boarders:
-		b.queue_free()
-
-func _update_camera_debug_overlay() -> void:
-	if not is_instance_valid(_camera_debug_label):
-		_camera_debug_label = Label.new()
-		_camera_debug_label.name = "CameraDebugOverlay"
-		_camera_debug_label.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-		_camera_debug_label.position = Vector2(20.0, -120.0)
-		_camera_debug_label.add_theme_font_size_override("font_size", 14)
-		_camera_debug_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.3, 1.0))
-		add_child(_camera_debug_label)
-
-	if is_instance_valid(boarding_camera):
-		var p: Vector3 = boarding_camera.position
-		var r: Vector3 = boarding_camera.rotation_degrees
-		var spawn_status: String = "HIDDEN [Press 'H' to show]" if debug_disable_spawns else "ACTIVE [Press 'H' to hide]"
-		if is_camera_free_mode:
-			_camera_debug_label.text = "[CAMERA ADJUST: ON ('C' to lock)] | Planks & Mobs: %s\nFly: WASD/QE | Look: Mouse Drag | Zoom: Wheel | Print: 'P'\nPos: Vector3(%.2f, %.2f, %.2f) | Rot: Vector3(%.1f, %.1f, %.1f)" % [spawn_status, p.x, p.y, p.z, r.x, r.y, r.z]
-			_camera_debug_label.visible = true
-		else:
-			_camera_debug_label.text = "Camera: Pos(%.1f, %.1f, %.1f) Rot(%.1f, %.1f) | Planks & Mobs: %s\n['C' adjust view, Wheel zoom, MMB orbit]" % [p.x, p.y, p.z, r.x, r.y, spawn_status]
-			_camera_debug_label.visible = true
-
-func _print_camera_transform() -> void:
-	if is_instance_valid(boarding_camera):
-		var p: Vector3 = boarding_camera.position
-		var r: Vector3 = boarding_camera.rotation_degrees
-		print("[BOARDING CAMERA TRANSFORM] position = Vector3(%.2f, %.2f, %.2f), rotation_degrees = Vector3(%.2f, %.2f, %.2f)" % [p.x, p.y, p.z, r.x, r.y, r.z])
+	clear_all_boarders()
 
 func _start_approach_sequence() -> void:
 	if not is_instance_valid(enemy_ship_container):
@@ -458,23 +522,39 @@ func setup_player_vessel(vessel_id: String = "") -> void:
 		return
 
 	var old_model: Node = player_ship_container.find_child("PlayerShipVisual", true, false)
+	var needs_reload: bool = true
 	if is_instance_valid(old_model):
-		old_model.queue_free()
+		if old_model.scene_file_path == glb_path:
+			needs_reload = false
+			var old_node3d: Node3D = old_model as Node3D
+			if is_instance_valid(old_node3d):
+				old_node3d.transform = get_config_transform(cfg)
+		else:
+			if Engine.is_editor_hint():
+				old_model.free()
+			else:
+				old_model.queue_free()
 
-	var scene: PackedScene = load(glb_path) as PackedScene
-	if scene:
-		var inst: Node3D = scene.instantiate() as Node3D
-		inst.name = "PlayerShipVisual"
-		inst.transform = cfg.get("transform", Transform3D.IDENTITY) as Transform3D
-		player_ship_container.add_child(inst)
+	if needs_reload:
+		var scene: PackedScene = load(glb_path) as PackedScene
+		if scene:
+			var inst: Node3D = scene.instantiate() as Node3D
+			inst.name = "PlayerShipVisual"
+			inst.transform = get_config_transform(cfg)
+			player_ship_container.add_child(inst)
+			var editor_root: Node = _get_editor_scene_root()
+			if editor_root:
+				inst.owner = editor_root
 
-		if v_key == "dinghy":
-			var mask_res: String = "res://assets/models/user/vessels/dinghy_cockpit_mask.tres"
-			if ResourceLoader.exists(mask_res):
-				var mask: MeshInstance3D = MeshInstance3D.new()
-				mask.name = "CockpitWaterMask"
-				mask.mesh = load(mask_res) as Mesh
-				inst.add_child(mask)
+			if v_key == "dinghy":
+				var mask_res: String = "res://assets/models/user/vessels/dinghy_cockpit_mask.tres"
+				if ResourceLoader.exists(mask_res):
+					var mask: MeshInstance3D = MeshInstance3D.new()
+					mask.name = "CockpitWaterMask"
+					mask.mesh = load(mask_res) as Mesh
+					inst.add_child(mask)
+					if editor_root:
+						mask.owner = editor_root
 
 	var target_zones: Array[BoardingZone] = zones if not zones.is_empty() else [zone_bow, zone_midship, zone_stern]
 	var rail_offset: float = float(cfg.get("rail_offset_x", 0.0))
@@ -485,13 +565,15 @@ func setup_player_vessel(vessel_id: String = "") -> void:
 func setup_enemy_vessel(boss_name: String = "") -> void:
 	if not is_instance_valid(enemy_ship_container):
 		return
-	var b_lower: String = boss_name.to_lower()
+	var b_lower: String = boss_name.to_lower().strip_edges()
 	var boss_key: String = "war_barge"
-	if b_lower.contains("fortress"):
+	if ENEMY_VESSEL_CONFIGS.has(b_lower):
+		boss_key = b_lower
+	elif b_lower.contains("fortress"):
 		boss_key = "siege_fortress"
 	elif b_lower.contains("phantom") or b_lower.contains("dredge") or b_lower.contains("ghost"):
 		boss_key = "ghost_sloop"
-	elif b_lower.contains("bone") or b_lower.contains("frigate"):
+	elif b_lower.contains("bone") or b_lower.contains("twin"):
 		boss_key = "bone_beard"
 
 	encounter_active_boss_name = boss_name if not boss_name.is_empty() else boss_key
@@ -501,14 +583,29 @@ func setup_enemy_vessel(boss_name: String = "") -> void:
 	
 	if ResourceLoader.exists(glb_path):
 		var old_model: Node = enemy_ship_container.find_child("EnemyShipVisual", true, false)
+		var needs_reload: bool = true
 		if is_instance_valid(old_model):
-			old_model.queue_free()
-		var scene: PackedScene = load(glb_path) as PackedScene
-		if scene:
-			var inst: Node3D = scene.instantiate() as Node3D
-			inst.name = "EnemyShipVisual"
-			inst.transform = cfg.get("transform", Transform3D.IDENTITY) as Transform3D
-			enemy_ship_container.add_child(inst)
+			if old_model.scene_file_path == glb_path:
+				needs_reload = false
+				var old_node3d: Node3D = old_model as Node3D
+				if is_instance_valid(old_node3d):
+					old_node3d.transform = get_config_transform(cfg)
+			else:
+				if Engine.is_editor_hint():
+					old_model.free()
+				else:
+					old_model.queue_free()
+
+		if needs_reload:
+			var scene: PackedScene = load(glb_path) as PackedScene
+			if scene:
+				var inst: Node3D = scene.instantiate() as Node3D
+				inst.name = "EnemyShipVisual"
+				inst.transform = get_config_transform(cfg)
+				enemy_ship_container.add_child(inst)
+				var editor_root: Node = _get_editor_scene_root()
+				if editor_root:
+					inst.owner = editor_root
 
 	if is_instance_valid(enemy_ship_marker_bow) and cfg.has("marker_bow"):
 		enemy_ship_marker_bow.position = cfg.get("marker_bow") as Vector3
@@ -519,8 +616,162 @@ func setup_enemy_vessel(boss_name: String = "") -> void:
 
 	if cfg.has("dock_x"):
 		target_dock_x = float(cfg.get("dock_x", 13.323))
-		if is_approaching:
+		if Engine.is_editor_hint():
+			enemy_ship_container.position.x = target_dock_x
+		elif is_approaching:
 			_start_approach_sequence()
+
+func _print_current_vessel_transforms() -> void:
+	print("\n================================================================================")
+	print("  CURRENT BOARDING ARENA VESSEL CONFIGURATION")
+	print("================================================================================")
+	
+	if is_instance_valid(player_ship_container):
+		var p_vis: Node3D = player_ship_container.find_child("PlayerShipVisual", true, false) as Node3D
+		if is_instance_valid(p_vis):
+			var pos: Vector3 = p_vis.position
+			var rot: Vector3 = p_vis.rotation_degrees
+			var sc: Vector3 = p_vis.scale
+			var rail_off: float = 0.0
+			if is_instance_valid(zone_bow) and is_instance_valid(zone_bow.plank_anchor):
+				rail_off = zone_bow.plank_anchor.position.x - 2.0
+			var p_path: String = ""
+			if PLAYER_VESSEL_CONFIGS.has(preview_player_vessel):
+				var p_dict: Dictionary = PLAYER_VESSEL_CONFIGS[preview_player_vessel] as Dictionary
+				p_path = str(p_dict.get("path", ""))
+			
+			print("--- PLAYER VESSEL ('%s') ---" % preview_player_vessel)
+			print("\t\"%s\": {" % preview_player_vessel)
+			print("\t\t\"path\": \"%s\"," % p_path)
+			print("\t\t\"position\": Vector3(%.4f, %.4f, %.4f)," % [pos.x, pos.y, pos.z])
+			print("\t\t\"rotation_degrees\": Vector3(%.2f, %.2f, %.2f)," % [rot.x, rot.y, rot.z])
+			print("\t\t\"scale\": Vector3(%.4f, %.4f, %.4f)," % [sc.x, sc.y, sc.z])
+			print("\t\t\"rail_offset_x\": %.2f" % rail_off)
+			print("\t},")
+	
+	if is_instance_valid(enemy_ship_container):
+		var e_vis: Node3D = enemy_ship_container.find_child("EnemyShipVisual", true, false) as Node3D
+		if is_instance_valid(e_vis):
+			var pos: Vector3 = e_vis.position
+			var rot: Vector3 = e_vis.rotation_degrees
+			var sc: Vector3 = e_vis.scale
+			var m_bow: Vector3 = enemy_ship_marker_bow.position if is_instance_valid(enemy_ship_marker_bow) else Vector3.ZERO
+			var m_mid: Vector3 = enemy_ship_marker_mid.position if is_instance_valid(enemy_ship_marker_mid) else Vector3.ZERO
+			var m_stern: Vector3 = enemy_ship_marker_stern.position if is_instance_valid(enemy_ship_marker_stern) else Vector3.ZERO
+			var dock: float = target_dock_x
+			var e_path: String = ""
+			if ENEMY_VESSEL_CONFIGS.has(preview_enemy_vessel):
+				var e_dict: Dictionary = ENEMY_VESSEL_CONFIGS[preview_enemy_vessel] as Dictionary
+				e_path = str(e_dict.get("path", ""))
+			
+			print("\n--- ENEMY VESSEL ('%s') ---" % preview_enemy_vessel)
+			print("\t\"%s\": {" % preview_enemy_vessel)
+			print("\t\t\"path\": \"%s\"," % e_path)
+			print("\t\t\"position\": Vector3(%.4f, %.4f, %.4f)," % [pos.x, pos.y, pos.z])
+			print("\t\t\"rotation_degrees\": Vector3(%.2f, %.2f, %.2f)," % [rot.x, rot.y, rot.z])
+			print("\t\t\"scale\": Vector3(%.4f, %.4f, %.4f)," % [sc.x, sc.y, sc.z])
+			print("\t\t\"marker_bow\": Vector3(%.4f, %.4f, %.4f)," % [m_bow.x, m_bow.y, m_bow.z])
+			print("\t\t\"marker_mid\": Vector3(%.4f, %.4f, %.4f)," % [m_mid.x, m_mid.y, m_mid.z])
+			print("\t\t\"marker_stern\": Vector3(%.4f, %.4f, %.4f)," % [m_stern.x, m_stern.y, m_stern.z])
+			print("\t\t\"dock_x\": %.3f" % dock)
+			print("\t}")
+	print("================================================================================\n")
+
+func _apply_current_transforms_to_config() -> void:
+	if is_instance_valid(player_ship_container):
+		var p_vis: Node3D = player_ship_container.find_child("PlayerShipVisual", true, false) as Node3D
+		if is_instance_valid(p_vis) and PLAYER_VESSEL_CONFIGS.has(preview_player_vessel):
+			var p_cfg: Dictionary = PLAYER_VESSEL_CONFIGS[preview_player_vessel] as Dictionary
+			p_cfg["position"] = p_vis.position
+			p_cfg["rotation_degrees"] = p_vis.rotation_degrees
+			p_cfg["scale"] = p_vis.scale
+			if is_instance_valid(zone_bow) and is_instance_valid(zone_bow.plank_anchor):
+				p_cfg["rail_offset_x"] = zone_bow.plank_anchor.position.x - 2.0
+			print("[BoardingArena Tool] Updated in-memory config for player vessel: '%s'" % preview_player_vessel)
+			
+	if is_instance_valid(enemy_ship_container):
+		var e_vis: Node3D = enemy_ship_container.find_child("EnemyShipVisual", true, false) as Node3D
+		if is_instance_valid(e_vis) and ENEMY_VESSEL_CONFIGS.has(preview_enemy_vessel):
+			var e_cfg: Dictionary = ENEMY_VESSEL_CONFIGS[preview_enemy_vessel] as Dictionary
+			e_cfg["position"] = e_vis.position
+			e_cfg["rotation_degrees"] = e_vis.rotation_degrees
+			e_cfg["scale"] = e_vis.scale
+			if is_instance_valid(enemy_ship_marker_bow):
+				e_cfg["marker_bow"] = enemy_ship_marker_bow.position
+			if is_instance_valid(enemy_ship_marker_mid):
+				e_cfg["marker_mid"] = enemy_ship_marker_mid.position
+			if is_instance_valid(enemy_ship_marker_stern):
+				e_cfg["marker_stern"] = enemy_ship_marker_stern.position
+			print("[BoardingArena Tool] Updated in-memory config for enemy vessel: '%s'" % preview_enemy_vessel)
+
+func _update_editor_preview_planks() -> void:
+	if not is_inside_tree():
+		return
+	
+	var container: Node3D = get_node_or_null("EditorPreviewPlanks") as Node3D
+	if not is_instance_valid(container):
+		container = Node3D.new()
+		container.name = "EditorPreviewPlanks"
+		add_child(container)
+	
+	var active_zones: Array[BoardingZone] = zones if not zones.is_empty() else [zone_bow, zone_midship, zone_stern]
+	
+	for i: int in 3:
+		var plank_name: String = "PreviewPlank_%d" % i
+		var plank_mesh: MeshInstance3D = container.get_node_or_null(plank_name) as MeshInstance3D
+		if not is_instance_valid(plank_mesh):
+			plank_mesh = MeshInstance3D.new()
+			plank_mesh.name = plank_name
+			container.add_child(plank_mesh)
+		
+		var start_marker: Marker3D = _get_spawn_marker(i)
+		var target_zone: BoardingZone = active_zones[i] if i < active_zones.size() else null
+		
+		if not is_instance_valid(start_marker) or not is_instance_valid(target_zone):
+			plank_mesh.visible = false
+			continue
+			
+		var target_anchor: Marker3D = target_zone.plank_anchor if is_instance_valid(target_zone.plank_anchor) else target_zone.grapple_anchor
+		if not is_instance_valid(target_anchor):
+			plank_mesh.visible = false
+			continue
+			
+		var origin_pos: Vector3 = start_marker.global_position
+		var target_pos: Vector3 = target_anchor.global_position
+		var length: float = origin_pos.distance_to(target_pos)
+		
+		if length < 0.1:
+			plank_mesh.visible = false
+			continue
+			
+		var mid_pos: Vector3 = (origin_pos + target_pos) * 0.5
+		plank_mesh.global_position = mid_pos
+		
+		var dir: Vector3 = (target_pos - origin_pos).normalized()
+		var up: Vector3 = Vector3.UP
+		if absf(dir.dot(up)) > 0.99:
+			up = Vector3.FORWARD
+		plank_mesh.look_at(target_pos, up)
+		
+		var box: BoxMesh = plank_mesh.mesh as BoxMesh
+		if not is_instance_valid(box):
+			box = BoxMesh.new()
+			var mat: StandardMaterial3D = StandardMaterial3D.new()
+			mat.albedo_color = Color(0.52, 0.35, 0.20, 1.0) # Weathered oak plank
+			mat.roughness = 0.85
+			box.material = mat
+			plank_mesh.mesh = box
+			
+		box.size = Vector3(0.41, 0.12, length)
+		plank_mesh.visible = true
+
+func _clear_editor_preview_planks() -> void:
+	var container: Node = get_node_or_null("EditorPreviewPlanks")
+	if is_instance_valid(container):
+		if Engine.is_editor_hint():
+			container.free()
+		else:
+			container.queue_free()
 
 func _setup_crew_from_gamestate() -> void:
 	var equipped_ids: Array[String] = []
@@ -574,6 +825,10 @@ func _setup_crew_from_gamestate() -> void:
 					child.queue_free()
 
 func _process(delta: float) -> void:
+	if Engine.is_editor_hint():
+		if show_editor_planks:
+			_update_editor_preview_planks()
+		return
 	if not is_encounter_active:
 		return
 		
@@ -581,26 +836,6 @@ func _process(delta: float) -> void:
 		boarding_camera.current = true
 		boarding_camera.make_current()
 
-	if is_camera_free_mode and is_instance_valid(boarding_camera):
-		var fly_speed: float = 8.0 * delta
-		var cam_basis: Basis = boarding_camera.global_transform.basis
-		var move_dir: Vector3 = Vector3.ZERO
-		if Input.is_key_pressed(KEY_W):
-			move_dir -= cam_basis.z
-		if Input.is_key_pressed(KEY_S):
-			move_dir += cam_basis.z
-		if Input.is_key_pressed(KEY_A):
-			move_dir -= cam_basis.x
-		if Input.is_key_pressed(KEY_D):
-			move_dir += cam_basis.x
-		if Input.is_key_pressed(KEY_E) or Input.is_key_pressed(KEY_SPACE):
-			move_dir += Vector3.UP
-		if Input.is_key_pressed(KEY_Q) or Input.is_key_pressed(KEY_CTRL):
-			move_dir += Vector3.DOWN
-		if move_dir.length_squared() > 0.001:
-			boarding_camera.global_position += move_dir.normalized() * fly_speed
-			_update_camera_debug_overlay()
-		
 	_process_overrun_attrition(delta)
 	_process_wave_director(delta)
 
@@ -625,6 +860,8 @@ func apply_biome_visuals(biome_name: String) -> void:
 			ocean_mat.albedo_color = Color(0.08, 0.38, 0.55, 0.85)
 
 func _process_overrun_attrition(delta: float) -> void:
+	if disable_enemies:
+		return
 	for zone: BoardingZone in zones:
 		if is_instance_valid(zone) and zone.is_overrun:
 			_damage_vessel_hull(overrun_damage_per_sec * delta)
@@ -777,6 +1014,8 @@ func _get_swarm_count_for_tier(wave_num: int) -> int:
 		return 3
 
 func _spawn_plank_swarm(plank: BoardingPlank, zone: BoardingZone, count: int, wave_num: int = 1, initial_delay_sec: float = 0.0) -> void:
+	if disable_enemies or debug_disable_spawns:
+		return
 	active_spawners_count += 1
 	if initial_delay_sec > 0.0:
 		await get_tree().create_timer(initial_delay_sec).timeout
