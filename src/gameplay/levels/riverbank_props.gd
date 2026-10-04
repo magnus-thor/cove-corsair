@@ -98,6 +98,16 @@ const FLAVOR_BARREL    := "res://assets/models/barrel.glb"
 const FLAVOR_CANNON    := "res://assets/models/cannon.glb"
 const FLAVOR_CRATE     := "res://assets/models/crate.glb"
 
+## Custom Stylized Scenery Models (assets/models/scenery/)
+const SCENERY_MANGROVE_GROVE   := "res://assets/models/scenery/Emerald_Mangrove_Grov.glb"
+const SCENERY_PALM_ISLAND      := "res://assets/models/scenery/Low_Poly_Palm_Island.glb"
+const SCENERY_MOLTEN_CROWN     := "res://assets/models/scenery/Molten_Crown.glb"
+const SCENERY_MOLTEN_TREE      := "res://assets/models/scenery/Molten_Thorn_Tree.glb"
+const SCENERY_MOSSWOOD_DRIFT   := "res://assets/models/scenery/Mosswood_Drift.glb"
+const SCENERY_OBSIDIAN_CRYSTAL := "res://assets/models/scenery/Obsidian_Crystal_Clus.glb"
+const SCENERY_PAINTED_TOTEM    := "res://assets/models/scenery/Totem_of_the_Painted.glb"
+const SCENERY_LAVA_GEYSER_VFX  := "res://src/vfx/vfx_lava_geyser.tscn"
+
 # ── Shared Materials for Mobile Batching ───────────────────────────────────────
 
 static var _shared_mat_tropical: StandardMaterial3D = null
@@ -234,6 +244,16 @@ func _generate_tropical_shoreline() -> void:
 			rock_node.rotation.y = randf_range(0.0, TAU)
 			_enforce_navigable_clearance(rock_node, is_left, 6.6)
 
+	# Custom Scenery: Low-Poly Palm Shoal Island
+	if randf() < 0.80:
+		var island_node := _instantiate_custom_scenery(SCENERY_PALM_ISLAND)
+		if island_node:
+			var s_val := randf_range(1.1, 1.4)
+			island_node.scale = Vector3.ONE * s_val
+			island_node.position = Vector3(sign_x * randf_range(7.8, 8.8), 0.65 * s_val, randf_range(-half_len * 0.7, half_len * 0.7))
+			island_node.rotation.y = randf_range(0.0, TAU)
+			_enforce_navigable_clearance(island_node, is_left, 6.6)
+
 	# Tier 2: Leaning Palms & Grass Tufts (|X| >= 8.2m)
 	var palm_count := randi_range(3, 4)
 	var palm_step := chunk_length / float(palm_count)
@@ -259,6 +279,16 @@ func _generate_tropical_shoreline() -> void:
 					tuft_node.scale = Vector3.ONE * randf_range(0.5, 0.75)
 					tuft_node.rotation.y = randf_range(0.0, TAU)
 					_enforce_navigable_clearance(tuft_node, is_left, 6.6)
+
+	# Custom Scenery: Lush Mangrove Cluster with arching waterline roots
+	if randf() < 0.70:
+		var mangrove_node := _instantiate_custom_scenery(SCENERY_MANGROVE_GROVE)
+		if mangrove_node:
+			var s_val := randf_range(1.2, 1.5)
+			mangrove_node.scale = Vector3.ONE * s_val
+			mangrove_node.position = Vector3(sign_x * randf_range(8.2, 9.2), 0.50 * s_val, randf_range(-half_len * 0.6, half_len * 0.6))
+			mangrove_node.rotation.y = randf_range(0.0, TAU)
+			_enforce_navigable_clearance(mangrove_node, is_left, 6.6)
 
 	# Tier 3: Natural Cliff Ridge (|X| >= 10.5m)
 	var cliff_count := randi_range(4, 6)
@@ -320,6 +350,20 @@ func _generate_bayou_shoreline() -> void:
 			rock_node.rotation.y = randf_range(0.0, TAU)
 			_enforce_navigable_clearance(rock_node, is_left, 6.6)
 
+	# Custom Scenery: Mossy Driftwood Log along the waterline (1-2 per chunk)
+	var drift_count := randi_range(1, 2)
+	var drift_step := chunk_length / float(drift_count)
+	for i in range(drift_count):
+		var z_pos := -half_len + (i + 0.5) * drift_step + randf_range(-1.0, 1.0)
+		var drift_node := _instantiate_custom_scenery(SCENERY_MOSSWOOD_DRIFT)
+		if drift_node:
+			var s_val := randf_range(1.1, 1.4)
+			drift_node.scale = Vector3.ONE * s_val
+			drift_node.position = Vector3(sign_x * randf_range(7.2, 8.0), 0.18 * s_val, z_pos)
+			drift_node.rotation.y = randf_range(0.0, TAU)
+			drift_node.rotation.z = sign_x * randf_range(-0.06, 0.06)
+			_enforce_navigable_clearance(drift_node, is_left, 6.6)
+
 	# Tier 2: Ruined Stilt Dock Platforms & Dense Reeds
 	var dock_count := randi_range(2, 3)
 	var dock_step := chunk_length / float(dock_count)
@@ -333,6 +377,34 @@ func _generate_bayou_shoreline() -> void:
 			dock_node.rotation.y = randf_range(0.0, TAU)
 			dock_node.rotation.z = sign_x * randf_range(0.04, 0.08) # slightly dilapidated tilt
 			_enforce_navigable_clearance(dock_node, is_left, 6.6)
+
+	# Custom Scenery: Swamp Mangrove Trees with twisted aerial roots (1-2 per chunk)
+	var mangrove_count := randi_range(1, 2)
+	var mangrove_step := chunk_length / float(mangrove_count)
+	for i in range(mangrove_count):
+		var z_pos := -half_len + (i + 0.5) * mangrove_step + randf_range(-1.2, 1.2)
+		var mangrove_node := _instantiate_custom_scenery(SCENERY_MANGROVE_GROVE)
+		if mangrove_node:
+			var s_val := randf_range(1.3, 1.7)
+			mangrove_node.scale = Vector3.ONE * s_val
+			mangrove_node.position = Vector3(sign_x * randf_range(8.0, 9.2), 0.50 * s_val, z_pos)
+			mangrove_node.rotation.y = randf_range(0.0, TAU)
+			_enforce_navigable_clearance(mangrove_node, is_left, 6.6)
+
+	# Custom Scenery: Voodoo Painted Totem Pole (1-2 per chunk)
+	var totem_count := randi_range(1, 2)
+	var totem_step := chunk_length / float(totem_count)
+	for i in range(totem_count):
+		var z_pos := -half_len + (i + 0.5) * totem_step + randf_range(-1.0, 1.0)
+		var totem_node := _instantiate_custom_scenery(SCENERY_PAINTED_TOTEM)
+		if totem_node:
+			var s_val := randf_range(1.0, 1.3)
+			totem_node.scale = Vector3.ONE * s_val
+			totem_node.position = Vector3(sign_x * randf_range(7.6, 8.6), 0.88 * s_val, z_pos)
+			var base_facing: float = PI * 0.5 if is_left else -PI * 0.5
+			totem_node.rotation.y = base_facing + randf_range(-0.35, 0.35)
+			totem_node.rotation.z = sign_x * randf_range(0.02, 0.08)
+			_enforce_navigable_clearance(totem_node, is_left, 6.6)
 
 	# Tier 3: Swamp Cliffs & Sunken Hulks
 	var cliff_count := randi_range(4, 5)
@@ -438,8 +510,40 @@ func _generate_brimstone_shoreline() -> void:
 			rock_node.rotation.y = randf_range(0.0, TAU)
 			_enforce_navigable_clearance(rock_node, is_left, 6.6)
 
+	# Custom Scenery: Active Lava Geyser Vent with looping fire/smoke VFX (1-2 per chunk)
+	var vent_count := randi_range(1, 2)
+	var vent_step := chunk_length / float(vent_count)
+	for i in range(vent_count):
+		var z_pos := -half_len + (i + 0.5) * vent_step + randf_range(-1.0, 1.0)
+		var vent_node := _instantiate_custom_scenery(SCENERY_MOLTEN_CROWN)
+		if vent_node:
+			var s_val := randf_range(1.2, 1.5)
+			vent_node.scale = Vector3.ONE * s_val
+			vent_node.position = Vector3(sign_x * randf_range(7.4, 8.4), 0.38 * s_val, z_pos)
+			vent_node.rotation.y = randf_range(0.0, TAU)
+			if ResourceLoader.exists(SCENERY_LAVA_GEYSER_VFX):
+				var vfx_scene := load(SCENERY_LAVA_GEYSER_VFX) as PackedScene
+				if vfx_scene:
+					var vfx_inst := vfx_scene.instantiate() as Node3D
+					vent_node.add_child(vfx_inst)
+					vfx_inst.position = Vector3(0.0, 0.38, 0.0)
+			_enforce_navigable_clearance(vent_node, is_left, 6.6)
+
+	# Custom Scenery: Obsidian Crystal Cluster (1-2 per chunk)
+	var crystal_count := randi_range(1, 2)
+	var crystal_step := chunk_length / float(crystal_count)
+	for i in range(crystal_count):
+		var z_pos := -half_len + (i + 0.7) * crystal_step + randf_range(-0.8, 0.8)
+		var crystal_node := _instantiate_custom_scenery(SCENERY_OBSIDIAN_CRYSTAL)
+		if crystal_node:
+			var s_val := randf_range(1.0, 1.4)
+			crystal_node.scale = Vector3.ONE * s_val
+			crystal_node.position = Vector3(sign_x * randf_range(7.6, 8.6), 0.85 * s_val, z_pos)
+			crystal_node.rotation.y = randf_range(0.0, TAU)
+			_enforce_navigable_clearance(crystal_node, is_left, 6.6)
+
 	# Tier 2: Charred Watch Structures & Iron Fortifications
-	var tower_count := randi_range(2, 3)
+	var tower_count := randi_range(1, 2)
 	var tower_step := chunk_length / float(tower_count)
 	for i in range(tower_count):
 		var z_pos := -half_len + (i + 0.5) * tower_step + randf_range(-1.0, 1.0)
@@ -449,6 +553,19 @@ func _generate_brimstone_shoreline() -> void:
 			tower_node.scale = Vector3.ONE * 0.85
 			tower_node.rotation.y = randf_range(0.0, TAU)
 			_enforce_navigable_clearance(tower_node, is_left, 6.6)
+
+	# Custom Scenery: Charred Scorched Thorn Tree (2-3 per chunk)
+	var tree_count := randi_range(2, 3)
+	var tree_step := chunk_length / float(tree_count)
+	for i in range(tree_count):
+		var z_pos := -half_len + (i + 0.5) * tree_step + randf_range(-1.2, 1.2)
+		var tree_node := _instantiate_custom_scenery(SCENERY_MOLTEN_TREE)
+		if tree_node:
+			var s_val := randf_range(1.2, 1.6)
+			tree_node.scale = Vector3.ONE * s_val
+			tree_node.position = Vector3(sign_x * randf_range(8.2, 9.4), 0.90 * s_val, z_pos)
+			tree_node.rotation.y = randf_range(0.0, TAU)
+			_enforce_navigable_clearance(tree_node, is_left, 6.6)
 
 	# Tier 3: Towering Volcanic Basalt Cliffs
 	var cliff_count := randi_range(5, 7)
@@ -533,7 +650,7 @@ func _enforce_navigable_clearance(prop: Node3D, p_is_left: bool, min_channel_mar
 
 # ── Asset Instantiation & Performance Helpers ─────────────────────────────────
 
-func _instantiate_prop(path: String, shared_mat: StandardMaterial3D) -> Node3D:
+func _instantiate_prop(path: String, shared_mat: StandardMaterial3D = null) -> Node3D:
 	if not ResourceLoader.exists(path):
 		return null
 	var scene_res := load(path) as PackedScene
@@ -546,6 +663,10 @@ func _instantiate_prop(path: String, shared_mat: StandardMaterial3D) -> Node3D:
 	add_child(inst)
 	_apply_mesh_optimizations(inst, shared_mat)
 	return inst
+
+## Instantiates custom scenery models without overriding their dedicated PBR textures.
+func _instantiate_custom_scenery(path: String) -> Node3D:
+	return _instantiate_prop(path, null)
 
 ## Recursively configures mesh instances for mobile performance:
 ## - Overrides material to shared colormap StandardMaterial3D (cull_mode = CULL_BACK)

@@ -203,10 +203,12 @@ func spawn_scenery() -> void:
 
 	# ── Asset paths ───────────────────────────────────────────────────────────
 	# Swap these to res://assets/models/environment/*.glb for the art-pass.
-	var sand_island_path   := "res://assets/models/patch-sand.glb"
-	var rock_island_path   := "res://assets/models/rocks-sand-a.glb"
-	var palm_straight_path := "res://assets/models/palm-detailed-straight.glb"
-	var palm_bend_path     := "res://assets/models/palm-detailed-bend.glb"
+	var sand_island_path    := "res://assets/models/patch-sand.glb"
+	var rock_island_path    := "res://assets/models/rocks-sand-a.glb"
+	var palm_straight_path  := "res://assets/models/palm-detailed-straight.glb"
+	var palm_bend_path      := "res://assets/models/palm-detailed-bend.glb"
+	var palm_island_path    := "res://assets/models/scenery/Low_Poly_Palm_Island.glb"
+	var mangrove_grove_path := "res://assets/models/scenery/Emerald_Mangrove_Grov.glb"
 	var dock_ruin_paths: Array[String] = [
 		"res://assets/models/structure-platform-dock-small.glb",
 		"res://assets/models/structure.glb",
@@ -235,31 +237,55 @@ func spawn_scenery() -> void:
 			
 		var rand_z := randf_range(zone.x, zone.y)
 		
-		# ── Shoal base (sand island or rock cluster) ──────────────────────────
-		var base_path := sand_island_path if randf() < 0.5 else rock_island_path
-		var base_scene: PackedScene = load(base_path) as PackedScene
-		if base_scene:
-			var base_inst := base_scene.instantiate() as Node3D
-			scenery_container.add_child(base_inst)
-			base_inst.position = Vector3(rand_x, 0.06, rand_z)
-			base_inst.scale = Vector3(randf_range(1.0, 1.3), randf_range(0.7, 1.0), randf_range(1.0, 1.3))
-			base_inst.rotation.y = randf_range(0.0, TAU)
-			_clean_shadow_nodes(base_inst)
-			
-			# Palm on shoal (60 % chance)
-			if randf() < 0.6:
-				var palm_path := palm_straight_path if randf() < 0.5 else palm_bend_path
-				var palm_scene: PackedScene = load(palm_path) as PackedScene
-				if palm_scene:
-					var palm_inst := palm_scene.instantiate() as Node3D
-					base_inst.add_child(palm_inst)
-					palm_inst.position = Vector3(randf_range(-0.2, 0.2), 0.0, randf_range(-0.2, 0.2))
-					palm_inst.scale    = Vector3.ONE * randf_range(0.8, 1.2)
-					palm_inst.rotation.y = randf_range(0.0, TAU)
-					_clean_shadow_nodes(palm_inst)
+		# ── Shoal base (custom palm island, mangrove grove, or Kenney sand/rock shoal) ──
+		var roll: float = randf()
+		if roll < 0.25 and ResourceLoader.exists(palm_island_path):
+			var island_scene := load(palm_island_path) as PackedScene
+			if island_scene:
+				var island_inst := island_scene.instantiate() as Node3D
+				scenery_container.add_child(island_inst)
+				var s_val: float = randf_range(1.1, 1.4)
+				island_inst.scale = Vector3.ONE * s_val
+				island_inst.position = Vector3(rand_x, 0.65 * s_val, rand_z)
+				island_inst.rotation.y = randf_range(0.0, TAU)
+				_clean_shadow_nodes(island_inst)
+				_enforce_navigable_clearance(island_inst, is_left)
+		elif roll < 0.45 and ResourceLoader.exists(mangrove_grove_path):
+			var mangrove_scene := load(mangrove_grove_path) as PackedScene
+			if mangrove_scene:
+				var mangrove_inst := mangrove_scene.instantiate() as Node3D
+				scenery_container.add_child(mangrove_inst)
+				var s_val: float = randf_range(1.2, 1.5)
+				mangrove_inst.scale = Vector3.ONE * s_val
+				mangrove_inst.position = Vector3(rand_x, 0.50 * s_val, rand_z)
+				mangrove_inst.rotation.y = randf_range(0.0, TAU)
+				_clean_shadow_nodes(mangrove_inst)
+				_enforce_navigable_clearance(mangrove_inst, is_left)
+		else:
+			var base_path := sand_island_path if randf() < 0.5 else rock_island_path
+			var base_scene: PackedScene = load(base_path) as PackedScene
+			if base_scene:
+				var base_inst := base_scene.instantiate() as Node3D
+				scenery_container.add_child(base_inst)
+				base_inst.position = Vector3(rand_x, 0.06, rand_z)
+				base_inst.scale = Vector3(randf_range(1.0, 1.3), randf_range(0.7, 1.0), randf_range(1.0, 1.3))
+				base_inst.rotation.y = randf_range(0.0, TAU)
+				_clean_shadow_nodes(base_inst)
+				
+				# Palm on shoal (60 % chance)
+				if randf() < 0.6:
+					var palm_path := palm_straight_path if randf() < 0.5 else palm_bend_path
+					var palm_scene: PackedScene = load(palm_path) as PackedScene
+					if palm_scene:
+						var palm_inst := palm_scene.instantiate() as Node3D
+						base_inst.add_child(palm_inst)
+						palm_inst.position = Vector3(randf_range(-0.2, 0.2), 0.0, randf_range(-0.2, 0.2))
+						palm_inst.scale    = Vector3.ONE * randf_range(0.8, 1.2)
+						palm_inst.rotation.y = randf_range(0.0, TAU)
+						_clean_shadow_nodes(palm_inst)
 
-			# buffer=0.0 — allow rocks to kiss ±6.0 for an organic jagged silhouette.
-			_enforce_navigable_clearance(base_inst, is_left)
+				# buffer=0.0 — allow rocks to kiss ±6.0 for an organic jagged silhouette.
+				_enforce_navigable_clearance(base_inst, is_left)
 
 		# ── Dock ruins accent prop (30 % chance) ──────────────────────────────
 		if randf() < 0.30:
