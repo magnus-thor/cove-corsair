@@ -35,6 +35,9 @@ var lifetime_coins_by_source: Dictionary = {}
 var total_doubloons_earned_session: int = 0
 var total_doubloons_spent_session: int = 0
 
+var is_telemetry_enabled: bool = true
+var _session_initialized: bool = false
+
 func _init_session_files() -> void:
 	var base_exists := false
 	if FileAccess.file_exists(TELEMETRY_FILE_USER):
@@ -71,11 +74,61 @@ func _init_session_files() -> void:
 		session_file_user = TELEMETRY_FILE_USER
 		session_file_project = TELEMETRY_FILE_PROJECT
 
+func _is_testing_environment() -> bool:
+	var args: PackedStringArray = OS.get_cmdline_args()
+	for arg: String in args:
+		var a_lower: String = arg.to_lower()
+		if a_lower.contains("test_scripts") or a_lower.contains("test_") or a_lower.contains("--headless") or a_lower.contains("sandbox") or a_lower.contains("harness"):
+			return true
+			
+	var uargs: PackedStringArray = OS.get_cmdline_user_args()
+	for uarg: String in uargs:
+		var u_lower: String = uarg.to_lower()
+		if u_lower.contains("test_scripts") or u_lower.contains("test_") or u_lower.contains("--headless") or u_lower.contains("sandbox"):
+			return true
+
+	var cur_scene: Node = get_tree().current_scene if get_tree() else null
+	if is_instance_valid(cur_scene) and _is_test_scene_path(cur_scene.scene_file_path):
+		return true
+
+	return false
+
+func _is_test_scene_path(path: String) -> bool:
+	var p_lower: String = path.to_lower()
+	if p_lower.is_empty():
+		return false
+	if p_lower.contains("/test_scripts/") or p_lower.contains("/tests/") or p_lower.contains("test_"):
+		return true
+	if p_lower.contains("sandbox") or p_lower.contains("level_test_harness") or p_lower.contains("build_chunks"):
+		return true
+	if p_lower.contains("boarding_defense_arena.tscn"):
+		return true
+	return false
+
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	session_start_epoch = int(Time.get_unix_time_from_system())
 	session_start_time_str = Time.get_datetime_string_from_system(false, true)
 	
+	if _is_testing_environment():
+		is_telemetry_enabled = false
+		return
+		
+	call_deferred("_evaluate_and_init_session")
+
+func _evaluate_and_init_session() -> void:
+	if not is_telemetry_enabled:
+		return
+	var cur_scene: Node = get_tree().current_scene if get_tree() else null
+	if is_instance_valid(cur_scene) and _is_test_scene_path(cur_scene.scene_file_path):
+		is_telemetry_enabled = false
+		return
+	_init_session_if_needed()
+
+func _init_session_if_needed() -> void:
+	if _session_initialized or not is_telemetry_enabled:
+		return
+	_session_initialized = true
 	_init_session_files()
 	_connect_event_bus()
 	
@@ -88,7 +141,7 @@ func _ready() -> void:
 	print("================================================================================")
 
 func _process(delta: float) -> void:
-	if not is_run_active:
+	if not is_telemetry_enabled or not is_run_active:
 		return
 	_fps_sample_timer += delta
 	if _fps_sample_timer >= 0.1:
@@ -104,6 +157,8 @@ func _process(delta: float) -> void:
 
 
 func _notification(what: int) -> void:
+	if not is_telemetry_enabled:
+		return
 	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_PREDELETE:
 		_finalize_active_run_if_any("ABORTED_ON_EXIT")
 		save_telemetry_to_disk()
@@ -158,6 +213,9 @@ func _connect_event_bus() -> void:
 		EventBus.boarding_encounter_ended.connect(_on_boarding_encounter_ended)
 
 func start_level_run(level_index: int) -> void:
+	if not is_telemetry_enabled:
+		return
+	_init_session_if_needed()
 	_finalize_active_run_if_any("SUPERSEDED")
 	
 	is_run_active = true
@@ -677,6 +735,10 @@ func generate_session_summary() -> Dictionary:
 	}
 
 func save_telemetry_to_disk() -> void:
+	if not is_telemetry_enabled:
+		return
+	if runs.is_empty() and shipyard_events.is_empty():
+		return
 	var payload: Dictionary = generate_session_summary()
 	var json_str: String = JSON.stringify(payload, "  ")
 	

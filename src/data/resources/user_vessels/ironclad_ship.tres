@@ -3,12 +3,14 @@
 [ext_resource type="Script" uid="uid://cs0f78ukvxpo3" path="res://src/data/ship_data.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://d3vjd6donghmj" path="res://assets/sprites/user_vessels/The Ironclad.png" id="2_tex"]
 [ext_resource type="PackedScene" uid="uid://dxytf28ecba3w" path="res://assets/models/user/vessels/the_ironclad.glb" id="3_mesh"]
+[ext_resource type="PackedScene" path="res://src/features/boarding/rigs/player/rig_ironclad.tscn" id="4_boarding_rig"]
 
 [resource]
 script = ExtResource("1_script")
 ship_id = "ironclad"
 ship_name = "The Ironclad"
 model_scene = ExtResource("3_mesh")
+boarding_rig = ExtResource("4_boarding_rig")
 sprite_texture = ExtResource("2_tex")
 pixel_size = 0.0011
 y_offset = 0.35

@@ -182,30 +182,41 @@ func _test_endless_mode_boss_slain_rewards() -> void:
 
 func _test_dynamic_vessel_and_gangplank_anchors() -> void:
 	print("--- 6. Testing Dynamic Vessel Model Swapping & Gangplank Anchors ---")
+	
+	# Verify all user vessel ShipData have boarding_rig assigned
+	var vessel_ids: Array[String] = ["sloop", "dinghy", "bombard_skiff", "ironclad"]
+	for vid: String in vessel_ids:
+		var sdata: ShipData = GameState.get_vessel_resource(vid)
+		assert(sdata != null, "ShipData for '%s' must exist" % vid)
+		assert(sdata.boarding_rig != null, "ShipData for '%s' must have boarding_rig assigned" % vid)
+
 	var arena: BoardingDefenseArena = ARENA_SCENE.instantiate() as BoardingDefenseArena
 	add_child(arena)
 	
-	# Test Player Vessel Swapping
+	# Test Player Vessel Swapping (Dinghy)
 	arena.setup_player_vessel("dinghy")
-	var dinghy_visual: Node = arena.player_ship_container.find_child("PlayerShipVisual", true, false)
-	assert(dinghy_visual != null, "PlayerShipVisual must exist after setup_player_vessel('dinghy')")
+	assert(arena.player_rig != null, "PlayerBoardingRig must exist for dinghy")
+	assert(arena.player_rig.get_node_or_null("Model") != null, "Model node must exist in dinghy rig")
 	assert(is_equal_approx(arena.zone_bow.plank_anchor.position.x, 2.0 - 0.25), "Dinghy anchor X must be adjusted for narrow beam")
+	assert(arena.player_controller.global_position.is_equal_approx(arena.player_rig.player_spawn.global_position), "PlayerController must anchor to player_spawn")
 	
+	# Test Player Vessel Swapping (Ironclad)
 	arena.setup_player_vessel("ironclad")
-	var ironclad_visual: Node = arena.player_ship_container.find_child("PlayerShipVisual", true, false)
-	assert(ironclad_visual != null, "PlayerShipVisual must exist after setup_player_vessel('ironclad')")
+	assert(arena.player_rig != null, "PlayerBoardingRig must exist for ironclad")
+	assert(arena.player_rig.get_node_or_null("Model") != null, "Model node must exist in ironclad rig")
 	assert(is_equal_approx(arena.zone_bow.plank_anchor.position.x, 2.0 + 0.35), "Ironclad anchor X must be adjusted for wide beam")
 	
 	# Test Boss 2 (Bone-Beard) Gangplank Anchors & Visual
 	arena.setup_enemy_vessel("BossBoneBeard")
-	var bone_beard_visual: Node = arena.enemy_ship_container.find_child("EnemyShipVisual", true, false)
-	assert(bone_beard_visual != null, "EnemyShipVisual must exist for Bone-Beard")
+	assert(arena.enemy_rig != null, "EnemyBoardingRig must exist for Bone-Beard")
+	assert(arena.enemy_rig.get_node_or_null("Model") != null, "Model node must exist in Bone-Beard rig")
 	assert(arena.enemy_ship_marker_bow.position.is_equal_approx(Vector3(-13.1, 0.55, -1.85)), "Bone-Beard MarkerBow must match calibrated anchor")
 	assert(arena.enemy_ship_marker_mid.position.is_equal_approx(Vector3(-13.1, 0.50, -0.05)), "Bone-Beard MarkerMid must match calibrated anchor")
 	assert(arena.enemy_ship_marker_stern.position.is_equal_approx(Vector3(-13.1, 0.55, 0.65)), "Bone-Beard MarkerStern must match calibrated anchor")
 	
 	# Test Siege Fortress
 	arena.setup_enemy_vessel("BossSiegeFortress")
+	assert(arena.enemy_rig != null, "EnemyBoardingRig must exist for Siege Fortress")
 	assert(arena.enemy_ship_marker_bow.position.is_equal_approx(Vector3(-13.2, 0.65, -1.90)), "Siege Fortress MarkerBow must match calibrated anchor")
 	
 	arena.queue_free()

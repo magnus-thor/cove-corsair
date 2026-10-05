@@ -5,6 +5,7 @@ enum State { APPROACHING, COMBAT, RAMMING, DYING }
 
 @export var max_hp: int = 800 # Port: 150, Starboard: 150, Prow Ram: 150, Furnace Core: 350
 @export var current_hp: int = 800
+@export var boarding_rig: PackedScene = preload("res://src/features/boarding/rigs/enemy/rig_siege_fortress.tscn")
 
 @export var approach_speed: float = 12.0
 @export var combat_z_offset: float = -19.0

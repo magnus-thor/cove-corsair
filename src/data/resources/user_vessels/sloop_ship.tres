@@ -3,12 +3,14 @@
 [ext_resource type="Script" uid="uid://cs0f78ukvxpo3" path="res://src/data/ship_data.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://dnrr4dhkxp2cc" path="res://assets/sprites/user_vessels/The Sloop.png" id="2_tex"]
 [ext_resource type="PackedScene" uid="uid://bfesco2vc1j1d" path="res://assets/models/user/vessels/the_sloop.glb" id="3_sloop_mesh"]
+[ext_resource type="PackedScene" path="res://src/features/boarding/rigs/player/rig_sloop.tscn" id="4_boarding_rig"]
 
 [resource]
 script = ExtResource("1_script")
 ship_id = "sloop"
 ship_name = "The Sloop"
 model_scene = ExtResource("3_sloop_mesh")
+boarding_rig = ExtResource("4_boarding_rig")
 sprite_texture = ExtResource("2_tex")
 pixel_size = 0.0028
 y_offset = 0.33

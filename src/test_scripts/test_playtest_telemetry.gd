@@ -40,6 +40,10 @@ func _ready() -> void:
 		get_tree().root.add_child(telemetry)
 
 	assert_test(telemetry != null, "PlaytestTelemetry autoload is loaded and valid")
+	if telemetry != null:
+		telemetry.set("is_telemetry_enabled", true)
+		if telemetry.has_method("_init_session_if_needed"):
+			telemetry.call("_init_session_if_needed")
 
 	# 3. Test Level Run Start
 	print("\n--- 3. Testing Run Start ---")
@@ -118,6 +122,9 @@ func _ready() -> void:
 		DirAccess.remove_absolute(ProjectSettings.globalize_path("res://playtest_session_latest.json"))
 	if FileAccess.file_exists("user://playtest_session_latest.json"):
 		DirAccess.remove_absolute(ProjectSettings.globalize_path("user://playtest_session_latest.json"))
+
+	if telemetry != null:
+		telemetry.set("is_telemetry_enabled", false)
 
 	print("\n========================================================")
 	print("  TESTS FINISHED: %d / %d PASSED" % [passed_count, total_count])

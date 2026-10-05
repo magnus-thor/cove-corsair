@@ -96,6 +96,14 @@ func _ready() -> void:
 		_clear_player_model()
 		_configure_crew_role("")
 
+func set_deck_anchor(global_xform: Transform3D) -> void:
+	global_transform = global_xform
+	initial_deck_local_position = position
+	initial_deck_position = global_position
+	_initial_deck_x = global_position.x
+	_initial_deck_z = global_position.z
+	target_station_position = global_position
+
 func setup_defender_model(new_crew_id: String) -> void:
 	current_crew_id = new_crew_id
 	if new_crew_id.is_empty():

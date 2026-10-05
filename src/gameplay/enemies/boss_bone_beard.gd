@@ -5,6 +5,7 @@ enum State { APPROACHING, COMBAT, DYING }
 
 @export var max_hp: int = 100
 @export var current_hp: int = 100
+@export var boarding_rig: PackedScene = preload("res://src/features/boarding/rigs/enemy/rig_bone_beard.tscn")
 @export var approach_speed: float = 14.0
 @export var combat_z_offset: float = -18.0
 @export var weave_speed: float = 1.8

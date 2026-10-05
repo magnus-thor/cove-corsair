@@ -1,0 +1,30 @@
+[gd_scene format=3 uid="uid://b13p2y6se7g8g"]
+
+[ext_resource type="Script" uid="uid://db51j6c1n8vuh" path="res://src/features/boarding/rigs/enemy_boarding_rig.gd" id="1_rig"]
+[ext_resource type="PackedScene" uid="uid://dkpneoghra51r" path="res://assets/models/enemy/vessels/ghost_sloop.glb" id="2_model"]
+[ext_resource type="PackedScene" path="res://src/vfx/boat_wake.tscn" id="3_wake"]
+
+[node name="EnemyBoardingRig" type="Node3D" unique_id=1780823999 node_paths=PackedStringArray("plank_origin_bow", "plank_origin_mid", "plank_origin_stern", "wake")]
+script = ExtResource("1_rig")
+plank_origin_bow = NodePath("PlankOrigins/MarkerBow")
+plank_origin_mid = NodePath("PlankOrigins/MarkerMid")
+plank_origin_stern = NodePath("PlankOrigins/MarkerStern")
+wake = NodePath("EnemyBoatWake")
+dock_position = Vector3(13.32, 0.287, 0)
+
+[node name="PlankOrigins" type="Node3D" parent="." unique_id=1320160932]
+
+[node name="MarkerBow" type="Marker3D" parent="PlankOrigins" unique_id=1064031795]
+transform = Transform3D(0.6102538, 0, 0.7922059, 0, 1, 0, -0.7922059, 0, 0.6102538, -10.495407, -0.25360602, -0.9313523)
+
+[node name="MarkerMid" type="Marker3D" parent="PlankOrigins" unique_id=1057139486]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.668317, -0.78375685, -0.85512197)
+
+[node name="MarkerStern" type="Marker3D" parent="PlankOrigins" unique_id=1288457501]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.5, -0.254, -0.931)
+
+[node name="EnemyBoatWake" parent="." unique_id=2089460132 instance=ExtResource("3_wake")]
+transform = Transform3D(0.3528645, 0, -4.415924, 0, 4.43, 0, 4.415924, 0, 0.3528645, -14.444548, -0.9119203, 0.111222744)
+
+[node name="Model" parent="." unique_id=861431229 instance=ExtResource("2_model")]
+transform = Transform3D(-4.8, 0, 5.878305e-16, 0, 4.8, 0, -5.878305e-16, 0, -4.8, -11.5, 0.35, 0)

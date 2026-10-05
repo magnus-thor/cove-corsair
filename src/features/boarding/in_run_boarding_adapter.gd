@@ -64,6 +64,12 @@ func start_in_run_boarding(boss: Node3D, player: Node3D) -> void:
 	else:
 		active_arena.boss_tier = 3
 
+	var p_vessel: String = "sloop"
+	if GameState and "active_vessel" in GameState and not str(GameState.active_vessel).is_empty():
+		p_vessel = str(GameState.active_vessel)
+	active_arena.pending_player_vessel_id = p_vessel
+	active_arena.pending_boss = active_boss
+
 	var root: Node = get_tree().current_scene
 	if not root:
 		root = active_player.get_parent()
@@ -72,13 +78,10 @@ func start_in_run_boarding(boss: Node3D, player: Node3D) -> void:
 
 	# Configure matching enemy ship model
 	if is_instance_valid(active_arena) and active_arena.has_method("setup_enemy_vessel"):
-		active_arena.setup_enemy_vessel(active_boss.name)
+		active_arena.setup_enemy_vessel(active_boss)
 
 	# Configure matching player ship model
 	if is_instance_valid(active_arena) and active_arena.has_method("setup_player_vessel"):
-		var p_vessel: String = "sloop"
-		if GameState and "active_vessel" in GameState and not str(GameState.active_vessel).is_empty():
-			p_vessel = str(GameState.active_vessel)
 		active_arena.setup_player_vessel(p_vessel)
 
 	# Configure biome visuals

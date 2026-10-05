@@ -5,6 +5,8 @@ extends Resource
 @export var ship_name: String = ""
 @export var model_scene: PackedScene = null
 @export var boat_scene: PackedScene = null # Complete assembled boat scene (e.g. bombard_skiff_boat.tscn)
+## Per-vessel deck layout used by the boarding defense arena (PlayerBoardingRig scene).
+@export var boarding_rig: PackedScene = null
 @export var sprite_texture: Texture2D
 @export var pixel_size: float = 0.006
 @export var y_offset: float = 0.485
