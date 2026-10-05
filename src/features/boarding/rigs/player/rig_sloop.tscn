@@ -1,14 +1,14 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://cphhvef8ckpip"]
 
-[ext_resource type="Script" path="res://src/features/boarding/rigs/player_boarding_rig.gd" id="1_rig"]
+[ext_resource type="Script" uid="uid://ckng2fjcpphvk" path="res://src/features/boarding/rigs/player_boarding_rig.gd" id="1_rig"]
 [ext_resource type="PackedScene" path="res://src/features/boarding/boarding_zone.tscn" id="2_zone"]
 [ext_resource type="PackedScene" path="res://src/features/boarding/crew/boarding_crew_station.tscn" id="3_crew"]
-[ext_resource type="PackedScene" path="res://assets/models/user/vessels/the_sloop.glb" id="4_sloop_model"]
+[ext_resource type="PackedScene" uid="uid://bfesco2vc1j1d" path="res://assets/models/user/vessels/the_sloop.glb" id="4_sloop_model"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_deck_floor"]
 size = Vector3(6, 0.4, 15)
 
-[node name="PlayerBoardingRig" type="Node3D" node_paths=PackedStringArray("zone_bow", "zone_midship", "zone_stern", "crew_station_bow", "crew_station_stern", "player_spawn", "camera_mount", "breach_line")]
+[node name="PlayerBoardingRig" type="Node3D" unique_id=893271766 node_paths=PackedStringArray("zone_bow", "zone_midship", "zone_stern", "crew_station_bow", "crew_station_stern", "player_spawn", "camera_mount", "breach_line")]
 script = ExtResource("1_rig")
 zone_bow = NodePath("DeckZones/ZoneBow")
 zone_midship = NodePath("DeckZones/ZoneMidship")
@@ -19,47 +19,69 @@ player_spawn = NodePath("PlayerSpawn")
 camera_mount = NodePath("CameraMount")
 breach_line = NodePath("BreachLine")
 
-[node name="DeckFloor" type="StaticBody3D" parent="."]
+[node name="DeckFloor" type="StaticBody3D" parent="." unique_id=418219926]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.52509, 0, 0.823544)
 collision_mask = 0
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="DeckFloor"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DeckFloor" unique_id=352705035]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.35419, -0.2, 0.658978)
 shape = SubResource("BoxShape3D_deck_floor")
 
-[node name="DeckZones" type="Node3D" parent="."]
+[node name="DeckZones" type="Node3D" parent="." unique_id=805732583]
 
-[node name="ZoneBow" parent="DeckZones" instance=ExtResource("2_zone")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6419401, -0.70695084, -0.9400308)
+[node name="ZoneBow" parent="DeckZones" unique_id=1290480101 instance=ExtResource("2_zone")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.32868028, 0.30560952, -0.9400308)
 zone_id = "bow"
 
-[node name="ZoneMidship" parent="DeckZones" instance=ExtResource("2_zone")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.647296, -0.77675766, -0.046703592)
+[node name="CollisionShape3D" parent="DeckZones/ZoneBow" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
-[node name="ZoneStern" parent="DeckZones" instance=ExtResource("2_zone")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.7819757, -0.65186054, 0.62764955)
+[node name="GrappleAnchor" parent="DeckZones/ZoneBow" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="ZoneMidship" parent="DeckZones" unique_id=1817592958 instance=ExtResource("2_zone")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3774433, 0.18924826, -0.046703592)
+
+[node name="CollisionShape3D" parent="DeckZones/ZoneMidship" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="GrappleAnchor" parent="DeckZones/ZoneMidship" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="ZoneStern" parent="DeckZones" unique_id=979117485 instance=ExtResource("2_zone")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.34881687, 0.31802493, 0.62764955)
 zone_id = "stern"
 
-[node name="CrewStations" type="Node3D" parent="."]
+[node name="CollisionShape3D" parent="DeckZones/ZoneStern" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="GrappleAnchor" parent="DeckZones/ZoneStern" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="CrewStations" type="Node3D" parent="." unique_id=1145100778]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.9001923, 1.0280576, 0)
 
-[node name="CrewStationBow" parent="CrewStations" node_paths=PackedStringArray("assigned_zone") instance=ExtResource("3_crew")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 0, -4)
+[node name="CrewStationBow" parent="CrewStations" unique_id=1054460316 node_paths=PackedStringArray("assigned_zone") instance=ExtResource("3_crew")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.9352248, -0.91154224, -0.94187975)
 assigned_zone = NodePath("../../DeckZones/ZoneBow")
 
-[node name="CrewStationStern" parent="CrewStations" node_paths=PackedStringArray("assigned_zone") instance=ExtResource("3_crew")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 0, 4)
+[node name="CrewStationStern" parent="CrewStations" unique_id=1490998030 node_paths=PackedStringArray("assigned_zone") instance=ExtResource("3_crew")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.9180453, -0.9534317, 0.10003734)
 station_id = "stern"
 assigned_zone = NodePath("../../DeckZones/ZoneStern")
 
-[node name="PlayerSpawn" type="Marker3D" parent="."]
+[node name="PlayerSpawn" type="Marker3D" parent="." unique_id=1604427623]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.24964976, 0.28, -0.025)
 
-[node name="CameraMount" type="Marker3D" parent="."]
+[node name="CameraMount" type="Marker3D" parent="." unique_id=16489876]
 transform = Transform3D(-0.08458755, -0.04236471, -1.0056611, 0.020957664, 1.008913, -0.04426448, 1.0063349, -0.024572324, -0.08360908, -4.7288647, 1.8908594, -0.57060933)
 
-[node name="BreachLine" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 6.2)
+[node name="BreachLine" type="Marker3D" parent="." unique_id=2140139354]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.28150654, 0, -0.3651638)
 
-[node name="Model" parent="." instance=ExtResource("4_sloop_model")]
+[node name="Model" parent="." unique_id=364357238 instance=ExtResource("4_sloop_model")]
 transform = Transform3D(0, 0, 1.655, 0, 1.655, 0, -1.655, 0, 0, 0, 0.0054335, 0)
+
+[editable path="DeckZones/ZoneBow"]
+[editable path="DeckZones/ZoneMidship"]
+[editable path="DeckZones/ZoneStern"]

@@ -15,6 +15,17 @@ extends Node3D
 @export var camera_mount: Marker3D = null
 @export var breach_line: Marker3D = null
 
+func _ready() -> void:
+	_ensure_rig_visibility(self)
+
+func _ensure_rig_visibility(target_node: Node) -> void:
+	if target_node is GeometryInstance3D:
+		var geom: GeometryInstance3D = target_node as GeometryInstance3D
+		geom.extra_cull_margin = 8.0
+		geom.lod_bias = 0.001
+	for child: Node in target_node.get_children():
+		_ensure_rig_visibility(child)
+
 func get_zones() -> Array[BoardingZone]:
 	var result: Array[BoardingZone] = []
 	if is_instance_valid(zone_bow):

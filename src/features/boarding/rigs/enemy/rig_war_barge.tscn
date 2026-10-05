@@ -15,16 +15,18 @@ dock_position = Vector3(13.323, 0.28704664, 0.385655)
 [node name="PlankOrigins" type="Node3D" parent="." unique_id=280982200]
 
 [node name="MarkerBow" type="Marker3D" parent="PlankOrigins" unique_id=140701635]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.876585, 0.86851966, -1.8804604)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.339832, 0.86851966, -2.6855898)
 
 [node name="MarkerMid" type="Marker3D" parent="PlankOrigins" unique_id=1247645049]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.893007, 0.013908476, -0.4803113)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.4681, 0.013908476, -0.46114114)
 
 [node name="MarkerStern" type="Marker3D" parent="PlankOrigins" unique_id=1744688072]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.911551, 0.5778208, 1.5936872)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.336458, 0.5778208, 2.2454586)
 
 [node name="EnemyBoatWake" parent="." unique_id=1355860833 instance=ExtResource("3_wake")]
-transform = Transform3D(0.3528645, 0, -4.415924, 0, 4.43, 0, 4.415924, 0, 0.3528645, -14.444548, -0.9119203, 0.111222744)
+transform = Transform3D(0.8379537, 0, -10.486574, 0, 10.52, 0, 10.486574, 0, 0.8379537, -14.444548, -1.4103338, 0.111222744)
+extra_cull_margin = 8.0
+lod_bias = 0.001
 
 [node name="Model" parent="." unique_id=2026260618 instance=ExtResource("2_model")]
-transform = Transform3D(-0.3129079, 0, 3.506065, 0, 3.52, 0, -3.506065, 0, -0.3129079, -11.51691, -0.3819456, 0.1718311)
+transform = Transform3D(-0.08155841, 0, 3.5190556, 0, 3.5199995, 0, -3.5190556, 0, -0.08155841, -11.51691, -0.3819456, 0.1718311)

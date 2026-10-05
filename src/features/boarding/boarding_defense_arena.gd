@@ -212,7 +212,7 @@ func _ready() -> void:
 	# If in an active in-run game, use GameState/adapter. If standalone F6 preview, use preview_player_vessel!
 	var p_vessel: String = pending_player_vessel_id
 	if p_vessel.is_empty():
-		if GameState and GameState.is_game_active and not str(GameState.active_vessel).is_empty():
+		if not Engine.is_editor_hint() and GameState and GameState.is_game_active and not str(GameState.active_vessel).is_empty():
 			p_vessel = str(GameState.active_vessel)
 		else:
 			p_vessel = preview_player_vessel
@@ -239,10 +239,11 @@ func _setup_camera() -> void:
 		boarding_camera.make_current()
 
 func _get_player_rig_scene(v_key: String) -> PackedScene:
-	if GameState and GameState.has_method("get_vessel_resource"):
-		var ship_data: ShipData = GameState.get_vessel_resource(v_key)
-		if is_instance_valid(ship_data) and is_instance_valid(ship_data.boarding_rig):
-			return ship_data.boarding_rig
+	if not Engine.is_editor_hint():
+		if GameState and GameState.has_method("get_vessel_resource"):
+			var ship_data: ShipData = GameState.get_vessel_resource(v_key)
+			if is_instance_valid(ship_data) and is_instance_valid(ship_data.boarding_rig):
+				return ship_data.boarding_rig
 
 	match v_key:
 		"sloop":
@@ -696,7 +697,7 @@ func _clear_editor_preview_planks() -> void:
 
 func _setup_crew_from_gamestate() -> void:
 	var equipped_ids: Array[String] = []
-	if GameState:
+	if not Engine.is_editor_hint() and GameState:
 		var active_ship: String = GameState.active_vessel
 		if GameState.equipped_crew.has(active_ship):
 			var ship_map: Dictionary = GameState.equipped_crew.get(active_ship, {}) as Dictionary
@@ -1062,7 +1063,7 @@ func _damage_vessel_hull(amount: float) -> void:
 	var player: PlayerSwerve = get_tree().get_first_node_in_group("player") as PlayerSwerve
 	if is_instance_valid(player):
 		player.take_hit(maxi(1, int(round(amount))), "boarding_overrun")
-	elif GameState:
+	elif not Engine.is_editor_hint() and GameState:
 		GameState.record_hit()
 		if EventBus and EventBus.has_signal("player_hit_taken"):
 			EventBus.player_hit_taken.emit(maxi(1, int(round(amount))), 1, 4, "boarding_overrun", 0.0)
