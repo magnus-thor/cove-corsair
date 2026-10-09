@@ -10,8 +10,17 @@ signal plank_hit(plank: BoardingPlank, current_hp: float, max_hp: float)
 
 @export var max_health: float = 30.0
 @export var cross_duration_sec: float = 4.2
-@export var plank_width: float = 0.41
-@export var plank_thickness: float = 0.12
+@export var plank_width: float = 0.41:
+	set(value):
+		plank_width = value
+		if is_inside_tree():
+			_update_visual_and_collision()
+
+@export var plank_thickness: float = 0.12:
+	set(value):
+		plank_thickness = value
+		if is_inside_tree():
+			_update_visual_and_collision()
 
 var current_health: float = 30.0
 var origin_pos: Vector3 = Vector3.ZERO
@@ -48,6 +57,13 @@ func setup_plank(start_point: Vector3, end_point: Vector3, zone: BoardingZone) -
 func setup_grapple(start_point: Vector3, end_point: Vector3, zone: BoardingZone) -> void:
 	setup_plank(start_point, end_point, zone)
 
+func _get_audio_manager() -> Node:
+	if Engine.is_editor_hint():
+		return null
+	if is_inside_tree() and get_tree() and get_tree().root:
+		return get_tree().root.get_node_or_null("AudioManager")
+	return null
+
 func take_damage(amount: float) -> void:
 	if not is_latched:
 		return
@@ -55,8 +71,9 @@ func take_damage(amount: float) -> void:
 	current_health = maxf(current_health - amount, 0.0)
 	plank_hit.emit(self, current_health, max_health)
 	
-	if AudioManager and AudioManager.has_method("play_sfx"):
-		AudioManager.play_sfx("sfx_wood_smash", 1.1, 1.3)
+	var audio: Node = _get_audio_manager()
+	if audio and audio.has_method("play_sfx"):
+		audio.call("play_sfx", "sfx_wood_smash", 1.1, 1.3)
 	_spawn_damage_text(int(round(amount)))
 	
 	if current_health <= 0.0:
@@ -66,8 +83,9 @@ func sever() -> void:
 	if not is_latched:
 		return
 	is_latched = false
-	if AudioManager and AudioManager.has_method("play_sfx"):
-		AudioManager.play_sfx("sfx_wood_smash", 0.8, 1.0)
+	var audio: Node = _get_audio_manager()
+	if audio and audio.has_method("play_sfx"):
+		audio.call("play_sfx", "sfx_wood_smash", 0.8, 1.0)
 	if is_instance_valid(target_zone):
 		if target_zone.has_method("unregister_plank"):
 			target_zone.call("unregister_plank", self)

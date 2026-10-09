@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/enemies/enemy_mob.gd" id="1_script"]
 [ext_resource type="Resource" path="res://src/data/resources/enemy_vessels/skeleton_rower.tres" id="2_enemy_data"]
@@ -20,9 +20,6 @@ corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_left = 4
 corner_radius_bottom_right = 4
-
-[sub_resource type="ViewportTexture" id="ViewportTexture_health"]
-viewport_path = NodePath("HealthBarViewport")
 
 [node name="EnemyMob" type="Area3D" groups=["destructible", "enemies"]]
 script = ExtResource("1_script")
@@ -70,4 +67,3 @@ show_percentage = false
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.82, 0)
 billboard = 1
 no_depth_test = true
-texture = SubResource("ViewportTexture_health")

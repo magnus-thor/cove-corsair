@@ -22,14 +22,16 @@ const APPROACH_DURATION_SEC: float = 1.8
 @export_category("Vessel Preview & Calibration (Editor Tool)")
 @export_enum("sloop", "dinghy", "bombard_skiff", "ironclad") var preview_player_vessel: String = "sloop":
 	set(value):
+		print("[BoardingArena] preview_player_vessel setter: ", value)
 		preview_player_vessel = value
-		if is_inside_tree():
+		if is_instance_valid(player_ship_container):
 			setup_player_vessel(preview_player_vessel)
 
 @export_enum("war_barge", "bone_beard", "siege_fortress", "ghost_sloop") var preview_enemy_vessel: String = "war_barge":
 	set(value):
+		print("[BoardingArena] preview_enemy_vessel setter: ", value)
 		preview_enemy_vessel = value
-		if is_inside_tree():
+		if is_instance_valid(enemy_ship_container):
 			setup_enemy_vessel(preview_enemy_vessel)
 
 @export var show_editor_planks: bool = true:
@@ -40,6 +42,18 @@ const APPROACH_DURATION_SEC: float = 1.8
 				_update_editor_preview_planks()
 			else:
 				_clear_editor_preview_planks()
+
+@export_range(0.2, 3.0, 0.05) var plank_width: float = 0.41:
+	set(value):
+		plank_width = value
+		if is_inside_tree() and Engine.is_editor_hint():
+			_update_editor_preview_planks()
+
+@export_range(0.02, 1.0, 0.02) var plank_thickness: float = 0.12:
+	set(value):
+		plank_thickness = value
+		if is_inside_tree() and Engine.is_editor_hint():
+			_update_editor_preview_planks()
 
 @export var refresh_preview: bool = false:
 	set(value):
@@ -66,6 +80,26 @@ const APPROACH_DURATION_SEC: float = 1.8
 		clear_planks_and_enemies = false
 		if is_inside_tree():
 			clear_all_planks_and_boarders()
+
+@export_group("Layout Overrides")
+## When true, BoardingCamera3D snaps to the rig's CameraMount.
+## When false (default), BoardingCamera3D keeps the transform authored in BoardingDefenseArena.
+@export var use_rig_camera_mount: bool = false:
+	set(value):
+		use_rig_camera_mount = value
+		if Engine.is_editor_hint() and is_inside_tree() and use_rig_camera_mount:
+			if is_instance_valid(boarding_camera) and is_instance_valid(player_rig) and is_instance_valid(player_rig.camera_mount):
+				boarding_camera.global_transform = player_rig.camera_mount.global_transform
+
+## When true, EnemyShipContainer snaps to the enemy rig's dock_position.
+## When false (default), EnemyShipContainer keeps the position authored in BoardingDefenseArena.
+@export var use_rig_dock_position: bool = false:
+	set(value):
+		use_rig_dock_position = value
+		if Engine.is_editor_hint() and is_inside_tree() and use_rig_dock_position:
+			if is_instance_valid(enemy_ship_container) and is_instance_valid(enemy_rig):
+				target_dock_x = enemy_rig.dock_position.x
+				enemy_ship_container.position = enemy_rig.dock_position
 
 @export_category("Boarding Rig Defaults")
 @export var default_player_rig: PackedScene = preload("res://src/features/boarding/rigs/player/rig_sloop.tscn")
@@ -168,6 +202,27 @@ func _get_editor_scene_root() -> Node:
 		return owner
 	return self
 
+func _get_game_state() -> Node:
+	if Engine.is_editor_hint():
+		return null
+	if is_inside_tree() and get_tree() and get_tree().root:
+		return get_tree().root.get_node_or_null("GameState")
+	return null
+
+func _get_audio_manager() -> Node:
+	if Engine.is_editor_hint():
+		return null
+	if is_inside_tree() and get_tree() and get_tree().root:
+		return get_tree().root.get_node_or_null("AudioManager")
+	return null
+
+func _get_event_bus() -> Node:
+	if Engine.is_editor_hint():
+		return null
+	if is_inside_tree() and get_tree() and get_tree().root:
+		return get_tree().root.get_node_or_null("EventBus")
+	return null
+
 func _ready() -> void:
 	# Check for pre-existing rig instances in scene
 	if is_instance_valid(player_ship_container):
@@ -190,18 +245,25 @@ func _ready() -> void:
 		_update_editor_preview_planks()
 
 	if is_instance_valid(hud):
-		zone_status_updated.connect(hud.update_zone)
-		encounter_won.connect(hud.show_victory)
-		encounter_lost.connect(hud.show_defeat)
+		if not zone_status_updated.is_connected(hud.update_zone):
+			zone_status_updated.connect(hud.update_zone)
+		if not encounter_won.is_connected(hud.show_victory):
+			encounter_won.connect(hud.show_victory)
+		if not encounter_lost.is_connected(hud.show_defeat):
+			encounter_lost.connect(hud.show_defeat)
 		hud.update_wave(1, total_waves_to_win)
 		if is_instance_valid(player_controller):
-			hud.special_attack_requested.connect(player_controller.fire_special_attack)
-			player_controller.special_cooldown_updated.connect(hud.update_special_cooldown)
-			player_controller.crew_role_changed.connect(hud.set_special_ability_name)
+			if not hud.special_attack_requested.is_connected(player_controller.fire_special_attack):
+				hud.special_attack_requested.connect(player_controller.fire_special_attack)
+			if not player_controller.special_cooldown_updated.is_connected(hud.update_special_cooldown):
+				player_controller.special_cooldown_updated.connect(hud.update_special_cooldown)
+			if not player_controller.crew_role_changed.is_connected(hud.set_special_ability_name):
+				player_controller.crew_role_changed.connect(hud.set_special_ability_name)
 			hud.set_special_ability_name(player_controller.crew_role, player_controller.special_ability_name)
 
 	if is_instance_valid(player_controller):
-		player_controller.player_defeated.connect(_on_crew_defeated)
+		if not player_controller.player_defeated.is_connected(_on_crew_defeated):
+			player_controller.player_defeated.connect(_on_crew_defeated)
 
 	if is_instance_valid(targeting_system) and is_instance_valid(boarding_camera):
 		targeting_system.camera = boarding_camera
@@ -212,8 +274,9 @@ func _ready() -> void:
 	# If in an active in-run game, use GameState/adapter. If standalone F6 preview, use preview_player_vessel!
 	var p_vessel: String = pending_player_vessel_id
 	if p_vessel.is_empty():
-		if not Engine.is_editor_hint() and GameState and GameState.is_game_active and not str(GameState.active_vessel).is_empty():
-			p_vessel = str(GameState.active_vessel)
+		var gs: Node = _get_game_state()
+		if not Engine.is_editor_hint() and gs and gs.get("is_game_active") and not str(gs.get("active_vessel")).is_empty():
+			p_vessel = str(gs.get("active_vessel"))
 		else:
 			p_vessel = preview_player_vessel
 	setup_player_vessel(p_vessel)
@@ -240,8 +303,9 @@ func _setup_camera() -> void:
 
 func _get_player_rig_scene(v_key: String) -> PackedScene:
 	if not Engine.is_editor_hint():
-		if GameState and GameState.has_method("get_vessel_resource"):
-			var ship_data: ShipData = GameState.get_vessel_resource(v_key)
+		var gs: Node = _get_game_state()
+		if gs and gs.has_method("get_vessel_resource"):
+			var ship_data: ShipData = gs.get_vessel_resource(v_key)
 			if is_instance_valid(ship_data) and is_instance_valid(ship_data.boarding_rig):
 				return ship_data.boarding_rig
 
@@ -311,13 +375,15 @@ func set_player_rig(scene: PackedScene) -> void:
 	if is_instance_valid(player_rig) and player_rig.scene_file_path == scene.resource_path:
 		return
 
-	if is_instance_valid(player_rig):
-		_unbind_player_rig()
-		if Engine.is_editor_hint():
-			player_rig.free()
-		else:
-			player_rig.queue_free()
-		player_rig = null
+	# Clear any existing PlayerBoardingRig from container
+	for child: Node in player_ship_container.get_children():
+		if child is PlayerBoardingRig or child.name.begins_with("PlayerBoardingRig"):
+			_unbind_player_rig()
+			if Engine.is_editor_hint():
+				child.free()
+			else:
+				child.queue_free()
+	player_rig = null
 
 	var inst: Node = scene.instantiate()
 	if not (inst is PlayerBoardingRig):
@@ -337,26 +403,27 @@ func set_player_rig(scene: PackedScene) -> void:
 func _bind_player_rig(rig: PlayerBoardingRig) -> void:
 	player_rig = rig
 	zones = player_rig.get_zones()
-	for z: BoardingZone in zones:
-		if is_instance_valid(z):
-			z.add_to_group("boarding_zone")
-			if not z.zone_overrun.is_connected(_on_zone_overrun):
-				z.zone_overrun.connect(_on_zone_overrun)
-			if not z.zone_cleared.is_connected(_on_zone_cleared):
-				z.zone_cleared.connect(_on_zone_cleared)
-			if not z.infestation_changed.is_connected(_on_zone_infestation_changed):
-				z.infestation_changed.connect(_on_zone_infestation_changed)
+	if not Engine.is_editor_hint():
+		for z: BoardingZone in zones:
+			if is_instance_valid(z):
+				z.add_to_group("boarding_zone")
+				if not z.zone_overrun.is_connected(_on_zone_overrun):
+					z.zone_overrun.connect(_on_zone_overrun)
+				if not z.zone_cleared.is_connected(_on_zone_cleared):
+					z.zone_cleared.connect(_on_zone_cleared)
+				if not z.infestation_changed.is_connected(_on_zone_infestation_changed):
+					z.infestation_changed.connect(_on_zone_infestation_changed)
 
-	if is_instance_valid(player_controller):
-		player_controller.station_markers = {
-			"bow": zone_bow.station_marker if is_instance_valid(zone_bow) else null,
-			"midship": zone_midship.station_marker if is_instance_valid(zone_midship) else null,
-			"stern": zone_stern.station_marker if is_instance_valid(zone_stern) else null
-		}
-		if is_instance_valid(player_rig.player_spawn):
-			player_controller.set_deck_anchor(player_rig.player_spawn.global_transform)
+		if is_instance_valid(player_controller):
+			player_controller.station_markers = {
+				"bow": zone_bow.station_marker if is_instance_valid(zone_bow) else null,
+				"midship": zone_midship.station_marker if is_instance_valid(zone_midship) else null,
+				"stern": zone_stern.station_marker if is_instance_valid(zone_stern) else null
+			}
+			if is_instance_valid(player_rig.player_spawn):
+				player_controller.set_deck_anchor(player_rig.player_spawn.global_transform)
 
-	if is_instance_valid(boarding_camera) and is_instance_valid(player_rig.camera_mount):
+	if use_rig_camera_mount and is_instance_valid(boarding_camera) and is_instance_valid(player_rig.camera_mount):
 		boarding_camera.global_transform = player_rig.camera_mount.global_transform
 
 	if not Engine.is_editor_hint():
@@ -366,7 +433,7 @@ func _bind_player_rig(rig: PlayerBoardingRig) -> void:
 		_update_editor_preview_planks()
 
 func _unbind_player_rig() -> void:
-	if is_instance_valid(player_rig):
+	if is_instance_valid(player_rig) and not Engine.is_editor_hint():
 		for z: BoardingZone in zones:
 			if is_instance_valid(z):
 				if z.zone_overrun.is_connected(_on_zone_overrun):
@@ -389,12 +456,14 @@ func set_enemy_rig(scene: PackedScene, display_name: String = "") -> void:
 			encounter_active_boss_name = display_name
 		return
 
-	if is_instance_valid(enemy_rig):
-		if Engine.is_editor_hint():
-			enemy_rig.free()
-		else:
-			enemy_rig.queue_free()
-		enemy_rig = null
+	# Clear any existing EnemyBoardingRig from container
+	for child: Node in enemy_ship_container.get_children():
+		if child is EnemyBoardingRig or child.name.begins_with("EnemyBoardingRig"):
+			if Engine.is_editor_hint():
+				child.free()
+			else:
+				child.queue_free()
+	enemy_rig = null
 
 	var inst: Node = scene.instantiate()
 	if not (inst is EnemyBoardingRig):
@@ -413,9 +482,12 @@ func set_enemy_rig(scene: PackedScene, display_name: String = "") -> void:
 
 func _bind_enemy_rig(rig: EnemyBoardingRig, display_name: String = "") -> void:
 	enemy_rig = rig
-	target_dock_x = enemy_rig.dock_position.x
-	enemy_ship_container.position.y = enemy_rig.dock_position.y
-	enemy_ship_container.position.z = enemy_rig.dock_position.z
+	if use_rig_dock_position:
+		target_dock_x = enemy_rig.dock_position.x
+		enemy_ship_container.position.y = enemy_rig.dock_position.y
+		enemy_ship_container.position.z = enemy_rig.dock_position.z
+	else:
+		target_dock_x = enemy_ship_container.position.x
 
 	if not display_name.is_empty():
 		encounter_active_boss_name = display_name
@@ -423,7 +495,8 @@ func _bind_enemy_rig(rig: EnemyBoardingRig, display_name: String = "") -> void:
 		encounter_active_boss_name = enemy_rig.name
 
 	if Engine.is_editor_hint():
-		enemy_ship_container.position.x = target_dock_x
+		if use_rig_dock_position:
+			enemy_ship_container.position.x = target_dock_x
 		if show_editor_planks:
 			_update_editor_preview_planks()
 	elif is_approaching:
@@ -434,6 +507,10 @@ func _rebuild_editor_preview() -> void:
 		return
 	setup_player_vessel(preview_player_vessel)
 	setup_enemy_vessel(preview_enemy_vessel)
+	if use_rig_camera_mount and is_instance_valid(boarding_camera) and is_instance_valid(player_rig) and is_instance_valid(player_rig.camera_mount):
+		boarding_camera.global_transform = player_rig.camera_mount.global_transform
+	if use_rig_dock_position and is_instance_valid(enemy_ship_container) and is_instance_valid(enemy_rig):
+		enemy_ship_container.position = enemy_rig.dock_position
 	if show_editor_planks:
 		_update_editor_preview_planks()
 
@@ -479,8 +556,9 @@ func _on_docking_complete() -> void:
 		_launch_initial_planks()
 
 func _trigger_docking_splash() -> void:
-	if AudioManager and AudioManager.has_method("play_sfx"):
-		AudioManager.play_sfx("water_splashes", 0.9, 1.1)
+	var audio: Node = _get_audio_manager()
+	if audio and audio.has_method("play_sfx"):
+		audio.call("play_sfx", "water_splashes", 0.9, 1.1)
 
 	if splash_scene and is_instance_valid(enemy_ship_container):
 		var splash_pos: Vector3 = enemy_ship_container.global_position + Vector3(-1.5, -0.42, 0.0)
@@ -558,8 +636,9 @@ func _emit_encounter_started() -> void:
 		return
 	encounter_telemetry_started = true
 	encounter_start_time = float(Time.get_ticks_msec()) / 1000.0
-	if EventBus and EventBus.has_signal("boarding_encounter_started"):
-		EventBus.boarding_encounter_started.emit(
+	var eb: Node = _get_event_bus()
+	if eb and eb.has_signal("boarding_encounter_started"):
+		eb.emit_signal("boarding_encounter_started",
 			encounter_active_boss_name,
 			boss_tier,
 			total_waves_to_win,
@@ -571,10 +650,11 @@ func _emit_encounter_ended(outcome: String) -> void:
 	if encounter_telemetry_ended:
 		return
 	encounter_telemetry_ended = true
-	if not EventBus or not EventBus.has_signal("boarding_encounter_ended"):
+	var eb: Node = _get_event_bus()
+	if not eb or not eb.has_signal("boarding_encounter_ended"):
 		return
 	var duration: float = (float(Time.get_ticks_msec()) / 1000.0) - encounter_start_time
-	EventBus.boarding_encounter_ended.emit(
+	eb.emit_signal("boarding_encounter_ended",
 		encounter_active_boss_name,
 		outcome,
 		snappedf(duration, 0.1),
@@ -646,6 +726,9 @@ func _update_editor_preview_planks() -> void:
 			plank_mesh.name = plank_name
 			container.add_child(plank_mesh)
 
+		if not plank_mesh.is_inside_tree():
+			continue
+
 		var start_marker: Marker3D = _get_spawn_marker(i)
 		var target_zone: BoardingZone = active_zones[i] if i < active_zones.size() else null
 
@@ -655,6 +738,10 @@ func _update_editor_preview_planks() -> void:
 
 		var target_anchor: Marker3D = target_zone.plank_anchor if is_instance_valid(target_zone.plank_anchor) else target_zone.grapple_anchor
 		if not is_instance_valid(target_anchor):
+			plank_mesh.visible = false
+			continue
+
+		if not start_marker.is_inside_tree() or not target_anchor.is_inside_tree():
 			plank_mesh.visible = false
 			continue
 
@@ -684,7 +771,7 @@ func _update_editor_preview_planks() -> void:
 			box.material = mat
 			plank_mesh.mesh = box
 
-		box.size = Vector3(0.41, 0.12, length)
+		box.size = Vector3(plank_width, plank_thickness, length)
 		plank_mesh.visible = true
 
 func _clear_editor_preview_planks() -> void:
@@ -697,10 +784,12 @@ func _clear_editor_preview_planks() -> void:
 
 func _setup_crew_from_gamestate() -> void:
 	var equipped_ids: Array[String] = []
-	if not Engine.is_editor_hint() and GameState:
-		var active_ship: String = GameState.active_vessel
-		if GameState.equipped_crew.has(active_ship):
-			var ship_map: Dictionary = GameState.equipped_crew.get(active_ship, {}) as Dictionary
+	var gs: Node = _get_game_state()
+	if not Engine.is_editor_hint() and gs:
+		var active_ship: String = str(gs.get("active_vessel"))
+		var eq_crew: Variant = gs.get("equipped_crew")
+		if eq_crew is Dictionary and (eq_crew as Dictionary).has(active_ship):
+			var ship_map: Dictionary = (eq_crew as Dictionary).get(active_ship, {}) as Dictionary
 			for socket_key: Variant in ship_map.keys():
 				var cid: String = str(ship_map[socket_key]).strip_edges()
 				if not cid.is_empty() and not equipped_ids.has(cid):
@@ -911,6 +1000,8 @@ func launch_plank_to_zone(zone_index: int, wave_num: int = 1, spawn_delay_sec: f
 		return
 
 	var plank: BoardingPlank = plank_scene.instantiate() as BoardingPlank
+	plank.plank_width = plank_width
+	plank.plank_thickness = plank_thickness
 	add_child(plank)
 	var anchor_pos: Vector3 = target_zone.plank_anchor.global_position if is_instance_valid(target_zone.plank_anchor) else target_zone.grapple_anchor.global_position
 	plank.setup_plank(start_marker.global_position, anchor_pos, target_zone)
@@ -1011,8 +1102,9 @@ func _on_enemy_breached_stern(_enemy: BoarderEnemy) -> void:
 	if is_instance_valid(hud):
 		hud.show_defeat("STERN BREACHED! GAME OVER")
 	encounter_lost.emit()
-	if AudioManager and AudioManager.has_method("play_sfx"):
-		AudioManager.play_sfx("barrel_breaks", 0.9, 1.1)
+	var audio: Node = _get_audio_manager()
+	if audio and audio.has_method("play_sfx"):
+		audio.call("play_sfx", "barrel_breaks", 0.9, 1.1)
 
 func _on_crew_defeated() -> void:
 	if not is_encounter_active:
@@ -1023,8 +1115,9 @@ func _on_crew_defeated() -> void:
 	if is_instance_valid(hud):
 		hud.show_defeat("CREW MEMBER DEFEATED!")
 	encounter_lost.emit()
-	if AudioManager and AudioManager.has_method("play_sfx"):
-		AudioManager.play_sfx("barrel_breaks", 0.9, 1.1)
+	var audio: Node = _get_audio_manager()
+	if audio and audio.has_method("play_sfx"):
+		audio.call("play_sfx", "barrel_breaks", 0.9, 1.1)
 
 func _get_enemy_scene_for_swarm(wave_num: int, swarm_index: int) -> PackedScene:
 	var raider_scn: PackedScene = boarder_raider_scene if is_instance_valid(boarder_raider_scene) else boarder_scene
@@ -1063,10 +1156,13 @@ func _damage_vessel_hull(amount: float) -> void:
 	var player: PlayerSwerve = get_tree().get_first_node_in_group("player") as PlayerSwerve
 	if is_instance_valid(player):
 		player.take_hit(maxi(1, int(round(amount))), "boarding_overrun")
-	elif not Engine.is_editor_hint() and GameState:
-		GameState.record_hit()
-		if EventBus and EventBus.has_signal("player_hit_taken"):
-			EventBus.player_hit_taken.emit(maxi(1, int(round(amount))), 1, 4, "boarding_overrun", 0.0)
+	elif not Engine.is_editor_hint():
+		var gs: Node = _get_game_state()
+		if gs and gs.has_method("record_hit"):
+			gs.call("record_hit")
+		var eb: Node = _get_event_bus()
+		if eb and eb.has_signal("player_hit_taken"):
+			eb.emit_signal("player_hit_taken", maxi(1, int(round(amount))), 1, 4, "boarding_overrun", 0.0)
 
 func _get_spawn_marker(zone_index: int) -> Marker3D:
 	if is_instance_valid(enemy_rig):
@@ -1090,8 +1186,9 @@ func _trigger_victory() -> void:
 	_emit_encounter_ended("VICTORY")
 	if is_instance_valid(hud):
 		hud.show_victory()
-	if AudioManager and AudioManager.has_method("play_sfx"):
-		AudioManager.play_sfx("gate_passes", 1.0, 1.2)
+	var audio: Node = _get_audio_manager()
+	if audio and audio.has_method("play_sfx"):
+		audio.call("play_sfx", "gate_passes", 1.0, 1.2)
 	var tw: Tween = create_tween()
 	tw.tween_interval(1.8)
 	tw.tween_callback(func() -> void:

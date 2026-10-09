@@ -75,6 +75,9 @@ func _ready() -> void:
 	else:
 		_apply_mob_type_fallback()
 		
+	if health_bar_sprite and health_bar_viewport:
+		health_bar_sprite.texture = health_bar_viewport.get_texture()
+
 	_update_health_bar()
 	_time = randf_range(0.0, TAU)
 	

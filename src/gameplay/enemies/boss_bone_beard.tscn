@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/enemies/boss_bone_beard.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://v00jmx7xnglw" path="res://assets/models/enemy/vessels/captain_bone-beard’s_twin_frigate.glb" id="2_frigate_mesh"]
@@ -9,9 +9,6 @@
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_boss"]
 size = Vector3(4.8, 2.0, 3.2)
-
-[sub_resource type="ViewportTexture" id="ViewportTexture_health"]
-viewport_path = NodePath("HealthBarViewport")
 
 [node name="BossBoneBeard" type="Area3D" groups=["destructible", "enemies"]]
 script = ExtResource("1_script")
@@ -68,5 +65,4 @@ show_percentage = false
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.8, 0)
 billboard = 1
 double_sided = false
-texture = SubResource("ViewportTexture_health")
 pixel_size = 0.012

@@ -10,9 +10,11 @@ extends Area3D
 @export var doubloon_scene: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
 @export var explosion_scene: PackedScene = preload("res://src/vfx/barrel_explosion.tscn")
 
-@onready var sprite_node: Sprite3D = get_node_or_null("Sprite3D")
-@onready var collision_shape: CollisionShape3D = get_node_or_null("CollisionShape3D")
-@onready var progress_bar: ProgressBar = get_node_or_null("HealthBarViewport/HealthBarControl/ProgressBar")
+@onready var sprite_node: Sprite3D = get_node_or_null("Sprite3D") as Sprite3D
+@onready var collision_shape: CollisionShape3D = get_node_or_null("CollisionShape3D") as CollisionShape3D
+@onready var health_bar_viewport: SubViewport = get_node_or_null("HealthBarViewport") as SubViewport
+@onready var health_bar_sprite: Sprite3D = get_node_or_null("HealthBarSprite") as Sprite3D
+@onready var progress_bar: ProgressBar = get_node_or_null("HealthBarViewport/HealthBarControl/ProgressBar") as ProgressBar
 
 var _bombard_timer: float = 0.0
 var _is_dead: bool = false
@@ -22,6 +24,8 @@ var _time: float = 0.0
 func _ready() -> void:
 	add_to_group("enemies")
 	add_to_group("destructible")
+	if health_bar_sprite and health_bar_viewport:
+		health_bar_sprite.texture = health_bar_viewport.get_texture()
 	current_hp = max_hp
 	_update_health_bar()
 	_bombard_timer = 0.8

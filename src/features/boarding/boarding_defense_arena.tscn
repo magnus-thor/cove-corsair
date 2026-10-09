@@ -2,13 +2,11 @@
 
 [ext_resource type="Script" uid="uid://b11wy3xj5s5q8" path="res://src/features/boarding/boarding_defense_arena.gd" id="1_arena_script"]
 [ext_resource type="PackedScene" path="res://src/features/boarding/player/deck_player_controller.tscn" id="3_player_scene"]
-[ext_resource type="PackedScene" uid="uid://mudvi8fam1dk" path="res://src/features/boarding/rigs/player/rig_bombard_skiff.tscn" id="4_li856"]
 [ext_resource type="PackedScene" path="res://src/features/boarding/player/deck_reticle_3d.tscn" id="4_reticle_scene"]
-[ext_resource type="Script" uid="uid://ckng2fjcpphvk" path="res://src/features/boarding/rigs/player_boarding_rig.gd" id="5_l0o87"]
-[ext_resource type="PackedScene" uid="uid://b2ie4mnsbpipm" path="res://src/features/boarding/rigs/enemy/rig_bone_beard.tscn" id="5_tf8ld"]
-[ext_resource type="Script" uid="uid://db51j6c1n8vuh" path="res://src/features/boarding/rigs/enemy_boarding_rig.gd" id="6_li856"]
+[ext_resource type="PackedScene" uid="uid://cvk7222bo75e5" path="res://src/features/boarding/rigs/player/rig_ironclad.tscn" id="5_ironclad"]
 [ext_resource type="Script" uid="uid://cq2k882f3urib" path="res://src/features/boarding/player/deck_targeting_system.gd" id="6_target_script"]
 [ext_resource type="PackedScene" path="res://src/features/boarding/ui/boarding_hud.tscn" id="7_hud_scene"]
+[ext_resource type="PackedScene" uid="uid://e4gxvth0ird8" path="res://src/features/boarding/rigs/enemy/rig_siege_fortress.tscn" id="8_qrrfi"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 sky_top_color = Color(0.24, 0.52, 0.88, 1)
@@ -35,8 +33,11 @@ size = Vector2(120, 120)
 
 [node name="BoardingDefenseArena" type="Node3D" unique_id=186159711 node_paths=PackedStringArray("player_ship_container", "enemy_ship_container", "player_controller", "hud", "boarding_camera", "targeting_system")]
 script = ExtResource("1_arena_script")
-preview_player_vessel = "bombard_skiff"
+preview_player_vessel = "ironclad"
 preview_enemy_vessel = "bone_beard"
+plank_width = 0.2
+plank_thickness = 0.02
+deploy_test_planks = true
 player_ship_container = NodePath("PlayerShipContainer")
 enemy_ship_container = NodePath("EnemyShipContainer")
 player_controller = NodePath("PlayerShipContainer/DeckPlayerController")
@@ -52,14 +53,14 @@ transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0
 shadow_enabled = true
 
 [node name="OceanPlane" type="MeshInstance3D" parent="." unique_id=376365588]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.7, 0)
+transform = Transform3D(0.9994526, -0.03308302, 0, 0.03308302, 0.9994526, 0, 0, 0, 1, 0, -0.7, 0)
 mesh = SubResource("PlaneMesh_ocean")
 
 [node name="PlayerShipContainer" type="Node3D" parent="." unique_id=228973526]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8711908, -0.5377771, 0)
 
 [node name="BoardingCamera3D" type="Camera3D" parent="PlayerShipContainer" unique_id=929146747]
-transform = Transform3D(-0.086250916, -0.25879216, -0.9620746, 0.0019830037, 0.9656266, -0.25992543, 0.99627143, -0.024326602, -0.082772985, -3.788904, 0.65230703, -0.57060933)
+transform = Transform3D(-0.08282983, -0.0013358437, -0.9965629, 0.024132421, 0.9997032, -0.003345832, 0.9962715, -0.02432661, -0.082773015, -2.501376, 1.0582197, -0.5067474)
 current = true
 fov = 55.0
 near = 0.1
@@ -67,34 +68,75 @@ far = 300.0
 
 [node name="DeckPlayerController" parent="PlayerShipContainer" unique_id=222421237 node_paths=PackedStringArray("targeting_system", "reticle_visual") instance=ExtResource("3_player_scene")]
 transform = Transform3D(0.05715192, 0, 0.45240414, 0, 0.45599973, 0, -0.45240414, 0, 0.05715192, -0.24964976, 0.28, -0.024999999)
+station_markers = {
+"bow": Object(Marker3D,
+"unique_name_in_owner": false,
+"process_mode": 0,
+"process_priority": 0,
+"process_physics_priority": 0,
+"process_thread_group": 0,
+"physics_interpolation_mode": 0,
+"auto_translate_mode": 0,
+"editor_description": "",
+"transform": Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0),
+"rotation_edit_mode": 0,
+"rotation_order": 2,
+"top_level": false,
+"visible": true,
+"visibility_parent": NodePath(""),
+"gizmo_extents": 0.25,
+"script": null
+),
+"midship": Object(Marker3D,
+"unique_name_in_owner": false,
+"process_mode": 0,
+"process_priority": 0,
+"process_physics_priority": 0,
+"process_thread_group": 0,
+"physics_interpolation_mode": 0,
+"auto_translate_mode": 0,
+"editor_description": "",
+"transform": Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0),
+"rotation_edit_mode": 0,
+"rotation_order": 2,
+"top_level": false,
+"visible": true,
+"visibility_parent": NodePath(""),
+"gizmo_extents": 0.25,
+"script": null
+),
+"stern": Object(Marker3D,
+"unique_name_in_owner": false,
+"process_mode": 0,
+"process_priority": 0,
+"process_physics_priority": 0,
+"process_thread_group": 0,
+"physics_interpolation_mode": 0,
+"auto_translate_mode": 0,
+"editor_description": "",
+"transform": Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0),
+"rotation_edit_mode": 0,
+"rotation_order": 2,
+"top_level": false,
+"visible": true,
+"visibility_parent": NodePath(""),
+"gizmo_extents": 0.25,
+"script": null
+)
+}
+crew_scale = Vector3(0.44, 0.55, 0.55)
 targeting_system = NodePath("../../DeckTargetingSystem")
 reticle_visual = NodePath("../DeckReticle3D")
-crew_scale = Vector3(0.44, 0.55, 0.55)
 
 [node name="DeckReticle3D" parent="PlayerShipContainer" unique_id=90472150 instance=ExtResource("4_reticle_scene")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.9001923, 0.54320914, 0)
 
-[node name="PlayerBoardingRig" type="Node3D" parent="PlayerShipContainer" unique_id=439027079 node_paths=PackedStringArray("zone_bow", "zone_midship", "zone_stern", "crew_station_bow", "crew_station_stern", "player_spawn", "camera_mount", "breach_line") instance=ExtResource("4_li856")]
-script = ExtResource("5_l0o87")
-zone_bow = NodePath("DeckZones/ZoneBow")
-zone_midship = NodePath("DeckZones/ZoneMidship")
-zone_stern = NodePath("DeckZones/ZoneStern")
-crew_station_bow = NodePath("CrewStations/CrewStationBow")
-crew_station_stern = NodePath("CrewStations/CrewStationStern")
-player_spawn = NodePath("PlayerSpawn")
-camera_mount = NodePath("CameraMount")
-breach_line = NodePath("BreachLine")
+[node name="PlayerBoardingRig" parent="PlayerShipContainer" unique_id=1802957695 instance=ExtResource("5_ironclad")]
 
 [node name="EnemyShipContainer" type="Node3D" parent="." unique_id=671411793]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.32, 0.287, 0)
+transform = Transform3D(0.999145, -0.041343454, 0, 0.041343454, 0.999145, 0, 0, 0, 1, 15.831383, 1.6130743, 0)
 
-[node name="EnemyBoardingRig" type="Node3D" parent="EnemyShipContainer" unique_id=755924704 node_paths=PackedStringArray("plank_origin_bow", "plank_origin_mid", "plank_origin_stern", "wake") instance=ExtResource("5_tf8ld")]
-script = ExtResource("6_li856")
-plank_origin_bow = NodePath("PlankOrigins/MarkerBow")
-plank_origin_mid = NodePath("PlankOrigins/MarkerMid")
-plank_origin_stern = NodePath("PlankOrigins/MarkerStern")
-wake = NodePath("EnemyBoatWake")
-dock_position = Vector3(13.32, 0.287, 0)
+[node name="EnemyBoardingRig" parent="EnemyShipContainer" unique_id=1647371874 instance=ExtResource("8_qrrfi")]
 
 [node name="DeckTargetingSystem" type="Node" parent="." unique_id=1084553511 node_paths=PackedStringArray("camera")]
 script = ExtResource("6_target_script")

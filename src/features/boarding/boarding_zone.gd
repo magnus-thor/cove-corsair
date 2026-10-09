@@ -1,3 +1,4 @@
+@tool
 class_name BoardingZone
 extends Area3D
 
@@ -25,10 +26,14 @@ var is_overrun: bool = false
 func _ready() -> void:
 	if not is_instance_valid(plank_anchor) and is_instance_valid(grapple_anchor):
 		plank_anchor = grapple_anchor
+	if Engine.is_editor_hint():
+		return
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
 
 func _process(delta: float) -> void:
+	if Engine.is_editor_hint():
+		return
 	_clean_invalid_entries()
 	
 	var total_infest_weight: float = 0.0

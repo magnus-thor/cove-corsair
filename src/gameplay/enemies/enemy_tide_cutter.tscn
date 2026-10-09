@@ -1,13 +1,10 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/enemies/enemy_tide_cutter.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://assets/sprites/enemy_vessels/Skeleton Rower.png" id="2_cutter_tex"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_cutter"]
 size = Vector3(1.6, 1.0, 2.0)
-
-[sub_resource type="ViewportTexture" id="ViewportTexture_hp"]
-viewport_path = NodePath("HealthBarViewport")
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_bg"]
 bg_color = Color(0.1, 0.12, 0.15, 0.8)
@@ -41,12 +38,6 @@ alpha_cut = 1
 texture = ExtResource("2_cutter_tex")
 modulate = Color(0.6, 1.0, 0.9, 1)
 
-[node name="HealthBarSprite" type="Sprite3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
-billboard = 1
-double_sided = false
-texture = SubResource("ViewportTexture_hp")
-
 [node name="HealthBarViewport" type="SubViewport" parent="."]
 transparent_bg = true
 size = Vector2i(100, 14)
@@ -77,3 +68,8 @@ theme_override_styles/background = SubResource("StyleBoxFlat_hp_bg")
 theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
 value = 100.0
 show_percentage = false
+
+[node name="HealthBarSprite" type="Sprite3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
+billboard = 1
+double_sided = false

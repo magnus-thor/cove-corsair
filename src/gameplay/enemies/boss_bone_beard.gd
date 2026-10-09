@@ -20,6 +20,8 @@ enum State { APPROACHING, COMBAT, DYING }
 @export var twin_salvo_scene: PackedScene = preload("res://src/gameplay/projectiles/boss_projectile_twin_cannon_salvo.tscn")
 
 @onready var boss_sprite: Node3D = get_node_or_null("BossMesh") if get_node_or_null("BossMesh") else get_node_or_null("BossSprite")
+@onready var health_bar_viewport: SubViewport = get_node_or_null("HealthBarViewport") as SubViewport
+@onready var health_bar_sprite: Sprite3D = get_node_or_null("HealthBarSprite") as Sprite3D
 @onready var health_bar_progress: ProgressBar = get_node_or_null("HealthBarViewport/HealthBarControl/VBoxContainer/ProgressBar")
 @onready var health_title_label: Label = get_node_or_null("HealthBarViewport/HealthBarControl/VBoxContainer/BossTitleLabel")
 
@@ -72,6 +74,9 @@ func _ready() -> void:
 	add_to_group("enemies")
 	add_to_group("boss")
 	add_to_group("destructible")
+	
+	if health_bar_sprite and health_bar_viewport:
+		health_bar_sprite.texture = health_bar_viewport.get_texture()
 	
 	if has_node("/root/GameState"):
 		var gs: Node = get_node("/root/GameState")
@@ -152,7 +157,9 @@ func _perform_attack() -> void:
 	else:
 		_drop_powder_kegs()
 
-func _fire_twin_cannon_salvo(target_lane_x: float = NAN) -> void:
+const NO_TARGET_OVERRIDE: float = 999.0
+
+func _fire_twin_cannon_salvo(target_lane_x: float = NO_TARGET_OVERRIDE) -> void:
 	if not twin_salvo_scene or _is_defeated or current_state == State.DYING:
 		return
 	
@@ -165,7 +172,7 @@ func _fire_twin_cannon_salvo(target_lane_x: float = NAN) -> void:
 		
 	var player := get_tree().get_first_node_in_group("player") as Node3D
 	var target_x: float = global_position.x
-	if not is_nan(target_lane_x):
+	if not is_nan(target_lane_x) and target_lane_x < 900.0:
 		target_x = target_lane_x
 	elif player and is_instance_valid(player):
 		target_x = player.global_position.x

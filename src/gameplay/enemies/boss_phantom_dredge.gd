@@ -389,7 +389,9 @@ func _resurface() -> void:
 		
 	_fire_poison_mortars()
 
-func _spawn_bayou_adds(lane_x_override: float = NAN, type_choice: int = -1) -> void:
+const NO_LANE_OVERRIDE: float = 999.0
+
+func _spawn_bayou_adds(lane_x_override: float = NO_LANE_OVERRIDE, type_choice: int = -1) -> void:
 	if is_barrage_active:
 		return # Enforce add suppression: zero new adds while geysers are warning or active
 	var existing_enemies := get_tree().get_nodes_in_group("enemies").filter(
@@ -402,7 +404,7 @@ func _spawn_bayou_adds(lane_x_override: float = NAN, type_choice: int = -1) -> v
 	if not parent: parent = get_parent()
 	if not parent: return
 	
-	var lx: float = randf_range(-3.5, 3.5) if is_nan(lane_x_override) else lane_x_override
+	var lx: float = randf_range(-3.5, 3.5) if (is_nan(lane_x_override) or lane_x_override >= 900.0) else lane_x_override
 	lx = clampf(lx, -4.2, 4.2)
 	var use_skiff: bool = (randf() < 0.55) if type_choice < 0 else (type_choice == 0)
 	

@@ -30,7 +30,7 @@ shape = SubResource("BoxShape3D_deck_floor")
 [node name="DeckZones" type="Node3D" parent="." unique_id=383051231]
 
 [node name="ZoneBow" parent="DeckZones" unique_id=120859222 instance=ExtResource("2_zone")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5957184, 0.081258595, -1.2160841)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.40616226, 0.081258595, -1.2160841)
 zone_id = "bow"
 
 [node name="CollisionShape3D" parent="DeckZones/ZoneBow" index="0"]
@@ -40,7 +40,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="ZoneMidship" parent="DeckZones" unique_id=1420732132 instance=ExtResource("2_zone")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.67681074, 0.07725608, 0.28011885)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5715022, 0.07725608, 0.28011885)
 
 [node name="CollisionShape3D" parent="DeckZones/ZoneMidship" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
@@ -49,7 +49,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="ZoneStern" parent="DeckZones" unique_id=591593894 instance=ExtResource("2_zone")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5204425, 0.6290715, 1.5130558)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.18345404, 0.6290715, 1.5130558)
 zone_id = "stern"
 
 [node name="CollisionShape3D" parent="DeckZones/ZoneStern" index="0"]
