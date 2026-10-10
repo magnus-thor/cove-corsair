@@ -49,10 +49,20 @@ func _cast_selection_ray(screen_pos: Vector2) -> void:
 		var n: Node3D = hit_collider as Node3D
 		if n is BoarderEnemy or n.is_in_group("boarder"):
 			resolved_node = n
-		elif n is BoardingPlank:
-			resolved_node = n
-		elif n.get_parent() is BoardingPlank:
-			resolved_node = n.get_parent() as Node3D
+		elif n is BoardingPlank or (n.get_parent() is BoardingPlank):
+			var initial_plank: BoardingPlank = n as BoardingPlank if (n is BoardingPlank) else (n.get_parent() as BoardingPlank)
+			var best_plank: BoardingPlank = initial_plank
+			var best_dist: float = _distance_to_plank_segment(hit_pos, initial_plank)
+			var tree: SceneTree = camera.get_tree() if is_instance_valid(camera) else null
+			if tree:
+				for p_node: Node in tree.get_nodes_in_group("boarding_plank"):
+					var p_cand: BoardingPlank = p_node as BoardingPlank
+					if is_instance_valid(p_cand) and p_cand.is_latched:
+						var d: float = _distance_to_plank_segment(hit_pos, p_cand)
+						if d < best_dist:
+							best_dist = d
+							best_plank = p_cand
+			resolved_node = best_plank
 		elif n is BoardingZone:
 			var zone: BoardingZone = n as BoardingZone
 			zone_focused.emit(zone.zone_id)
@@ -93,3 +103,15 @@ func _select_priority_in_zone(zone: BoardingZone, fallback_pos: Vector3) -> void
 		target_acquired.emit(null, zone.grapple_anchor.global_position)
 	else:
 		target_acquired.emit(null, fallback_pos)
+
+func _distance_to_plank_segment(pt: Vector3, plank: BoardingPlank) -> float:
+	if not is_instance_valid(plank):
+		return 9999.0
+	var a: Vector3 = plank.origin_pos
+	var b: Vector3 = plank.target_pos
+	var ab: Vector3 = b - a
+	var l_sq: float = ab.length_squared()
+	if l_sq < 0.0001:
+		return pt.distance_to(a)
+	var t: float = clampf((pt - a).dot(ab) / l_sq, 0.0, 1.0)
+	return pt.distance_to(a + ab * t)

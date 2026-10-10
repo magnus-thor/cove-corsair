@@ -108,7 +108,10 @@ func _spawn_damage_text(dmg: int) -> void:
 func get_point_along_plank(progress_t: float) -> Vector3:
 	var t: float = clampf(progress_t, 0.0, 1.0)
 	var linear_p: Vector3 = origin_pos.lerp(target_pos, t)
-	linear_p.y += plank_thickness * 0.5
+	if is_inside_tree() and global_transform.basis.y.length_squared() > 0.01:
+		linear_p += global_transform.basis.y * (plank_thickness * 0.5)
+	else:
+		linear_p.y += plank_thickness * 0.5
 	return linear_p
 
 # Backward-compatibility alias
@@ -143,10 +146,14 @@ func _update_visual_and_collision() -> void:
 	if not is_instance_valid(hit_collision) and is_instance_valid(hit_area):
 		hit_collision = hit_area.find_child("CollisionShape3D", true, false) as CollisionShape3D
 
-	# Position HitArea collision at mid-point spanning distance
+	# Position HitArea collision at mid-point spanning distance.
+	# Keep width and height proportional to plank dimensions so adjacent planks
+	# do not overlap and occlude each other's click volumes.
 	if is_instance_valid(hit_area) and is_instance_valid(hit_collision):
 		var box: BoxShape3D = BoxShape3D.new()
-		box.size = Vector3(maxf(plank_width, 1.2), 1.8, length)
+		var col_width: float = clampf(plank_width * 1.5, 0.32, 0.55)
+		var col_height: float = clampf(plank_thickness * 3.5, 0.35, 0.65)
+		box.size = Vector3(col_width, col_height, length)
 		hit_collision.shape = box
 		hit_area.position = Vector3.ZERO
 		hit_area.rotation = Vector3.ZERO

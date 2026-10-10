@@ -298,8 +298,9 @@ func _setup_camera() -> void:
 				boarding_camera.look_at(player_ship_container.to_global(look_target), Vector3.UP)
 			else:
 				boarding_camera.look_at(global_position + look_target, Vector3.UP)
-		boarding_camera.current = true
-		boarding_camera.make_current()
+		if not Engine.is_editor_hint():
+			boarding_camera.current = true
+			boarding_camera.make_current()
 
 func _get_player_rig_scene(v_key: String) -> PackedScene:
 	if not Engine.is_editor_hint():
@@ -379,10 +380,9 @@ func set_player_rig(scene: PackedScene) -> void:
 	for child: Node in player_ship_container.get_children():
 		if child is PlayerBoardingRig or child.name.begins_with("PlayerBoardingRig"):
 			_unbind_player_rig()
-			if Engine.is_editor_hint():
-				child.free()
-			else:
-				child.queue_free()
+			if child.get_parent():
+				child.get_parent().remove_child(child)
+			child.queue_free()
 	player_rig = null
 
 	var inst: Node = scene.instantiate()
@@ -459,10 +459,9 @@ func set_enemy_rig(scene: PackedScene, display_name: String = "") -> void:
 	# Clear any existing EnemyBoardingRig from container
 	for child: Node in enemy_ship_container.get_children():
 		if child is EnemyBoardingRig or child.name.begins_with("EnemyBoardingRig"):
-			if Engine.is_editor_hint():
-				child.free()
-			else:
-				child.queue_free()
+			if child.get_parent():
+				child.get_parent().remove_child(child)
+			child.queue_free()
 	enemy_rig = null
 
 	var inst: Node = scene.instantiate()

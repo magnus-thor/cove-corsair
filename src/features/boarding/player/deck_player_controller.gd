@@ -14,7 +14,7 @@ signal player_defeated()
 
 @export var targeting_system: DeckTargetingSystem = null
 @export var reticle_visual: Node3D = null
-@export var station_markers: Dictionary = {} # Dictionary of String -> Marker3D
+var station_markers: Dictionary = {} # Dictionary of String -> Marker3D
 
 @export var move_speed: float = 7.5
 @export var blunderbuss_damage: float = 18.0

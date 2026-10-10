@@ -20,7 +20,7 @@ camera_mount = NodePath("CameraMount")
 breach_line = NodePath("BreachLine")
 
 [node name="DeckFloor" type="StaticBody3D" parent="." unique_id=418219926]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.52509, 0, 0.823544)
+transform = Transform3D(0.009015148, 0, -0.5999323, 0, 0.6, 0, 0.5999323, 0, 0.009015148, 0.62319875, 0.03181845, 0.7667177)
 collision_mask = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="DeckFloor" unique_id=352705035]
@@ -28,9 +28,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.35419, -0.2, 0.658978)
 shape = SubResource("BoxShape3D_deck_floor")
 
 [node name="DeckZones" type="Node3D" parent="." unique_id=805732583]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6250849, 0, -0.34095526)
 
 [node name="ZoneBow" parent="DeckZones" unique_id=1290480101 instance=ExtResource("2_zone")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.32868028, 0.30560952, -0.9400308)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15231872, 0.10735583, -0.5055567)
 zone_id = "bow"
 
 [node name="CollisionShape3D" parent="DeckZones/ZoneBow" index="0"]
@@ -40,7 +41,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="ZoneMidship" parent="DeckZones" unique_id=1817592958 instance=ExtResource("2_zone")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3774433, 0.18924826, -0.046703592)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.017321348, 0.037170827, 0.043811917)
 
 [node name="CollisionShape3D" parent="DeckZones/ZoneMidship" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
@@ -49,7 +50,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="ZoneStern" parent="DeckZones" unique_id=979117485 instance=ExtResource("2_zone")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.34881687, 0.31802493, 0.62764955)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1546967, 0.1339651, 0.77247405)
 zone_id = "stern"
 
 [node name="CollisionShape3D" parent="DeckZones/ZoneStern" index="0"]
@@ -59,7 +60,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="CrewStations" type="Node3D" parent="." unique_id=1145100778]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.9001923, 1.0280576, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5987444, 1.0280576, -0.22730374)
 
 [node name="CrewStationBow" parent="CrewStations" unique_id=1054460316 node_paths=PackedStringArray("assigned_zone") instance=ExtResource("3_crew")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.9352248, -0.91154224, -0.94187975)
@@ -71,16 +72,16 @@ station_id = "stern"
 assigned_zone = NodePath("../../DeckZones/ZoneStern")
 
 [node name="PlayerSpawn" type="Marker3D" parent="." unique_id=1604427623]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.24964976, 0.28, -0.025)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6192987, 0.07685107, -0.025)
 
 [node name="CameraMount" type="Marker3D" parent="." unique_id=16489876]
 transform = Transform3D(-0.08458755, -0.04236471, -1.0056611, 0.020957664, 1.008913, -0.04426448, 1.0063349, -0.024572324, -0.08360908, -4.7288647, 1.8908594, -0.57060933)
 
 [node name="BreachLine" type="Marker3D" parent="." unique_id=2140139354]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.28150654, 0, -0.3651638)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.42451334, 0.11503613, -0.18413317)
 
 [node name="Model" parent="." unique_id=364357238 instance=ExtResource("4_sloop_model")]
-transform = Transform3D(0, 0, 1.655, 0, 1.655, 0, -1.655, 0, 0, 0, 0.0054335, 0)
+transform = Transform3D(-5.2672224e-08, 0, 1.205, 0, 1.205, 0, -1.205, 0, -5.2672224e-08, 0.4106884, -0.055000007, -0.034224153)
 
 [editable path="DeckZones/ZoneBow"]
 [editable path="DeckZones/ZoneMidship"]

@@ -67,7 +67,7 @@ static func _get_or_create_shared_anim_library() -> AnimationLibrary:
 
 @export_group("Visuals")
 @export var enemy_model_path: String = DEFAULT_ENEMY_MODEL_PATH
-@export var model_scale: Vector3 = Vector3(0.33, 0.33, 0.33)
+@export var model_scale: Vector3 = Vector3(0.24, 0.24, 0.24)
 
 var current_hp: float = 25.0
 var active_plank: BoardingPlank = null
@@ -167,6 +167,7 @@ func play_animation(anim_name: String, speed_scale: float = 1.0) -> void:
 			anim_player.play(anim_name, -1.0, speed_scale)
 
 func _align_feet_to_ground(model: Node3D) -> void:
+	model.position = Vector3.ZERO
 	var min_y: float = 0.0
 	var found_mesh: bool = false
 	var meshes: Array[Node] = model.find_children("*", "MeshInstance3D", true, false)
@@ -178,8 +179,18 @@ func _align_feet_to_ground(model: Node3D) -> void:
 			if not found_mesh or local_min < min_y:
 				min_y = local_min
 				found_mesh = true
-	if found_mesh and min_y < 0.0:
+	if found_mesh:
 		model.position.y = -min_y
+
+func _get_audio_manager() -> Node:
+	if Engine.is_editor_hint():
+		return null
+	if Engine.has_singleton("AudioManager"):
+		return Engine.get_singleton("AudioManager")
+	var root_w: Window = get_tree().root if is_inside_tree() and get_tree() else null
+	if root_w and root_w.has_node("AudioManager"):
+		return root_w.get_node("AudioManager")
+	return null
 
 func start_crossing(plank: BoardingPlank, zone: BoardingZone) -> void:
 	current_state = BoarderState.CROSSING
@@ -328,8 +339,9 @@ func _process_deck_combat(delta: float) -> void:
 				_attack_timer = attack_interval_sec
 				if crew_target.has_method("take_damage"):
 					crew_target.call("take_damage", attack_damage)
-				if AudioManager and AudioManager.has_method("play_sfx") and not attack_sfx.is_empty():
-					AudioManager.play_sfx(attack_sfx, 0.95, 1.15)
+				var audio: Node = _get_audio_manager()
+				if audio and audio.has_method("play_sfx") and not attack_sfx.is_empty():
+					audio.call("play_sfx", attack_sfx, 0.95, 1.15)
 	else:
 		# Fallback if no crew defender found: march toward Stern (+Z)
 		var march_dir: Vector3 = Vector3(0.0, 0.0, 1.0)
@@ -383,8 +395,9 @@ func take_damage(amount: float) -> void:
 	
 	# Visual & Audio hit feedback + brief stagger
 	apply_stagger(0.20)
-	if AudioManager and AudioManager.has_method("play_sfx") and not impact_sfx.is_empty():
-		AudioManager.play_sfx(impact_sfx, 1.0, 1.25)
+	var audio_hit: Node = _get_audio_manager()
+	if audio_hit and audio_hit.has_method("play_sfx") and not impact_sfx.is_empty():
+		audio_hit.call("play_sfx", impact_sfx, 1.0, 1.25)
 	_spawn_damage_text(int(round(amount)))
 	
 	if current_hp <= 0.0:
@@ -394,8 +407,9 @@ func die() -> void:
 	if current_state == BoarderState.DEAD:
 		return
 	current_state = BoarderState.DEAD
-	if AudioManager and AudioManager.has_method("play_sfx") and not death_sfx.is_empty():
-		AudioManager.play_sfx(death_sfx, 1.0, 1.2)
+	var audio_death: Node = _get_audio_manager()
+	if audio_death and audio_death.has_method("play_sfx") and not death_sfx.is_empty():
+		audio_death.call("play_sfx", death_sfx, 1.0, 1.2)
 	if is_instance_valid(current_zone):
 		current_zone.unregister_boarder(self)
 	died.emit(self)
@@ -432,8 +446,9 @@ func _fall_overboard() -> void:
 	fall_tween.tween_property(self, "global_position:y", target_y, 0.65).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	fall_tween.parallel().tween_property(self, "rotation:z", 1.8, 0.65)
 	fall_tween.tween_callback(func() -> void:
-		if AudioManager and AudioManager.has_method("play_sfx"):
-			AudioManager.play_sfx("water_splashes", 0.9, 1.1)
+		var audio: Node = _get_audio_manager()
+		if audio and audio.has_method("play_sfx"):
+			audio.call("play_sfx", "water_splashes", 0.9, 1.1)
 		queue_free()
 	)
 

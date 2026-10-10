@@ -4,8 +4,8 @@
 [ext_resource type="PackedScene" path="res://assets/models/enemy/crew/frontline_pirate_walking.glb" id="2_frontline_pirate"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_raider"]
-radius = 0.22
-height = 0.75
+radius = 0.16
+height = 0.54
 
 [node name="BoarderRaider" type="CharacterBody3D"]
 collision_layer = 4
@@ -21,13 +21,13 @@ attack_interval_sec = 1.35
 infestation_weight = 1.0
 impact_sfx = "barrel_hits"
 death_sfx = "barrel_breaks"
-model_scale = Vector3(0.33, 0.33, 0.33)
+model_scale = Vector3(0.24, 0.24, 0.24)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.38, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.27, 0)
 shape = SubResource("CapsuleShape3D_raider")
 
 [node name="ModelContainer" type="Node3D" parent="."]
 
 [node name="FrontlinePirate" parent="ModelContainer" instance=ExtResource("2_frontline_pirate")]
-transform = Transform3D(0.33, 0, 0, 0, 0.33, 0, 0, 0, 0.33, 0, 0.31, 0)
+transform = Transform3D(0.24, 0, 0, 0, 0.24, 0, 0, 0, 0.24, 0, 0, 0)

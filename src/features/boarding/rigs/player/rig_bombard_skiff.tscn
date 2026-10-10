@@ -20,7 +20,7 @@ camera_mount = NodePath("CameraMount")
 breach_line = NodePath("BreachLine")
 
 [node name="DeckFloor" type="StaticBody3D" parent="." unique_id=951011249]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.52509, 0, 0.823544)
+transform = Transform3D(-0.0011254504, 0, -0.619999, 0, 0.62, 0, 0.619999, 0, -0.0011254504, 0.37617755, 0, 0.8467984)
 collision_mask = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="DeckFloor" unique_id=1935192977]
@@ -30,7 +30,7 @@ shape = SubResource("BoxShape3D_deck_floor")
 [node name="DeckZones" type="Node3D" parent="." unique_id=383051231]
 
 [node name="ZoneBow" parent="DeckZones" unique_id=120859222 instance=ExtResource("2_zone")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.40616226, 0.081258595, -1.2160841)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.23765779, 0.03898561, -0.63933444)
 zone_id = "bow"
 
 [node name="CollisionShape3D" parent="DeckZones/ZoneBow" index="0"]
@@ -40,7 +40,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="ZoneMidship" parent="DeckZones" unique_id=1420732132 instance=ExtResource("2_zone")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5715022, 0.07725608, 0.28011885)
+transform = Transform3D(0.999998, -8.8230416e-11, -0.0020184766, 8.8230416e-11, 1, -8.858366e-14, 0.0020184766, -8.858366e-14, 0.999998, 0.36594677, 0.07725608, -0.21118632)
 
 [node name="CollisionShape3D" parent="DeckZones/ZoneMidship" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
@@ -49,7 +49,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="ZoneStern" parent="DeckZones" unique_id=591593894 instance=ExtResource("2_zone")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.18345404, 0.6290715, 1.5130558)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.23420763, 0.23587003, 0.40256488)
 zone_id = "stern"
 
 [node name="CollisionShape3D" parent="DeckZones/ZoneStern" index="0"]
@@ -59,28 +59,28 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="CrewStations" type="Node3D" parent="." unique_id=1902623866]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.9001923, 1.0280576, 0)
+transform = Transform3D(-0.99989426, 0, -0.014543887, 0, 1, 0, 0.014543887, 0, -0.99989426, 0.16843796, 1.0280576, 0)
 
 [node name="CrewStationBow" parent="CrewStations" unique_id=1558434778 node_paths=PackedStringArray("assigned_zone") instance=ExtResource("3_crew")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.830639, -1.0323243, -0.95141506)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.048252106, -1.0323243, 0.53133243)
 assigned_zone = NodePath("../../DeckZones/ZoneBow")
 
 [node name="CrewStationStern" parent="CrewStations" unique_id=1427029191 node_paths=PackedStringArray("assigned_zone") instance=ExtResource("3_crew")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.877903, -0.9478613, 0.90414953)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.041261196, -0.9478613, -0.38198674)
 station_id = "stern"
 assigned_zone = NodePath("../../DeckZones/ZoneStern")
 
 [node name="PlayerSpawn" type="Marker3D" parent="." unique_id=664192570]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.24964976, 0.28, -0.025)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29295945, 0.28, -0.025)
 
 [node name="CameraMount" type="Marker3D" parent="." unique_id=215712857]
 transform = Transform3D(-0.2905836, -0.1455355, -3.4547474, 0.07199586, 3.4659188, -0.15206176, 3.457062, -0.08441331, -0.28722224, -4.7288647, 1.8908594, -0.57060933)
 
 [node name="BreachLine" type="Marker3D" parent="." unique_id=19175018]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5337324, 0, -0.2566328)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00983429, 0, -0.2566328)
 
 [node name="Model" parent="." unique_id=17916692 instance=ExtResource("4_bombard_model")]
-transform = Transform3D(1.494069e-16, 0, -2.44, 0, 2.44, 0, 2.44, 0, 1.494069e-16, 0.05, 0.05, -0.1)
+transform = Transform3D(-4.0433033e-08, 0, -0.925, 0, 0.925, 0, 0.925, 0, -4.0433033e-08, 0.14411426, 0.065, -0.2254835)
 
 [editable path="DeckZones/ZoneBow"]
 [editable path="DeckZones/ZoneMidship"]
