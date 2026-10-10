@@ -120,6 +120,7 @@ func get_point_along_rope(progress_t: float) -> Vector3:
 
 var is_selected: bool = false
 var border_container: Node3D = null
+var _gold_trim_mat: StandardMaterial3D = null
 
 func set_selected(selected: bool) -> void:
 	is_selected = selected
@@ -129,9 +130,11 @@ func set_selected(selected: bool) -> void:
 func _process(_delta: float) -> void:
 	if Engine.is_editor_hint():
 		return
-	if is_selected and is_instance_valid(border_container):
-		var pulse: float = 1.0 + sin(float(Time.get_ticks_msec()) * 0.008) * 0.12
-		border_container.scale = Vector3(1.0 + pulse * 0.05, 1.0, 1.0 + pulse * 0.02)
+	if is_selected and is_instance_valid(_gold_trim_mat):
+		var time_sec: float = float(Time.get_ticks_msec()) * 0.001
+		var pulse: float = sin(time_sec * 3.5)
+		_gold_trim_mat.emission_energy_multiplier = 0.70 + pulse * 0.20
+		_gold_trim_mat.albedo_color.a = 0.40 + pulse * 0.10
 
 func _update_visual_and_collision() -> void:
 	var mid_p: Vector3 = (origin_pos + target_pos) * 0.5
@@ -187,50 +190,78 @@ func _create_or_update_selection_border(length: float) -> void:
 	for child: Node in border_container.get_children():
 		child.queue_free()
 		
-	var border_mat: StandardMaterial3D = StandardMaterial3D.new()
-	border_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	border_mat.albedo_color = Color(1.0, 0.15, 0.15, 1.0) # Vibrant red border
-	
-	var border_w: float = 0.05
-	var border_h: float = 0.035
-	var top_y: float = plank_thickness * 0.5 + (border_h * 0.5)
+	_gold_trim_mat = StandardMaterial3D.new()
+	_gold_trim_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_gold_trim_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	# Luminous transparent gold hue
+	_gold_trim_mat.albedo_color = Color(1.0, 0.80, 0.15, 0.40)
+	_gold_trim_mat.metallic = 0.55
+	_gold_trim_mat.metallic_specular = 0.95
+	_gold_trim_mat.roughness = 0.08
+	_gold_trim_mat.clearcoat_enabled = true
+	_gold_trim_mat.clearcoat = 1.0
+	_gold_trim_mat.clearcoat_roughness = 0.08
+	_gold_trim_mat.emission_enabled = true
+	_gold_trim_mat.emission = Color(1.0, 0.75, 0.12, 1.0)
+	_gold_trim_mat.emission_energy_multiplier = 0.70
+
 	var half_w: float = plank_width * 0.5
 	var half_l: float = length * 0.5
-	
-	# Left strip (along length)
-	var left_mesh: MeshInstance3D = MeshInstance3D.new()
-	var left_box: BoxMesh = BoxMesh.new()
-	left_box.size = Vector3(border_w, border_h, length + border_w * 2.0)
-	left_box.material = border_mat
-	left_mesh.mesh = left_box
-	left_mesh.position = Vector3(-half_w - (border_w * 0.5), top_y, 0.0)
-	border_container.add_child(left_mesh)
-	
-	# Right strip (along length)
-	var right_mesh: MeshInstance3D = MeshInstance3D.new()
-	var right_box: BoxMesh = BoxMesh.new()
-	right_box.size = Vector3(border_w, border_h, length + border_w * 2.0)
-	right_box.material = border_mat
-	right_mesh.mesh = right_box
-	right_mesh.position = Vector3(half_w + (border_w * 0.5), top_y, 0.0)
-	border_container.add_child(right_mesh)
-	
-	# Start strip (crosswise at origin)
+	var side_thickness: float = 0.016
+	var top_y: float = (plank_thickness * 0.5) + 0.002
+
+	# Left side flank: hugs the vertical outer left face of the plank
+	var left_side_mesh: MeshInstance3D = MeshInstance3D.new()
+	var left_side_box: BoxMesh = BoxMesh.new()
+	left_side_box.size = Vector3(side_thickness, plank_thickness + 0.010, length)
+	left_side_box.material = _gold_trim_mat
+	left_side_mesh.mesh = left_side_box
+	left_side_mesh.position = Vector3(-half_w, 0.003, 0.0)
+	border_container.add_child(left_side_mesh)
+
+	# Right side flank: hugs the vertical outer right face of the plank
+	var right_side_mesh: MeshInstance3D = MeshInstance3D.new()
+	var right_side_box: BoxMesh = BoxMesh.new()
+	right_side_box.size = Vector3(side_thickness, plank_thickness + 0.010, length)
+	right_side_box.material = _gold_trim_mat
+	right_side_mesh.mesh = right_side_box
+	right_side_mesh.position = Vector3(half_w, 0.003, 0.0)
+	border_container.add_child(right_side_mesh)
+
+	# Left top deck rim ribbon: a sleek, transparent gold rim hugging the top-left edge
+	var left_top_mesh: MeshInstance3D = MeshInstance3D.new()
+	var left_top_box: BoxMesh = BoxMesh.new()
+	left_top_box.size = Vector3(0.024, 0.003, length)
+	left_top_box.material = _gold_trim_mat
+	left_top_mesh.mesh = left_top_box
+	left_top_mesh.position = Vector3(-half_w + 0.010, top_y, 0.0)
+	border_container.add_child(left_top_mesh)
+
+	# Right top deck rim ribbon: a sleek, transparent gold rim hugging the top-right edge
+	var right_top_mesh: MeshInstance3D = MeshInstance3D.new()
+	var right_top_box: BoxMesh = BoxMesh.new()
+	right_top_box.size = Vector3(0.024, 0.003, length)
+	right_top_box.material = _gold_trim_mat
+	right_top_mesh.mesh = right_top_box
+	right_top_mesh.position = Vector3(half_w - 0.010, top_y, 0.0)
+	border_container.add_child(right_top_mesh)
+
+	# Start threshold inlay (flush with wood, not a raised block)
 	var start_mesh: MeshInstance3D = MeshInstance3D.new()
 	var start_box: BoxMesh = BoxMesh.new()
-	start_box.size = Vector3(plank_width + border_w * 2.0, border_h, border_w)
-	start_box.material = border_mat
+	start_box.size = Vector3(plank_width, 0.003, 0.018)
+	start_box.material = _gold_trim_mat
 	start_mesh.mesh = start_box
-	start_mesh.position = Vector3(0.0, top_y, -half_l - (border_w * 0.5))
+	start_mesh.position = Vector3(0.0, top_y, -half_l + 0.009)
 	border_container.add_child(start_mesh)
-	
-	# End strip (crosswise at ship railing)
+
+	# End threshold inlay (flush with wood, not a raised block)
 	var end_mesh: MeshInstance3D = MeshInstance3D.new()
 	var end_box: BoxMesh = BoxMesh.new()
-	end_box.size = Vector3(plank_width + border_w * 2.0, border_h, border_w)
-	end_box.material = border_mat
+	end_box.size = Vector3(plank_width, 0.003, 0.018)
+	end_box.material = _gold_trim_mat
 	end_mesh.mesh = end_box
-	end_mesh.position = Vector3(0.0, top_y, half_l + (border_w * 0.5))
+	end_mesh.position = Vector3(0.0, top_y, half_l - 0.009)
 	border_container.add_child(end_mesh)
-	
+
 	border_container.visible = is_selected
