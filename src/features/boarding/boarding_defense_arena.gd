@@ -2,9 +2,6 @@
 class_name BoardingDefenseArena
 extends Node3D
 
-const PlayerBoardingRig = preload("res://src/features/boarding/rigs/player_boarding_rig.gd")
-const EnemyBoardingRig = preload("res://src/features/boarding/rigs/enemy_boarding_rig.gd")
-
 ## Coordinates 3-zone deck defense encounters: parallel enemy approach,
 ## docking sequence, broadside camera framing, wave cadence, gangplank launches,
 ## swarm spawning, overrun hull penalties, and victory/defeat progression.
@@ -56,7 +53,7 @@ const APPROACH_DURATION_SEC: float = 1.8
 			_update_editor_preview_planks()
 
 @export var refresh_preview: bool = false:
-	set(value):
+	set(_value):
 		refresh_preview = false
 		if Engine.is_editor_hint() and is_inside_tree():
 			_rebuild_editor_preview()
@@ -68,7 +65,7 @@ const APPROACH_DURATION_SEC: float = 1.8
 			clear_all_boarders()
 
 @export var deploy_test_planks: bool = false:
-	set(value):
+	set(_value):
 		deploy_test_planks = false
 		if is_inside_tree():
 			launch_plank_to_zone(0, 1, 0.0)
@@ -76,7 +73,7 @@ const APPROACH_DURATION_SEC: float = 1.8
 			launch_plank_to_zone(2, 1, 0.0)
 
 @export var clear_planks_and_enemies: bool = false:
-	set(value):
+	set(_value):
 		clear_planks_and_enemies = false
 		if is_inside_tree():
 			clear_all_planks_and_boarders()
@@ -306,7 +303,7 @@ func _get_player_rig_scene(v_key: String) -> PackedScene:
 	if not Engine.is_editor_hint():
 		var gs: Node = _get_game_state()
 		if gs and gs.has_method("get_vessel_resource"):
-			var ship_data: ShipData = gs.get_vessel_resource(v_key)
+			var ship_data: ShipData = gs.call("get_vessel_resource", v_key) as ShipData
 			if is_instance_valid(ship_data) and is_instance_valid(ship_data.boarding_rig):
 				return ship_data.boarding_rig
 
@@ -352,8 +349,8 @@ func setup_player_vessel(vessel_id: String = "") -> void:
 func setup_enemy_vessel(boss_or_name: Variant = null) -> void:
 	if boss_or_name is Node3D:
 		var boss_node: Node3D = boss_or_name as Node3D
-		var scene: PackedScene = boss_node.get("boarding_rig") as PackedScene if "boarding_rig" in boss_node else null
-		set_enemy_rig(scene if is_instance_valid(scene) else default_enemy_rig, String(boss_node.name))
+		var boss_rig_scene: PackedScene = boss_node.get("boarding_rig") as PackedScene if "boarding_rig" in boss_node else null
+		set_enemy_rig(boss_rig_scene if is_instance_valid(boss_rig_scene) else default_enemy_rig, String(boss_node.name))
 		return
 
 	var b_str: String = ""

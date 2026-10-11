@@ -379,7 +379,7 @@ func _on_obstacle_destroyed(obstacle_type: String, shots_taken: int, river_dista
 		obstacle_type, shots_taken, river_distance, effort_tag
 	])
 
-func _on_shot_expired(weapon_id: String, max_range_m: float, river_distance: float) -> void:
+func _on_shot_expired(_weapon_id: String, max_range_m: float, river_distance: float) -> void:
 	if not is_run_active:
 		return
 	current_run["shot_expirations"] = int(current_run.get("shot_expirations", 0)) + 1

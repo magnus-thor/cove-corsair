@@ -465,9 +465,9 @@ func _execute_fire(proj_scene: PackedScene, world_container: Node) -> void:
 		proj_dir.z = -abs(proj_dir.z)
 		proj_dir = proj_dir.normalized()
 
-	var player := get_tree().get_first_node_in_group("player")
+	var player: PlayerSwerve = get_tree().get_first_node_in_group("player") as PlayerSwerve
 	var is_scatter_weapon: bool = (weapon_data.get("is_scatter") == true or weapon_data.weapon_type == "scattershot" or "scatter" in weapon_data.weapon_name.to_lower())
-	var camera := get_tree().get_first_node_in_group("game_camera")
+	var camera: GameCamera = get_tree().get_first_node_in_group("game_camera") as GameCamera
 
 	if is_scatter_weapon:
 		fire_scattershot(proj_dir, world_container, proj_scene)
@@ -598,10 +598,10 @@ func fire_scattershot(_proj_dir: Vector3 = Vector3.ZERO, world_container: Node =
 	# Play sfx_scattershot ONCE per volley and trigger lateral camera jitter trauma
 	AudioManager.play_sfx("sfx_scattershot")
 	var is_hostile := _is_hostile_vessel()
-	var p: Node = get_tree().get_first_node_in_group("player") if get_tree() else null
+	var p: PlayerSwerve = get_tree().get_first_node_in_group("player") as PlayerSwerve if get_tree() else null
 	if not is_hostile and p and p.has_method("apply_firing_recoil"):
 		p.call("apply_firing_recoil", 2.2, false)
-	var camera := get_tree().get_first_node_in_group("game_camera")
+	var camera: GameCamera = get_tree().get_first_node_in_group("game_camera") as GameCamera if get_tree() else null
 	if camera and camera.has_method("add_trauma"):
 		camera.call("add_trauma", 0.15, 0.35)
 

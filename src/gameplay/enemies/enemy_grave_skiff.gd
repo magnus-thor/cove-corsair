@@ -45,10 +45,10 @@ func _physics_process(delta: float) -> void:
 		sprite_node.position.y = 1.0 + sin(_time * 4.0) * 0.05
 		
 	# Shooting logic - only if can_shoot is enabled and not during boss fight
-	var is_boss_active := GameState.boss_spawned or get_tree().get_first_node_in_group("boss") != null
-	var player := get_tree().get_first_node_in_group("player")
+	var is_boss_active: bool = GameState.boss_spawned or get_tree().get_first_node_in_group("boss") != null
+	var player: PlayerSwerve = get_tree().get_first_node_in_group("player") as PlayerSwerve
 	var player_z: float = player.global_position.z if player else 0.0
-	var dist_to_player: Variant = abs(global_position.z - player_z)
+	var dist_to_player: float = abs(global_position.z - player_z)
 	
 	if can_shoot and not is_boss_active and dist_to_player >= 14.0 and dist_to_player <= 45.0:
 		_shoot_timer += delta
@@ -58,36 +58,35 @@ func _physics_process(delta: float) -> void:
 		
 	if global_position.z > (player_z + 4.0):
 		GameState.record_mob_leaked()
-		if player and player.has_method("leak_threat"):
+		if player:
 			player.leak_threat(self)
 		queue_free()
 
 func _fire_dart_burst() -> void:
 	if not enemy_cannonball_scene:
 		return
-	var boss_node := get_tree().get_first_node_in_group("boss")
-	if boss_node != null and is_instance_valid(boss_node) and "is_barrage_active" in boss_node and boss_node.is_barrage_active:
+	var boss_node: Node = get_tree().get_first_node_in_group("boss")
+	if boss_node != null and is_instance_valid(boss_node) and bool(boss_node.get("is_barrage_active")):
 		return
 	
 	for i in range(burst_count):
 		get_tree().create_timer(i * 0.18).timeout.connect(func() -> void:
 			if _is_dead or not is_instance_valid(self):
 				return
-			var dart := enemy_cannonball_scene.instantiate() as Area3D
-			var root := get_tree().current_scene
+			var dart: EnemyCannonball = enemy_cannonball_scene.instantiate() as EnemyCannonball
+			var root: Node = get_tree().current_scene
 			if root:
 				root.add_child(dart)
 			else:
 				get_parent().add_child(dart)
 			dart.global_position = global_position + Vector3(randf_range(-0.3, 0.3), 0.4, 1.0)
 			dart.scale = Vector3(0.85, 0.85, 0.85)
-			var fire_mesh := dart.get_node_or_null("FireCore")
+			var fire_mesh: Node3D = dart.get_node_or_null("FireCore") as Node3D
 			if fire_mesh:
 				fire_mesh.scale = Vector3(0.8, 0.8, 1.6)
-			if "speed" in dart:
-				dart.speed = 18.0
-			var player := get_tree().get_first_node_in_group("player")
-			var fire_dir := Vector3(0, 0, 1)
+			dart.speed = 18.0
+			var player: PlayerSwerve = get_tree().get_first_node_in_group("player") as PlayerSwerve
+			var fire_dir: Vector3 = Vector3(0, 0, 1)
 			if player and is_instance_valid(player):
 				var to_player: Vector3 = (player.global_position - dart.global_position)
 				to_player.y = 0.0
@@ -96,12 +95,9 @@ func _fire_dart_burst() -> void:
 					if fire_dir.z < 0.1:
 						fire_dir.z = 0.4
 						fire_dir = fire_dir.normalized()
-			if dart.has_method("setup"):
-				dart.setup(fire_dir, null, null)
-			if "direction" in dart:
-				dart.direction = fire_dir
-			if dart.has_method("set_color"):
-				dart.set_color(Color(0.2, 1.0, 0.35)) # Toxic green glow
+			dart.setup(fire_dir, null, null)
+			dart.direction = fire_dir
+			dart.set_color(Color(0.2, 1.0, 0.35)) # Toxic green glow
 			AudioManager.play_sfx("cannon_shots", 1.4, 1.8, -4.0)
 		)
 
@@ -113,14 +109,12 @@ func take_damage(amount: int) -> void:
 	_update_health_bar()
 	_flash()
 	
-	var ft_script := load("res://src/vfx/floating_text.gd")
-	if ft_script:
-		var fct: Variant = ft_script.new()
-		var root := get_tree().current_scene
-		if root:
-			root.add_child(fct)
-			fct.global_position = global_position + Vector3(randf_range(-0.4, 0.4), 1.2, randf_range(-0.4, 0.4))
-			fct.setup("-" + str(amount), Color(0.4, 1.0, 0.5))
+	var fct: FloatingText = FloatingText.new()
+	var root: Node = get_tree().current_scene
+	if root:
+		root.add_child(fct)
+		fct.global_position = global_position + Vector3(randf_range(-0.4, 0.4), 1.2, randf_range(-0.4, 0.4))
+		fct.setup("-" + str(amount), Color(0.4, 1.0, 0.5))
 			
 	if current_hp <= 0:
 		die()
@@ -165,16 +159,15 @@ func die() -> void:
 		
 	if doubloon_scene:
 		for i in range(doubloons_drop):
-			var d := doubloon_scene.instantiate() as Area3D
-			var root := get_tree().current_scene
+			var d: CollectibleDoubloon = doubloon_scene.instantiate() as CollectibleDoubloon
+			var root: Node = get_tree().current_scene
 			if root:
 				root.add_child(d)
 				d.global_position = global_position
-				if d.has_method("_trigger_spawn_bounce"):
-					d._trigger_spawn_bounce(Vector2(randf_range(-0.6, 0.6), randf_range(-0.6, 0.6)))
+				d._trigger_spawn_bounce(Vector2(randf_range(-0.6, 0.6), randf_range(-0.6, 0.6)))
 					
-	var player := get_tree().get_first_node_in_group("player")
-	if player and player.has_method("upgrade_ship"):
+	var player: PlayerSwerve = get_tree().get_first_node_in_group("player") as PlayerSwerve
+	if player:
 		player.upgrade_ship(1)
 		
 	queue_free()

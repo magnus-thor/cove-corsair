@@ -6,6 +6,7 @@ extends Node
 
 signal speed_changed(new_speed: float)
 signal multiplier_changed(new_multiplier: float)
+@warning_ignore("unused_signal")
 signal wager_checkpoint_reached(checkpoint_distance: float)
 signal run_extracted(distance_score: int, doubloons_banked: int)
 signal doubloons_updated(new_amount: int)
@@ -105,6 +106,7 @@ func start_run() -> void:
 	active_endless_boss = null
 	
 	GameState.is_game_active = true
+	GameState.is_endless_mode = true
 	GameState.run_doubloons = 0
 	GameState.run_doubloons_banked = false
 	GameState.level_distance_target = 999999.0
@@ -270,7 +272,7 @@ func push_luck() -> void:
 	if AudioManager:
 		AudioManager.play_sfx("gate_passes")
 		if AudioManager.has_method("play_barrel_break_scaled"):
-			AudioManager.play_barrel_break_scaled()
+			AudioManager.call("play_barrel_break_scaled")
 			
 	if EventBus and EventBus.has_signal("wager_pushed"):
 		EventBus.wager_pushed.emit(multiplier, current_speed)
@@ -446,6 +448,7 @@ func _pick_chunk_for_distance(proj_dist: float) -> PackedScene:
 			pass
 		else:
 			_checkpoint_chunk_spawned_for_distance = next_checkpoint_distance
+			wager_checkpoint_reached.emit(next_checkpoint_distance)
 			print("[ENDLESS MODE] Checkpoint Wager Fork spawned for target %.1fm (proj_dist: %.1fm)" % [next_checkpoint_distance, proj_dist])
 			return wager_fork_scene
 		

@@ -35,10 +35,7 @@ func _ready() -> void:
 	_shoot_timer = randf_range(0.3, 0.8)
 
 func _apply_level_tuning() -> void:
-	var cur_lvl: int = 1
-	var gs := get_node_or_null("/root/GameState")
-	if gs and "current_level" in gs:
-		cur_lvl = int(gs.current_level)
+	var cur_lvl: int = GameState.current_level if GameState else 1
 	if cur_lvl <= 3:
 		max_hp = 4
 		current_hp = 4
@@ -81,10 +78,10 @@ func _physics_process(delta: float) -> void:
 		sprite_node.position.y = 0.9 + sin(_time * 2.8) * 0.04
 		
 	# Shooting logic: only shoot if explicitly marked as gunner vanguard and not in boss fight
-	var is_boss_active := GameState.boss_spawned or get_tree().get_first_node_in_group("boss") != null
-	var player := get_tree().get_first_node_in_group("player")
+	var is_boss_active: bool = GameState.boss_spawned or get_tree().get_first_node_in_group("boss") != null
+	var player: PlayerSwerve = get_tree().get_first_node_in_group("player") as PlayerSwerve
 	var player_z: float = player.global_position.z if player else 0.0
-	var dist_to_player: Variant = abs(global_position.z - player_z)
+	var dist_to_player: float = abs(global_position.z - player_z)
 
 	if (can_shoot or is_gunner_vanguard) and not is_boss_active and dist_to_player >= 14.0 and dist_to_player <= 45.0:
 		_shoot_timer += delta
@@ -94,7 +91,7 @@ func _physics_process(delta: float) -> void:
 		
 	if global_position.z > (player_z + 4.0):
 		GameState.record_mob_leaked()
-		if player and player.has_method("leak_threat"):
+		if player:
 			player.leak_threat(self)
 		queue_free()
 
@@ -104,24 +101,20 @@ func _fire_dual_cannons() -> void:
 		
 	AudioManager.play_sfx("cannon_shots", 0.9, 1.1, 0.0)
 	
-	var cur_lvl: int = 1
-	var gs := get_node_or_null("/root/GameState")
-	if gs and "current_level" in gs:
-		cur_lvl = int(gs.current_level)
+	var cur_lvl: int = GameState.current_level if GameState else 1
 		
-	var offsets := [0.0] if cur_lvl <= 3 else [-0.6, 0.6]
-	var player := get_tree().get_first_node_in_group("player")
-	for offset_x in offsets:
-		var ball := enemy_cannonball_scene.instantiate() as Area3D
-		var root := get_tree().current_scene
+	var offsets: Array[float] = [0.0] if cur_lvl <= 3 else [-0.6, 0.6]
+	var player: PlayerSwerve = get_tree().get_first_node_in_group("player") as PlayerSwerve
+	for offset_x: float in offsets:
+		var ball: EnemyCannonball = enemy_cannonball_scene.instantiate() as EnemyCannonball
+		var root: Node = get_tree().current_scene
 		if root:
 			root.add_child(ball)
 		else:
 			get_parent().add_child(ball)
 		ball.global_position = global_position + Vector3(offset_x, 0.5, 1.2)
-		if "speed" in ball:
-			ball.speed = 12.5
-		var fire_dir := Vector3(0, 0, 1)
+		ball.speed = 12.5
+		var fire_dir: Vector3 = Vector3(0, 0, 1)
 		if player and is_instance_valid(player):
 			var to_player: Vector3 = (player.global_position - ball.global_position)
 			to_player.y = 0.0
@@ -130,10 +123,8 @@ func _fire_dual_cannons() -> void:
 				if fire_dir.z < 0.1:
 					fire_dir.z = 0.4
 					fire_dir = fire_dir.normalized()
-		if ball.has_method("setup"):
-			ball.setup(fire_dir, null, null)
-		if "direction" in ball:
-			ball.direction = fire_dir
+		ball.setup(fire_dir, null, null)
+		ball.direction = fire_dir
 		ball.scale = Vector3(1.2, 1.2, 1.2)
 
 func take_damage(amount: int) -> void:
@@ -143,14 +134,12 @@ func take_damage(amount: int) -> void:
 	_update_health_bar()
 	_flash()
 	
-	var ft_script := load("res://src/vfx/floating_text.gd")
-	if ft_script:
-		var fct: Variant = ft_script.new()
-		var root := get_tree().current_scene
-		if root:
-			root.add_child(fct)
-			fct.global_position = global_position + Vector3(randf_range(-0.4, 0.4), 1.3, randf_range(-0.4, 0.4))
-			fct.setup("-" + str(amount), Color(1.0, 0.6, 0.2))
+	var fct: FloatingText = FloatingText.new()
+	var root: Node = get_tree().current_scene
+	if root:
+		root.add_child(fct)
+		fct.global_position = global_position + Vector3(randf_range(-0.4, 0.4), 1.3, randf_range(-0.4, 0.4))
+		fct.setup("-" + str(amount), Color(1.0, 0.6, 0.2))
 			
 	if current_hp <= 0:
 		die()
@@ -196,16 +185,15 @@ func die() -> void:
 		
 	if doubloon_scene:
 		for i in range(doubloons_drop):
-			var d := doubloon_scene.instantiate() as Area3D
-			var root := get_tree().current_scene
+			var d: CollectibleDoubloon = doubloon_scene.instantiate() as CollectibleDoubloon
+			var root: Node = get_tree().current_scene
 			if root:
 				root.add_child(d)
 				d.global_position = global_position
-				if d.has_method("_trigger_spawn_bounce"):
-					d._trigger_spawn_bounce(Vector2(randf_range(-0.7, 0.7), randf_range(-0.7, 0.7)))
+				d._trigger_spawn_bounce(Vector2(randf_range(-0.7, 0.7), randf_range(-0.7, 0.7)))
 					
-	var player := get_tree().get_first_node_in_group("player")
-	if player and player.has_method("upgrade_ship"):
+	var player: PlayerSwerve = get_tree().get_first_node_in_group("player") as PlayerSwerve
+	if player:
 		player.upgrade_ship(1)
 		
 	queue_free()

@@ -29,10 +29,7 @@ func _ready() -> void:
 	area_entered.connect(_on_area_entered)
 
 func _apply_level_tuning() -> void:
-	var cur_lvl: int = 1
-	var gs := get_node_or_null("/root/GameState")
-	if gs and "current_level" in gs:
-		cur_lvl = int(gs.current_level)
+	var cur_lvl: int = GameState.current_level if GameState else 1
 	if cur_lvl <= 3:
 		max_hp = 3
 		current_hp = 3
@@ -52,7 +49,7 @@ func _physics_process(delta: float) -> void:
 	global_position.z += forward_speed * delta
 	
 	# Homing towards player
-	var player := get_tree().get_first_node_in_group("player")
+	var player: PlayerSwerve = get_tree().get_first_node_in_group("player") as PlayerSwerve
 	if player and is_instance_valid(player):
 		var target_x: float = player.global_position.x
 		global_position.x = move_toward(global_position.x, target_x, steer_speed * delta)
@@ -61,7 +58,7 @@ func _physics_process(delta: float) -> void:
 	var player_z: float = player.global_position.z if player else 0.0
 	if global_position.z > (player_z + 3.0):
 		GameState.record_mob_leaked()
-		if player and player.has_method("leak_threat"):
+		if player:
 			player.leak_threat(self)
 		queue_free()
 
@@ -69,8 +66,8 @@ func _on_area_entered(area: Area3D) -> void:
 	if _is_dead:
 		return
 	if area.is_in_group("player") or (area.get_parent() and area.get_parent().is_in_group("player")):
-		var player := get_tree().get_first_node_in_group("player")
-		if player and player.has_method("take_hit"):
+		var player: PlayerSwerve = get_tree().get_first_node_in_group("player") as PlayerSwerve
+		if player:
 			player.take_hit(1, "brimstone_raft_ram")
 		die()
 
@@ -81,14 +78,12 @@ func take_damage(amount: int) -> void:
 	_update_health_bar()
 	_flash()
 	
-	var ft_script := load("res://src/vfx/floating_text.gd")
-	if ft_script:
-		var fct: Variant = ft_script.new()
-		var root := get_tree().current_scene
-		if root:
-			root.add_child(fct)
-			fct.global_position = global_position + Vector3(randf_range(-0.3, 0.3), 1.2, randf_range(-0.3, 0.3))
-			fct.setup("-" + str(amount), Color(1.0, 0.3, 0.1))
+	var fct: FloatingText = FloatingText.new()
+	var root: Node = get_tree().current_scene
+	if root:
+		root.add_child(fct)
+		fct.global_position = global_position + Vector3(randf_range(-0.3, 0.3), 1.2, randf_range(-0.3, 0.3))
+		fct.setup("-" + str(amount), Color(1.0, 0.3, 0.1))
 			
 	if current_hp <= 0:
 		die()
@@ -125,30 +120,30 @@ func die() -> void:
 	AudioManager.play_sfx("barrel_breaks", 0.8, 1.1, 2.0)
 	
 	if explosion_scene:
-		var vfx := explosion_scene.instantiate() as Node3D
-		var root := get_tree().current_scene
+		var vfx: Node3D = explosion_scene.instantiate() as Node3D
+		var root: Node = get_tree().current_scene
 		if root:
 			root.add_child(vfx)
 		vfx.global_position = global_position
 		vfx.scale = Vector3(2.0, 2.0, 2.0)
-		vfx.modulate = Color(2.5, 0.8, 0.2, 1.0)
+		if "modulate" in vfx:
+			vfx.set("modulate", Color(2.5, 0.8, 0.2, 1.0))
 		
-	var camera := get_tree().get_first_node_in_group("game_camera")
-	if camera and camera.has_method("shake"):
+	var camera: GameCamera = get_tree().get_first_node_in_group("game_camera") as GameCamera
+	if camera:
 		camera.shake(0.25, 0.22)
 		
 	if doubloon_scene:
 		for i in range(doubloons_drop):
-			var d := doubloon_scene.instantiate() as Area3D
-			var root := get_tree().current_scene
+			var d: CollectibleDoubloon = doubloon_scene.instantiate() as CollectibleDoubloon
+			var root: Node = get_tree().current_scene
 			if root:
 				root.add_child(d)
 				d.global_position = global_position
-				if d.has_method("_trigger_spawn_bounce"):
-					d._trigger_spawn_bounce(Vector2(randf_range(-0.8, 0.8), randf_range(-0.8, 0.8)))
+				d._trigger_spawn_bounce(Vector2(randf_range(-0.8, 0.8), randf_range(-0.8, 0.8)))
 					
-	var player := get_tree().get_first_node_in_group("player")
-	if player and player.has_method("upgrade_ship"):
+	var player: PlayerSwerve = get_tree().get_first_node_in_group("player") as PlayerSwerve
+	if player:
 		player.upgrade_ship(1)
 		
 	queue_free()

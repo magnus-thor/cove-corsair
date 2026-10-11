@@ -128,6 +128,7 @@ var is_game_active: bool = false
 var boss_spawned: bool = false
 var should_auto_start: bool = false
 var should_auto_start_endless: bool = false
+var is_endless_mode: bool = false
 ## When true, pirate_lair_hub will auto-open the campaign river map on _ready().
 ## Reset to false immediately after the hub consumes it.
 var should_open_map: bool = false

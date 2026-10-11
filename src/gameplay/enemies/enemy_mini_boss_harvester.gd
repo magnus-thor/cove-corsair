@@ -52,16 +52,16 @@ func _physics_process(delta: float) -> void:
 			_mortar_timer = 0.0
 			_launch_toxic_mortar()
 		
-	var player := get_tree().get_first_node_in_group("player")
+	var player: PlayerSwerve = get_tree().get_first_node_in_group("player") as PlayerSwerve
 	var player_z: float = player.global_position.z if player else 0.0
 	if global_position.z > (player_z + 4.5):
 		GameState.record_mob_leaked()
-		if player and player.has_method("leak_threat"):
+		if player:
 			player.leak_threat(self)
 		queue_free()
 
 func _launch_toxic_mortar() -> void:
-	var player := get_tree().get_first_node_in_group("player")
+	var player: PlayerSwerve = get_tree().get_first_node_in_group("player") as PlayerSwerve
 	if not player or not is_instance_valid(player):
 		return
 		
@@ -99,22 +99,23 @@ static func execute_toxic_mortar_detonation(pos: Vector3, vfx_prefab: PackedScen
 	AudioManager.play_sfx("water_splashes", 0.8, 1.0)
 	
 	if vfx_prefab:
-		var vfx := vfx_prefab.instantiate() as Node3D
-		var root := tree.current_scene
+		var vfx: Node3D = vfx_prefab.instantiate() as Node3D
+		var root: Node = tree.current_scene
 		if root:
 			root.add_child(vfx)
 		vfx.global_position = pos
 		vfx.scale = Vector3(2.2, 2.2, 2.2)
-		vfx.modulate = Color(0.3, 1.8, 0.5, 1.0)
+		if "modulate" in vfx:
+			vfx.set("modulate", Color(0.3, 1.8, 0.5, 1.0))
 		
-	var camera := tree.get_first_node_in_group("game_camera")
-	if camera and camera.has_method("shake"):
+	var camera: GameCamera = tree.get_first_node_in_group("game_camera") as GameCamera
+	if camera:
 		camera.shake(0.25, 0.22)
 		
-	var player := tree.get_first_node_in_group("player")
+	var player: PlayerSwerve = tree.get_first_node_in_group("player") as PlayerSwerve
 	if player and is_instance_valid(player):
 		var dist: float = player.global_position.distance_to(pos)
-		if dist <= 2.2 and player.has_method("damage_fleet"):
+		if dist <= 2.2:
 			player.damage_fleet(1)
 
 func _detonate_toxic_mortar(pos: Vector3) -> void:
@@ -127,14 +128,12 @@ func take_damage(amount: int) -> void:
 	_update_health_bar()
 	_flash()
 	
-	var ft_script := load("res://src/vfx/floating_text.gd")
-	if ft_script:
-		var fct: Variant = ft_script.new()
-		var root := get_tree().current_scene
-		if root:
-			root.add_child(fct)
-			fct.global_position = global_position + Vector3(randf_range(-0.6, 0.6), 1.5, randf_range(-0.6, 0.6))
-			fct.setup("-" + str(amount), Color(0.2, 1.0, 0.6))
+	var fct: FloatingText = FloatingText.new()
+	var root: Node = get_tree().current_scene
+	if root:
+		root.add_child(fct)
+		fct.global_position = global_position + Vector3(randf_range(-0.6, 0.6), 1.5, randf_range(-0.6, 0.6))
+		fct.setup("-" + str(amount), Color(0.2, 1.0, 0.6))
 			
 	if current_hp <= 0:
 		die()
@@ -170,15 +169,15 @@ func die() -> void:
 	GameState.targets_destroyed += 1
 	AudioManager.play_sfx("barrel_breaks", 0.7, 0.9, 3.0)
 	
-	var camera := get_tree().get_first_node_in_group("game_camera")
-	if camera and camera.has_method("shake"):
+	var camera: GameCamera = get_tree().get_first_node_in_group("game_camera") as GameCamera
+	if camera:
 		camera.shake(0.35, 0.3)
 		
 	# Multiple hull explosions
 	for i in range(4):
 		get_tree().create_timer(i * 0.12).timeout.connect(func() -> void:
 			if explosion_scene:
-				var vfx := explosion_scene.instantiate() as Node3D
+				var vfx: Node3D = explosion_scene.instantiate() as Node3D
 				get_tree().current_scene.add_child(vfx)
 				vfx.global_position = global_position + Vector3(randf_range(-1.5, 1.5), 0.4, randf_range(-1.5, 1.5))
 				vfx.scale = Vector3(1.8, 1.8, 1.8)
@@ -186,16 +185,15 @@ func die() -> void:
 		
 	if doubloon_scene:
 		for i in range(doubloons_drop):
-			var d := doubloon_scene.instantiate() as Area3D
-			var root := get_tree().current_scene
+			var d: CollectibleDoubloon = doubloon_scene.instantiate() as CollectibleDoubloon
+			var root: Node = get_tree().current_scene
 			if root:
 				root.add_child(d)
 				d.global_position = global_position
-				if d.has_method("_trigger_spawn_bounce"):
-					d._trigger_spawn_bounce(Vector2(randf_range(-1.5, 1.5), randf_range(-1.5, 1.5)))
+				d._trigger_spawn_bounce(Vector2(randf_range(-1.5, 1.5), randf_range(-1.5, 1.5)))
 					
-	var player := get_tree().get_first_node_in_group("player")
-	if player and player.has_method("upgrade_ship"):
+	var player: PlayerSwerve = get_tree().get_first_node_in_group("player") as PlayerSwerve
+	if player:
 		player.upgrade_ship(2)
 		
 	queue_free()

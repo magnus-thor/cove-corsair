@@ -37,7 +37,7 @@ zone_id = "bow"
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="GrappleAnchor" parent="DeckZones/ZoneBow" index="1"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.35, 1, 0)
 
 [node name="ZoneMidship" parent="DeckZones" unique_id=101303190 instance=ExtResource("2_zone")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.48575354, -0.036711633, -0.046703592)
@@ -46,7 +46,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.48575354, -0.036711633, -0.
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="GrappleAnchor" parent="DeckZones/ZoneMidship" index="1"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.35, 1, 0)
 
 [node name="ZoneStern" parent="DeckZones" unique_id=1654720967 instance=ExtResource("2_zone")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.49031687, -0.018458724, 0.2525537)
@@ -56,7 +56,7 @@ zone_id = "stern"
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="GrappleAnchor" parent="DeckZones/ZoneStern" index="1"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.35, 1, 0)
 
 [node name="CrewStations" type="Node3D" parent="." unique_id=240058129]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.9001923, 1.0280576, 0)

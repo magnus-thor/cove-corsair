@@ -259,34 +259,34 @@ func _animate_breakdown(run_coins: int, bonus: int, final_run_bank: int) -> void
 	_tally_tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	_tally_tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 
-	var tracker = {"last_tick": -1}
-	var step_chunk = max(1, int(float(run_coins) / 12.0))
+	var tracker: Dictionary = {"last_tick": -1}
+	var step_chunk: int = max(1, int(float(run_coins) / 12.0))
 	
-	_tally_tween.tween_method(func(val: float):
-		var cur = int(val)
+	_tally_tween.tween_method(func(val: float) -> void:
+		var cur: int = int(val)
 		if run_doubloons_label:
 			run_doubloons_label.text = str(cur)
-		if cur != tracker["last_tick"] and (cur % step_chunk == 0 or cur == run_coins):
+		if cur != int(tracker["last_tick"]) and (cur % step_chunk == 0 or cur == run_coins):
 			tracker["last_tick"] = cur
 			if AudioManager and AudioManager.has_method("play_sfx") and cur > 0:
 				AudioManager.play_sfx("coin_pickups", 0.95 + float(cur) / max(1.0, float(run_coins)) * 0.35, 1.05 + float(cur) / max(1.0, float(run_coins)) * 0.35, 0.5)
 	, 0.0, float(run_coins), 0.75)
 
 	if _is_victory and bonus > 0:
-		_tally_tween.tween_method(func(val: float):
+		_tally_tween.tween_method(func(val: float) -> void:
 			if bonus_label:
 				bonus_label.text = "+%d" % int(val)
 		, 0.0, float(bonus), 0.75)
 
-	_tally_tween.tween_method(func(val: float):
+	_tally_tween.tween_method(func(val: float) -> void:
 		if total_banked_label:
 			total_banked_label.text = str(int(val))
 	, 0.0, float(final_run_bank), 0.85)
 
 func _update_stars(count: int) -> void:
-	var stars = [star_1, star_2, star_3]
-	for i in range(stars.size()):
-		var s = stars[i]
+	var stars: Array[Label] = [star_1, star_2, star_3]
+	for i: int in range(stars.size()):
+		var s: Label = stars[i]
 		if not s:
 			continue
 		if i < count:
@@ -298,7 +298,7 @@ func _update_shipyard_button() -> void:
 	if not shipyard_button:
 		return
 
-	var can_afford = GameState.can_afford_active_vessel_upgrade()
+	var can_afford: bool = GameState.can_afford_active_vessel_upgrade()
 
 	if _glow_tween and _glow_tween.is_valid():
 		_glow_tween.kill()
@@ -361,15 +361,15 @@ func _on_bonus_claim_pressed() -> void:
 		AudioManager.play_sfx("coin_pickups", 1.2, 1.2, 4.0)
 		AudioManager.play_sfx("gate_passes", 0.9, 1.1)
 		
-	var old_run_spoils = _banked_this_run
+	var old_run_spoils: int = _banked_this_run
 	_banked_this_run += bonus_amount
 	_total_banked = GameState.doubloons
 	
 	if total_banked_label:
 		total_banked_label.text = str(_banked_this_run)
-		var tween = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		var tween: Tween = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
-		tween.tween_method(func(val: float):
+		tween.tween_method(func(val: float) -> void:
 			if total_banked_label:
 				total_banked_label.text = str(int(val))
 		, float(old_run_spoils), float(_banked_this_run), 0.5)
@@ -411,13 +411,13 @@ func _on_shipyard_pressed() -> void:
 		AudioManager.play_sfx("gate_passes")
 	if shipyard_button:
 		shipyard_button.disabled = true
-	var shipyard_scene = preload("res://src/ui/shipyard/shipyard_ui.tscn")
+	var shipyard_scene: PackedScene = preload("res://src/ui/shipyard/shipyard_ui.tscn")
 	if shipyard_scene:
-		var shipyard = shipyard_scene.instantiate() as CanvasLayer
+		var shipyard: ShipyardUI = shipyard_scene.instantiate() as ShipyardUI
 		visible = false
 		get_parent().add_child(shipyard)
-		if shipyard.has_signal("shipyard_closed"):
-			shipyard.shipyard_closed.connect(func():
+		if shipyard:
+			shipyard.shipyard_closed.connect(func() -> void:
 				visible = true
 				if shipyard_button:
 					shipyard_button.disabled = false
