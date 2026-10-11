@@ -209,6 +209,9 @@ func spawn_scenery() -> void:
 	var palm_bend_path      := "res://assets/models/palm-detailed-bend.glb"
 	var palm_island_path    := "res://assets/models/scenery/Low_Poly_Palm_Island.glb"
 	var mangrove_grove_path := "res://assets/models/scenery/Emerald_Mangrove_Grov.glb"
+	var coconut_palm_path   := "res://assets/models/scenery/Coconut_Palm_Tree.glb"
+	var bush_path           := "res://assets/models/scenery/Tropical_Hibiscus_Blo.glb"
+	var anchor_path         := "res://assets/models/scenery/Rustbound_Anchor.glb"
 	var dock_ruin_paths: Array[String] = [
 		"res://assets/models/structure-platform-dock-small.glb",
 		"res://assets/models/structure.glb",
@@ -274,7 +277,12 @@ func spawn_scenery() -> void:
 				
 				# Palm on shoal (60 % chance)
 				if randf() < 0.6:
-					var palm_path := palm_straight_path if randf() < 0.5 else palm_bend_path
+					var p_roll: float = randf()
+					var palm_path: String = palm_straight_path
+					if p_roll < 0.35 and ResourceLoader.exists(coconut_palm_path):
+						palm_path = coconut_palm_path
+					elif p_roll < 0.65:
+						palm_path = palm_bend_path
 					var palm_scene: PackedScene = load(palm_path) as PackedScene
 					if palm_scene:
 						var palm_inst := palm_scene.instantiate() as Node3D
@@ -284,22 +292,47 @@ func spawn_scenery() -> void:
 						palm_inst.rotation.y = randf_range(0.0, TAU)
 						_clean_shadow_nodes(palm_inst)
 
+				# Understory bush on shoal (30 % chance)
+				if randf() < 0.30 and ResourceLoader.exists(bush_path):
+					var bush_scene := load(bush_path) as PackedScene
+					if bush_scene:
+						var bush_inst := bush_scene.instantiate() as Node3D
+						base_inst.add_child(bush_inst)
+						var b_scale: float = randf_range(0.6, 0.9)
+						bush_inst.scale = Vector3.ONE * b_scale
+						bush_inst.position = Vector3(randf_range(-0.3, 0.3), 0.52 * b_scale, randf_range(-0.3, 0.3))
+						bush_inst.rotation.y = randf_range(0.0, TAU)
+						_clean_shadow_nodes(bush_inst)
+
 				# buffer=0.0 — allow rocks to kiss ±6.0 for an organic jagged silhouette.
 				_enforce_navigable_clearance(base_inst, is_left)
 
-		# ── Dock ruins accent prop (30 % chance) ──────────────────────────────
+		# ── Dock ruins / Anchor accent prop (30 % chance) ─────────────────────
 		if randf() < 0.30:
-			var ruin_path: String = dock_ruin_paths[randi() % dock_ruin_paths.size()]
-			var ruin_scene: PackedScene = load(ruin_path) as PackedScene
-			if ruin_scene:
-				var ruin_inst := ruin_scene.instantiate() as Node3D
-				scenery_container.add_child(ruin_inst)
-				var ruin_x := randf_range(-8.5, -6.5) if is_left else randf_range(6.5, 8.5)
-				ruin_inst.position   = Vector3(ruin_x, 0.0, rand_z + randf_range(-2.0, 2.0))
-				ruin_inst.scale      = Vector3.ONE * randf_range(0.8, 1.2)
-				ruin_inst.rotation.y = randf_range(0.0, TAU)
-				_clean_shadow_nodes(ruin_inst)
-				_enforce_navigable_clearance(ruin_inst, is_left)
+			var accent_x: float = randf_range(-8.5, -6.5) if is_left else randf_range(6.5, 8.5)
+			if randf() < 0.40 and ResourceLoader.exists(anchor_path):
+				var anchor_scene := load(anchor_path) as PackedScene
+				if anchor_scene:
+					var anchor_inst := anchor_scene.instantiate() as Node3D
+					scenery_container.add_child(anchor_inst)
+					var a_scale: float = randf_range(0.8, 1.1)
+					anchor_inst.position = Vector3(accent_x, 0.45 * a_scale, rand_z + randf_range(-1.5, 1.5))
+					anchor_inst.scale = Vector3.ONE * a_scale
+					anchor_inst.rotation.y = randf_range(0.0, TAU)
+					anchor_inst.rotation.z = (0.15 if is_left else -0.15)
+					_clean_shadow_nodes(anchor_inst)
+					_enforce_navigable_clearance(anchor_inst, is_left)
+			else:
+				var ruin_path: String = dock_ruin_paths[randi() % dock_ruin_paths.size()]
+				var ruin_scene: PackedScene = load(ruin_path) as PackedScene
+				if ruin_scene:
+					var ruin_inst := ruin_scene.instantiate() as Node3D
+					scenery_container.add_child(ruin_inst)
+					ruin_inst.position   = Vector3(accent_x, 0.0, rand_z + randf_range(-2.0, 2.0))
+					ruin_inst.scale      = Vector3.ONE * randf_range(0.8, 1.2)
+					ruin_inst.rotation.y = randf_range(0.0, TAU)
+					_clean_shadow_nodes(ruin_inst)
+					_enforce_navigable_clearance(ruin_inst, is_left)
 
 func _clean_shadow_nodes(node: Node) -> void:
 	if not node:

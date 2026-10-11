@@ -99,14 +99,22 @@ const FLAVOR_CANNON    := "res://assets/models/cannon.glb"
 const FLAVOR_CRATE     := "res://assets/models/crate.glb"
 
 ## Custom Stylized Scenery Models (assets/models/scenery/)
-const SCENERY_MANGROVE_GROVE   := "res://assets/models/scenery/Emerald_Mangrove_Grov.glb"
-const SCENERY_PALM_ISLAND      := "res://assets/models/scenery/Low_Poly_Palm_Island.glb"
-const SCENERY_MOLTEN_CROWN     := "res://assets/models/scenery/Molten_Crown.glb"
-const SCENERY_MOLTEN_TREE      := "res://assets/models/scenery/Molten_Thorn_Tree.glb"
-const SCENERY_MOSSWOOD_DRIFT   := "res://assets/models/scenery/Mosswood_Drift.glb"
-const SCENERY_OBSIDIAN_CRYSTAL := "res://assets/models/scenery/Obsidian_Crystal_Clus.glb"
-const SCENERY_PAINTED_TOTEM    := "res://assets/models/scenery/Totem_of_the_Painted.glb"
-const SCENERY_LAVA_GEYSER_VFX  := "res://src/vfx/vfx_lava_geyser.tscn"
+const SCENERY_MANGROVE_GROVE    := "res://assets/models/scenery/Emerald_Mangrove_Grov.glb"
+const SCENERY_PALM_ISLAND       := "res://assets/models/scenery/Low_Poly_Palm_Island.glb"
+const SCENERY_MOLTEN_CROWN      := "res://assets/models/scenery/Molten_Crown.glb"
+const SCENERY_MOLTEN_TREE       := "res://assets/models/scenery/Molten_Thorn_Tree.glb"
+const SCENERY_MOSSWOOD_DRIFT    := "res://assets/models/scenery/Mosswood_Drift.glb"
+const SCENERY_OBSIDIAN_CRYSTAL  := "res://assets/models/scenery/Obsidian_Crystal_Clus.glb"
+const SCENERY_PAINTED_TOTEM     := "res://assets/models/scenery/Totem_of_the_Painted.glb"
+const SCENERY_LAVA_GEYSER_VFX   := "res://src/vfx/vfx_lava_geyser.tscn"
+const SCENERY_VOLCANIC_SPIRE    := "res://assets/models/scenery/Volcanic_Spire.glb"
+const SCENERY_MOURNWOOD_TREE    := "res://assets/models/scenery/Mournwood_Tree.glb"
+const SCENERY_WITHERED_WILLOW   := "res://assets/models/scenery/The_Withered_Willow.glb"
+const SCENERY_CATTAILS          := "res://assets/models/scenery/Cattails.glb"
+const SCENERY_CATTAILS_WATER    := "res://assets/models/scenery/Cattails_in_Water.glb"
+const SCENERY_TROPICAL_BUSH     := "res://assets/models/scenery/Tropical_Hibiscus_Blo.glb"
+const SCENERY_COCONUT_PALM      := "res://assets/models/scenery/Coconut_Palm_Tree.glb"
+const SCENERY_RUSTBOUND_ANCHOR  := "res://assets/models/scenery/Rustbound_Anchor.glb"
 
 # ── Shared Materials for Mobile Batching ───────────────────────────────────────
 
@@ -280,6 +288,43 @@ func _generate_tropical_shoreline() -> void:
 					tuft_node.rotation.y = randf_range(0.0, TAU)
 					_enforce_navigable_clearance(tuft_node, is_left, 6.6)
 
+	# Custom Scenery: Tropical Flowering Bush (understory 2-3 per chunk)
+	var bush_count := randi_range(2, 3)
+	var bush_step := chunk_length / float(bush_count)
+	for i in range(bush_count):
+		var z_pos := -half_len + (i + 0.5) * bush_step + randf_range(-1.0, 1.0)
+		var bush_node := _instantiate_custom_scenery(SCENERY_TROPICAL_BUSH)
+		if bush_node:
+			var s_val := randf_range(0.9, 1.3)
+			bush_node.scale = Vector3.ONE * s_val
+			bush_node.position = Vector3(sign_x * randf_range(7.4, 8.4), 0.52 * s_val, z_pos)
+			bush_node.rotation.y = randf_range(0.0, TAU)
+			_enforce_navigable_clearance(bush_node, is_left, 6.6)
+
+	# Custom Scenery: Coconut Palm Sapling/Tree (1-2 per chunk)
+	var coco_count := randi_range(1, 2)
+	var coco_step := chunk_length / float(coco_count)
+	for i in range(coco_count):
+		var z_pos := -half_len + (i + 0.6) * coco_step + randf_range(-1.0, 1.0)
+		var coco_node := _instantiate_custom_scenery(SCENERY_COCONUT_PALM)
+		if coco_node:
+			var s_val := randf_range(1.1, 1.4)
+			coco_node.scale = Vector3.ONE * s_val
+			coco_node.position = Vector3(sign_x * randf_range(8.4, 9.4), 0.95 * s_val, z_pos)
+			coco_node.rotation.y = randf_range(0.0, TAU)
+			_enforce_navigable_clearance(coco_node, is_left, 6.6)
+
+	# Custom Scenery: Rustbound Anchor (flavor prop half-buried in sand)
+	if randf() < 0.40:
+		var anchor_node := _instantiate_custom_scenery(SCENERY_RUSTBOUND_ANCHOR)
+		if anchor_node:
+			var s_val := randf_range(0.9, 1.2)
+			anchor_node.scale = Vector3.ONE * s_val
+			anchor_node.position = Vector3(sign_x * randf_range(7.2, 8.0), 0.45 * s_val, randf_range(-half_len * 0.7, half_len * 0.7))
+			anchor_node.rotation.y = randf_range(0.0, TAU)
+			anchor_node.rotation.z = sign_x * randf_range(0.10, 0.25)
+			_enforce_navigable_clearance(anchor_node, is_left, 6.6)
+
 	# Custom Scenery: Lush Mangrove Cluster with arching waterline roots
 	if randf() < 0.70:
 		var mangrove_node := _instantiate_custom_scenery(SCENERY_MANGROVE_GROVE)
@@ -364,6 +409,20 @@ func _generate_bayou_shoreline() -> void:
 			drift_node.rotation.z = sign_x * randf_range(-0.06, 0.06)
 			_enforce_navigable_clearance(drift_node, is_left, 6.6)
 
+	# Custom Scenery: Swamp Cattail Reeds along waterline (2-4 per chunk)
+	var cattail_count := randi_range(2, 4)
+	var cattail_step := chunk_length / float(cattail_count)
+	for i in range(cattail_count):
+		var z_pos := -half_len + (i + 0.5) * cattail_step + randf_range(-0.8, 0.8)
+		var reed_path := SCENERY_CATTAILS_WATER if randf() < 0.5 else SCENERY_CATTAILS
+		var reed_node := _instantiate_custom_scenery(reed_path)
+		if reed_node:
+			var s_val := randf_range(1.0, 1.4)
+			reed_node.scale = Vector3.ONE * s_val
+			reed_node.position = Vector3(sign_x * randf_range(7.0, 7.8), 0.72 * s_val, z_pos)
+			reed_node.rotation.y = randf_range(0.0, TAU)
+			_enforce_navigable_clearance(reed_node, is_left, 6.6)
+
 	# Tier 2: Ruined Stilt Dock Platforms & Dense Reeds
 	var dock_count := randi_range(2, 3)
 	var dock_step := chunk_length / float(dock_count)
@@ -377,6 +436,20 @@ func _generate_bayou_shoreline() -> void:
 			dock_node.rotation.y = randf_range(0.0, TAU)
 			dock_node.rotation.z = sign_x * randf_range(0.04, 0.08) # slightly dilapidated tilt
 			_enforce_navigable_clearance(dock_node, is_left, 6.6)
+
+	# Custom Scenery: Dead Swamp Trees (Mournwood / Withered Willow, 2-3 per chunk)
+	var swamp_tree_count := randi_range(2, 3)
+	var swamp_tree_step := chunk_length / float(swamp_tree_count)
+	for i in range(swamp_tree_count):
+		var z_pos := -half_len + (i + 0.5) * swamp_tree_step + randf_range(-1.2, 1.2)
+		var tree_path := SCENERY_WITHERED_WILLOW if randf() < 0.5 else SCENERY_MOURNWOOD_TREE
+		var tree_node := _instantiate_custom_scenery(tree_path)
+		if tree_node:
+			var s_val := randf_range(1.2, 1.6)
+			tree_node.scale = Vector3.ONE * s_val
+			tree_node.position = Vector3(sign_x * randf_range(8.2, 9.5), 0.76 * s_val, z_pos)
+			tree_node.rotation.y = randf_range(0.0, TAU)
+			_enforce_navigable_clearance(tree_node, is_left, 6.6)
 
 	# Custom Scenery: Swamp Mangrove Trees with twisted aerial roots (1-2 per chunk)
 	var mangrove_count := randi_range(1, 2)
@@ -541,6 +614,19 @@ func _generate_brimstone_shoreline() -> void:
 			crystal_node.position = Vector3(sign_x * randf_range(7.6, 8.6), 0.85 * s_val, z_pos)
 			crystal_node.rotation.y = randf_range(0.0, TAU)
 			_enforce_navigable_clearance(crystal_node, is_left, 6.6)
+
+	# Custom Scenery: Volcanic Rock Spire (2-3 per chunk)
+	var spire_count := randi_range(2, 3)
+	var spire_step := chunk_length / float(spire_count)
+	for i in range(spire_count):
+		var z_pos := -half_len + (i + 0.5) * spire_step + randf_range(-1.2, 1.2)
+		var spire_node := _instantiate_custom_scenery(SCENERY_VOLCANIC_SPIRE)
+		if spire_node:
+			var s_val := randf_range(1.4, 2.0)
+			spire_node.scale = Vector3.ONE * s_val
+			spire_node.position = Vector3(sign_x * randf_range(8.0, 9.4), 0.92 * s_val, z_pos)
+			spire_node.rotation.y = randf_range(0.0, TAU)
+			_enforce_navigable_clearance(spire_node, is_left, 6.6)
 
 	# Tier 2: Charred Watch Structures & Iron Fortifications
 	var tower_count := randi_range(1, 2)

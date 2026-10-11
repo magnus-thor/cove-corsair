@@ -1,0 +1,46 @@
+[remap]
+
+importer="texture"
+type="CompressedTexture2D"
+uid="uid://cwvhvog2nxsaf"
+path.s3tc="res://.godot/imported/Coconut_Palm_Tree_2.jpg-856a613a84c795564cc0ed9c0fe0eaf0.s3tc.ctex"
+path.etc2="res://.godot/imported/Coconut_Palm_Tree_2.jpg-856a613a84c795564cc0ed9c0fe0eaf0.etc2.ctex"
+metadata={
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
+}
+generator_parameters={
+"md5": "a1abdd79b0c0cde92f490ddf4487ea1b"
+}
+
+[deps]
+
+source_file="res://assets/models/scenery/Coconut_Palm_Tree_2.jpg"
+dest_files=["res://.godot/imported/Coconut_Palm_Tree_2.jpg-856a613a84c795564cc0ed9c0fe0eaf0.s3tc.ctex", "res://.godot/imported/Coconut_Palm_Tree_2.jpg-856a613a84c795564cc0ed9c0fe0eaf0.etc2.ctex"]
+
+[params]
+
+compress/mode=2
+compress/high_quality=false
+compress/high_quality_mode=0
+compress/lossy_quality=0.7
+compress/uastc_level=0
+compress/rdo_quality_loss=0.0
+compress/hdr_compression=1
+compress/normal_map=1
+compress/channel_pack=0
+mipmaps/generate=true
+mipmaps/limit=-1
+roughness/mode=1
+roughness/src_normal="res://assets/models/scenery/Coconut_Palm_Tree_2.jpg"
+process/channel_remap/red=0
+process/channel_remap/green=1
+process/channel_remap/blue=2
+process/channel_remap/alpha=3
+process/fix_alpha_border=true
+process/premult_alpha=false
+process/normal_map_invert_y=false
+process/hdr_as_srgb=false
+process/hdr_clamp_exposure=false
+process/size_limit=0
+detect_3d/compress_to=0
