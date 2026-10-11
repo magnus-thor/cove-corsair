@@ -103,3 +103,59 @@ func get_chunk_length() -> float:
 ## has moved past the cleanup threshold behind the camera.
 func is_past_camera(cleanup_z: float = 30.0) -> bool:
 	return get_end_z() > cleanup_z
+
+## Applies per-level procedural variation to chunk scenery (mirroring, scale, jitter, density, open vs narrow).
+## Reuses existing Kenney and custom models with novel combinations, rotations, and distances from lane.
+func apply_scenery_variation(level_seed: int, is_narrow_section: bool = false) -> void:
+	var banks: Node3D = get_node_or_null("Banks") as Node3D
+	if not banks:
+		return
+
+	var rng := RandomNumberGenerator.new()
+	rng.seed = level_seed
+
+	# 1. Bank Mirroring: 50% chance to flip left and right banks across the river
+	var mirror_banks: bool = (rng.randi() % 2 == 1)
+
+	# 2. Section Spacing: Narrow gorge vs Open wide bay
+	var spacing_bias: float = rng.randf_range(0.0, 0.7) if is_narrow_section else rng.randf_range(1.5, 3.2)
+
+	for child: Node in banks.get_children():
+		if not (child is Node3D):
+			continue
+		var prop: Node3D = child as Node3D
+
+		# Mirror X-axis and mirror orientation
+		if mirror_banks:
+			prop.position.x = -prop.position.x
+			prop.rotation.y = wrapf(prop.rotation.y + PI, 0.0, TAU)
+
+		# Jitter lane distance while strictly respecting minimum navigable clearance (|X| >= 6.8m)
+		var sign_x: float = -1.0 if prop.position.x < 0.0 else 1.0
+		var current_dist: float = absf(prop.position.x)
+		var target_dist: float = maxf(6.8, current_dist + spacing_bias + rng.randf_range(-0.4, 0.6))
+		prop.position.x = sign_x * target_dist
+
+		# Longitudinal Z-axis jitter (constrained within chunk length)
+		var jitter_z: float = rng.randf_range(-2.0, 2.0)
+		prop.position.z = clampf(prop.position.z + jitter_z, -CHUNK_LENGTH + 1.0, -1.0)
+
+		# Scale randomization (0.85x to 1.30x)
+		var scale_factor: float = rng.randf_range(0.85, 1.30)
+		prop.scale *= scale_factor
+
+		# Rotation randomization
+		var prop_name: String = prop.name.to_lower()
+		if "rock" in prop_name or "palm" in prop_name or "bush" in prop_name:
+			prop.rotation.y = wrapf(prop.rotation.y + rng.randf_range(-PI, PI), 0.0, TAU)
+			prop.rotation.x = rng.randf_range(-0.06, 0.06)
+			prop.rotation.z = rng.randf_range(-0.06, 0.06)
+		else:
+			# Docks, towers, walls: subtle organic angle offset
+			prop.rotation.y = wrapf(prop.rotation.y + rng.randf_range(-0.15, 0.15), 0.0, TAU)
+
+		# Density & grouping: 30% chance to toggle non-essential secondary accents for organic pacing
+		if "fence" in prop_name or "accent" in prop_name or "dock" in prop_name or "flavor" in prop_name:
+			if rng.randf() < 0.30:
+				prop.visible = false
+

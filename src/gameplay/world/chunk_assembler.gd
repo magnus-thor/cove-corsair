@@ -181,6 +181,8 @@ func assemble_level(data: LevelData = null) -> void:
 				if prev_chunk.chunk_id != "boss_intro_buffer" and BOSS_BUFFER_CHUNK_SCENE:
 					var buffer_instance := BOSS_BUFFER_CHUNK_SCENE.instantiate() as BaseTrackChunk
 					if buffer_instance:
+						var buf_seed: int = (active_level_data.level_id * 7919) + (active_chunks.size() * 313) + 42
+						buffer_instance.apply_scenery_variation(buf_seed, false)
 						add_child(buffer_instance)
 						buffer_instance.position = Vector3(0.0, 0.0, current_z_offset)
 						current_z_offset -= buffer_instance.CHUNK_LENGTH
@@ -189,6 +191,12 @@ func assemble_level(data: LevelData = null) -> void:
 		# If this is the starting chunk (index 0), enforce safe clearance runway (>= 35.0m) from player start
 		if active_chunks.is_empty():
 			_enforce_start_clearance_in_chunk(chunk_instance, 35.0)
+
+		# Apply procedural scenery variations (bank mirroring, transform jitter, spacing)
+		var chunk_idx: int = active_chunks.size()
+		var level_seed: int = (active_level_data.level_id * 7919) + (chunk_idx * 313) + 42
+		var is_narrow: bool = ((active_level_data.level_id + chunk_idx) % 3 == 0)
+		chunk_instance.apply_scenery_variation(level_seed, is_narrow)
 
 		add_child(chunk_instance)
 		chunk_instance.position = Vector3(0.0, 0.0, current_z_offset)

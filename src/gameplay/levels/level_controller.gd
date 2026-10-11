@@ -1043,6 +1043,12 @@ func _advance_and_wrap_side(chunks: Array[Node3D], delta_z: float) -> void:
 			chunk.global_position.z -= c_len * float(chunks.size())
 		wrapping.erase(chunk)
 
+		# Regenerate scenery on wrap so riverbank chunks never loop identically
+		if chunk.has_method("setup"):
+			var side_str: String = str(chunk.get("side")) if "side" in chunk else "left"
+			var b_name: String = level_data.biome_name if (level_data and "biome_name" in level_data) else "tropical"
+			chunk.call("setup", side_str, c_len, b_name)
+
 # ── Diagnostic In-Game Monitor ───────────────────────────────────────────────
 
 func run_blinking_diagnostic() -> Dictionary:

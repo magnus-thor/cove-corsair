@@ -1,9 +1,9 @@
 [gd_resource type="Resource" script_class="LevelData" format=3]
 
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_opener_ambush.tscn" id="chunk_1"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_opener_gauntlet.tscn" id="chunk_1"]
 [ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_gunner_ambush.tscn" id="chunk_2"]
 [ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_warmup.tscn" id="chunk_3"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_mine_gauntlet.tscn" id="chunk_4"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_reef_slalom.tscn" id="chunk_4"]
 [ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_barricade_siege.tscn" id="chunk_5"]
 [ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_fodder_swarm.tscn" id="chunk_6"]
 [ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_finish_line.tscn" id="chunk_7"]
@@ -21,5 +21,5 @@ completion_doubloon_reward = 72
 horizon_texture = ExtResource("ext_horizon")
 water_albedo = Color(0.08, 0.58, 0.82, 0.88)
 fog_color = Color(0.48, 0.76, 0.94, 1.0)
-fog_density = 0.005
+fog_density = 0.002
 river_width_world = 12.0

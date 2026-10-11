@@ -169,16 +169,19 @@ func _ready() -> void:
 
 # ── Public API ────────────────────────────────────────────────────────────────
 
-func setup(p_side: String, p_length: float = 40.0, p_biome: String = "tropical") -> void:
+func setup(p_side: String, p_length: float = 40.0, p_biome: String = "tropical", p_seed: int = 0) -> void:
 	side         = p_side
 	chunk_length = p_length
 	biome        = p_biome
+	if p_seed != 0:
+		seed(p_seed)
 	_generate()
 
 # ── Internal Generation ───────────────────────────────────────────────────────
 
 func _generate() -> void:
-	for child in get_children():
+	for child: Node in get_children():
+		remove_child(child)
 		child.queue_free()
 
 	_setup_bank_scenery_slots()

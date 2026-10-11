@@ -17,31 +17,6 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 RESOURCES_DIR = os.path.join(ROOT_DIR, "src", "data", "resources", "levels")
 DOCS_DIR = os.path.join(ROOT_DIR, "documents", "levels")
 
-# Biome definitions
-BIOMES = {
-    "tropical": {
-        "name": "tropical",
-        "horizon": "res://assets/textures/horizon_smugglers_run.png",
-        "water": "Color(0.08, 0.58, 0.82, 0.88)",
-        "fog_color": "Color(0.48, 0.76, 0.94, 1.0)",
-        "fog_density": 0.005,
-    },
-    "bayou": {
-        "name": "bayou",
-        "horizon": "res://assets/textures/horizon_bayou.png",
-        "water": "Color(0.12, 0.32, 0.22, 0.92)",
-        "fog_color": "Color(0.20, 0.38, 0.30, 1.0)",
-        "fog_density": 0.02,
-    },
-    "brimstone": {
-        "name": "brimstone",
-        "horizon": "res://assets/textures/horizon_brimstone.png",
-        "water": "Color(0.28, 0.14, 0.12, 0.92)",
-        "fog_color": "Color(0.45, 0.22, 0.18, 1.0)",
-        "fog_density": 0.018,
-    }
-}
-
 # 45 Level Titles
 LEVEL_TITLES = {
     1: "Level 1: Smuggler's Run",
@@ -91,6 +66,87 @@ LEVEL_TITLES = {
     45: "Level 45: Bonebeard's Throne",
 }
 
+# Biome definitions with progressive atmospheric tuning
+def get_biome_data(lvl: int) -> dict:
+    if 1 <= lvl <= 15:
+        # Tropical: Shallows -> Lagoons -> Storm Citadel Reefs
+        if lvl <= 5:
+            return {
+                "name": "tropical",
+                "horizon": "res://assets/textures/horizon_smugglers_run.png",
+                "water": "Color(0.08, 0.58, 0.82, 0.88)",
+                "fog_color": "Color(0.48, 0.76, 0.94, 1.0)",
+                "fog_density": 0.002,
+            }
+        elif lvl <= 10:
+            return {
+                "name": "tropical",
+                "horizon": "res://assets/textures/horizon_smugglers_run.png",
+                "water": "Color(0.06, 0.52, 0.66, 0.88)",
+                "fog_color": "Color(0.44, 0.72, 0.88, 1.0)",
+                "fog_density": 0.006,
+            }
+        else:
+            return {
+                "name": "tropical",
+                "horizon": "res://assets/textures/horizon_smugglers_run.png",
+                "water": "Color(0.05, 0.40, 0.58, 0.90)",
+                "fog_color": "Color(0.38, 0.65, 0.82, 1.0)",
+                "fog_density": 0.010,
+            }
+    elif 16 <= lvl <= 30:
+        # Bayou: Murkwater Run -> Gloom Mire -> Black Tide Abyss
+        if lvl <= 20:
+            return {
+                "name": "bayou",
+                "horizon": "res://assets/textures/horizon_bayou.png",
+                "water": "Color(0.14, 0.35, 0.22, 0.92)",
+                "fog_color": "Color(0.24, 0.40, 0.32, 1.0)",
+                "fog_density": 0.016,
+            }
+        elif lvl <= 25:
+            return {
+                "name": "bayou",
+                "horizon": "res://assets/textures/horizon_bayou.png",
+                "water": "Color(0.10, 0.26, 0.18, 0.94)",
+                "fog_color": "Color(0.18, 0.35, 0.26, 1.0)",
+                "fog_density": 0.022,
+            }
+        else:
+            return {
+                "name": "bayou",
+                "horizon": "res://assets/textures/horizon_bayou.png",
+                "water": "Color(0.07, 0.18, 0.14, 0.95)",
+                "fog_color": "Color(0.15, 0.28, 0.22, 1.0)",
+                "fog_density": 0.028,
+            }
+    else:
+        # Brimstone: Cinder Rapids -> Magma Surge -> Abyssal Inferno
+        if lvl <= 35:
+            return {
+                "name": "brimstone",
+                "horizon": "res://assets/textures/horizon_brimstone.png",
+                "water": "Color(0.30, 0.14, 0.12, 0.92)",
+                "fog_color": "Color(0.48, 0.24, 0.18, 1.0)",
+                "fog_density": 0.016,
+            }
+        elif lvl <= 40:
+            return {
+                "name": "brimstone",
+                "horizon": "res://assets/textures/horizon_brimstone.png",
+                "water": "Color(0.38, 0.12, 0.08, 0.94)",
+                "fog_color": "Color(0.44, 0.20, 0.16, 1.0)",
+                "fog_density": 0.022,
+            }
+        else:
+            return {
+                "name": "brimstone",
+                "horizon": "res://assets/textures/horizon_brimstone.png",
+                "water": "Color(0.24, 0.06, 0.06, 0.96)",
+                "fog_color": "Color(0.40, 0.16, 0.14, 1.0)",
+                "fog_density": 0.028,
+            }
+
 def get_biome_key(lvl: int) -> str:
     if 1 <= lvl <= 15:
         return "tropical"
@@ -128,7 +184,6 @@ def get_level_title(lvl: int) -> str:
         return f"{base} (Hazard Nav)"
 
 def get_chunk_sequence(lvl: int) -> list:
-    # Base chunk pools
     C_WARMUP = "res://src/gameplay/chunks/chunk_warmup.tscn"              # Contains Gate 1
     C_OPENER_AMBUSH = "res://src/gameplay/chunks/chunk_opener_ambush.tscn"
     C_OPENER_GAUNTLET = "res://src/gameplay/chunks/chunk_opener_gauntlet.tscn"
@@ -142,59 +197,63 @@ def get_chunk_sequence(lvl: int) -> list:
     C_CLIMAX = "res://src/gameplay/chunks/chunk_vanguard_climax.tscn"
     C_FINISH = "res://src/gameplay/chunks/chunk_finish_line.tscn"
 
-    # Handcrafted early campaign levels (Levels 1-5):
-    # Enforces: Part 1 easy start -> Gate 1 (~33%) -> Part 2 escalation -> Gate 2 (~66%) -> Part 3 swarm horde
-    if lvl == 1:
-        # 5 chunks: Opener -> Gate 1 (~33%) -> Gunner -> Gate 2 (~66%) -> Finish
-        return [C_OPENER_AMBUSH, C_WARMUP, C_GUNNER, C_BARRICADE, C_FINISH]
-    elif lvl == 2:
-        # 6 chunks: Opener -> Gate 1 (~33%) -> Mine -> Gate 2 (~66%) -> Fodder Swarm -> Finish
-        return [C_OPENER_AMBUSH, C_WARMUP, C_MINE, C_BARRICADE, C_FODDER, C_FINISH]
-    elif lvl == 3:
-        # 7 chunks: Opener -> Opener Ambush -> Gate 1 (~33%) -> Gunner -> Gate 2 (~66%) -> Fodder Swarm -> Finish
-        return [C_OPENER_AMBUSH, C_GUNNER, C_WARMUP, C_MINE, C_BARRICADE, C_FODDER, C_FINISH]
-    elif lvl == 4:
-        # 7 chunks: Opener Ambush -> Gunner Skirmish -> Gate 1 (~33%) -> Reef Slalom (gentle 2-reef intro) -> Gate 2 (~66%) -> Fodder Swarm -> Finish
-        return [C_OPENER_AMBUSH, C_GUNNER, C_WARMUP, C_REEF, C_BARRICADE, C_FODDER, C_FINISH]
-    elif lvl == 5:
-        # 7 chunks: Opener -> Gunner -> Gate 1 (~33%) -> Mine -> Gate 2 (~66%) -> Fodder Swarm -> Boss Ironjaw
-        boss_chunk = get_boss_chunk(lvl)
-        return [C_OPENER_AMBUSH, C_GUNNER, C_WARMUP, C_MINE, C_BARRICADE, C_FODDER, boss_chunk]
-    elif lvl == 19:
-        # Level 19: Devil's Slalom (mine gauntlet & reefs)
-        return [C_OPENER_GAUNTLET, C_MINE, C_WARMUP, C_REEF, C_GUNNER, C_BARRICADE, C_FODDER, C_CLIMAX, C_FINISH]
+    # Handcrafted, distinctive sequences for every level: NO two consecutive levels share order or pacing!
+    SEQUENCES = {
+        1: [C_OPENER_AMBUSH, C_WARMUP, C_GUNNER, C_BARRICADE, C_FINISH],
+        2: [C_OPENER_SLALOM, C_WARMUP, C_MINE, C_BARRICADE, C_FODDER, C_FINISH],
+        3: [C_OPENER_GAUNTLET, C_GUNNER, C_WARMUP, C_REEF, C_BARRICADE, C_FODDER, C_FINISH],
+        4: [C_OPENER_AMBUSH, C_REEF, C_WARMUP, C_MINE, C_BARRICADE, C_CLIMAX, C_FINISH],
+        5: [C_OPENER_AMBUSH, C_GUNNER, C_WARMUP, C_MINE, C_BARRICADE, C_FODDER, get_boss_chunk(5)],
+        
+        6: [C_OPENER_SLALOM, C_MINE, C_WARMUP, C_GUNNER, C_REEF, C_BARRICADE, C_FODDER, C_FINISH],
+        7: [C_OPENER_GAUNTLET, C_REEF, C_WARMUP, C_MINE, C_GUNNER, C_BARRICADE, C_CLIMAX, C_FINISH],
+        8: [C_OPENER_AMBUSH, C_GUNNER, C_WARMUP, C_REEF, C_MINE, C_BARRICADE, C_FODDER, C_FINISH],
+        9: [C_OPENER_SLALOM, C_WARMUP, C_MINE, C_GUNNER, C_REEF, C_BARRICADE, C_CLIMAX, C_FINISH],
+        10: [C_OPENER_GAUNTLET, C_REEF, C_WARMUP, C_GUNNER, C_MINE, C_BARRICADE, C_CLIMAX, get_boss_chunk(10)],
 
-    is_boss = (lvl % 5 == 0)
+        11: [C_OPENER_AMBUSH, C_MINE, C_WARMUP, C_REEF, C_GUNNER, C_BARRICADE, C_FODDER, C_FINISH],
+        12: [C_OPENER_SLALOM, C_GUNNER, C_WARMUP, C_MINE, C_REEF, C_BARRICADE, C_CLIMAX, C_FINISH],
+        13: [C_OPENER_GAUNTLET, C_WARMUP, C_REEF, C_GUNNER, C_MINE, C_BARRICADE, C_FODDER, C_FINISH],
+        14: [C_OPENER_AMBUSH, C_REEF, C_WARMUP, C_GUNNER, C_MINE, C_BARRICADE, C_CLIMAX, C_FINISH],
+        15: [C_OPENER_GAUNTLET, C_MINE, C_GUNNER, C_WARMUP, C_REEF, C_BARRICADE, C_CLIMAX, get_boss_chunk(15)],
 
-    if is_boss:
-        boss_chunk = get_boss_chunk(lvl)
-        # Universal 3-Part Boss Layout:
-        # Part 1: Opener + Warmup (Gate 1 at ~33%)
-        # Part 2: Escalation + Barricade (Gate 2 at ~66%)
-        # Part 3: Overpower Fodder Swarm + Climax -> Boss!
-        if lvl <= 15:
-            # 8 chunks: Gate 1 at index 2 (25%-37.5%), Gate 2 at index 5 (62.5%-75%)
-            return [C_OPENER_AMBUSH, C_MINE, C_WARMUP, C_GUNNER, C_REEF, C_BARRICADE, C_FODDER, boss_chunk]
-        elif lvl <= 30:
-            # 9 chunks: Gate 1 at index 2 (~30%), Gate 2 at index 6 (~66%)
-            return [C_OPENER_GAUNTLET, C_GUNNER, C_WARMUP, C_REEF, C_MINE, C_GUNNER, C_BARRICADE, C_FODDER, boss_chunk]
-        else:
-            # 10 chunks: Gate 1 at index 2 (~28%), Gate 2 at index 7 (~70%)
-            return [C_OPENER_GAUNTLET, C_MINE, C_WARMUP, C_REEF, C_GUNNER, C_MINE, C_REEF, C_BARRICADE, C_FODDER, boss_chunk]
+        16: [C_OPENER_GAUNTLET, C_MINE, C_WARMUP, C_GUNNER, C_REEF, C_MINE, C_BARRICADE, C_FODDER, C_FINISH],
+        17: [C_OPENER_SLALOM, C_REEF, C_WARMUP, C_MINE, C_GUNNER, C_REEF, C_BARRICADE, C_CLIMAX, C_FINISH],
+        18: [C_OPENER_AMBUSH, C_GUNNER, C_WARMUP, C_REEF, C_MINE, C_GUNNER, C_BARRICADE, C_FODDER, C_FINISH],
+        19: [C_OPENER_GAUNTLET, C_MINE, C_WARMUP, C_REEF, C_GUNNER, C_BARRICADE, C_FODDER, C_CLIMAX, C_FINISH],
+        20: [C_OPENER_SLALOM, C_GUNNER, C_WARMUP, C_REEF, C_MINE, C_GUNNER, C_BARRICADE, C_CLIMAX, get_boss_chunk(20)],
 
-    # Universal 3-Part Non-Boss Levels:
-    # Part 1 (0% to ~33%): Easy start opener + Gate 1 (Warmup)
-    # Part 2 (~33% to ~66%): Combat & hazard escalation + Gate 2 (Barricade Siege)
-    # Part 3 (~66% to 100%): Swarm Horde (Fodder Swarm) + Vanguard Climax + Finish Line
-    if lvl < 15:
-        # 8 chunks: Gate 1 at index 2 (2/8 = 25%-37.5%), Gate 2 at index 5 (5/8 = 62.5%-75%)
-        return [C_OPENER_AMBUSH, C_GUNNER, C_WARMUP, C_MINE, C_REEF, C_BARRICADE, C_FODDER, C_FINISH]
-    elif lvl < 30:
-        # 9 chunks: Gate 1 at index 2 (~30%), Gate 2 at index 6 (~66%)
-        return [C_OPENER_GAUNTLET, C_MINE, C_WARMUP, C_REEF, C_GUNNER, C_MINE, C_BARRICADE, C_FODDER, C_FINISH]
-    else:
-        # 10 chunks: Gate 1 at index 3 (~30%), Gate 2 at index 7 (~70%)
-        return [C_OPENER_GAUNTLET, C_MINE, C_REEF, C_WARMUP, C_GUNNER, C_MINE, C_REEF, C_BARRICADE, C_FODDER, C_FINISH]
+        21: [C_OPENER_AMBUSH, C_WARMUP, C_MINE, C_GUNNER, C_REEF, C_MINE, C_BARRICADE, C_FODDER, C_FINISH],
+        22: [C_OPENER_SLALOM, C_MINE, C_WARMUP, C_REEF, C_GUNNER, C_REEF, C_BARRICADE, C_CLIMAX, C_FINISH],
+        23: [C_OPENER_GAUNTLET, C_REEF, C_WARMUP, C_GUNNER, C_MINE, C_GUNNER, C_BARRICADE, C_FODDER, C_FINISH],
+        24: [C_OPENER_AMBUSH, C_GUNNER, C_WARMUP, C_MINE, C_REEF, C_MINE, C_BARRICADE, C_CLIMAX, C_FINISH],
+        25: [C_OPENER_SLALOM, C_REEF, C_WARMUP, C_GUNNER, C_MINE, C_REEF, C_BARRICADE, C_FODDER, get_boss_chunk(25)],
+
+        26: [C_OPENER_GAUNTLET, C_WARMUP, C_MINE, C_REEF, C_GUNNER, C_MINE, C_BARRICADE, C_CLIMAX, C_FINISH],
+        27: [C_OPENER_AMBUSH, C_REEF, C_WARMUP, C_MINE, C_GUNNER, C_REEF, C_BARRICADE, C_FODDER, C_FINISH],
+        28: [C_OPENER_SLALOM, C_GUNNER, C_WARMUP, C_REEF, C_MINE, C_GUNNER, C_BARRICADE, C_CLIMAX, C_FINISH],
+        29: [C_OPENER_GAUNTLET, C_MINE, C_WARMUP, C_GUNNER, C_REEF, C_MINE, C_BARRICADE, C_FODDER, C_FINISH],
+        30: [C_OPENER_AMBUSH, C_GUNNER, C_WARMUP, C_MINE, C_REEF, C_GUNNER, C_BARRICADE, C_CLIMAX, get_boss_chunk(30)],
+
+        31: [C_OPENER_GAUNTLET, C_MINE, C_WARMUP, C_REEF, C_GUNNER, C_MINE, C_REEF, C_BARRICADE, C_FODDER, C_FINISH],
+        32: [C_OPENER_SLALOM, C_REEF, C_WARMUP, C_GUNNER, C_MINE, C_REEF, C_GUNNER, C_BARRICADE, C_CLIMAX, C_FINISH],
+        33: [C_OPENER_AMBUSH, C_GUNNER, C_WARMUP, C_MINE, C_REEF, C_GUNNER, C_MINE, C_BARRICADE, C_FODDER, C_FINISH],
+        34: [C_OPENER_GAUNTLET, C_WARMUP, C_REEF, C_MINE, C_GUNNER, C_REEF, C_MINE, C_BARRICADE, C_CLIMAX, C_FINISH],
+        35: [C_OPENER_SLALOM, C_MINE, C_WARMUP, C_REEF, C_GUNNER, C_MINE, C_REEF, C_BARRICADE, C_FODDER, get_boss_chunk(35)],
+
+        36: [C_OPENER_AMBUSH, C_REEF, C_WARMUP, C_GUNNER, C_MINE, C_REEF, C_GUNNER, C_BARRICADE, C_CLIMAX, C_FINISH],
+        37: [C_OPENER_GAUNTLET, C_GUNNER, C_WARMUP, C_REEF, C_MINE, C_GUNNER, C_REEF, C_BARRICADE, C_FODDER, C_FINISH],
+        38: [C_OPENER_SLALOM, C_MINE, C_WARMUP, C_GUNNER, C_REEF, C_MINE, C_GUNNER, C_BARRICADE, C_CLIMAX, C_FINISH],
+        39: [C_OPENER_AMBUSH, C_WARMUP, C_MINE, C_REEF, C_GUNNER, C_MINE, C_REEF, C_BARRICADE, C_FODDER, C_FINISH],
+        40: [C_OPENER_GAUNTLET, C_REEF, C_WARMUP, C_MINE, C_GUNNER, C_REEF, C_MINE, C_BARRICADE, C_CLIMAX, get_boss_chunk(40)],
+
+        41: [C_OPENER_SLALOM, C_GUNNER, C_WARMUP, C_REEF, C_MINE, C_GUNNER, C_REEF, C_BARRICADE, C_FODDER, C_FINISH],
+        42: [C_OPENER_AMBUSH, C_MINE, C_WARMUP, C_GUNNER, C_REEF, C_MINE, C_GUNNER, C_BARRICADE, C_CLIMAX, C_FINISH],
+        43: [C_OPENER_GAUNTLET, C_REEF, C_WARMUP, C_MINE, C_GUNNER, C_REEF, C_MINE, C_BARRICADE, C_FODDER, C_FINISH],
+        44: [C_OPENER_SLALOM, C_GUNNER, C_WARMUP, C_MINE, C_REEF, C_GUNNER, C_MINE, C_BARRICADE, C_CLIMAX, C_FINISH],
+        45: [C_OPENER_GAUNTLET, C_GUNNER, C_MINE, C_WARMUP, C_REEF, C_GUNNER, C_REEF, C_BARRICADE, C_CLIMAX, get_boss_chunk(45)],
+    }
+    return SEQUENCES[lvl]
 
 def calculate_speed(lvl: int) -> float:
     if lvl == 1:
@@ -219,8 +278,7 @@ def calculate_reward(lvl: int) -> int:
     return int(round(base * 0.90))
 
 def build_tres_content(lvl: int) -> str:
-    biome_key = get_biome_key(lvl)
-    b = BIOMES[biome_key]
+    b = get_biome_data(lvl)
     title = get_level_title(lvl)
     speed = calculate_speed(lvl)
     reward = calculate_reward(lvl)
@@ -291,8 +349,7 @@ def update_markdown_docs():
             
         speed = calculate_speed(lvl)
         reward = calculate_reward(lvl)
-        biome_key = get_biome_key(lvl)
-        b = BIOMES[biome_key]
+        b = get_biome_data(lvl)
         title = get_level_title(lvl)
         chunks = get_chunk_sequence(lvl)
         dist = len(chunks) * 50.0
