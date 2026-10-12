@@ -123,6 +123,8 @@ static var _shared_mat_bayou:    StandardMaterial3D = null
 static var _shared_mat_citadel:  StandardMaterial3D = null
 static var _shared_mat_bastion:  StandardMaterial3D = null
 
+static var _scenery_cache: Dictionary[String, PackedScene] = {}
+
 static func _get_or_create_material(p_biome: String) -> StandardMaterial3D:
 	var b := p_biome.to_lower()
 	if "bayou" in b:
@@ -256,7 +258,7 @@ func _generate_tropical_shoreline() -> void:
 			_enforce_navigable_clearance(rock_node, is_left, 6.6)
 
 	# Custom Scenery: Low-Poly Palm Shoal Island
-	if randf() < 0.80:
+	if randf() < 0.45:
 		var island_node := _instantiate_custom_scenery(SCENERY_PALM_ISLAND)
 		if island_node:
 			var s_val := randf_range(1.1, 1.4)
@@ -291,9 +293,9 @@ func _generate_tropical_shoreline() -> void:
 					tuft_node.rotation.y = randf_range(0.0, TAU)
 					_enforce_navigable_clearance(tuft_node, is_left, 6.6)
 
-	# Custom Scenery: Tropical Flowering Bush (understory 2-3 per chunk)
-	var bush_count := randi_range(2, 3)
-	var bush_step := chunk_length / float(bush_count)
+	# Custom Scenery: Tropical Flowering Bush (understory landmark)
+	var bush_count: int = 1 if randf() < 0.60 else 0
+	var bush_step := chunk_length / maxf(float(bush_count), 1.0)
 	for i in range(bush_count):
 		var z_pos := -half_len + (i + 0.5) * bush_step + randf_range(-1.0, 1.0)
 		var bush_node := _instantiate_custom_scenery(SCENERY_TROPICAL_BUSH)
@@ -304,9 +306,9 @@ func _generate_tropical_shoreline() -> void:
 			bush_node.rotation.y = randf_range(0.0, TAU)
 			_enforce_navigable_clearance(bush_node, is_left, 6.6)
 
-	# Custom Scenery: Coconut Palm Sapling/Tree (1-2 per chunk)
-	var coco_count := randi_range(1, 2)
-	var coco_step := chunk_length / float(coco_count)
+	# Custom Scenery: Coconut Palm Sapling/Tree (landmark)
+	var coco_count: int = 1 if randf() < 0.65 else 0
+	var coco_step := chunk_length / maxf(float(coco_count), 1.0)
 	for i in range(coco_count):
 		var z_pos := -half_len + (i + 0.6) * coco_step + randf_range(-1.0, 1.0)
 		var coco_node := _instantiate_custom_scenery(SCENERY_COCONUT_PALM)
@@ -318,7 +320,7 @@ func _generate_tropical_shoreline() -> void:
 			_enforce_navigable_clearance(coco_node, is_left, 6.6)
 
 	# Custom Scenery: Rustbound Anchor (flavor prop half-buried in sand)
-	if randf() < 0.40:
+	if randf() < 0.35:
 		var anchor_node := _instantiate_custom_scenery(SCENERY_RUSTBOUND_ANCHOR)
 		if anchor_node:
 			var s_val := randf_range(0.9, 1.2)
@@ -329,7 +331,7 @@ func _generate_tropical_shoreline() -> void:
 			_enforce_navigable_clearance(anchor_node, is_left, 6.6)
 
 	# Custom Scenery: Lush Mangrove Cluster with arching waterline roots
-	if randf() < 0.70:
+	if randf() < 0.50:
 		var mangrove_node := _instantiate_custom_scenery(SCENERY_MANGROVE_GROVE)
 		if mangrove_node:
 			var s_val := randf_range(1.2, 1.5)
@@ -398,9 +400,9 @@ func _generate_bayou_shoreline() -> void:
 			rock_node.rotation.y = randf_range(0.0, TAU)
 			_enforce_navigable_clearance(rock_node, is_left, 6.6)
 
-	# Custom Scenery: Mossy Driftwood Log along the waterline (1-2 per chunk)
-	var drift_count := randi_range(1, 2)
-	var drift_step := chunk_length / float(drift_count)
+	# Custom Scenery: Mossy Driftwood Log along the waterline
+	var drift_count: int = 1 if randf() < 0.60 else 0
+	var drift_step := chunk_length / maxf(float(drift_count), 1.0)
 	for i in range(drift_count):
 		var z_pos := -half_len + (i + 0.5) * drift_step + randf_range(-1.0, 1.0)
 		var drift_node := _instantiate_custom_scenery(SCENERY_MOSSWOOD_DRIFT)
@@ -412,9 +414,9 @@ func _generate_bayou_shoreline() -> void:
 			drift_node.rotation.z = sign_x * randf_range(-0.06, 0.06)
 			_enforce_navigable_clearance(drift_node, is_left, 6.6)
 
-	# Custom Scenery: Swamp Cattail Reeds along waterline (2-4 per chunk)
-	var cattail_count := randi_range(2, 4)
-	var cattail_step := chunk_length / float(cattail_count)
+	# Custom Scenery: Swamp Cattail Reeds along waterline (landmark)
+	var cattail_count: int = 1 if randf() < 0.85 else 0
+	var cattail_step := chunk_length / maxf(float(cattail_count), 1.0)
 	for i in range(cattail_count):
 		var z_pos := -half_len + (i + 0.5) * cattail_step + randf_range(-0.8, 0.8)
 		var reed_path := SCENERY_CATTAILS_WATER if randf() < 0.5 else SCENERY_CATTAILS
@@ -427,7 +429,7 @@ func _generate_bayou_shoreline() -> void:
 			_enforce_navigable_clearance(reed_node, is_left, 6.6)
 
 	# Tier 2: Ruined Stilt Dock Platforms & Dense Reeds
-	var dock_count := randi_range(2, 3)
+	var dock_count := randi_range(1, 2)
 	var dock_step := chunk_length / float(dock_count)
 	for i in range(dock_count):
 		var z_pos := -half_len + (i + 0.5) * dock_step + randf_range(-1.0, 1.0)
@@ -440,9 +442,9 @@ func _generate_bayou_shoreline() -> void:
 			dock_node.rotation.z = sign_x * randf_range(0.04, 0.08) # slightly dilapidated tilt
 			_enforce_navigable_clearance(dock_node, is_left, 6.6)
 
-	# Custom Scenery: Dead Swamp Trees (Mournwood / Withered Willow, 2-3 per chunk)
-	var swamp_tree_count := randi_range(2, 3)
-	var swamp_tree_step := chunk_length / float(swamp_tree_count)
+	# Custom Scenery: Dead Swamp Trees (Mournwood / Withered Willow, landmark)
+	var swamp_tree_count: int = 1 if randf() < 0.85 else 0
+	var swamp_tree_step := chunk_length / maxf(float(swamp_tree_count), 1.0)
 	for i in range(swamp_tree_count):
 		var z_pos := -half_len + (i + 0.5) * swamp_tree_step + randf_range(-1.2, 1.2)
 		var tree_path := SCENERY_WITHERED_WILLOW if randf() < 0.5 else SCENERY_MOURNWOOD_TREE
@@ -454,9 +456,9 @@ func _generate_bayou_shoreline() -> void:
 			tree_node.rotation.y = randf_range(0.0, TAU)
 			_enforce_navigable_clearance(tree_node, is_left, 6.6)
 
-	# Custom Scenery: Swamp Mangrove Trees with twisted aerial roots (1-2 per chunk)
-	var mangrove_count := randi_range(1, 2)
-	var mangrove_step := chunk_length / float(mangrove_count)
+	# Custom Scenery: Swamp Mangrove Trees with twisted aerial roots
+	var mangrove_count: int = 1 if randf() < 0.60 else 0
+	var mangrove_step := chunk_length / maxf(float(mangrove_count), 1.0)
 	for i in range(mangrove_count):
 		var z_pos := -half_len + (i + 0.5) * mangrove_step + randf_range(-1.2, 1.2)
 		var mangrove_node := _instantiate_custom_scenery(SCENERY_MANGROVE_GROVE)
@@ -467,9 +469,9 @@ func _generate_bayou_shoreline() -> void:
 			mangrove_node.rotation.y = randf_range(0.0, TAU)
 			_enforce_navigable_clearance(mangrove_node, is_left, 6.6)
 
-	# Custom Scenery: Voodoo Painted Totem Pole (1-2 per chunk)
-	var totem_count := randi_range(1, 2)
-	var totem_step := chunk_length / float(totem_count)
+	# Custom Scenery: Voodoo Painted Totem Pole
+	var totem_count: int = 1 if randf() < 0.50 else 0
+	var totem_step := chunk_length / maxf(float(totem_count), 1.0)
 	for i in range(totem_count):
 		var z_pos := -half_len + (i + 0.5) * totem_step + randf_range(-1.0, 1.0)
 		var totem_node := _instantiate_custom_scenery(SCENERY_PAINTED_TOTEM)
@@ -586,9 +588,9 @@ func _generate_brimstone_shoreline() -> void:
 			rock_node.rotation.y = randf_range(0.0, TAU)
 			_enforce_navigable_clearance(rock_node, is_left, 6.6)
 
-	# Custom Scenery: Active Lava Geyser Vent with looping fire/smoke VFX (1-2 per chunk)
-	var vent_count := randi_range(1, 2)
-	var vent_step := chunk_length / float(vent_count)
+	# Custom Scenery: Active Lava Geyser Vent with looping fire/smoke VFX
+	var vent_count: int = 1 if randf() < 0.50 else 0
+	var vent_step := chunk_length / maxf(float(vent_count), 1.0)
 	for i in range(vent_count):
 		var z_pos := -half_len + (i + 0.5) * vent_step + randf_range(-1.0, 1.0)
 		var vent_node := _instantiate_custom_scenery(SCENERY_MOLTEN_CROWN)
@@ -605,9 +607,9 @@ func _generate_brimstone_shoreline() -> void:
 					vfx_inst.position = Vector3(0.0, 0.38, 0.0)
 			_enforce_navigable_clearance(vent_node, is_left, 6.6)
 
-	# Custom Scenery: Obsidian Crystal Cluster (1-2 per chunk)
-	var crystal_count := randi_range(1, 2)
-	var crystal_step := chunk_length / float(crystal_count)
+	# Custom Scenery: Obsidian Crystal Cluster
+	var crystal_count: int = 1 if randf() < 0.60 else 0
+	var crystal_step := chunk_length / maxf(float(crystal_count), 1.0)
 	for i in range(crystal_count):
 		var z_pos := -half_len + (i + 0.7) * crystal_step + randf_range(-0.8, 0.8)
 		var crystal_node := _instantiate_custom_scenery(SCENERY_OBSIDIAN_CRYSTAL)
@@ -618,9 +620,9 @@ func _generate_brimstone_shoreline() -> void:
 			crystal_node.rotation.y = randf_range(0.0, TAU)
 			_enforce_navigable_clearance(crystal_node, is_left, 6.6)
 
-	# Custom Scenery: Volcanic Rock Spire (2-3 per chunk)
-	var spire_count := randi_range(2, 3)
-	var spire_step := chunk_length / float(spire_count)
+	# Custom Scenery: Volcanic Rock Spire (landmark)
+	var spire_count: int = 1 if randf() < 0.85 else 0
+	var spire_step := chunk_length / maxf(float(spire_count), 1.0)
 	for i in range(spire_count):
 		var z_pos := -half_len + (i + 0.5) * spire_step + randf_range(-1.2, 1.2)
 		var spire_node := _instantiate_custom_scenery(SCENERY_VOLCANIC_SPIRE)
@@ -643,9 +645,9 @@ func _generate_brimstone_shoreline() -> void:
 			tower_node.rotation.y = randf_range(0.0, TAU)
 			_enforce_navigable_clearance(tower_node, is_left, 6.6)
 
-	# Custom Scenery: Charred Scorched Thorn Tree (2-3 per chunk)
-	var tree_count := randi_range(2, 3)
-	var tree_step := chunk_length / float(tree_count)
+	# Custom Scenery: Charred Scorched Thorn Tree (landmark)
+	var tree_count: int = 1 if randf() < 0.75 else 0
+	var tree_step := chunk_length / maxf(float(tree_count), 1.0)
 	for i in range(tree_count):
 		var z_pos := -half_len + (i + 0.5) * tree_step + randf_range(-1.2, 1.2)
 		var tree_node := _instantiate_custom_scenery(SCENERY_MOLTEN_TREE)
@@ -742,10 +744,16 @@ func _enforce_navigable_clearance(prop: Node3D, p_is_left: bool, min_channel_mar
 func _instantiate_prop(path: String, shared_mat: StandardMaterial3D = null) -> Node3D:
 	if not ResourceLoader.exists(path):
 		return null
-	var scene_res := load(path) as PackedScene
+	var scene_res: PackedScene = null
+	if _scenery_cache.has(path):
+		scene_res = _scenery_cache[path]
+	else:
+		scene_res = load(path) as PackedScene
+		if scene_res:
+			_scenery_cache[path] = scene_res
 	if not scene_res:
 		return null
-	var inst := scene_res.instantiate() as Node3D
+	var inst: Node3D = scene_res.instantiate() as Node3D
 	if not inst:
 		return null
 	inst.name = path.get_file().get_basename()
@@ -760,14 +768,20 @@ func _instantiate_custom_scenery(path: String) -> Node3D:
 ## Recursively configures mesh instances for mobile performance:
 ## - Overrides material to shared colormap StandardMaterial3D (cull_mode = CULL_BACK)
 ## - Disables cast_shadow to eliminate redundant shadow map draw passes
+## - Enables standard frustum culling (extra_cull_margin = 0.0)
+## - Limits visibility range to fog threshold (visibility_range_end = 75.0m)
+## - Selects lighter mesh LOD levels for background geometry
 func _apply_mesh_optimizations(node: Node, shared_mat: StandardMaterial3D = null) -> void:
 	if node is MeshInstance3D:
-		var mi := node as MeshInstance3D
+		var mi: MeshInstance3D = node as MeshInstance3D
 		if shared_mat:
 			mi.material_override = shared_mat
 	if node is GeometryInstance3D:
-		var gi := node as GeometryInstance3D
+		var gi: GeometryInstance3D = node as GeometryInstance3D
 		gi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		gi.extra_cull_margin = 100.0
-	for child in node.get_children():
+		gi.extra_cull_margin = 0.0
+		gi.visibility_range_end = 75.0
+		gi.visibility_range_end_margin = 10.0
+		gi.lod_bias = 0.5
+	for child: Node in node.get_children():
 		_apply_mesh_optimizations(child, shared_mat)

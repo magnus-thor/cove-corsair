@@ -16,10 +16,21 @@ extends Node3D
 
 @onready var obstacles_container: Node3D = $Obstacles
 
-## Signal emitted when this segment moves off-screen and needs recycling.
 signal off_screen(segment: TrackSegment)
 
 var level_config_data: Dictionary = {}
+
+static var _track_scenery_cache: Dictionary[String, PackedScene] = {}
+
+static func _get_cached_scene(path: String) -> PackedScene:
+	if not ResourceLoader.exists(path):
+		return null
+	if _track_scenery_cache.has(path):
+		return _track_scenery_cache[path]
+	var res: PackedScene = load(path) as PackedScene
+	if res:
+		_track_scenery_cache[path] = res
+	return res
 
 func _ready() -> void:
 	var notifier: VisibleOnScreenNotifier3D = get_node_or_null("VisibleOnScreenNotifier3D") as VisibleOnScreenNotifier3D
@@ -242,10 +253,10 @@ func spawn_scenery() -> void:
 		
 		# ── Shoal base (custom palm island, mangrove grove, or Kenney sand/rock shoal) ──
 		var roll: float = randf()
-		if roll < 0.25 and ResourceLoader.exists(palm_island_path):
-			var island_scene := load(palm_island_path) as PackedScene
+		if roll < 0.20 and ResourceLoader.exists(palm_island_path):
+			var island_scene: PackedScene = _get_cached_scene(palm_island_path)
 			if island_scene:
-				var island_inst := island_scene.instantiate() as Node3D
+				var island_inst: Node3D = island_scene.instantiate() as Node3D
 				scenery_container.add_child(island_inst)
 				var s_val: float = randf_range(1.1, 1.4)
 				island_inst.scale = Vector3.ONE * s_val
@@ -253,10 +264,10 @@ func spawn_scenery() -> void:
 				island_inst.rotation.y = randf_range(0.0, TAU)
 				_clean_shadow_nodes(island_inst)
 				_enforce_navigable_clearance(island_inst, is_left)
-		elif roll < 0.45 and ResourceLoader.exists(mangrove_grove_path):
-			var mangrove_scene := load(mangrove_grove_path) as PackedScene
+		elif roll < 0.38 and ResourceLoader.exists(mangrove_grove_path):
+			var mangrove_scene: PackedScene = _get_cached_scene(mangrove_grove_path)
 			if mangrove_scene:
-				var mangrove_inst := mangrove_scene.instantiate() as Node3D
+				var mangrove_inst: Node3D = mangrove_scene.instantiate() as Node3D
 				scenery_container.add_child(mangrove_inst)
 				var s_val: float = randf_range(1.2, 1.5)
 				mangrove_inst.scale = Vector3.ONE * s_val
@@ -265,10 +276,10 @@ func spawn_scenery() -> void:
 				_clean_shadow_nodes(mangrove_inst)
 				_enforce_navigable_clearance(mangrove_inst, is_left)
 		else:
-			var base_path := sand_island_path if randf() < 0.5 else rock_island_path
-			var base_scene: PackedScene = load(base_path) as PackedScene
+			var base_path: String = sand_island_path if randf() < 0.5 else rock_island_path
+			var base_scene: PackedScene = _get_cached_scene(base_path)
 			if base_scene:
-				var base_inst := base_scene.instantiate() as Node3D
+				var base_inst: Node3D = base_scene.instantiate() as Node3D
 				scenery_container.add_child(base_inst)
 				base_inst.position = Vector3(rand_x, 0.06, rand_z)
 				base_inst.scale = Vector3(randf_range(1.0, 1.3), randf_range(0.7, 1.0), randf_range(1.0, 1.3))
@@ -283,20 +294,20 @@ func spawn_scenery() -> void:
 						palm_path = coconut_palm_path
 					elif p_roll < 0.65:
 						palm_path = palm_bend_path
-					var palm_scene: PackedScene = load(palm_path) as PackedScene
+					var palm_scene: PackedScene = _get_cached_scene(palm_path)
 					if palm_scene:
-						var palm_inst := palm_scene.instantiate() as Node3D
+						var palm_inst: Node3D = palm_scene.instantiate() as Node3D
 						base_inst.add_child(palm_inst)
 						palm_inst.position = Vector3(randf_range(-0.2, 0.2), 0.0, randf_range(-0.2, 0.2))
 						palm_inst.scale    = Vector3.ONE * randf_range(0.8, 1.2)
 						palm_inst.rotation.y = randf_range(0.0, TAU)
 						_clean_shadow_nodes(palm_inst)
 
-				# Understory bush on shoal (30 % chance)
-				if randf() < 0.30 and ResourceLoader.exists(bush_path):
-					var bush_scene := load(bush_path) as PackedScene
+				# Understory bush on shoal (20 % chance)
+				if randf() < 0.20 and ResourceLoader.exists(bush_path):
+					var bush_scene: PackedScene = _get_cached_scene(bush_path)
 					if bush_scene:
-						var bush_inst := bush_scene.instantiate() as Node3D
+						var bush_inst: Node3D = bush_scene.instantiate() as Node3D
 						base_inst.add_child(bush_inst)
 						var b_scale: float = randf_range(0.6, 0.9)
 						bush_inst.scale = Vector3.ONE * b_scale
@@ -310,10 +321,10 @@ func spawn_scenery() -> void:
 		# ── Dock ruins / Anchor accent prop (30 % chance) ─────────────────────
 		if randf() < 0.30:
 			var accent_x: float = randf_range(-8.5, -6.5) if is_left else randf_range(6.5, 8.5)
-			if randf() < 0.40 and ResourceLoader.exists(anchor_path):
-				var anchor_scene := load(anchor_path) as PackedScene
+			if randf() < 0.30 and ResourceLoader.exists(anchor_path):
+				var anchor_scene: PackedScene = _get_cached_scene(anchor_path)
 				if anchor_scene:
-					var anchor_inst := anchor_scene.instantiate() as Node3D
+					var anchor_inst: Node3D = anchor_scene.instantiate() as Node3D
 					scenery_container.add_child(anchor_inst)
 					var a_scale: float = randf_range(0.8, 1.1)
 					anchor_inst.position = Vector3(accent_x, 0.45 * a_scale, rand_z + randf_range(-1.5, 1.5))
@@ -324,9 +335,9 @@ func spawn_scenery() -> void:
 					_enforce_navigable_clearance(anchor_inst, is_left)
 			else:
 				var ruin_path: String = dock_ruin_paths[randi() % dock_ruin_paths.size()]
-				var ruin_scene: PackedScene = load(ruin_path) as PackedScene
+				var ruin_scene: PackedScene = _get_cached_scene(ruin_path)
 				if ruin_scene:
-					var ruin_inst := ruin_scene.instantiate() as Node3D
+					var ruin_inst: Node3D = ruin_scene.instantiate() as Node3D
 					scenery_container.add_child(ruin_inst)
 					ruin_inst.position   = Vector3(accent_x, 0.0, rand_z + randf_range(-2.0, 2.0))
 					ruin_inst.scale      = Vector3.ONE * randf_range(0.8, 1.2)
@@ -339,8 +350,12 @@ func _clean_shadow_nodes(node: Node) -> void:
 		return
 		
 	if node is GeometryInstance3D:
-		var geom := node as GeometryInstance3D
+		var geom: GeometryInstance3D = node as GeometryInstance3D
 		geom.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		geom.extra_cull_margin = 0.0
+		geom.visibility_range_end = 75.0
+		geom.visibility_range_end_margin = 10.0
+		geom.lod_bias = 0.5
 		
 	var lower_name: String = node.name.to_lower()
 	var is_shadow_node: bool = false
