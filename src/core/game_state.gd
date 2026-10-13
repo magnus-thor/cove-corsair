@@ -16,6 +16,25 @@ signal crew_equipped(ship_id: String, socket_name: String, crew_id: String)
 signal outfitting_unlocked(item_id: String)
 signal outfitting_equipped(ship_id: String, category: String, item_id: String)
 signal fire_frenzy_triggered(duration: float)
+signal tutorial_step_changed(new_step: int)
+
+enum TutorialStep {
+	NOT_STARTED = 0,         # Before Level 1 start
+	LEVEL_1_IN_PROGRESS = 1, # First run on Dinghy
+	LEVEL_1_COMPLETED = 2,   # Level 1 victory, 2x claimed
+	LEVEL_2_IN_PROGRESS = 3, # Sailing Level 2 on Dinghy
+	LEVEL_2_COMPLETED = 4,   # Shipyard unlocked! Guided to buy Sloop
+	SLOOP_PURCHASED = 5,     # Sloop bought & equipped, ready for Level 3
+	LEVEL_3_IN_PROGRESS = 6, # Sailing Level 3
+	LEVEL_3_COMPLETED = 7,   # Guided to upgrade Sloop to Tier 2
+	SLOOP_T2_UPGRADED = 8,   # Sloop upgraded, ready for Level 4
+	LEVEL_4_IN_PROGRESS = 9, # Sailing Level 4
+	LEVEL_4_COMPLETED = 10,  # Guided to recruit Monkey Bomber
+	CREW_EQUIPPED = 11,      # Monkey Bomber auto-equipped, ready for Level 5
+	COMPLETED = 12           # Full tutorial complete
+}
+
+var tutorial_step: int = TutorialStep.NOT_STARTED
 
 # Legacy cross-boundary lifecycle signals (retained for backward compatibility).
 # Canonical cross-boundary events route through EventBus.
@@ -143,13 +162,13 @@ const VESSEL_CATALOG: Dictionary = {
 		"max_level": 3,
 		"tier_prices": { 2: 150, 3: 450 },
 		"tier_descriptions": {
-			1: "Leaky Skiff (2 HP, 1 Bow Chaser)",
-			2: "Patched Planks (3 HP, 11.0 m/s, +Mid Crew Socket)",
-			3: "Reinforced Rowboat (4 HP, 11.5 m/s, All Sockets Unlocked)"
+			1: "Leaky Skiff (3 HP, 1 Bow Chaser)",
+			2: "Patched Planks (4 HP, 11.0 m/s, +Mid Crew Socket)",
+			3: "Reinforced Rowboat (5 HP, 11.5 m/s, All Sockets Unlocked)"
 		},
-		"base_hp": 2,
+		"base_hp": 3,
 		"base_speed": 10.5,
-		"fire_rate": 0.20,
+		"fire_rate": 0.38,
 		"preview_texture": "res://assets/sprites/user_vessels/The Dinghy.png"
 	},
 	"sloop": {
@@ -162,8 +181,8 @@ const VESSEL_CATALOG: Dictionary = {
 		"tier_prices": { 2: 250, 3: 550, 4: 1200, 5: 2400, 6: 4200, 7: 7000, 8: 11000, 9: 16500, 10: 25000 },
 		"tier_descriptions": {
 			1: "Standard Oak (4 HP, Twin Bow Chasers)",
-			2: "Tuned Rigging (4 HP, 11.8 m/s, +5% Firepower)",
-			3: "Reinforced Planks (5 HP, 12.1 m/s, +Mid Crew Socket)",
+			2: "Tuned Rigging (4 HP, 11.8 m/s, +Mid Crew Socket)",
+			3: "Reinforced Planks (5 HP, 12.1 m/s, +10% Firepower)",
 			4: "Copper Fasteners (5 HP, 12.4 m/s, +15% Firepower)",
 			5: "Hardened Gunwales (5 HP, 12.8 m/s, +20% Firepower)",
 			6: "Broadside Carronades (6 HP, 13.2 m/s, +Dual Swivel Mounts)",
@@ -610,6 +629,9 @@ func buy_vessel(vessel_id: String) -> bool:
 	if is_vessel_owned(vessel_id):
 		return false
 	var cost: int = int(VESSEL_CATALOG[vessel_id]["purchase_price"])
+	# Tutorial Discount: Guarantee affordable Sloop purchase during tutorial
+	if tutorial_step == TutorialStep.LEVEL_2_COMPLETED and vessel_id == "sloop":
+		cost = mini(cost, doubloons)
 	if doubloons < cost:
 		if EventBus and EventBus.has_signal("shipyard_item_action"):
 			EventBus.shipyard_item_action.emit(vessel_id, "vessel", cost, doubloons, false, "insufficient_funds")
@@ -624,6 +646,8 @@ func buy_vessel(vessel_id: String) -> bool:
 		EventBus.shipyard_item_action.emit(vessel_id, "vessel", cost, doubloons + cost, true, "purchased")
 	doubloons_changed.emit(doubloons)
 	active_vessel_changed.emit(active_vessel)
+	if tutorial_step == TutorialStep.LEVEL_2_COMPLETED and vessel_id == "sloop":
+		advance_tutorial_to(TutorialStep.SLOOP_PURCHASED)
 	return true
 
 func get_max_vessel_tier(vessel_id: String) -> int:
@@ -651,6 +675,9 @@ func upgrade_vessel_tier(vessel_id: String) -> bool:
 		return false
 	var next_tier := cur_tier + 1
 	var cost := get_upgrade_cost(vessel_id, next_tier)
+	# Tutorial Discount: Guarantee affordable Sloop Tier 2 upgrade during tutorial
+	if tutorial_step == TutorialStep.LEVEL_3_COMPLETED and vessel_id == "sloop" and next_tier == 2:
+		cost = mini(cost, doubloons)
 	if doubloons < cost:
 		if EventBus and EventBus.has_signal("shipyard_item_action"):
 			EventBus.shipyard_item_action.emit("%s_t%d" % [vessel_id, next_tier], "vessel_upgrade", cost, doubloons, false, "insufficient_funds")
@@ -662,6 +689,8 @@ func upgrade_vessel_tier(vessel_id: String) -> bool:
 	if EventBus and EventBus.has_signal("shipyard_item_action"):
 		EventBus.shipyard_item_action.emit("%s_t%d" % [vessel_id, next_tier], "vessel_upgrade", cost, doubloons + cost, true, "upgraded")
 	doubloons_changed.emit(doubloons)
+	if tutorial_step == TutorialStep.LEVEL_3_COMPLETED and vessel_id == "sloop" and next_tier == 2:
+		advance_tutorial_to(TutorialStep.SLOOP_T2_UPGRADED)
 	return true
 
 
@@ -710,6 +739,9 @@ func buy_crew(crew_id: String) -> bool:
 	if is_crew_unlocked(crew_id):
 		return false
 	var cost := get_crew_unlock_cost(crew_id)
+	# Tutorial Discount: Guarantee affordable crew purchase during tutorial
+	if (tutorial_step == TutorialStep.LEVEL_3_COMPLETED or tutorial_step == TutorialStep.LEVEL_4_COMPLETED) and crew_id == "monkey_bomber":
+		cost = mini(cost, doubloons)
 	if doubloons < cost:
 		if EventBus and EventBus.has_signal("shipyard_item_action"):
 			EventBus.shipyard_item_action.emit(crew_id, "crew", cost, doubloons, false, "insufficient_funds")
@@ -722,7 +754,28 @@ func buy_crew(crew_id: String) -> bool:
 		EventBus.shipyard_item_action.emit(crew_id, "crew", cost, doubloons + cost, true, "hired")
 	doubloons_changed.emit(doubloons)
 	crew_unlocked.emit(crew_id, 1)
+	auto_equip_crew_to_vessel(active_vessel, crew_id)
+	if (tutorial_step == TutorialStep.LEVEL_3_COMPLETED or tutorial_step == TutorialStep.LEVEL_4_COMPLETED) and crew_id == "monkey_bomber":
+		advance_tutorial_to(TutorialStep.CREW_EQUIPPED)
 	return true
+
+
+func auto_equip_crew_to_vessel(vessel_id: String, crew_id: String) -> bool:
+	if not is_crew_unlocked(crew_id):
+		return false
+	var cur_tier := get_vessel_tier(vessel_id)
+	var available_sockets := get_crew_sockets_for_ship(vessel_id, cur_tier)
+	if available_sockets.is_empty():
+		return false
+	var ship_map: Dictionary = equipped_crew.get(vessel_id, {}) as Dictionary
+	var target_socket := ""
+	for s: String in available_sockets:
+		if not ship_map.has(s) or ship_map[s] == "":
+			target_socket = s
+			break
+	if target_socket == "":
+		target_socket = available_sockets[0]
+	return equip_crew(vessel_id, target_socket, crew_id)
 
 func upgrade_crew_level(crew_id: String) -> bool:
 	if not is_crew_unlocked(crew_id):
@@ -1064,12 +1117,14 @@ func reset_save_data() -> void:
 	last_cleared_level = 1
 	level_high_scores = {}
 	level_stars = {}
+	tutorial_step = TutorialStep.NOT_STARTED
 	reset_level()
 	if FileAccess.file_exists(SAVE_PATH):
 		DirAccess.remove_absolute(SAVE_PATH)
 	save_game()
 	doubloons_changed.emit(doubloons)
 	active_vessel_changed.emit(active_vessel)
+	tutorial_step_changed.emit(tutorial_step)
 
 func init_playtest_fresh_save() -> void:
 	if FileAccess.file_exists(SAVE_PATH):
@@ -1105,6 +1160,7 @@ func save_game() -> void:
 		"level_high_scores": level_high_scores,
 		"level_stars": level_stars,
 		"unlocked_levels": highest_unlocked_level,
+		"tutorial_step": tutorial_step,
 		"master_volume": master_volume,
 		"music_volume": music_volume,
 		"sfx_volume": sfx_volume,
@@ -1269,6 +1325,18 @@ func load_game() -> void:
 				if lvl_key >= 1 and lvl_key <= 45:
 					level_stars[lvl_key] = clamp(int(stars_dict[k]), 0, 3)
 
+		if data.has("tutorial_step"):
+			tutorial_step = int(data["tutorial_step"])
+		else:
+			# Legacy save migration: auto-complete if level > 2 or Sloop already owned
+			if highest_unlocked_level > 2 or is_vessel_owned("sloop"):
+				tutorial_step = TutorialStep.COMPLETED
+			else:
+				tutorial_step = TutorialStep.NOT_STARTED
+
+		# Self-healing / Fast-forward checks on loaded tutorial_step:
+		check_and_fast_forward_tutorial()
+
 		if data.has("master_volume"): master_volume = clamp(float(data["master_volume"]), 0.0, 1.0)
 		if data.has("music_volume"): music_volume = clamp(float(data["music_volume"]), 0.0, 1.0)
 		if data.has("sfx_volume"): sfx_volume = clamp(float(data["sfx_volume"]), 0.0, 1.0)
@@ -1277,6 +1345,7 @@ func load_game() -> void:
 		if data.has("sfx_muted"): sfx_muted = (data["sfx_muted"] == true)
 
 		doubloons_changed.emit(doubloons)
+		tutorial_step_changed.emit(tutorial_step)
 	else:
 		# Corrupted save file fallback
 		active_vessel = "dinghy"
@@ -1291,4 +1360,50 @@ func load_game() -> void:
 		current_selected_level = 1
 		unlocked_levels = 1
 		current_level = 1
+		tutorial_step = TutorialStep.NOT_STARTED
+
+# --- Tutorial State Management ---
+
+func is_tutorial_completed() -> bool:
+	return tutorial_step >= TutorialStep.COMPLETED
+
+func is_tutorial_in_progress() -> bool:
+	return tutorial_step < TutorialStep.COMPLETED
+
+func check_and_fast_forward_tutorial() -> void:
+	if tutorial_step == TutorialStep.LEVEL_2_COMPLETED and is_vessel_owned("sloop"):
+		if active_vessel != "sloop":
+			set_active_vessel("sloop")
+		advance_tutorial_to(TutorialStep.SLOOP_PURCHASED)
+	elif tutorial_step == TutorialStep.LEVEL_3_COMPLETED and is_crew_unlocked("monkey_bomber"):
+		if not is_crew_equipped_on_active_ship("monkey_bomber"):
+			auto_equip_crew_to_vessel(active_vessel, "monkey_bomber")
+		advance_tutorial_to(TutorialStep.CREW_EQUIPPED)
+
+func advance_tutorial_to(step: int) -> void:
+	if step > tutorial_step:
+		tutorial_step = step
+		save_game()
+		tutorial_step_changed.emit(tutorial_step)
+		print("[TUTORIAL] Advanced to step %d (%s)" % [tutorial_step, TutorialStep.keys()[tutorial_step] if tutorial_step < TutorialStep.size() else "UNKNOWN"])
+
+func reset_tutorial() -> void:
+	tutorial_step = TutorialStep.NOT_STARTED
+	highest_unlocked_level = 1
+	current_selected_level = 1
+	current_level = 1
+	unlocked_levels = 1
+	doubloons = 0
+	active_vessel = "dinghy"
+	owned_vessels = ["dinghy"]
+	vessel_tiers["dinghy"] = 1
+	if vessel_tiers.has("sloop"):
+		vessel_tiers["sloop"] = 1
+	unlocked_crew = {}
+	equipped_crew = {}
+	save_game()
+	active_vessel_changed.emit(active_vessel)
+	doubloons_changed.emit(doubloons)
+	tutorial_step_changed.emit(tutorial_step)
+	print("[TUTORIAL] Reset to step 0 (Level 1, Dinghy T1, 0 doubloons)")
 

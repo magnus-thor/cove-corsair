@@ -9,6 +9,7 @@ signal hotspot_activated(mode_id: String)
 @export var mode_id: String = "campaign"
 @export var display_title: String = "Chart House"
 @export var display_subtitle: String = "Campaign"
+@export var locked_subtitle: String = ""
 @export var required_level: int = 0
 @export var theme_accent_color: Color = Color(0.96, 0.62, 0.04) # Default warm amber
 @export var icon_texture: Texture2D = null
@@ -67,7 +68,31 @@ func refresh_lock_state() -> void:
 		elif "highest_unlocked_level" in GameState:
 			highest_lvl = int(GameState.highest_unlocked_level)
 
-	is_locked = (required_level > 0 and highest_lvl < required_level)
+	if mode_id == "shipyard":
+		var tutorial_unlocked: bool = false
+		if GameState and "tutorial_step" in GameState:
+			if GameState.is_tutorial_in_progress():
+				var step: int = int(GameState.tutorial_step)
+				tutorial_unlocked = (
+					step == GameState.TutorialStep.LEVEL_2_COMPLETED
+					or step == GameState.TutorialStep.LEVEL_3_COMPLETED
+					or step == GameState.TutorialStep.LEVEL_4_COMPLETED
+				)
+			else:
+				tutorial_unlocked = true
+		is_locked = not tutorial_unlocked if (GameState and GameState.is_tutorial_in_progress()) else not (highest_lvl >= required_level)
+	elif mode_id == "campaign":
+		if GameState and GameState.is_tutorial_in_progress():
+			var step: int = int(GameState.tutorial_step)
+			is_locked = (
+				step == GameState.TutorialStep.LEVEL_2_COMPLETED
+				or step == GameState.TutorialStep.LEVEL_3_COMPLETED
+				or step == GameState.TutorialStep.LEVEL_4_COMPLETED
+			)
+		else:
+			is_locked = (required_level > 0 and highest_lvl < required_level)
+	else:
+		is_locked = (required_level > 0 and highest_lvl < required_level)
 
 	if lock_icon_rect and icon_texture_rect:
 		lock_icon_rect.visible = is_locked
@@ -75,11 +100,19 @@ func refresh_lock_state() -> void:
 
 	if subtitle_label:
 		if is_locked:
-			subtitle_label.text = "UNLOCKS AT LVL %d" % required_level
+			if locked_subtitle != "":
+				subtitle_label.text = locked_subtitle.to_upper()
+			elif mode_id == "campaign" and GameState and GameState.is_tutorial_in_progress():
+				subtitle_label.text = "VISIT DRYDOCK FIRST"
+			elif mode_id == "shipyard" and GameState and GameState.is_tutorial_in_progress():
+				subtitle_label.text = "SET SAIL FIRST"
+			else:
+				subtitle_label.text = "UNLOCKS AT LVL %d" % required_level
 			subtitle_label.modulate = Color(0.9, 0.4, 0.4, 1.0)
 		else:
 			subtitle_label.text = display_subtitle.to_upper()
 			subtitle_label.modulate = Color(0.75, 0.85, 0.95, 0.9)
+
 
 	if click_detector:
 		click_detector.mouse_default_cursor_shape = Control.CURSOR_FORBIDDEN if is_locked else Control.CURSOR_POINTING_HAND

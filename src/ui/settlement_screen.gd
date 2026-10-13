@@ -54,6 +54,9 @@ const COLOR_VICTORY_HEADER := Color(1.0, 0.84, 0.22, 1.0) # Radiant Gold
 const COLOR_DEFEAT_HEADER := Color(0.92, 0.22, 0.24, 1.0) # Crimson Red
 const COLOR_STAR_ACTIVE := Color(1.0, 0.85, 0.15, 1.0)
 const COLOR_STAR_INACTIVE := Color(0.40, 0.35, 0.30, 1.0)
+const GUIDANCE_SCENE: PackedScene = preload("res://src/ui/tutorial/tutorial_guidance_overlay.tscn")
+
+var _tutorial_overlay: TutorialGuidanceOverlay = null
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -107,10 +110,26 @@ func show_victory(coins_collected: int, completion_bonus: int, banked_total: int
 		banked_total
 	])
 	
+	var cleared_lvl: int = GameState.current_level
+	
 	# Record high score, star mastery, and unlock next level
-	GameState.record_level_score(GameState.current_level, coins_collected + completion_bonus)
-	GameState.record_level_stars(GameState.current_level, _stars_earned)
+	GameState.record_level_score(cleared_lvl, coins_collected + completion_bonus)
+	GameState.record_level_stars(cleared_lvl, _stars_earned)
 	GameState.unlock_next_level()
+
+	# Tutorial Progression Advancements
+	if GameState.is_tutorial_in_progress():
+		match cleared_lvl:
+			1:
+				GameState.advance_tutorial_to(GameState.TutorialStep.LEVEL_1_COMPLETED)
+			2:
+				GameState.advance_tutorial_to(GameState.TutorialStep.LEVEL_2_COMPLETED)
+			3:
+				GameState.advance_tutorial_to(GameState.TutorialStep.LEVEL_3_COMPLETED)
+			4:
+				GameState.advance_tutorial_to(GameState.TutorialStep.LEVEL_4_COMPLETED)
+			5:
+				GameState.advance_tutorial_to(GameState.TutorialStep.COMPLETED)
 	
 	_present_modal()
 
@@ -187,15 +206,22 @@ func _present_modal() -> void:
 		if primary_button:
 			if GameState.is_campaign_complete():
 				primary_button.text = "MAP COMPLETE"
+				primary_button.visible = true
+			elif GameState.is_tutorial_in_progress() and GameState.last_cleared_level in [2, 3]:
+				primary_button.visible = false
 			else:
 				primary_button.text = "NEXT LEVEL"
+				primary_button.visible = true
 		_bonus_claimed = false
 		if bonus_claim_button:
 			bonus_claim_button.visible = true
 			bonus_claim_button.disabled = false
 			bonus_claim_button.text = "✦ CLAIM 2X BONUS DOUBLOONS"
 		if map_button:
-			map_button.text = "LEVEL MAP"
+			if GameState.is_tutorial_in_progress() and GameState.last_cleared_level in [2, 3]:
+				map_button.text = "RETURN TO COVE"
+			else:
+				map_button.text = "LEVEL MAP"
 	else:
 		if header_label:
 			header_label.text = "SHIP SUNK!"
@@ -233,6 +259,7 @@ func _present_modal() -> void:
 
 	# 5. Roll-up count animation
 	_animate_breakdown(_run_doubloons, _completion_bonus, _banked_this_run)
+	_check_tutorial_guidance()
 
 func _animate_open() -> void:
 	if _modal_tween and _modal_tween.is_valid():
@@ -297,6 +324,14 @@ func _update_stars(count: int) -> void:
 func _update_shipyard_button() -> void:
 	if not shipyard_button:
 		return
+
+	# During tutorial levels 1 & 2, shipyard is completely locked & hidden
+	if GameState and GameState.is_tutorial_in_progress() and GameState.highest_unlocked_level <= 2:
+		shipyard_button.visible = false
+		if shipyard_badge:
+			shipyard_badge.visible = false
+		return
+	shipyard_button.visible = true
 
 	var can_afford: bool = GameState.can_afford_active_vessel_upgrade()
 
@@ -376,8 +411,11 @@ func _on_bonus_claim_pressed() -> void:
 		
 	_update_vault_balance_display()
 	_update_shipyard_button()
+	_check_tutorial_guidance()
 
 func _on_primary_pressed() -> void:
+	if _tutorial_overlay and is_instance_valid(_tutorial_overlay):
+		_tutorial_overlay.dismiss()
 	if AudioManager and AudioManager.has_method("play_sfx"):
 		AudioManager.play_sfx("gate_passes")
 	get_tree().paused = false
@@ -407,6 +445,8 @@ func _on_primary_pressed() -> void:
 		get_tree().reload_current_scene()
 
 func _on_shipyard_pressed() -> void:
+	if _tutorial_overlay and is_instance_valid(_tutorial_overlay):
+		_tutorial_overlay.dismiss()
 	if AudioManager and AudioManager.has_method("play_sfx"):
 		AudioManager.play_sfx("gate_passes")
 	if shipyard_button:
@@ -423,18 +463,116 @@ func _on_shipyard_pressed() -> void:
 					shipyard_button.disabled = false
 				_refresh_banked_display()
 				_update_shipyard_button()
+				_check_tutorial_guidance()
 			)
 
 func _on_map_pressed() -> void:
+	if _tutorial_overlay and is_instance_valid(_tutorial_overlay):
+		_tutorial_overlay.dismiss()
 	if AudioManager and AudioManager.has_method("play_sfx"):
 		AudioManager.play_sfx("gate_passes")
 	map_requested.emit()
 	get_tree().paused = false
 	GameState.should_auto_start = false
-	# Signal the hub to auto-open the campaign river map when it loads,
-	# so "Level Map" takes the player directly to the map view.
-	GameState.should_open_map = true
-	GameState.change_scene_with_loading("res://src/features/hub/pirate_lair_hub.tscn", "Pirate Lair")
+	if GameState.is_tutorial_in_progress():
+		GameState.should_open_map = false
+	else:
+		GameState.should_open_map = true
+	GameState.reset_level()
+	GameState.change_scene_with_loading("res://src/features/hub/pirate_lair_hub.tscn", "Smuggler's Cove")
+
+func _check_tutorial_guidance() -> void:
+	if not GameState or not GameState.is_tutorial_in_progress() or not _is_victory:
+		if _tutorial_overlay and is_instance_valid(_tutorial_overlay):
+			_tutorial_overlay.dismiss()
+		return
+
+	if not _tutorial_overlay or not is_instance_valid(_tutorial_overlay):
+		_tutorial_overlay = GUIDANCE_SCENE.instantiate() as TutorialGuidanceOverlay
+		add_child(_tutorial_overlay)
+
+	var cleared_lvl: int = GameState.last_cleared_level
+	if cleared_lvl in [2, 3]:
+		if primary_button:
+			primary_button.visible = false
+		if map_button:
+			map_button.text = "RETURN TO COVE"
+
+	# 1. First action on victory: Claim 2X bonus gold!
+	if not _bonus_claimed and bonus_claim_button and bonus_claim_button.visible and not bonus_claim_button.disabled:
+		_tutorial_overlay.guide_to(
+			bonus_claim_button,
+			"A true corsair always doubles their haul! Claim yer bonus gold!",
+			Vector2.UP,
+			"QUARTERMASTER",
+			"tut_settle_claim_2x"
+		)
+		return
+
+	# 2. After bonus is claimed, guide to the next navigation step:
+	if cleared_lvl == 1:
+		# Level 1 victory: proceed to next level
+		if primary_button and primary_button.visible:
+			_tutorial_overlay.guide_to(
+				primary_button,
+				"Doubloons banked in the vault! Onward to the next voyage!",
+				Vector2.UP,
+				"QUARTERMASTER",
+				"tut_settle_continue_1"
+			)
+	elif cleared_lvl == 2:
+		# Level 2 victory: return to cove / shipyard
+		if primary_button:
+			primary_button.visible = false
+		if map_button and map_button.visible:
+			map_button.text = "RETURN TO COVE"
+			_tutorial_overlay.guide_to(
+				map_button,
+				"We've got the coin! Return to Smuggler's Cove to visit the Drydock!",
+				Vector2.UP,
+				"QUARTERMASTER",
+				"tut_settle_return_to_hub"
+			)
+		elif shipyard_button and shipyard_button.visible:
+			_tutorial_overlay.guide_to(
+				shipyard_button,
+				"To the Drydock! Commission THE SLOOP!",
+				Vector2.UP,
+				"QUARTERMASTER",
+				"tut_settle_return_to_hub"
+			)
+	elif cleared_lvl == 3:
+		# Level 3 victory: return to cove / recruit crew
+		if primary_button:
+			primary_button.visible = false
+		if map_button and map_button.visible:
+			map_button.text = "RETURN TO COVE"
+			_tutorial_overlay.guide_to(
+				map_button,
+				"Plunder secured! Return to Smuggler's Cove to recruit your crew!",
+				Vector2.UP,
+				"QUARTERMASTER",
+				"tut_settle_return_to_hub"
+			)
+	else:
+		# Levels 4+: proceed to next level (or boss)
+		if primary_button and primary_button.visible:
+			_tutorial_overlay.guide_to(
+				primary_button,
+				"The final showdown awaits! Onward to The Phantom Dredge!",
+				Vector2.UP,
+				"QUARTERMASTER",
+				"tut_settle_continue_4"
+			)
+		elif map_button and map_button.visible:
+			_tutorial_overlay.guide_to(
+				map_button,
+				"Plunder secured! Return to Smuggler's Cove!",
+				Vector2.UP,
+				"QUARTERMASTER",
+				"tut_settle_return_to_hub"
+			)
+
 
 func _on_copy_telemetry_pressed() -> void:
 	if AudioManager and AudioManager.has_method("play_sfx"):

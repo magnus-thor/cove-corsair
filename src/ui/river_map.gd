@@ -36,6 +36,7 @@ const ICON_CHECKMARK: Texture2D = preload("res://assets/sprites/ui/theme/icon_ch
 const ICON_SKULL: Texture2D = preload("res://assets/sprites/ui/hud_skull_icon.svg")
 const ICON_COIN: Texture2D = preload("res://assets/sprites/ui/coin_icon.svg")
 const ICON_BOAT_FALLBACK: Texture2D = preload("res://assets/sprites/ui/hud_boat_icon.svg")
+const GUIDANCE_SCENE: PackedScene = preload("res://src/ui/tutorial/tutorial_guidance_overlay.tscn")
 
 static var MILESTONES: Dictionary = _build_milestones()
 
@@ -44,6 +45,7 @@ var node_controls: Dictionary = {}
 var vessel_bob_tween: Tween
 var is_animating_travel: bool = false
 var popup_selected_level: int = 1
+var _tutorial_overlay: TutorialGuidanceOverlay = null
 
 func _ready() -> void:
 	_init_milestones_data()
@@ -541,6 +543,9 @@ func _handle_initial_presentation() -> void:
 		var target_pos := _get_node_dock_pos(active_lvl)
 		mini_vessel.position = target_pos
 		mini_vessel.rotation = _get_node_water_rotation(active_lvl)
+		var parent_canvas: CanvasLayer = get_parent() as CanvasLayer
+		if is_visible_in_tree() and (not parent_canvas or parent_canvas.visible):
+			_check_tutorial_guidance()
 
 func _get_node_dock_pos(lvl: int) -> Vector2:
 	if MILESTONES.has(lvl):
@@ -641,9 +646,13 @@ func _play_advancement_sequence() -> void:
 	_refresh_all_node_states()
 	is_animating_travel = false
 	
-	# Open level detail popup for the newly unlocked level
-	await get_tree().create_timer(0.3, true, false, true).timeout
-	_show_level_popup(to_lvl)
+	# During tutorial, guide the player to click the milestone node first rather than auto-opening popup
+	if not GameState.is_tutorial_in_progress():
+		await get_tree().create_timer(0.3, true, false, true).timeout
+		_show_level_popup(to_lvl)
+	else:
+		_check_tutorial_guidance()
+
 
 func _trigger_unlock_burst(lvl: int) -> void:
 	if not unlock_vfx or not MILESTONES.has(lvl):
@@ -670,7 +679,32 @@ func _trigger_unlock_burst(lvl: int) -> void:
 func _on_node_pressed(lvl: int) -> void:
 	if is_animating_travel:
 		return
-		
+
+	if GameState.is_tutorial_in_progress():
+		var allowed_lvl: int = -1
+		match GameState.tutorial_step:
+			GameState.TutorialStep.NOT_STARTED:
+				allowed_lvl = 1
+			GameState.TutorialStep.LEVEL_1_COMPLETED:
+				allowed_lvl = 2
+			GameState.TutorialStep.SLOOP_PURCHASED:
+				allowed_lvl = 3
+			GameState.TutorialStep.CREW_EQUIPPED:
+				allowed_lvl = 4
+			GameState.TutorialStep.LEVEL_4_COMPLETED:
+				allowed_lvl = 5
+		if lvl != allowed_lvl:
+			AudioManager.play_sfx("barrel_hits", 1.2, 1.4)
+			var cont := node_controls.get(lvl) as Control
+			if cont:
+				var shake_t := create_tween()
+				var orig_x: float = cont.position.x
+				shake_t.tween_property(cont, "position:x", orig_x - 8.0, 0.06)
+				shake_t.tween_property(cont, "position:x", orig_x + 8.0, 0.06)
+				shake_t.tween_property(cont, "position:x", orig_x - 4.0, 0.06)
+				shake_t.tween_property(cont, "position:x", orig_x, 0.06)
+			return
+
 	var unlocked_max := GameState.highest_unlocked_level
 	if lvl <= unlocked_max:
 		AudioManager.play_sfx("gate_passes", 1.0, 1.1)
@@ -771,6 +805,7 @@ func _show_level_popup(lvl: int) -> void:
 	var pt := create_tween().set_parallel(true).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	pt.tween_property(popup_panel, "scale", Vector2.ONE, 0.35)
 	pt.tween_property(popup_panel, "modulate:a", 1.0, 0.25)
+	_check_tutorial_guidance()
 
 func _close_level_popup() -> void:
 	if not popup_scrim or not popup_scrim.visible:
@@ -783,11 +818,82 @@ func _close_level_popup() -> void:
 	
 	await pt.finished
 	popup_scrim.visible = false
+	_check_tutorial_guidance()
 
 func _on_set_sail_pressed() -> void:
+	if _tutorial_overlay and is_instance_valid(_tutorial_overlay):
+		_tutorial_overlay.dismiss()
 	AudioManager.play_sfx("gate_passes")
 	GameState.select_level(popup_selected_level)
 	sail_requested.emit(popup_selected_level)
+
+func dismiss_tutorial_guidance() -> void:
+	if _tutorial_overlay and is_instance_valid(_tutorial_overlay):
+		_tutorial_overlay.dismiss()
+
+func _check_tutorial_guidance() -> void:
+	if not GameState.is_tutorial_in_progress():
+		dismiss_tutorial_guidance()
+		return
+
+	# Only show guidance if river map itself is currently visible and active in the scene tree
+	if not is_visible_in_tree() or not is_inside_tree():
+		dismiss_tutorial_guidance()
+		return
+
+	var parent_canvas: CanvasLayer = get_parent() as CanvasLayer
+	if parent_canvas and not parent_canvas.visible:
+		dismiss_tutorial_guidance()
+		return
+
+	if not _tutorial_overlay or not is_instance_valid(_tutorial_overlay):
+		_tutorial_overlay = GUIDANCE_SCENE.instantiate() as TutorialGuidanceOverlay
+		add_child(_tutorial_overlay)
+
+	# If level popup modal is open, guide directly to "SET SAIL" button
+	if popup_scrim and popup_scrim.visible and btn_set_sail and is_instance_valid(btn_set_sail):
+		var target_lvl: int = popup_selected_level
+		_tutorial_overlay.guide_to(
+			btn_set_sail,
+			"All hands on deck! Set sail into the shallows!",
+			Vector2.UP,
+			"QUARTERMASTER",
+			"tut_map_set_sail_%d" % target_lvl
+		)
+		return
+
+	# Otherwise, guide to the appropriate level milestone node on the river
+	match GameState.tutorial_step:
+		GameState.TutorialStep.NOT_STARTED:
+			_guide_to_milestone_node(1, "Smuggler's Run awaits! Tap the first outpost to inspect the voyage.", "tut_map_select_level_1")
+		GameState.TutorialStep.LEVEL_1_COMPLETED:
+			_guide_to_milestone_node(2, "Palm Shallows ahead! Select Level 2.", "tut_map_select_level_2")
+		GameState.TutorialStep.SLOOP_PURCHASED:
+			_guide_to_milestone_node(3, "The Sloop is ready! Select Level 3 for her maiden run.", "tut_map_select_level_3")
+		GameState.TutorialStep.LEVEL_3_COMPLETED:
+			var parent_hub: Node = get_parent()
+			if parent_hub:
+				var back_btn: BaseButton = parent_hub.find_child("BtnCloseRiverMap", true, false) as BaseButton
+				if back_btn:
+					_tutorial_overlay.guide_to(back_btn, "Recruit crew first! Return to Smuggler's Cove to visit the Drydock!", Vector2.UP, "QUARTERMASTER", "tut_map_return_to_hub")
+		GameState.TutorialStep.CREW_EQUIPPED:
+			_guide_to_milestone_node(4, "Crew stationed! Select Level 4 to test explosive coconuts!", "tut_map_select_level_4")
+		GameState.TutorialStep.LEVEL_4_COMPLETED:
+			_guide_to_milestone_node(5, "Plot your course for Level 5 to challenge The Phantom Dredge!", "tut_map_select_level_5")
+		_:
+			if _tutorial_overlay and is_instance_valid(_tutorial_overlay):
+				_tutorial_overlay.dismiss()
+
+
+func _guide_to_milestone_node(lvl: int, text_content: String, voice_id: String) -> void:
+	var container: Control = node_controls.get(lvl, null) as Control
+	if not container:
+		return
+	_focus_on_level(lvl, false)
+	var btn: Control = container.get_node_or_null("TouchButton") as Control
+	var target_ctrl: Control = btn if btn else container
+	if _tutorial_overlay:
+		_tutorial_overlay.guide_to(target_ctrl, text_content, Vector2.UP, "QUARTERMASTER", voice_id)
 
 func _format_number(val: int) -> String:
 	var s := str(abs(val))

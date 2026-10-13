@@ -23,12 +23,25 @@ func _spawn_escort_rowers() -> void:
 	var entities: Node = get_node_or_null("Entities")
 	if not entities:
 		return
-	var spawns: Array[Vector3] = [
-		Vector3(-1.8, 0.1, -12.0),
-		Vector3(1.8, 0.1, -18.0),
-		Vector3(-1.2, 0.1, -30.0),
-		Vector3(1.5, 0.1, -38.0),
-	]
+	var cur_lvl: int = 1
+	var gs: Node = get_node_or_null("/root/GameState")
+	if gs and "current_level" in gs:
+		cur_lvl = int(gs.get("current_level"))
+
+	var spawns: Array[Vector3] = []
+	if cur_lvl <= 2:
+		# Paced early tutorial encounter: give player 3+ seconds to react, avoid instant ramming
+		spawns = [
+			Vector3(1.8, 0.1, -24.0),
+			Vector3(-1.2, 0.1, -38.0),
+		]
+	else:
+		spawns = [
+			Vector3(-1.8, 0.1, -14.0),
+			Vector3(1.8, 0.1, -22.0),
+			Vector3(-1.2, 0.1, -32.0),
+			Vector3(1.5, 0.1, -42.0),
+		]
 	for i: int in range(spawns.size()):
 		var rower: Area3D = ENEMY_SCENE.instantiate() as Area3D
 		rower.name = "EscortRower_%d" % (i + 1)

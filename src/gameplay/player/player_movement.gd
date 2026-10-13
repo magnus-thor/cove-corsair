@@ -5,6 +5,8 @@ extends Node
 ## and kinetic impact shudder for the player vessel.
 ## Owned and driven by PlayerSwerve (player.gd).
 
+signal player_swerved
+
 # ── Input ────────────────────────────────────────────────────────────────────
 ## Touch/drag sensitivity scaling factor.
 @export var sensitivity: float = 0.015
@@ -66,10 +68,18 @@ func process_input(event: InputEvent) -> void:
 		var mm := event as InputEventMouseMotion
 		target_x += mm.relative.x * sensitivity
 		target_x = clamp(target_x, -_half_width, _half_width)
+		if absf(mm.relative.x) > 1.0:
+			player_swerved.emit()
+			if EventBus and EventBus.has_signal("player_swerved"):
+				EventBus.player_swerved.emit()
 	elif event is InputEventScreenDrag:
 		var sd := event as InputEventScreenDrag
 		target_x += sd.relative.x * sensitivity
 		target_x = clamp(target_x, -_half_width, _half_width)
+		if absf(sd.relative.x) > 1.0:
+			player_swerved.emit()
+			if EventBus and EventBus.has_signal("player_swerved"):
+				EventBus.player_swerved.emit()
 
 
 ## Tick the idle bobbing animation used when the game is not active (harbor view).
@@ -96,6 +106,9 @@ func tick(delta: float, speed_mult: float) -> float:
 	if input_dir != 0.0:
 		target_x += input_dir * keyboard_speed * speed_mult * delta
 		target_x = clamp(target_x, -_half_width, _half_width)
+		player_swerved.emit()
+		if EventBus and EventBus.has_signal("player_swerved"):
+			EventBus.player_swerved.emit()
 
 	# Smooth swerve horizontal interpolation
 	var previous_x: float = _body.position.x

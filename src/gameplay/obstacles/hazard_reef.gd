@@ -53,7 +53,7 @@ func _check_collision(node: Node) -> void:
 	if player and is_instance_valid(player):
 		_has_damaged_player = true
 		if player.has_method("damage_fleet"):
-			player.damage_fleet(1)
+			player.damage_fleet(1, "hazard_reef")
 		AudioManager.play_sfx("barrel_breaks", 0.7, 0.9, 2.0)
 		var camera: Node = get_tree().get_first_node_in_group("game_camera")
 		if camera and camera.has_method("shake"):

@@ -33,6 +33,10 @@ signal player_sunk()
 @warning_ignore("unused_signal")
 signal run_failed(coins_collected: int, distance_reached: float)
 
+## Fired on initial player steer/swerve input during run.
+@warning_ignore("unused_signal")
+signal player_swerved()
+
 ## ── Boss Lifecycle ───────────────────────────────────────────────────────────
 
 ## Fired when a boss enters the arena. HUD subscribes to show boss HP bar.

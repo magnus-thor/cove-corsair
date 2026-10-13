@@ -52,6 +52,7 @@ const ICON_STAT_AGILITY: Texture2D = preload("res://assets/sprites/ui/shipyard/i
 const CARD_SCENE: PackedScene = preload("res://src/ui/shipyard/vessel_card.tscn")
 const CREW_CARD_SCENE: PackedScene = preload("res://src/ui/shipyard/crew_card.tscn")
 const OUTFITTING_CARD_SCENE: PackedScene = preload("res://src/ui/shipyard/outfitting_card.tscn")
+const GUIDANCE_SCENE: PackedScene = preload("res://src/ui/tutorial/tutorial_guidance_overlay.tscn")
 
 # Perk chip style reused for all dynamically created chips
 var _style_perk_chip: StyleBoxFlat
@@ -62,6 +63,7 @@ var current_tab: TabType = TabType.VESSELS
 var vessel_ids: Array[String] = ["dinghy", "sloop", "bombard_skiff", "ironclad"]
 var card_instances: Dictionary = {} # vessel_id -> VesselCard
 var selected_vessel_id: String = "dinghy"
+var _tutorial_overlay: TutorialGuidanceOverlay = null
 
 var crew_ids: Array[String] = ["monkey_bomber", "skeleton_tosser", "grease_monkey"]
 var crew_card_instances: Dictionary = {} # crew_id -> CrewCard
@@ -108,18 +110,34 @@ func _ready() -> void:
 	GameState.crew_equipped.connect(func(_ship: String, _sock: String, _id: String) -> void: _refresh_crew_cards())
 	GameState.outfitting_unlocked.connect(func(_id: String) -> void: _refresh_outfitting_cards())
 	GameState.outfitting_equipped.connect(func(_ship: String, _cat: String, _id: String) -> void: _refresh_outfitting_cards())
+	GameState.tutorial_step_changed.connect(func(_step: int) -> void: _check_tutorial_guidance())
 
-	# Default selected vessel to active vessel
-	if GameState.active_vessel in vessel_ids:
+	# Default selected vessel to active vessel (filtering hidden vessels)
+	var active_vessels := _get_active_vessel_ids()
+	if GameState.active_vessel in active_vessels:
 		selected_vessel_id = GameState.active_vessel
+	elif not active_vessels.is_empty():
+		selected_vessel_id = active_vessels[0]
 	else:
-		selected_vessel_id = "dinghy"
+		selected_vessel_id = "sloop"
 
 	_update_tab_headers()
 	_build_grid_cards()
 	_update_purse_display()
 	_update_inspection_drawer()
+	_check_tutorial_guidance()
 	print("[TELEMETRY:SHIPYARD] ⚓ Shipyard Opened | Vault Balance: %d 🪙" % (GameState.doubloons if GameState else 0))
+
+func _get_active_vessel_ids() -> Array[String]:
+	var list: Array[String] = []
+	# Permanently retire and hide Dinghy once Sloop is owned or tutorial complete
+	var hide_dinghy: bool = GameState.is_vessel_owned("sloop") or GameState.is_tutorial_completed() or GameState.highest_unlocked_level > 2
+	for v_id: String in vessel_ids:
+		if v_id == "dinghy" and hide_dinghy:
+			continue
+		list.append(v_id)
+	return list
+
 
 
 func _init_perk_chip_style() -> void:
@@ -242,8 +260,9 @@ func _build_grid_cards() -> void:
 		child.queue_free()
 	card_instances.clear()
 
+	var active_vessels := _get_active_vessel_ids()
 	var index_counter: int = 1
-	for v_id: String in vessel_ids:
+	for v_id: String in active_vessels:
 		var card: VesselCard = CARD_SCENE.instantiate() as VesselCard
 		grid_container.add_child(card)
 		card.setup_vessel(v_id, index_counter)
@@ -527,18 +546,21 @@ func _on_action_pressed() -> void:
 				AudioManager.play_sfx("barrel_hits")
 				_refresh_card_selections()
 				_update_inspection_drawer()
+				_check_tutorial_guidance()
 		ActionState.UPGRADE:
 			if GameState.upgrade_vessel_tier(selected_vessel_id):
 				AudioManager.play_sfx("coin_pickups", 1.1, 1.3)
 				AudioManager.play_sfx("gate_passes")
 				_refresh_card_selections()
 				_update_inspection_drawer()
+				_check_tutorial_guidance()
 		ActionState.EQUIP:
 			if GameState.set_active_vessel(selected_vessel_id):
 				AudioManager.play_sfx("coin_pickups", 1.0, 1.2)
 				AudioManager.play_sfx("gate_passes")
 				_refresh_card_selections()
 				_update_inspection_drawer()
+				_check_tutorial_guidance()
 		_:
 			pass
 
@@ -571,6 +593,7 @@ func _on_tab_vessels_pressed() -> void:
 	if drawer_panel:
 		drawer_panel.visible = true
 	_update_inspection_drawer()
+	_check_tutorial_guidance()
 
 func _on_tab_crew_pressed() -> void:
 	if current_tab == TabType.CREW:
@@ -585,6 +608,7 @@ func _on_tab_crew_pressed() -> void:
 	if equip_button:
 		equip_button.visible = false
 	_build_crew_cards()
+	_check_tutorial_guidance()
 
 func _on_tab_outfitting_pressed() -> void:
 	if current_tab == TabType.OUTFITTING:
@@ -655,6 +679,7 @@ func _on_crew_buy_requested(c_id: String) -> void:
 		AudioManager.play_sfx("barrel_hits")
 		_update_purse_display()
 		_refresh_crew_cards()
+		_check_tutorial_guidance()
 
 func _on_crew_upgrade_requested(c_id: String) -> void:
 	if GameState.upgrade_crew_level(c_id):
@@ -766,10 +791,102 @@ func _on_outfitting_equip_requested(item_id: String) -> void:
 		_refresh_outfitting_cards()
 
 func _on_back_pressed() -> void:
+	if _tutorial_overlay and is_instance_valid(_tutorial_overlay):
+		_tutorial_overlay.dismiss()
 	AudioManager.play_sfx("gate_passes")
 	print("[TELEMETRY:SHIPYARD] ⚓ Shipyard Closed | Vault Balance: %d 🪙" % (GameState.doubloons if GameState else 0))
 	shipyard_closed.emit()
 	queue_free()
+
+func _lock_tabs_except(allowed_tab: TabType) -> void:
+	if tab_vessels:
+		tab_vessels.disabled = (allowed_tab != TabType.VESSELS)
+	if tab_crew:
+		tab_crew.disabled = (allowed_tab != TabType.CREW)
+	if tab_outfitting:
+		tab_outfitting.disabled = (allowed_tab != TabType.OUTFITTING)
+
+func _unlock_all_tabs() -> void:
+	if tab_vessels:
+		tab_vessels.disabled = false
+	if tab_crew:
+		tab_crew.disabled = false
+	if tab_outfitting:
+		tab_outfitting.disabled = false
+
+func _check_tutorial_guidance() -> void:
+	if not GameState.is_tutorial_in_progress():
+		if _tutorial_overlay and is_instance_valid(_tutorial_overlay):
+			_tutorial_overlay.dismiss()
+		_unlock_all_tabs()
+		return
+
+	# Fast forward if prerequisites are already met
+	GameState.check_and_fast_forward_tutorial()
+
+	if not _tutorial_overlay or not is_instance_valid(_tutorial_overlay):
+		_tutorial_overlay = GUIDANCE_SCENE.instantiate() as TutorialGuidanceOverlay
+		add_child(_tutorial_overlay)
+
+	match GameState.tutorial_step:
+		GameState.TutorialStep.LEVEL_2_COMPLETED:
+			_lock_tabs_except(TabType.VESSELS)
+			if GameState.is_vessel_owned("sloop"):
+				if GameState.active_vessel != "sloop":
+					GameState.set_active_vessel("sloop")
+				GameState.advance_tutorial_to(GameState.TutorialStep.SLOOP_PURCHASED)
+				return
+			if selected_vessel_id != "sloop":
+				selected_vessel_id = "sloop"
+				_refresh_card_selections()
+				_update_inspection_drawer()
+			if action_button and action_button.is_visible_in_tree() and not action_button.disabled:
+				_tutorial_overlay.guide_to(action_button, "Commission THE SLOOP for twin bow chasers and rapid sea speed!", Vector2.UP, "QUARTERMASTER", "tut_shipyard_buy_sloop")
+			elif back_button and back_button.is_visible_in_tree():
+				_tutorial_overlay.guide_to(back_button, "Sloop is ready! Close the Drydock to return to the Cove!", Vector2.UP, "QUARTERMASTER", "tut_shipyard_close_after_sloop")
+
+		GameState.TutorialStep.SLOOP_PURCHASED:
+			_lock_tabs_except(TabType.VESSELS)
+			if back_button and back_button.is_visible_in_tree():
+				_tutorial_overlay.guide_to(back_button, "Close the Drydock and set sail from the Chart House!", Vector2.UP, "QUARTERMASTER", "tut_shipyard_close_after_sloop")
+
+		GameState.TutorialStep.LEVEL_3_COMPLETED:
+			if GameState.is_crew_unlocked("monkey_bomber"):
+				if not GameState.is_crew_equipped_on_active_ship("monkey_bomber"):
+					GameState.auto_equip_crew_to_vessel(GameState.active_vessel, "monkey_bomber")
+				GameState.advance_tutorial_to(GameState.TutorialStep.CREW_EQUIPPED)
+				return
+			if current_tab != TabType.CREW:
+				_lock_tabs_except(TabType.CREW)
+				_on_tab_crew_pressed()
+				return
+			_lock_tabs_except(TabType.CREW)
+			var monkey_card: Node = crew_card_instances.get("monkey_bomber")
+			if monkey_card and is_instance_valid(monkey_card):
+				var recruit_btn: BaseButton = monkey_card.find_child("*BuyButton*", true, false) as BaseButton
+				if recruit_btn and recruit_btn.is_visible_in_tree() and not recruit_btn.disabled:
+					_tutorial_overlay.guide_to(recruit_btn, "Recruit Monkey Bomber! They auto-equip to your mid-deck!", Vector2.UP, "QUARTERMASTER", "tut_shipyard_hire_monkey_bomber")
+				elif back_button and back_button.is_visible_in_tree():
+					_tutorial_overlay.guide_to(back_button, "Monkey Bomber equipped! Close the Drydock to sail!", Vector2.UP, "QUARTERMASTER", "tut_shipyard_close_after_crew")
+			elif back_button and back_button.is_visible_in_tree():
+				_tutorial_overlay.guide_to(back_button, "Monkey Bomber equipped! Close the Drydock to sail!", Vector2.UP, "QUARTERMASTER", "tut_shipyard_close_after_crew")
+
+		GameState.TutorialStep.CREW_EQUIPPED:
+			_lock_tabs_except(TabType.CREW)
+			if back_button and back_button.is_visible_in_tree():
+				_tutorial_overlay.guide_to(back_button, "All battle stations manned! Close the Drydock to sail Level 4!", Vector2.UP, "QUARTERMASTER", "tut_shipyard_close_after_crew")
+
+		GameState.TutorialStep.LEVEL_4_COMPLETED:
+			_unlock_all_tabs()
+			if back_button and back_button.is_visible_in_tree():
+				_tutorial_overlay.guide_to(back_button, "All hands on deck! Close the Drydock to challenge The Phantom Dredge!", Vector2.UP, "QUARTERMASTER", "tut_shipyard_close_after_crew")
+
+
+
+		_:
+			_unlock_all_tabs()
+			if _tutorial_overlay and is_instance_valid(_tutorial_overlay):
+				_tutorial_overlay.dismiss()
 
 
 func _format_number(val: int) -> String:

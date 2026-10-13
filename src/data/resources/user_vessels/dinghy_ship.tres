@@ -16,9 +16,12 @@ pixel_size = 0.0021
 y_offset = 0.26
 scale = Vector3(3.8, 3.8, 3.8)
 rotation_degrees = Vector3(0, 0, 0)
-max_health = 2
+max_health = 3
 move_speed = 10.5
-fire_rate = 0.2
+fire_rate = 0.38
+socket_weapons = {
+"BowMount": "res://src/data/resources/user_crew/weapon_dinghy_chaser.tres"
+}
 hardpoint_offsets = {
 "AftDeckCrew": Vector3(0.05, 0.46, 0.55),
 "BowMount": Vector3(0, 0.46, -1.7),

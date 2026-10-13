@@ -30,6 +30,7 @@ const WAKE_SCENE: PackedScene = preload("res://src/vfx/boat_wake.tscn")
 const SHIPYARD_SCENE: PackedScene = preload("res://src/ui/shipyard/shipyard_ui.tscn")
 const SETTINGS_SCENE: PackedScene = preload("res://src/ui/settings_menu.tscn")
 const CALIBRATION_PANEL_SCENE: PackedScene = preload("res://src/features/hub/harbor_calibration_panel.tscn")
+const GUIDANCE_SCENE: PackedScene = preload("res://src/ui/tutorial/tutorial_guidance_overlay.tscn")
 const MAIN_GAME_PATH: String = "res://src/core/main_game.tscn"
 
 const WATERLINE_ELEVATION_OFFSET: float = 0.35
@@ -81,6 +82,7 @@ var _current_flagship_mesh: Node3D = null
 var _flagship_wake: Node3D = null
 var _bob_tween: Tween = null
 var _calibration_panel: HarborCalibrationPanel = null
+var _tutorial_overlay: TutorialGuidanceOverlay = null
 
 func _ready() -> void:
 	GameState.set_performance_mode(false)
@@ -100,9 +102,12 @@ func _ready() -> void:
 
 	GameState.active_vessel_changed.connect(_on_active_vessel_changed)
 	GameState.doubloons_changed.connect(_on_doubloons_changed)
+	GameState.tutorial_step_changed.connect(func(_s: int) -> void: _check_tutorial_guidance())
 
 	if AudioManager and AudioManager.has_method("play_music"):
 		AudioManager.play_music()
+
+	_check_tutorial_guidance()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey:
@@ -302,23 +307,34 @@ func _on_flagship_gui_input(event: InputEvent) -> void:
 			activated = true
 
 	if activated:
+		if hotspot_drydock and hotspot_drydock.is_active_locked():
+			hotspot_drydock.trigger_activation()
+			return
 		if AudioManager and AudioManager.has_method("play_sfx"):
 			AudioManager.play_sfx("gate_passes")
 		_open_shipyard_ui()
 
 func _open_campaign_map() -> void:
+	if _tutorial_overlay and is_instance_valid(_tutorial_overlay):
+		_tutorial_overlay.dismiss()
 	if river_map_layer:
 		river_map_layer.visible = true
 		river_map_layer.process_mode = Node.PROCESS_MODE_INHERIT
-		if river_map_instance and river_map_instance.has_method("_setup_mini_vessel"):
-			river_map_instance.call("_setup_mini_vessel")
+		if river_map_instance:
+			if river_map_instance.has_method("_setup_mini_vessel"):
+				river_map_instance.call("_setup_mini_vessel")
+			if river_map_instance.has_method("_check_tutorial_guidance"):
+				river_map_instance.call("_check_tutorial_guidance")
 
 func _close_river_map() -> void:
 	if AudioManager and AudioManager.has_method("play_sfx"):
 		AudioManager.play_sfx("gate_passes", 0.9, 1.0)
 
+	if river_map_instance and river_map_instance.has_method("dismiss_tutorial_guidance"):
+		river_map_instance.call("dismiss_tutorial_guidance")
 	if river_map_layer:
 		river_map_layer.visible = false
+	_check_tutorial_guidance()
 
 func _on_level_selected(level_num: int) -> void:
 	GameState.select_level(level_num)
@@ -341,8 +357,13 @@ func _open_shipyard_ui() -> void:
 		return
 
 	for child: Node in get_children():
-		if child is ShipyardUI:
+		if child is ShipyardUI and not child.is_queued_for_deletion():
 			return
+
+	if _tutorial_overlay and is_instance_valid(_tutorial_overlay):
+		_tutorial_overlay.dismiss()
+	if river_map_instance and river_map_instance.has_method("dismiss_tutorial_guidance"):
+		river_map_instance.call("dismiss_tutorial_guidance")
 
 	var shipyard_node := SHIPYARD_SCENE.instantiate() as CanvasLayer
 	if not shipyard_node:
@@ -353,7 +374,117 @@ func _open_shipyard_ui() -> void:
 		shipyard_node.connect("shipyard_closed", func() -> void:
 			_refresh_docked_flagship()
 			_update_hud_display()
+			call_deferred("_check_tutorial_guidance")
 		)
+	shipyard_node.tree_exited.connect(func() -> void:
+		call_deferred("_check_tutorial_guidance")
+	)
+
+
+func _is_subview_active() -> bool:
+	if river_map_layer and river_map_layer.visible:
+		return true
+	for child: Node in get_children():
+		if child is ShipyardUI and not child.is_queued_for_deletion():
+			return true
+	return false
+
+func _check_tutorial_guidance() -> void:
+	if hotspot_chart_house:
+		hotspot_chart_house.refresh_lock_state()
+	if hotspot_drydock:
+		hotspot_drydock.refresh_lock_state()
+
+	if not GameState.is_tutorial_in_progress() or _is_subview_active():
+		if _tutorial_overlay and is_instance_valid(_tutorial_overlay):
+			_tutorial_overlay.dismiss()
+		return
+
+	GameState.check_and_fast_forward_tutorial()
+
+	if not _tutorial_overlay or not is_instance_valid(_tutorial_overlay):
+		_tutorial_overlay = GUIDANCE_SCENE.instantiate() as TutorialGuidanceOverlay
+		add_child(_tutorial_overlay)
+
+	match GameState.tutorial_step:
+		GameState.TutorialStep.NOT_STARTED:
+			if hotspot_chart_house:
+				_tutorial_overlay.guide_to(
+					hotspot_chart_house,
+					"Ahoy, recruit! Open the Chart House to map our voyage up the river!",
+					Vector2.UP,
+					"QUARTERMASTER",
+					"tut_hub_open_charthouse"
+				)
+		GameState.TutorialStep.LEVEL_1_COMPLETED:
+			if hotspot_chart_house:
+				_tutorial_overlay.guide_to(
+					hotspot_chart_house,
+					"First voyage survived! Chart your course for River Level 2!",
+					Vector2.UP,
+					"QUARTERMASTER",
+					"tut_hub_open_charthouse_lvl2"
+				)
+		GameState.TutorialStep.LEVEL_2_COMPLETED:
+			if GameState.is_vessel_owned("sloop"):
+				if GameState.active_vessel != "sloop":
+					GameState.set_active_vessel("sloop")
+				GameState.advance_tutorial_to(GameState.TutorialStep.SLOOP_PURCHASED)
+				return
+			if hotspot_drydock:
+				hotspot_drydock.refresh_lock_state()
+				_tutorial_overlay.guide_to(
+					hotspot_drydock,
+					"That rowboat won't survive what's ahead! Head to the Drydock to commission THE SLOOP!",
+					Vector2.UP,
+					"QUARTERMASTER",
+					"tut_hub_open_drydock"
+				)
+		GameState.TutorialStep.SLOOP_PURCHASED:
+			if hotspot_chart_house:
+				_tutorial_overlay.guide_to(
+					hotspot_chart_house,
+					"The Sloop is rigged and ready! Chart a course for River Level 3!",
+					Vector2.UP,
+					"QUARTERMASTER",
+					"tut_hub_open_map_lvl3"
+				)
+		GameState.TutorialStep.LEVEL_3_COMPLETED:
+			if GameState.is_crew_unlocked("monkey_bomber"):
+				if not GameState.is_crew_equipped_on_active_ship("monkey_bomber"):
+					GameState.auto_equip_crew_to_vessel(GameState.active_vessel, "monkey_bomber")
+				GameState.advance_tutorial_to(GameState.TutorialStep.CREW_EQUIPPED)
+				return
+			if hotspot_drydock:
+				hotspot_drydock.refresh_lock_state()
+				_tutorial_overlay.guide_to(
+					hotspot_drydock,
+					"Every flagship needs a salty crew! To the Drydock to recruit a Monkey Bomber!",
+					Vector2.UP,
+					"QUARTERMASTER",
+					"tut_hub_drydock_for_crew"
+				)
+		GameState.TutorialStep.CREW_EQUIPPED:
+			if hotspot_chart_house:
+				_tutorial_overlay.guide_to(
+					hotspot_chart_house,
+					"Crew battle stations manned! Set sail on River Level 4!",
+					Vector2.UP,
+					"QUARTERMASTER",
+					"tut_hub_open_map_lvl4"
+				)
+		GameState.TutorialStep.LEVEL_4_COMPLETED:
+			if hotspot_chart_house:
+				_tutorial_overlay.guide_to(
+					hotspot_chart_house,
+					"With the Sloop and Monkey Bomber at your command, you're ready for anything! Open the Chart House!",
+					Vector2.UP,
+					"QUARTERMASTER",
+					"tut_hub_final_launch"
+				)
+
+		_:
+			_tutorial_overlay.dismiss()
 
 func _on_settings_pressed() -> void:
 	if AudioManager and AudioManager.has_method("play_sfx"):

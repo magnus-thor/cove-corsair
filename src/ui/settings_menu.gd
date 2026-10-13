@@ -16,6 +16,7 @@ signal settings_closed
 @onready var sfx_mute_btn: Button = %SFXMuteBtn
 
 @onready var reset_button: Button = %ResetButton
+@onready var reset_tutorial_button: Button = %ResetTutorialButton
 @onready var close_button: Button = %CloseButton
 @onready var panel_container: PanelContainer = %PanelContainer
 @onready var backdrop: ColorRect = %Backdrop
@@ -175,6 +176,8 @@ func _connect_signals() -> void:
 		
 	if reset_button:
 		reset_button.pressed.connect(_on_reset_pressed)
+	if reset_tutorial_button:
+		reset_tutorial_button.pressed.connect(_on_reset_tutorial_pressed)
 	if close_button:
 		close_button.pressed.connect(_on_close_pressed)
 
@@ -297,6 +300,16 @@ func _on_reset_pressed() -> void:
 			reset_button.add_theme_stylebox_override("normal", style_mute_on)
 			await get_tree().create_timer(1.5, true, false, true).timeout
 			_update_reset_button_ui()
+
+func _on_reset_tutorial_pressed() -> void:
+	GameState.reset_tutorial()
+	if AudioManager and AudioManager.has_method("play_sfx"):
+		AudioManager.play_sfx("coin_pickups", 0.9, 1.0)
+	if reset_tutorial_button:
+		reset_tutorial_button.text = "TUTORIAL RESET ✓"
+		await get_tree().create_timer(1.5, true, false, true).timeout
+		if is_instance_valid(reset_tutorial_button):
+			reset_tutorial_button.text = "🔄 REPLAY TUTORIAL (RESET TO LVL 1)"
 
 func _on_close_pressed() -> void:
 	AudioManager.play_sfx("gate_passes", 0.9, 1.0)
