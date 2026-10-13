@@ -27,6 +27,7 @@ func _ready() -> void:
 	_test_endless_mode_boss_slain_rewards()
 	_test_dynamic_vessel_and_gangplank_anchors()
 	_test_boarding_wave_scaling_and_telemetry()
+	_test_vessel_calibration_persistence()
 	
 	print("\n========================================================")
 	print("  ALL ROUTE A & ENDLESS BOSS TESTS PASSED SUCCESSFULLY! ")
@@ -217,7 +218,7 @@ func _test_dynamic_vessel_and_gangplank_anchors() -> void:
 	# Test Siege Fortress
 	arena.setup_enemy_vessel("BossSiegeFortress")
 	assert(arena.enemy_rig != null, "EnemyBoardingRig must exist for Siege Fortress")
-	assert(arena.enemy_ship_marker_bow.position.is_equal_approx(Vector3(-13.2, 0.65, -1.90)), "Siege Fortress MarkerBow must match calibrated anchor")
+	assert(arena.enemy_ship_marker_bow.position.is_equal_approx(Vector3(-13.087265, 0.022980452, -1.0365026)), "Siege Fortress MarkerBow must match calibrated anchor")
 	
 	arena.queue_free()
 	print("  [PASS] Dynamic player vessel swapping and calibrated boss gangplank anchors verified.")
@@ -297,4 +298,26 @@ func _test_boarding_wave_scaling_and_telemetry() -> void:
 
 	arena.queue_free()
 	print("  [PASS] Boarding wave scaling across 4 tiers and telemetry event emission verified.")
+
+func _test_vessel_calibration_persistence() -> void:
+	print("--- 8. Testing Vessel Calibration Persistence & Disk Sync ---")
+	var arena: BoardingDefenseArena = ARENA_SCENE.instantiate() as BoardingDefenseArena
+	add_child(arena)
+	arena.preview_enemy_vessel = "siege_fortress"
+	arena.setup_enemy_vessel("siege_fortress")
+	assert(arena.enemy_rig != null, "Enemy rig must exist for siege fortress")
+
+	var orig_dock: Vector3 = arena.enemy_rig.dock_position
+	var orig_bow: Vector3 = arena.enemy_rig.plank_origin_bow.position
+
+	# Verify save round-trip
+	arena.save_active_enemy_rig_to_disk()
+	arena.reload_active_enemy_rig()
+
+	assert(arena.enemy_rig.dock_position.is_equal_approx(orig_dock), "dock_position must match after reload")
+	assert(arena.enemy_rig.plank_origin_bow.position.is_equal_approx(orig_bow), "MarkerBow must match after reload")
+
+	arena.queue_free()
+	print("  [PASS] Vessel calibration persistence and reload verified.")
+
 

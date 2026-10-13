@@ -88,15 +88,34 @@ const APPROACH_DURATION_SEC: float = 1.8
 			if is_instance_valid(boarding_camera) and is_instance_valid(player_rig) and is_instance_valid(player_rig.camera_mount):
 				boarding_camera.global_transform = player_rig.camera_mount.global_transform
 
-## When true, EnemyShipContainer snaps to the enemy rig's dock_position.
-## When false (default), EnemyShipContainer keeps the position authored in BoardingDefenseArena.
-@export var use_rig_dock_position: bool = false:
+## When true (default), EnemyShipContainer always docks using the vehicle's saved dock_position.
+@export var use_rig_dock_position: bool = true:
 	set(value):
 		use_rig_dock_position = value
 		if Engine.is_editor_hint() and is_inside_tree() and use_rig_dock_position:
 			if is_instance_valid(enemy_ship_container) and is_instance_valid(enemy_rig):
 				target_dock_x = enemy_rig.dock_position.x
 				enemy_ship_container.position = enemy_rig.dock_position
+				enemy_ship_container.rotation = Vector3.ZERO
+
+## When true, in-game boarding runs will force the selected preview_enemy_vessel for live testing.
+@export var debug_force_preview_enemy_vessel: bool = false
+
+@export_group("Vessel Calibration & Persistence")
+## Saves current enemy rig transforms (dock_position, MarkerBow, MarkerMid, MarkerStern, wake, model)
+## directly into that vessel's authoritative .tscn file on disk (res://src/features/boarding/rigs/enemy/rig_<vessel>.tscn).
+@export var save_current_enemy_vessel_data: bool = false:
+	set(_value):
+		save_current_enemy_vessel_data = false
+		if is_inside_tree():
+			save_active_enemy_rig_to_disk()
+
+## Reloads the active enemy vessel rig fresh from disk, discarding any unsaved local tweaks.
+@export var reload_active_vessel_from_disk: bool = false:
+	set(_value):
+		reload_active_vessel_from_disk = false
+		if is_inside_tree():
+			reload_active_enemy_rig()
 
 @export_category("Boarding Rig Defaults")
 @export var default_player_rig: PackedScene = preload("res://src/features/boarding/rigs/player/rig_sloop.tscn")
@@ -347,6 +366,11 @@ func setup_player_vessel(vessel_id: String = "") -> void:
 	set_player_rig(rig_scene)
 
 func setup_enemy_vessel(boss_or_name: Variant = null) -> void:
+	if debug_force_preview_enemy_vessel:
+		var scene: PackedScene = _get_enemy_rig_scene(preview_enemy_vessel.to_lower().strip_edges())
+		set_enemy_rig(scene if is_instance_valid(scene) else default_enemy_rig, preview_enemy_vessel)
+		return
+
 	if boss_or_name is Node3D:
 		var boss_node: Node3D = boss_or_name as Node3D
 		var boss_rig_scene: PackedScene = boss_node.get("boarding_rig") as PackedScene if "boarding_rig" in boss_node else null
@@ -478,12 +502,10 @@ func set_enemy_rig(scene: PackedScene, display_name: String = "") -> void:
 
 func _bind_enemy_rig(rig: EnemyBoardingRig, display_name: String = "") -> void:
 	enemy_rig = rig
-	if use_rig_dock_position:
-		target_dock_x = enemy_rig.dock_position.x
-		enemy_ship_container.position.y = enemy_rig.dock_position.y
-		enemy_ship_container.position.z = enemy_rig.dock_position.z
-	else:
-		target_dock_x = enemy_ship_container.position.x
+	target_dock_x = enemy_rig.dock_position.x
+	enemy_ship_container.position.y = enemy_rig.dock_position.y
+	enemy_ship_container.position.z = enemy_rig.dock_position.z
+	enemy_ship_container.rotation = Vector3.ZERO
 
 	if not display_name.is_empty():
 		encounter_active_boss_name = display_name
@@ -491,8 +513,7 @@ func _bind_enemy_rig(rig: EnemyBoardingRig, display_name: String = "") -> void:
 		encounter_active_boss_name = enemy_rig.name
 
 	if Engine.is_editor_hint():
-		if use_rig_dock_position:
-			enemy_ship_container.position.x = target_dock_x
+		enemy_ship_container.position.x = target_dock_x
 		if show_editor_planks:
 			_update_editor_preview_planks()
 	elif is_approaching:
@@ -505,13 +526,14 @@ func _rebuild_editor_preview() -> void:
 	setup_enemy_vessel(preview_enemy_vessel)
 	if use_rig_camera_mount and is_instance_valid(boarding_camera) and is_instance_valid(player_rig) and is_instance_valid(player_rig.camera_mount):
 		boarding_camera.global_transform = player_rig.camera_mount.global_transform
-	if use_rig_dock_position and is_instance_valid(enemy_ship_container) and is_instance_valid(enemy_rig):
+	if is_instance_valid(enemy_ship_container) and is_instance_valid(enemy_rig):
 		enemy_ship_container.position = enemy_rig.dock_position
+		enemy_ship_container.rotation = Vector3.ZERO
 	if show_editor_planks:
 		_update_editor_preview_planks()
 
 func _start_approach_sequence() -> void:
-	if not is_instance_valid(enemy_ship_container):
+	if not is_instance_valid(enemy_ship_container) or not is_instance_valid(enemy_rig):
 		is_approaching = false
 		_on_docking_complete()
 		return
@@ -523,6 +545,9 @@ func _start_approach_sequence() -> void:
 	var start_x: float = maxf(dock_x + 8.0, 14.0)
 	is_approaching = true
 	enemy_ship_container.position.x = start_x
+	enemy_ship_container.position.y = enemy_rig.dock_position.y
+	enemy_ship_container.position.z = enemy_rig.dock_position.z
+	enemy_ship_container.rotation = Vector3.ZERO
 
 	var wake: GPUParticles3D = enemy_rig.wake if is_instance_valid(enemy_rig) else null
 	if is_instance_valid(wake):
@@ -535,6 +560,10 @@ func _start_approach_sequence() -> void:
 
 func _on_docking_complete() -> void:
 	is_approaching = false
+	if is_instance_valid(enemy_ship_container) and is_instance_valid(enemy_rig):
+		enemy_ship_container.position = enemy_rig.dock_position
+		enemy_ship_container.rotation = Vector3.ZERO
+
 	var wake: GPUParticles3D = enemy_rig.wake if is_instance_valid(enemy_rig) else null
 	if is_instance_valid(wake):
 		wake.emitting = false
@@ -550,6 +579,136 @@ func _on_docking_complete() -> void:
 
 	if is_encounter_active and current_wave == 0:
 		_launch_initial_planks()
+
+func get_enemy_rig_path(v_key: String) -> String:
+	match v_key.to_lower().strip_edges():
+		"war_barge", "bosswarbarge":
+			return "res://src/features/boarding/rigs/enemy/rig_war_barge.tscn"
+		"bone_beard", "bossbonebeard":
+			return "res://src/features/boarding/rigs/enemy/rig_bone_beard.tscn"
+		"siege_fortress", "bosssiegefortress":
+			return "res://src/features/boarding/rigs/enemy/rig_siege_fortress.tscn"
+		"ghost_sloop", "phantom_dredge", "bossphantomdredge":
+			return "res://src/features/boarding/rigs/enemy/rig_phantom_dredge.tscn"
+		_:
+			if v_key.contains("fortress"):
+				return "res://src/features/boarding/rigs/enemy/rig_siege_fortress.tscn"
+			elif v_key.contains("bone") or v_key.contains("twin"):
+				return "res://src/features/boarding/rigs/enemy/rig_bone_beard.tscn"
+			elif v_key.contains("ghost") or v_key.contains("dredge") or v_key.contains("phantom"):
+				return "res://src/features/boarding/rigs/enemy/rig_phantom_dredge.tscn"
+			return "res://src/features/boarding/rigs/enemy/rig_war_barge.tscn"
+
+func save_active_enemy_rig_to_disk() -> void:
+	if not is_instance_valid(enemy_rig):
+		push_error("[BoardingArena] Cannot save vessel data: enemy_rig is null or invalid.")
+		return
+
+	var v_key: String = preview_enemy_vessel.to_lower().strip_edges()
+	var rig_path: String = get_enemy_rig_path(v_key)
+	if not FileAccess.file_exists(rig_path):
+		push_error("[BoardingArena] Target rig file not found: %s" % rig_path)
+		return
+
+	var read_file: FileAccess = FileAccess.open(rig_path, FileAccess.READ)
+	if not read_file:
+		push_error("[BoardingArena] Failed to open %s for reading." % rig_path)
+		return
+	var content: String = read_file.get_as_text()
+	read_file.close()
+
+	var dock_pos: Vector3 = enemy_rig.dock_position
+	var bow_t: Transform3D = enemy_rig.plank_origin_bow.transform if is_instance_valid(enemy_rig.plank_origin_bow) else Transform3D.IDENTITY
+	var mid_t: Transform3D = enemy_rig.plank_origin_mid.transform if is_instance_valid(enemy_rig.plank_origin_mid) else Transform3D.IDENTITY
+	var stern_t: Transform3D = enemy_rig.plank_origin_stern.transform if is_instance_valid(enemy_rig.plank_origin_stern) else Transform3D.IDENTITY
+	var wake_t: Transform3D = enemy_rig.wake.transform if is_instance_valid(enemy_rig.wake) else Transform3D.IDENTITY
+	var model_node: Node3D = enemy_rig.get_node_or_null("Model") as Node3D
+	var model_t: Transform3D = model_node.transform if is_instance_valid(model_node) else Transform3D.IDENTITY
+
+	var updated_text: String = _update_rig_tscn_text(content, dock_pos, bow_t, mid_t, stern_t, wake_t, model_t)
+
+	var write_file: FileAccess = FileAccess.open(rig_path, FileAccess.WRITE)
+	if not write_file:
+		push_error("[BoardingArena] Failed to open %s for writing." % rig_path)
+		return
+	write_file.store_string(updated_text)
+	write_file.close()
+
+	print("[BoardingArena] SUCCESS: Calibrated numbers saved to '%s' for '%s':" % [rig_path, v_key])
+	print("  dock_position = %s" % [var_to_str(dock_pos)])
+	print("  MarkerBow     = %s" % [var_to_str(bow_t.origin)])
+	print("  MarkerMid     = %s" % [var_to_str(mid_t.origin)])
+	print("  MarkerStern   = %s" % [var_to_str(stern_t.origin)])
+	print("  Model         = %s" % [var_to_str(model_t.origin)])
+
+func reload_active_enemy_rig() -> void:
+	if not is_instance_valid(enemy_ship_container):
+		return
+	for child: Node in enemy_ship_container.get_children():
+		if child is EnemyBoardingRig or child.name.begins_with("EnemyBoardingRig"):
+			enemy_ship_container.remove_child(child)
+			child.queue_free()
+	enemy_rig = null
+	setup_enemy_vessel(preview_enemy_vessel)
+	print("[BoardingArena] Reloaded '%s' rig cleanly from disk." % preview_enemy_vessel)
+
+func _update_rig_tscn_text(
+	text: String,
+	dock_pos: Vector3,
+	bow_t: Transform3D,
+	mid_t: Transform3D,
+	stern_t: Transform3D,
+	wake_t: Transform3D,
+	model_t: Transform3D
+) -> String:
+	var lines: PackedStringArray = text.split("\n")
+	var result: PackedStringArray = []
+	var current_node: String = ""
+
+	for line: String in lines:
+		var trimmed: String = line.strip_edges()
+		if trimmed.begins_with("[node name=\""):
+			var start_idx: int = trimmed.find("\"") + 1
+			var end_idx: int = trimmed.find("\"", start_idx)
+			current_node = trimmed.substr(start_idx, end_idx - start_idx)
+			result.append(line)
+			continue
+		elif trimmed.begins_with("["):
+			current_node = ""
+			result.append(line)
+			continue
+
+		var replaced: bool = false
+		match current_node:
+			"EnemyBoardingRig":
+				if trimmed.begins_with("dock_position ="):
+					result.append("dock_position = " + var_to_str(dock_pos))
+					replaced = true
+			"MarkerBow":
+				if trimmed.begins_with("transform ="):
+					result.append("transform = " + var_to_str(bow_t))
+					replaced = true
+			"MarkerMid":
+				if trimmed.begins_with("transform ="):
+					result.append("transform = " + var_to_str(mid_t))
+					replaced = true
+			"MarkerStern":
+				if trimmed.begins_with("transform ="):
+					result.append("transform = " + var_to_str(stern_t))
+					replaced = true
+			"EnemyBoatWake":
+				if trimmed.begins_with("transform ="):
+					result.append("transform = " + var_to_str(wake_t))
+					replaced = true
+			"Model":
+				if trimmed.begins_with("transform ="):
+					result.append("transform = " + var_to_str(model_t))
+					replaced = true
+
+		if not replaced:
+			result.append(line)
+
+	return "\n".join(result)
 
 func _trigger_docking_splash() -> void:
 	var audio: Node = _get_audio_manager()

@@ -4,9 +4,9 @@
 [ext_resource type="PackedScene" path="res://src/features/boarding/player/deck_player_controller.tscn" id="3_player_scene"]
 [ext_resource type="PackedScene" uid="uid://cphhvef8ckpip" path="res://src/features/boarding/rigs/player/rig_sloop.tscn" id="4_l0o87"]
 [ext_resource type="PackedScene" path="res://src/features/boarding/player/deck_reticle_3d.tscn" id="4_reticle_scene"]
+[ext_resource type="PackedScene" uid="uid://e4gxvth0ird8" path="res://src/features/boarding/rigs/enemy/rig_siege_fortress.tscn" id="5_li856"]
 [ext_resource type="Script" uid="uid://cq2k882f3urib" path="res://src/features/boarding/player/deck_targeting_system.gd" id="6_target_script"]
 [ext_resource type="PackedScene" path="res://src/features/boarding/ui/boarding_hud.tscn" id="7_hud_scene"]
-[ext_resource type="PackedScene" uid="uid://b13p2y6se7g8g" path="res://src/features/boarding/rigs/enemy/rig_phantom_dredge.tscn" id="8_qrrfi"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 sky_top_color = Color(0.24, 0.52, 0.88, 1)
@@ -34,9 +34,10 @@ size = Vector2(120, 120)
 [sub_resource type="BoxShape3D" id="BoxShape3D_deck_floor"]
 size = Vector3(6, 0.4, 15)
 
+
 [node name="BoardingDefenseArena" type="Node3D" unique_id=186159711 node_paths=PackedStringArray("player_ship_container", "enemy_ship_container", "player_controller", "hud", "boarding_camera", "targeting_system")]
 script = ExtResource("1_arena_script")
-preview_enemy_vessel = "ghost_sloop"
+preview_enemy_vessel = "siege_fortress"
 plank_width = 0.2
 plank_thickness = 0.02
 player_ship_container = NodePath("PlayerShipContainer")
@@ -84,26 +85,9 @@ visible = false
 shape = SubResource("BoxShape3D_deck_floor")
 
 [node name="EnemyShipContainer" type="Node3D" parent="." unique_id=671411793]
-transform = Transform3D(0.9969173, -0.0784591, 0, 0.0784591, 0.9969173, 0, 0, 0, 1, 13.2, 2.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.5, 0.287, 0)
 
-[node name="EnemyBoardingRig" parent="EnemyShipContainer" unique_id=1780823999 instance=ExtResource("8_qrrfi")]
-
-[node name="MarkerBow" parent="EnemyShipContainer/EnemyBoardingRig/PlankOrigins" parent_id_path=PackedInt32Array(1780823999, 1320160932) index="0" unique_id=1064031795]
-transform = Transform3D(0.6102541, -3.7252903e-08, 0.7922062, 1.8626451e-08, 1, 7.450581e-09, -0.7922059, 0, 0.6102538, -13.559704, -1.3658379, -0.6102504)
-
-[node name="MarkerMid" parent="EnemyShipContainer/EnemyBoardingRig/PlankOrigins" parent_id_path=PackedInt32Array(1780823999, 1320160932) index="1" unique_id=1057139486]
-transform = Transform3D(1, -4.4703484e-08, 0, 4.4703484e-08, 1, 0, 0, 0, 1, -13.922285, -1.6945463, 0.30018497)
-
-[node name="MarkerStern" parent="EnemyShipContainer/EnemyBoardingRig/PlankOrigins" parent_id_path=PackedInt32Array(1780823999, 1320160932) index="2" unique_id=1288457501]
-transform = Transform3D(1, -5.9604645e-08, 0, 5.9604645e-08, 1, 0, 0, 0, 1, -13.460548, -1.3399732, 1.1302793)
-
-[node name="EnemyBoatWake" parent="EnemyShipContainer/EnemyBoardingRig" index="1" unique_id=2089460132]
-transform = Transform3D(0.016743997, 7.702577e-09, -1.1449889, 1.0025384e-10, 1.145, 7.702783e-09, 3.814963, -6.3896444e-11, 0.0050253933, -14.430881, -1.930572, 0.111222744)
-extra_cull_margin = 8.0
-lod_bias = 0.001
-
-[node name="Model" parent="EnemyShipContainer/EnemyBoardingRig" index="2" unique_id=861431229]
-transform = Transform3D(-2.0588067e-07, -2.9802322e-08, -4.71, -1.7763568e-15, 4.71, -2.9802322e-08, 4.71, 1.7020028e-15, -2.0588064e-07, -12.611379, -0.836408, 0.2053442)
+[node name="EnemyBoardingRig" parent="EnemyShipContainer" unique_id=1647371874 instance=ExtResource("5_li856")]
 
 [node name="DeckTargetingSystem" type="Node" parent="." unique_id=1084553511 node_paths=PackedStringArray("camera")]
 script = ExtResource("6_target_script")
@@ -115,4 +99,4 @@ camera = NodePath("../PlayerShipContainer/BoardingCamera3D")
 [editable path="PlayerShipContainer/PlayerBoardingRig/DeckZones/ZoneBow"]
 [editable path="PlayerShipContainer/PlayerBoardingRig/DeckZones/ZoneMidship"]
 [editable path="PlayerShipContainer/PlayerBoardingRig/DeckZones/ZoneStern"]
-[editable path="EnemyShipContainer/EnemyBoardingRig"]
+
