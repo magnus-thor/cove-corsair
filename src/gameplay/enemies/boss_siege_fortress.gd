@@ -8,7 +8,8 @@ enum State { APPROACHING, COMBAT, RAMMING, DYING }
 @export var boarding_rig: PackedScene = preload("res://src/features/boarding/rigs/enemy/rig_siege_fortress.tscn")
 
 @export var approach_speed: float = 12.0
-@export var combat_z_offset: float = -19.0
+@export var combat_z_offset: float = -60.0
+@export var advance_speed: float = 2.4
 @export var weave_speed: float = 1.1
 @export var patrol_width: float = 2.6
 
@@ -16,19 +17,19 @@ enum State { APPROACHING, COMBAT, RAMMING, DYING }
 @export var attack_interval: float = 2.2
 @export var spawn_hazard_enabled: bool = true
 @export var hazard_telegraph_time: float = 1.8
-@export var max_active_adds: int = 2
+@export var max_active_adds: int = 6
 
 # Component HP
 var hp_port_turret: int = 150
 var hp_starboard_turret: int = 150
 var hp_prow_ram: int = 150
-var hp_furnace_core: int = 350
+var hp_furnace_core: int = 400
 
 var current_state: State = State.APPROACHING
 var current_phase: int = 1
 var combat_time: float = 0.0
 
-var _target_z: float = -19.0
+var _target_z: float = -60.0
 var _weave_time: float = 0.0
 var _attack_timer: float = 0.0
 var _geyser_timer: float = 0.0
@@ -60,6 +61,9 @@ var _base_mesh_scale: Vector3 = Vector3(4.74, 4.74, 4.74)
 
 func activate_arena() -> void:
 	is_arena_active = true
+	current_state = State.COMBAT
+	global_position.z = -60.0
+	global_position.x = 0.0
 
 func _ready() -> void:
 	if has_node("/root/GameState"):
@@ -67,23 +71,23 @@ func _ready() -> void:
 		if "current_level" in gs:
 			var lvl: int = int(gs.get("current_level"))
 			if lvl <= 15:
-				hp_port_turret = 300
-				hp_starboard_turret = 300
-				hp_prow_ram = 300
-				hp_furnace_core = 700
-				max_hp = 1600
+				hp_port_turret = 150
+				hp_starboard_turret = 150
+				hp_prow_ram = 150
+				hp_furnace_core = 400
+				max_hp = 850
 			elif lvl <= 30:
-				hp_port_turret = 550
-				hp_starboard_turret = 550
-				hp_prow_ram = 550
-				hp_furnace_core = 1350
-				max_hp = 3000
+				hp_port_turret = 250
+				hp_starboard_turret = 250
+				hp_prow_ram = 250
+				hp_furnace_core = 850
+				max_hp = 1600
 			else:
-				hp_port_turret = 850
-				hp_starboard_turret = 850
-				hp_prow_ram = 850
-				hp_furnace_core = 2250
-				max_hp = 4800
+				hp_port_turret = 400
+				hp_starboard_turret = 400
+				hp_prow_ram = 400
+				hp_furnace_core = 1200
+				max_hp = 2400
 	current_hp = max_hp
 
 	if boss_sprite:
@@ -98,6 +102,8 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if _is_defeated or current_state == State.DYING:
 		return
+	if not is_arena_active:
+		return
 		
 	var player := get_tree().get_first_node_in_group("player") as Node3D
 	var player_z: float = player.global_position.z if player else 0.0
@@ -106,6 +112,7 @@ func _physics_process(delta: float) -> void:
 	match current_state:
 		State.APPROACHING:
 			global_position.z = move_toward(global_position.z, _target_z, approach_speed * delta)
+			global_position.x = move_toward(global_position.x, 0.0, 3.0 * delta)
 			if abs(global_position.z - _target_z) < 0.5:
 				current_state = State.COMBAT
 				_attack_timer = 0.5
@@ -117,22 +124,31 @@ func _physics_process(delta: float) -> void:
 		State.RAMMING:
 			_process_ram_overdrive(delta)
 
-	# Standoff limit guard: ensure the fortress never passes the player's standoff threshold
-	if is_instance_valid(player):
-		var min_standoff: float = player_z - 6.5
-		if global_position.z > min_standoff:
-			global_position.z = min_standoff
-
 func _process_combat(delta: float) -> void:
 	combat_time += delta
 	
-	# Horizontal patrol weave
-	global_position.z = lerp(global_position.z, _target_z, 3.0 * delta)
-	_weave_time += delta * weave_speed
-	global_position.x = sin(_weave_time) * patrol_width
+	# Relentless Advancing Dreadnought: Steady center-lane advance down river toward player
+	global_position.x = move_toward(global_position.x, 0.0, 2.5 * delta)
+	global_position.z += advance_speed * delta
 	
+	_weave_time += delta * 1.5
 	if boss_sprite:
 		boss_sprite.position.y = _y_base + sin(_weave_time * 2.0) * 0.06
+
+	# Doom-Clock Proximity Check & Event Broadcast (60m to 0m)
+	var player_node := get_tree().get_first_node_in_group("player") as Node3D
+	var cur_player_z: float = player_node.global_position.z if player_node and is_instance_valid(player_node) else 0.0
+	var dist_to_player: float = cur_player_z - global_position.z
+	EventBus.boss_distance_updated.emit(maxf(0.0, dist_to_player), 60.0)
+
+	if dist_to_player <= 1.5:
+		var b_thresh: int = max(1, int(round(float(max_hp) * 0.15)))
+		if current_hp <= b_thresh:
+			if not has_triggered_boarding:
+				_initiate_desperation_boarding()
+		else:
+			_ram_crush_player(player_node)
+		return
 		
 	# Turret Broadsides
 	_attack_timer += delta
@@ -393,7 +409,7 @@ func damage_component(comp_name: String, amount: int, _from_bow: bool = false) -
 			_flash_node(furnace_core_node)
 			_flash_boss_main()
 			
-	var boarding_threshold: int = max(1, int(round(float(max_hp) * 0.20)))
+	var boarding_threshold: int = max(1, int(round(float(max_hp) * 0.15)))
 	if current_hp <= boarding_threshold and not has_triggered_boarding:
 		if current_hp <= 0:
 			current_hp = 1
@@ -405,6 +421,19 @@ func damage_component(comp_name: String, amount: int, _from_bow: bool = false) -
 			boss_defeat()
 	else:
 		_check_phase()
+
+func _ram_crush_player(player: Node3D) -> void:
+	if _is_defeated or current_state == State.DYING:
+		return
+	AudioManager.play_sfx("barrel_breaks")
+	var camera := get_tree().get_first_node_in_group("game_camera") as GameCamera
+	if camera and camera.has_method("shake"):
+		camera.shake(0.65, 0.5)
+	if is_instance_valid(player):
+		if player.has_method("take_hit"):
+			player.call("take_hit", 999, "boss_ram_crush")
+		elif player.has_method("game_over"):
+			player.call("game_over", false)
 
 func _initiate_desperation_boarding() -> void:
 	if has_triggered_boarding or _is_defeated:

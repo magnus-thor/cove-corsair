@@ -7,12 +7,13 @@ enum State { APPROACHING, COMBAT, DYING }
 @export var current_hp: int = 100
 @export var boarding_rig: PackedScene = preload("res://src/features/boarding/rigs/enemy/rig_bone_beard.tscn")
 @export var approach_speed: float = 14.0
-@export var combat_z_offset: float = -18.0
+@export var combat_z_offset: float = -60.0
+@export var advance_speed: float = 2.4
 @export var weave_speed: float = 1.8
 @export var attack_interval: float = 2.5
 @export var spawn_hazard_enabled: bool = true
 @export var hazard_telegraph_time: float = 1.8
-@export var max_active_adds: int = 2
+@export var max_active_adds: int = 6
 
 @export var doubloon_scene: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
 @export var explosion_scene: PackedScene = preload("res://src/vfx/barrel_explosion.tscn")
@@ -31,7 +32,7 @@ var _base_scale: Vector3 = Vector3(4.48, 4.48, 4.48)
 var _attack_timer: float = 0.0
 var _attack_count: int = 0
 var _weave_time: float = 0.0
-var _target_z: float = -18.0
+var _target_z: float = -60.0
 var _current_base_y: float = 0.0
 var _is_defeated: bool = false
 var is_arena_active: bool = false
@@ -39,6 +40,9 @@ var has_triggered_boarding: bool = false
 
 func activate_arena() -> void:
 	is_arena_active = true
+	current_state = State.COMBAT
+	global_position.z = -60.0
+	global_position.x = 0.0
 
 func take_damage(amount: int) -> void:
 	if _is_defeated or current_state == State.DYING or not is_arena_active:
@@ -48,7 +52,7 @@ func take_damage(amount: int) -> void:
 	_flash_red()
 	_update_health_bar()
 	
-	var boarding_threshold: int = max(1, int(round(float(max_hp) * 0.20)))
+	var boarding_threshold: int = max(1, int(round(float(max_hp) * 0.15)))
 	if current_hp <= boarding_threshold and not has_triggered_boarding:
 		if current_hp <= 0:
 			current_hp = 1
@@ -58,6 +62,19 @@ func take_damage(amount: int) -> void:
 			current_hp = 1
 		else:
 			boss_defeat()
+
+func _ram_crush_player(player: Node3D) -> void:
+	if _is_defeated or current_state == State.DYING:
+		return
+	AudioManager.play_sfx("barrel_breaks")
+	var camera := get_tree().get_first_node_in_group("game_camera") as GameCamera
+	if camera and camera.has_method("shake"):
+		camera.shake(0.65, 0.5)
+	if is_instance_valid(player):
+		if player.has_method("take_hit"):
+			player.call("take_hit", 999, "boss_ram_crush")
+		elif player.has_method("game_over"):
+			player.call("game_over", false)
 
 func _initiate_desperation_boarding() -> void:
 	if has_triggered_boarding or _is_defeated:
@@ -82,14 +99,12 @@ func _ready() -> void:
 		var gs: Node = get_node("/root/GameState")
 		if "current_level" in gs:
 			var lvl: int = int(gs.get("current_level"))
-			if lvl <= 15:
+			if lvl <= 20:
+				max_hp = 1200
+			elif lvl <= 35:
 				max_hp = 1800
-			elif lvl <= 20:
-				max_hp = 2600
-			elif lvl <= 30:
-				max_hp = 3800
 			else:
-				max_hp = 6000
+				max_hp = 2800
 				
 	current_hp = max_hp
 	_attack_timer = attack_interval * 0.75
@@ -116,6 +131,8 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if _is_defeated or current_state == State.DYING:
 		return
+	if not is_arena_active:
+		return
 
 	var player := get_tree().get_first_node_in_group("player") as Node3D
 	var player_z: float = player.global_position.z if player else 0.0
@@ -124,29 +141,35 @@ func _physics_process(delta: float) -> void:
 	match current_state:
 		State.APPROACHING:
 			global_position.z = move_toward(global_position.z, _target_z, approach_speed * delta)
+			global_position.x = move_toward(global_position.x, 0.0, 3.0 * delta)
 			if abs(global_position.z - _target_z) < 0.5:
 				current_state = State.COMBAT
 				_attack_timer = 0.5 # First attack shortly after arriving
 				
 		State.COMBAT:
-			global_position.z = lerp(global_position.z, _target_z, 4.0 * delta)
+			global_position.x = move_toward(global_position.x, 0.0, 2.5 * delta)
+			global_position.z += advance_speed * delta
 			
-			_weave_time += delta * weave_speed
-			global_position.x = sin(_weave_time) * 2.5
-			
+			_weave_time += delta * 1.5
 			if boss_sprite:
 				boss_sprite.position.y = _current_base_y + sin(_weave_time * 2.0) * 0.05
+
+			var dist_to_player: float = player_z - global_position.z
+			EventBus.boss_distance_updated.emit(maxf(0.0, dist_to_player), 60.0)
+
+			if dist_to_player <= 1.5:
+				var b_thresh: int = max(1, int(round(float(max_hp) * 0.15)))
+				if current_hp <= b_thresh:
+					if not has_triggered_boarding:
+						_initiate_desperation_boarding()
+				else:
+					_ram_crush_player(player)
+				return
 
 			_attack_timer += delta
 			if _attack_timer >= attack_interval:
 				_attack_timer = 0.0
 				_perform_attack()
-
-	# Standoff limit guard: ensure the boss never passes the player's standoff threshold
-	if is_instance_valid(player):
-		var min_standoff: float = player_z - 8.0
-		if global_position.z > min_standoff:
-			global_position.z = min_standoff
 
 func _perform_attack() -> void:
 	if not spawn_hazard_enabled:

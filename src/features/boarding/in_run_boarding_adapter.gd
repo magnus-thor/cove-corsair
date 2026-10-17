@@ -48,12 +48,23 @@ func start_in_run_boarding(boss: Node3D, player: Node3D) -> void:
 	active_arena = ARENA_SCENE.instantiate() as BoardingDefenseArena
 	active_arena.position = STAGING_POSITION
 	
-	# Configure encounter difficulty and wave scaling based on campaign level or endless mode
+	# Cinematic Grapple & Broadside Collision FX
+	AudioManager.play_sfx("barrel_breaks", 0.8, 1.0, 2.0)
+	AudioManager.play_sfx("gate_passes", 0.9, 1.1, 1.5)
+	var cam: Node = get_tree().get_first_node_in_group("game_camera")
+	if cam and cam.has_method("add_trauma"):
+		cam.call("add_trauma", 0.7)
+
+	# Configure encounter difficulty and wave scaling based on campaign level, endless mode, and remaining Boss HP %
 	var cur_lvl: int = GameState.current_level if GameState else 1
 	var is_endless: bool = GameState.is_endless_mode if GameState else false
 	var endless_dist: float = GameState.distance_traveled if GameState else 0.0
+	var boss_hp_pct: float = 0.15
+	if "current_hp" in active_boss and "max_hp" in active_boss and int(active_boss.get("max_hp")) > 0:
+		boss_hp_pct = clampf(float(active_boss.get("current_hp")) / float(active_boss.get("max_hp")), 0.01, 0.15)
+
 	if active_arena.has_method("setup_encounter_difficulty"):
-		active_arena.setup_encounter_difficulty(cur_lvl, is_endless, endless_dist)
+		active_arena.setup_encounter_difficulty(cur_lvl, is_endless, endless_dist, boss_hp_pct)
 	elif cur_lvl <= 15:
 		active_arena.boss_tier = 1
 		active_arena.single_plank_mode = false

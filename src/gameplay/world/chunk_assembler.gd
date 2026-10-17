@@ -188,10 +188,6 @@ func assemble_level(data: LevelData = null) -> void:
 						current_z_offset -= buffer_instance.CHUNK_LENGTH
 						active_chunks.append(buffer_instance)
 			
-		# If this is the starting chunk (index 0), enforce safe clearance runway (>= 35.0m) from player start
-		if active_chunks.is_empty():
-			_enforce_start_clearance_in_chunk(chunk_instance, 35.0)
-
 		# Apply procedural scenery variations (bank mirroring, transform jitter, spacing)
 		var chunk_idx: int = active_chunks.size()
 		var level_seed: int = (active_level_data.level_id * 7919) + (chunk_idx * 313) + 42
@@ -200,9 +196,13 @@ func assemble_level(data: LevelData = null) -> void:
 
 		add_child(chunk_instance)
 		chunk_instance.position = Vector3(0.0, 0.0, current_z_offset)
-		var c_len := chunk_instance.CHUNK_LENGTH
+		var c_len: float = chunk_instance.CHUNK_LENGTH
 		current_z_offset -= c_len
 		active_chunks.append(chunk_instance)
+
+		# If this is the starting chunk (index 0), enforce safe clearance runway (>= 16.0m) from player start
+		if active_chunks.size() == 1:
+			_enforce_start_clearance_in_chunk(chunk_instance, 16.0)
 		
 	# Calculate total track distance (distance until boss arena is reached)
 	total_track_distance = 0.0
@@ -255,7 +255,7 @@ func _physics_process(delta: float) -> void:
 	# Check if the boss chunk has reached the arena engagement point
 	for chunk in active_chunks:
 		if is_instance_valid(chunk) and chunk.is_boss_chunk:
-			if chunk.get_start_z() >= 0.0 or distance_traveled >= total_track_distance:
+			if chunk.get_start_z() >= -60.0 or distance_traveled >= total_track_distance:
 				_on_boss_arena_reached(chunk)
 				break
 				
@@ -291,6 +291,13 @@ func _on_boss_arena_reached(boss_chunk: BaseTrackChunk) -> void:
 	# Trigger boss engagement hook inside boss chunk
 	if not boss_chunk.is_active:
 		boss_chunk.activate_spawners()
+
+	var boss := boss_chunk.find_child("*Boss*", true, false)
+	if not boss:
+		boss = get_tree().get_first_node_in_group("boss")
+	if boss and is_instance_valid(boss):
+		if boss.has_method("activate_arena"):
+			boss.call("activate_arena")
 		
 	boss_arena_reached.emit(boss_chunk)
 
@@ -311,21 +318,30 @@ func _suppress_gates_in_chunk_final_portion(chunk: BaseTrackChunk, portion: floa
 				child.queue_free()
 
 ## Enforces a safe clearance runway at the start of a level so no hazards, mines, or hostile vessels appear dangerously close to the player.
-func _enforce_start_clearance_in_chunk(chunk: BaseTrackChunk, min_clearance: float = 35.0) -> void:
+func _enforce_start_clearance_in_chunk(chunk: BaseTrackChunk, min_clearance: float = 32.0) -> void:
 	if not chunk or not is_instance_valid(chunk):
 		return
-	var entities := chunk.find_child("Entities", true, false)
+	var entities: Node = chunk.find_child("Entities", true, false)
 	if not entities:
 		return
+	var to_remove: Array[Node] = []
 	for child: Node in entities.get_children():
-		if not is_instance_valid(child):
+		if not is_instance_valid(child) or not (child is Node3D):
 			continue
-		var is_hazard := child is HazardSeaMine or child is HazardThermalGeyser or child.is_in_group("hazards") or child.name.to_lower().contains("mine")
-		var is_enemy := child.is_in_group("enemies") or child is EnemyMob or child.name.to_lower().contains("enemy") or child.name.to_lower().contains("fodder") or child.name.to_lower().contains("skiff") or child.name.to_lower().contains("rower")
-		if (is_hazard or is_enemy) and child is Node3D and (child as Node3D).position.z > -min_clearance:
-			if child.get_parent():
-				child.get_parent().remove_child(child)
-			child.queue_free()
+		var n_lower: String = child.name.to_lower()
+		# Exclude barrels and multiplier gates from removal so player can practice shooting and recruit followers
+		if child is DestructibleBarrel or child.is_in_group("multiplier_gate") or n_lower.contains("barrel") or n_lower.contains("gate"):
+			continue
+		var is_hazard: bool = child.is_in_group("hazards") or child.is_in_group("sea_mine") or child is HazardSeaMine or child is HazardThermalGeyser or n_lower.contains("mine") or n_lower.contains("reef") or n_lower.contains("barricade") or n_lower.contains("keg")
+		var is_enemy: bool = child.is_in_group("enemies") or child.is_in_group("destructible") or child is EnemyMob or child is EnemyBrimstoneRaft or child is EnemyIronGunner or child is EnemyTideCutter or n_lower.contains("enemy") or n_lower.contains("fodder") or n_lower.contains("skiff") or n_lower.contains("rower") or n_lower.contains("gunner") or n_lower.contains("raft") or n_lower.contains("cutter")
+		var node_3d: Node3D = child as Node3D
+		if (is_hazard or is_enemy) and node_3d.position.z > -min_clearance:
+			to_remove.append(child)
+	for rem: Node in to_remove:
+		if is_instance_valid(rem):
+			if rem.get_parent():
+				rem.get_parent().remove_child(rem)
+			rem.queue_free()
 
 ## Fast-forwards the runner track directly to the boss chunk entrance for isolated testing.
 func jump_to_boss() -> void:

@@ -10,6 +10,8 @@
 [ext_resource type="PackedScene" path="res://src/gameplay/enemies/enemy_iron_gunner.tscn" id="8_gunner"]
 [ext_resource type="PackedScene" path="res://src/gameplay/obstacles/multiplier_gate.tscn" id="9_gate"]
 [ext_resource type="Script" path="res://src/gameplay/obstacles/multiplier_gate.gd" id="10_gate_script"]
+[ext_resource type="PackedScene" path="res://src/gameplay/enemies/enemy_mob.tscn" id="11_mob"]
+[ext_resource type="Script" path="res://src/gameplay/enemies/enemy_mob.gd" id="12_mob_script"]
 
 [node name="ChunkOpenerSlalom" type="Node3D" unique_id=9825101]
 script = ExtResource("1_chunk")
@@ -55,6 +57,33 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 0.1, -38)
 
 [node name="Reef_Far_Right" parent="Entities" unique_id=9825113 instance=ExtResource("4_reef")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0, -44)
+
+[node name="EnemyMob_SlalomRower1" type="Area3D" parent="Entities" unique_id=9825121 groups=["destructible", "enemies"] instance=ExtResource("11_mob")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0.1, -16)
+script = ExtResource("12_mob_script")
+max_hp = 5
+current_hp = 5
+forward_speed = 1.6
+doubloons_drop = 2
+
+[node name="EnemyMob_SlalomSkiff2" type="Area3D" parent="Entities" unique_id=9825122 groups=["destructible", "enemies"] instance=ExtResource("11_mob")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0.1, -26)
+script = ExtResource("12_mob_script")
+max_hp = 8
+current_hp = 8
+forward_speed = 2.0
+doubloons_drop = 3
+
+[node name="IronGunner_SlalomMid" type="Area3D" parent="Entities" unique_id=9825123 groups=["destructible", "enemies"] instance=ExtResource("8_gunner")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2, 0.1, -30)
+
+[node name="EnemyMob_SlalomRower3" type="Area3D" parent="Entities" unique_id=9825124 groups=["destructible", "enemies"] instance=ExtResource("11_mob")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0.1, -42)
+script = ExtResource("12_mob_script")
+max_hp = 5
+current_hp = 5
+forward_speed = 1.6
+doubloons_drop = 2
 
 [node name="Gate_Opener" type="Area3D" parent="Entities" unique_id=9825118 groups=["multiplier_gate"] instance=ExtResource("9_gate")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0, 0, -46)

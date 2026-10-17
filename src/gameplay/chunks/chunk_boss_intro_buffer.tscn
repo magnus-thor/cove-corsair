@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://src/gameplay/chunks/base_track_chunk.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/gameplay/chunks/chunk_boss_intro_buffer.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://assets/models/structure-platform-dock.glb" id="2_dock"]
 [ext_resource type="PackedScene" path="res://assets/models/palm-detailed-straight.glb" id="3_palm"]
 [ext_resource type="PackedScene" path="res://assets/models/rocks-a.glb" id="4_rocks_a"]

@@ -1,14 +1,15 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://src/gameplay/chunks/chunk_gunner_ambush.gd" id="1_chunk"]
+[ext_resource type="Script" path="res://src/gameplay/chunks/base_track_chunk.gd" id="1_chunk"]
 [ext_resource type="PackedScene" path="res://assets/models/tower-complete-small.glb" id="2_tower"]
 [ext_resource type="PackedScene" path="res://assets/models/structure-platform-dock.glb" id="3_dock"]
 [ext_resource type="PackedScene" path="res://assets/models/rocks-b.glb" id="4_rocks"]
 [ext_resource type="PackedScene" path="res://src/gameplay/enemies/enemy_iron_gunner.tscn" id="5_gunner"]
-[ext_resource type="PackedScene" path="res://src/gameplay/enemies/enemy_brimstone_raft.tscn" id="6_raft"]
 [ext_resource type="PackedScene" path="res://src/gameplay/obstacles/barricade_wall.tscn" id="7_barricade"]
 [ext_resource type="PackedScene" path="res://src/gameplay/obstacles/destructible_barrel.tscn" id="8_barrel"]
 [ext_resource type="Script" path="res://src/gameplay/obstacles/destructible_barrel.gd" id="9_barrel_script"]
+[ext_resource type="PackedScene" path="res://src/gameplay/obstacles/multiplier_gate.tscn" id="10_gate"]
+[ext_resource type="Script" path="res://src/gameplay/obstacles/multiplier_gate.gd" id="11_gate_script"]
 
 [node name="ChunkOpenerAmbush" type="Node3D" unique_id=9836101]
 script = ExtResource("1_chunk")
@@ -32,22 +33,30 @@ transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 10.5, 0, -24)
 
 [node name="Entities" type="Node3D" parent="." unique_id=9836108]
 
-[node name="BrimstoneRaft_Scout" type="Area3D" parent="Entities" unique_id=9836114 groups=["destructible", "enemies"] instance=ExtResource("6_raft")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0.1, -20)
+[node name="Barrel_Left_Practice" type="Area3D" parent="Entities" unique_id=9836114 groups=["destructible"] instance=ExtResource("8_barrel")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0, 0.05, -20)
+script = ExtResource("9_barrel_script")
+obstacle_type = 0
 
-[node name="IronGunner_Left" type="Area3D" parent="Entities" unique_id=9836109 groups=["destructible", "enemies"] instance=ExtResource("5_gunner")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0.1, -26)
+[node name="Barrel_Right_Practice" type="Area3D" parent="Entities" unique_id=9836115 groups=["destructible"] instance=ExtResource("8_barrel")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.0, 0.05, -20)
+script = ExtResource("9_barrel_script")
+obstacle_type = 0
 
-[node name="IronGunner_Right" type="Area3D" parent="Entities" unique_id=9836110 groups=["destructible", "enemies"] instance=ExtResource("5_gunner")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.1, -32)
-
-[node name="BrimstoneRaft_Charge" type="Area3D" parent="Entities" unique_id=9836111 groups=["destructible", "enemies"] instance=ExtResource("6_raft")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0, 0.1, -38)
-
-[node name="TacticalBarricade" parent="Entities" unique_id=9836112 instance=ExtResource("7_barricade")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0, 0, -44)
+[node name="IronGunner_Skirmish" type="Area3D" parent="Entities" unique_id=9836109 groups=["destructible", "enemies"] instance=ExtResource("5_gunner")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 0.1, -33)
 
 [node name="ExplosiveKeg" type="Area3D" parent="Entities" unique_id=9836113 groups=["destructible"] instance=ExtResource("8_barrel")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 0.05, -44)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 0.05, -36)
 script = ExtResource("9_barrel_script")
 obstacle_type = 2
+
+[node name="Gate_Opener" type="Area3D" parent="Entities" unique_id=9836118 groups=["multiplier_gate"] instance=ExtResource("10_gate")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0, 0, -44)
+script = ExtResource("11_gate_script")
+value = 10
+custom_text = "+10"
+gate_action = "add_fleet_1"
+
+[node name="TacticalBarricade" parent="Entities" unique_id=9836112 instance=ExtResource("7_barricade")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0, -44)

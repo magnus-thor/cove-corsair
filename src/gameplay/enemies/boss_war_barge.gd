@@ -8,7 +8,8 @@ enum State { APPROACHING, COMBAT, DYING }
 @export var boarding_rig: PackedScene = preload("res://src/features/boarding/rigs/enemy/rig_war_barge.tscn")
 
 @export var approach_speed: float = 12.0
-@export var combat_z_offset: float = -18.0
+@export var combat_z_offset: float = -60.0
+@export var advance_speed: float = 2.4
 @export var weave_speed: float = 1.3
 @export var patrol_width: float = 2.8
 
@@ -16,7 +17,7 @@ enum State { APPROACHING, COMBAT, DYING }
 @export var attack_interval: float = 2.0
 @export var spawn_hazard_enabled: bool = true
 @export var hazard_telegraph_time: float = 1.8
-@export var max_active_adds: int = 2
+@export var max_active_adds: int = 6
 
 var combat_time: float = 0.0
 var enraged_shoot_timer: float = 0.0
@@ -45,7 +46,7 @@ var is_barrage_active: bool = false
 # State variables
 var current_state: State = State.APPROACHING
 var current_phase: int = 1
-var _target_z: float = -18.0
+var _target_z: float = -60.0
 var _weave_time: float = 0.0
 var _attack_timer: float = 0.0
 var _attack_cooldown: float = 2.0
@@ -66,12 +67,16 @@ var ram_cooldown: float = 6.0
 var is_charging: bool = false
 var charge_direction: int = 1 # 1 = forward, -1 = retreating
 var has_triggered_boarding: bool = false
-var original_combat_z: float = -18.0
+var original_combat_z: float = -60.0
 var is_arena_active: bool = false
 var _base_mesh_scale: Vector3 = Vector3.ONE
 
 func activate_arena() -> void:
 	is_arena_active = true
+	current_state = State.COMBAT
+	global_position.z = -60.0
+	global_position.x = 0.0
+	_deploy_opening_escort_wave()
 
 func _ready() -> void:
 	_clean_shadow_nodes(self)
@@ -83,15 +88,15 @@ func _ready() -> void:
 		if "current_level" in gs:
 			var lvl: int = int(gs.get("current_level"))
 			if lvl <= 5:
-				max_hp = 850
+				max_hp = 300
 			elif lvl <= 10:
-				max_hp = 1400
+				max_hp = 550
 			elif lvl <= 20:
-				max_hp = 2400
+				max_hp = 1000
 			elif lvl <= 35:
-				max_hp = 3800
+				max_hp = 1800
 			else:
-				max_hp = 5500
+				max_hp = 2600
 	
 	current_hp = max_hp
 	original_combat_z = combat_z_offset
@@ -99,7 +104,7 @@ func _ready() -> void:
 	keg_timer = 4.5
 	
 	if boss_sprite:
-		boss_sprite.position.y = 0.22
+		boss_sprite.position.y = _y_base
 		boss_sprite.scale = Vector3(3.39, 3.39, 3.39)
 		boss_sprite.rotation_degrees = Vector3(0.0, 91.0, 0.0)
 		if boss_sprite is Sprite3D:
@@ -121,14 +126,17 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if _is_defeated or current_state == State.DYING:
 		return
+	if not is_arena_active:
+		return
 		
 	var player := get_tree().get_first_node_in_group("player") as Node3D
-	var player_z: float = player.global_position.z if player else 0.0
+	var player_z: float = player.global_position.z if player and is_instance_valid(player) else 0.0
 	_target_z = player_z + combat_z_offset
 	
 	match current_state:
 		State.APPROACHING:
 			global_position.z = move_toward(global_position.z, _target_z, approach_speed * delta)
+			global_position.x = move_toward(global_position.x, 0.0, 3.0 * delta)
 			if abs(global_position.z - _target_z) < 0.5:
 				current_state = State.COMBAT
 				_attack_timer = 0.0
@@ -136,28 +144,35 @@ func _physics_process(delta: float) -> void:
 		State.COMBAT:
 			_process_combat(delta)
 
-	# Standoff limit guard: ensure the boss never passes the player's standoff threshold
-	if is_instance_valid(player):
-		var min_standoff: float = player_z - 7.5
-		if global_position.z > min_standoff:
-			global_position.z = min_standoff
-
 func _process_combat(delta: float) -> void:
 	combat_time += delta
 	
-	# Horizontal Patrol Weaving (unless charging)
-	if not is_charging:
-		global_position.z = lerp(global_position.z, _target_z, 3.0 * delta)
-		_weave_time += delta * weave_speed
-		global_position.x = sin(_weave_time) * patrol_width
-		
-		# Bobbing
-		if boss_sprite:
-			boss_sprite.position.y = _y_base + sin(_weave_time * 2.0) * 0.05
-		if bow_crest:
-			bow_crest.position.y = 0.04 + sin(_weave_time * 2.5) * 0.015
-	else:
-		_process_ram_charge(delta)
+	# Relentless Advancing Dreadnought: Steady center-lane advance down river toward player
+	global_position.x = move_toward(global_position.x, 0.0, 2.5 * delta)
+	global_position.z += advance_speed * delta
+
+	# Subtle aquatic bobbing
+	_weave_time += delta * 1.5
+	if boss_sprite:
+		boss_sprite.position.y = _y_base + sin(_weave_time * 2.0) * 0.05
+	if bow_crest:
+		bow_crest.position.y = 0.04 + sin(_weave_time * 2.5) * 0.015
+
+	# Doom-Clock Proximity Check & Event Broadcast (60m to 0m)
+	var player := get_tree().get_first_node_in_group("player") as Node3D
+	var player_z: float = player.global_position.z if player and is_instance_valid(player) else 0.0
+	var dist_to_player: float = player_z - global_position.z
+	EventBus.boss_distance_updated.emit(maxf(0.0, dist_to_player), 60.0)
+
+	# Lethal Collision Plane Reached
+	if dist_to_player <= 1.5:
+		var boarding_threshold: int = max(1, int(round(float(max_hp) * 0.15)))
+		if current_hp <= boarding_threshold:
+			if not has_triggered_boarding:
+				_initiate_desperation_boarding()
+		else:
+			_ram_crush_player(player)
+		return
 		
 	# Targeted mortar pressure (paused if hazard spawning disabled or already in a barrage)
 	if spawn_hazard_enabled and not is_barrage_active:
@@ -167,9 +182,9 @@ func _process_combat(delta: float) -> void:
 			mortar_timer = 0.0
 			_fire_targeted_mortar()
 
-	# Continuous Minion Add Spawns
+	# Continuous Minion Add Spawns (large swarm stream down river)
 	minion_timer += delta
-	var spawn_interval: float = 5.5 if current_phase == 1 else (4.0 if current_phase == 2 else 3.0)
+	var spawn_interval: float = 3.2 if current_phase == 1 else (2.6 if current_phase == 2 else 2.0)
 	if minion_timer >= spawn_interval:
 		minion_timer = 0.0
 		_deploy_side_minions()
@@ -196,6 +211,12 @@ func _process_combat(delta: float) -> void:
 			3:
 				_process_phase_3(delta)
 
+func _deploy_opening_escort_wave() -> void:
+	_spawn_pressure_skiff(-0.7, 4.2)
+	_spawn_pressure_skiff(0.7, 4.2)
+	_spawn_pressure_skiff(-0.25, 4.6)
+	_spawn_pressure_skiff(0.25, 4.6)
+
 func _deploy_side_minions() -> void:
 	if has_node("/root/GameState") and int(get_node("/root/GameState").get("current_level")) <= 2:
 		return
@@ -206,12 +227,12 @@ func _deploy_side_minions() -> void:
 		return
 		
 	if current_phase == 1:
-		_spawn_pressure_skiff(-0.6, 3.5)
-		_spawn_pressure_skiff(0.6, 3.5)
+		_spawn_pressure_skiff(-0.65, 4.2)
+		_spawn_pressure_skiff(0.65, 4.2)
 	elif current_phase == 2:
-		_spawn_pressure_skiff(-0.7, 4.0)
-		_spawn_pressure_skiff(0.0, 3.2)
-		_spawn_pressure_skiff(0.7, 4.0)
+		_spawn_pressure_skiff(-0.7, 4.5)
+		_spawn_pressure_skiff(0.0, 3.8)
+		_spawn_pressure_skiff(0.7, 4.5)
 	else:
 		_spawn_pressure_skiff(-0.55, 5.0)
 		_spawn_pressure_skiff(0.55, 5.0)
@@ -225,9 +246,9 @@ func _spawn_pressure_skiff(x_norm: float, speed_val: float) -> void:
 			parent = get_parent()
 		if parent and skiff:
 			parent.add_child(skiff)
-			skiff.apply_enemy_data(skiff_data)
-			skiff.max_hp = 5
-			skiff.current_hp = 5
+			var cur_lvl: int = GameState.current_level if GameState else 1
+			skiff.max_hp = 3 if cur_lvl <= 5 else 5
+			skiff.current_hp = skiff.max_hp
 			skiff.forward_speed = speed_val
 			var river_width: float = 12.0
 			var player := get_tree().get_first_node_in_group("player") as Node3D
@@ -601,7 +622,7 @@ func take_damage(amount: int) -> void:
 	EventBus.boss_health_changed.emit(current_hp, max_hp)
 	_flash_boss_main()
 	
-	var boarding_threshold: int = max(1, int(round(float(max_hp) * 0.20)))
+	var boarding_threshold: int = max(1, int(round(float(max_hp) * 0.15)))
 	if current_hp <= boarding_threshold and not has_triggered_boarding:
 		if current_hp <= 0:
 			current_hp = 1
@@ -613,6 +634,19 @@ func take_damage(amount: int) -> void:
 			boss_defeat()
 	else:
 		_check_phase_transition()
+
+func _ram_crush_player(player: Node3D) -> void:
+	if _is_defeated or current_state == State.DYING:
+		return
+	AudioManager.play_sfx("barrel_breaks")
+	var camera := get_tree().get_first_node_in_group("game_camera") as GameCamera
+	if camera and camera.has_method("shake"):
+		camera.shake(0.65, 0.5)
+	if is_instance_valid(player):
+		if player.has_method("take_hit"):
+			player.call("take_hit", 999, "boss_ram_crush")
+		elif player.has_method("game_over"):
+			player.call("game_over", false)
 
 func _initiate_desperation_boarding() -> void:
 	if has_triggered_boarding or _is_defeated:

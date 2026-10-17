@@ -8,7 +8,8 @@ enum State { APPROACHING, COMBAT, SUBMERGED, DYING }
 @export var boarding_rig: PackedScene = preload("res://src/features/boarding/rigs/enemy/rig_phantom_dredge.tscn")
 
 @export var approach_speed: float = 12.0
-@export var combat_z_offset: float = -18.0
+@export var combat_z_offset: float = -60.0
+@export var advance_speed: float = 2.4
 @export var weave_speed: float = 1.3
 @export var patrol_width: float = 3.0
 
@@ -16,12 +17,12 @@ enum State { APPROACHING, COMBAT, SUBMERGED, DYING }
 @export var attack_interval: float = 2.4
 @export var spawn_hazard_enabled: bool = true
 @export var hazard_telegraph_time: float = 1.6
-@export var max_active_adds: int = 2
+@export var max_active_adds: int = 4
 
 # Phase thresholds
 var current_phase: int = 1
 var combat_time: float = 0.0
-var _target_z: float = -18.0
+var _target_z: float = -60.0
 var _weave_time: float = 0.0
 var _submerge_timer: float = 0.0
 var _submerge_duration: float = 3.2
@@ -51,6 +52,9 @@ var is_arena_active: bool = false
 
 func activate_arena() -> void:
 	is_arena_active = true
+	current_state = State.COMBAT
+	global_position.z = -60.0
+	global_position.x = 0.0
 
 func _ready() -> void:
 	add_to_group("enemies")
@@ -61,11 +65,11 @@ func _ready() -> void:
 		if "current_level" in gs:
 			var lvl: int = int(gs.get("current_level"))
 			if lvl <= 10:
-				max_hp = 1400
+				max_hp = 550
 			elif lvl <= 25:
-				max_hp = 2800
+				max_hp = 1200
 			else:
-				max_hp = 4500
+				max_hp = 2200
 				
 	current_hp = max_hp
 	_base_y = 1.45
@@ -86,6 +90,8 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if _is_defeated or current_state == State.DYING:
 		return
+	if not is_arena_active:
+		return
 		
 	var player := get_tree().get_first_node_in_group("player") as Node3D
 	var player_z: float = player.global_position.z if player and is_instance_valid(player) else 0.0
@@ -99,14 +105,9 @@ func _physics_process(delta: float) -> void:
 		State.SUBMERGED:
 			_process_submerged(delta)
 
-	# Standoff limit guard: ensure the boss never passes the player's standoff threshold
-	if is_instance_valid(player):
-		var min_standoff: float = player_z - 8.0
-		if global_position.z > min_standoff:
-			global_position.z = min_standoff
-
 func _process_approaching(delta: float) -> void:
 	global_position.z = move_toward(global_position.z, _target_z, approach_speed * delta)
+	global_position.x = move_toward(global_position.x, 0.0, 3.0 * delta)
 	if absf(global_position.z - _target_z) < 1.0:
 		current_state = State.COMBAT
 		_cannon_timer = 1.0
@@ -115,14 +116,28 @@ func _process_approaching(delta: float) -> void:
 func _process_combat(delta: float) -> void:
 	combat_time += delta
 	
-	# Horizontal patrol weave
-	global_position.z = lerp(global_position.z, _target_z, 3.0 * delta)
-	_weave_time += delta * weave_speed
-	global_position.x = sin(_weave_time) * patrol_width
+	# Relentless Advancing Dreadnought: Steady center-lane advance down river toward player
+	global_position.x = move_toward(global_position.x, 0.0, 2.5 * delta)
+	global_position.z += advance_speed * delta
 	
-	# Bobbing
+	_weave_time += delta * 1.5
 	if visual_container:
 		visual_container.position.y = _base_y + sin(_weave_time * 2.5) * 0.08
+
+	# Doom-Clock Proximity Check & Event Broadcast (60m to 0m)
+	var player_node := get_tree().get_first_node_in_group("player") as Node3D
+	var cur_player_z: float = player_node.global_position.z if player_node and is_instance_valid(player_node) else 0.0
+	var dist_to_player: float = cur_player_z - global_position.z
+	EventBus.boss_distance_updated.emit(maxf(0.0, dist_to_player), 60.0)
+
+	if dist_to_player <= 1.5:
+		var b_thresh: int = max(1, int(round(float(max_hp) * 0.15)))
+		if current_hp <= b_thresh:
+			if not has_triggered_boarding:
+				_initiate_desperation_boarding()
+		else:
+			_ram_crush_player(player_node)
+		return
 		
 	# Spectral Cannon Volley (Fires downriver toward player)
 	# PAUSE direct boss cannon fire while geysers are channeling/warning/active
@@ -454,7 +469,7 @@ func take_damage(amount: int) -> void:
 			if fct.has_method("setup"):
 				fct.call("setup", "-" + str(amount), Color(0.2, 1.0, 0.6))
 			
-	var boarding_threshold: int = max(1, int(round(float(max_hp) * 0.20)))
+	var boarding_threshold: int = max(1, int(round(float(max_hp) * 0.15)))
 	if current_hp <= boarding_threshold and not has_triggered_boarding:
 		if current_hp <= 0:
 			current_hp = 1
@@ -466,6 +481,19 @@ func take_damage(amount: int) -> void:
 			boss_defeat()
 	else:
 		_check_phase()
+
+func _ram_crush_player(player: Node3D) -> void:
+	if _is_defeated or current_state == State.DYING:
+		return
+	AudioManager.play_sfx("barrel_breaks")
+	var camera := get_tree().get_first_node_in_group("game_camera") as GameCamera
+	if camera and camera.has_method("shake"):
+		camera.shake(0.65, 0.5)
+	if is_instance_valid(player):
+		if player.has_method("take_hit"):
+			player.call("take_hit", 999, "boss_ram_crush")
+		elif player.has_method("game_over"):
+			player.call("game_over", false)
 
 func _initiate_desperation_boarding() -> void:
 	if has_triggered_boarding or _is_defeated:

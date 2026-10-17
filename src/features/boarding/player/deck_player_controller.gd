@@ -97,7 +97,9 @@ func _ready() -> void:
 		_configure_crew_role("")
 
 func set_deck_anchor(global_xform: Transform3D) -> void:
-	global_transform = global_xform
+	var saved_scale: Vector3 = scale
+	global_position = global_xform.origin
+	global_basis = global_xform.basis.orthonormalized().scaled(saved_scale)
 	initial_deck_local_position = position
 	initial_deck_position = global_position
 	_initial_deck_x = global_position.x

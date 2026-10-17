@@ -47,22 +47,22 @@ func _test_route_a_desperation_threshold_and_clamp() -> void:
 	var max_hp: int = int(boss.get("max_hp"))
 	assert(max_hp > 0, "War-Barge max_hp must be positive (got %d)" % max_hp)
 	
-	# Deal damage above 20% threshold (HP drops to 50% > 20%)
+	# Deal damage above 15% threshold (HP drops to 50% > 15%)
 	var dmg_half: int = int(max_hp * 0.5)
 	boss.call("take_damage", dmg_half)
 	var hp_after_first: int = int(boss.get("current_hp"))
-	var threshold_20pct: int = max(1, int(round(float(max_hp) * 0.20)))
-	assert(hp_after_first > threshold_20pct, "HP must remain above 20 percent (got %d / %d)" % [hp_after_first, max_hp])
+	var threshold_15pct: int = max(1, int(round(float(max_hp) * 0.15)))
+	assert(hp_after_first > threshold_15pct, "HP must remain above 15 percent (got %d / %d)" % [hp_after_first, max_hp])
 	var has_triggered_1: bool = bool(boss.get("has_triggered_boarding"))
-	assert(not has_triggered_1, "Boarding must NOT trigger above 20% HP threshold")
+	assert(not has_triggered_1, "Boarding must NOT trigger above 15% HP threshold")
 	
-	# Deal damage to drop below 20% threshold (HP drops to <= 20%)
-	var dmg_desperation: int = max(1, hp_after_first - max(1, int(threshold_20pct * 0.5)))
+	# Deal damage to drop below 15% threshold (HP drops to <= 15%)
+	var dmg_desperation: int = max(1, hp_after_first - max(1, int(threshold_15pct * 0.5)))
 	boss.call("take_damage", dmg_desperation)
 	var hp_after_second: int = int(boss.get("current_hp"))
-	assert(hp_after_second <= threshold_20pct, "HP must be <= 20 percent (got %d / %d, threshold %d)" % [hp_after_second, max_hp, threshold_20pct])
+	assert(hp_after_second <= threshold_15pct, "HP must be <= 15 percent (got %d / %d, threshold %d)" % [hp_after_second, max_hp, threshold_15pct])
 	var has_triggered_2: bool = bool(boss.get("has_triggered_boarding"))
-	assert(has_triggered_2, "Boarding MUST trigger when HP <= 20%% (got %d / %d)" % [hp_after_second, max_hp])
+	assert(has_triggered_2, "Boarding MUST trigger when HP <= 15%% (got %d / %d)" % [hp_after_second, max_hp])
 	
 	# Deal massive fatal damage (1000) while boarding is active
 	boss.call("take_damage", 1000)
@@ -72,7 +72,7 @@ func _test_route_a_desperation_threshold_and_clamp() -> void:
 	assert(not is_defeated, "Boss must not be defeated prematurely while boarding party is active")
 	
 	boss.queue_free()
-	print("  [PASS] Route A Desperation threshold (<= 20%) and HP clamp at 1 verified.")
+	print("  [PASS] Route A Desperation threshold (<= 15%) and HP clamp at 1 verified.")
 
 func _test_boarding_adapter_defeat_flow() -> void:
 	print("--- 2. Testing InRunBoardingAdapter Arena Victory Cascade ---")
@@ -144,7 +144,7 @@ func _test_endless_mode_boss_spawn_at_distance() -> void:
 	
 	var active_boss: Node3D = mode.get("active_endless_boss") as Node3D
 	assert(active_boss != null and is_instance_valid(active_boss), "Active endless boss must be instantiated")
-	assert(active_boss.global_position.z == -18.0, "Boss must be positioned at track front Z=-18.0 (got %.1f)" % active_boss.global_position.z)
+	assert(active_boss.global_position.z == -60.0, "Boss must be positioned at track front Z=-60.0 (got %.1f)" % active_boss.global_position.z)
 	
 	# Verify tuned Endless Mode HP for weaker vessels
 	var boss_hp: int = int(active_boss.get("max_hp"))
@@ -211,14 +211,14 @@ func _test_dynamic_vessel_and_gangplank_anchors() -> void:
 	arena.setup_enemy_vessel("BossBoneBeard")
 	assert(arena.enemy_rig != null, "EnemyBoardingRig must exist for Bone-Beard")
 	assert(arena.enemy_rig.get_node_or_null("Model") != null, "Model node must exist in Bone-Beard rig")
-	assert(arena.enemy_ship_marker_bow.position.is_equal_approx(Vector3(-13.1, 0.55, -1.85)), "Bone-Beard MarkerBow must match calibrated anchor")
-	assert(arena.enemy_ship_marker_mid.position.is_equal_approx(Vector3(-13.1, 0.50, -0.05)), "Bone-Beard MarkerMid must match calibrated anchor")
-	assert(arena.enemy_ship_marker_stern.position.is_equal_approx(Vector3(-13.1, 0.55, 0.65)), "Bone-Beard MarkerStern must match calibrated anchor")
+	assert(arena.enemy_ship_marker_bow.position.is_equal_approx(Vector3(-14.45, -0.537, -0.847)), "Bone-Beard MarkerBow must match calibrated anchor")
+	assert(arena.enemy_ship_marker_mid.position.is_equal_approx(Vector3(-14.32, -0.537, -0.297)), "Bone-Beard MarkerMid must match calibrated anchor")
+	assert(arena.enemy_ship_marker_stern.position.is_equal_approx(Vector3(-14.32, -0.537, 0.432)), "Bone-Beard MarkerStern must match calibrated anchor")
 	
 	# Test Siege Fortress
 	arena.setup_enemy_vessel("BossSiegeFortress")
 	assert(arena.enemy_rig != null, "EnemyBoardingRig must exist for Siege Fortress")
-	assert(arena.enemy_ship_marker_bow.position.is_equal_approx(Vector3(-13.087265, 0.022980452, -1.0365026)), "Siege Fortress MarkerBow must match calibrated anchor")
+	assert(arena.enemy_ship_marker_bow.position.is_equal_approx(Vector3(-13.45, -0.137, -0.847)), "Siege Fortress MarkerBow must match calibrated anchor")
 	
 	arena.queue_free()
 	print("  [PASS] Dynamic player vessel swapping and calibrated boss gangplank anchors verified.")
@@ -300,24 +300,24 @@ func _test_boarding_wave_scaling_and_telemetry() -> void:
 	print("  [PASS] Boarding wave scaling across 4 tiers and telemetry event emission verified.")
 
 func _test_vessel_calibration_persistence() -> void:
-	print("--- 8. Testing Vessel Calibration Persistence & Disk Sync ---")
+	print("--- 8. Testing Vessel Calibration Persistence & In-Memory Text Serializer ---")
 	var arena: BoardingDefenseArena = ARENA_SCENE.instantiate() as BoardingDefenseArena
 	add_child(arena)
 	arena.preview_enemy_vessel = "siege_fortress"
 	arena.setup_enemy_vessel("siege_fortress")
 	assert(arena.enemy_rig != null, "Enemy rig must exist for siege fortress")
 
-	var orig_dock: Vector3 = arena.enemy_rig.dock_position
-	var orig_bow: Vector3 = arena.enemy_rig.plank_origin_bow.position
-
-	# Verify save round-trip
-	arena.save_active_enemy_rig_to_disk()
-	arena.reload_active_enemy_rig()
-
-	assert(arena.enemy_rig.dock_position.is_equal_approx(orig_dock), "dock_position must match after reload")
-	assert(arena.enemy_rig.plank_origin_bow.position.is_equal_approx(orig_bow), "MarkerBow must match after reload")
+	# Test in-memory regex serializer without touching authoritative project files on disk
+	var sample_tscn: String = """[node name="EnemyBoardingRig" type="Node3D"]
+dock_position = Vector3(0, 0, 0)
+[node name="MarkerBow" type="Marker3D" parent="PlankOrigins"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+"""
+	var serialized: String = arena._update_rig_tscn_text(sample_tscn, Vector3(10, 1, 2), Transform3D(Basis.IDENTITY, Vector3(-5, 0, -1)), Transform3D.IDENTITY, Transform3D.IDENTITY, Transform3D.IDENTITY, Transform3D.IDENTITY)
+	assert(serialized.contains("dock_position = Vector3(10, 1, 2)"), "Serializer must update dock_position in memory")
+	assert(serialized.contains("-5"), "Serializer must update MarkerBow transform in memory")
 
 	arena.queue_free()
-	print("  [PASS] Vessel calibration persistence and reload verified.")
+	print("  [PASS] Vessel calibration serializer verified safely without disk modification.")
 
 

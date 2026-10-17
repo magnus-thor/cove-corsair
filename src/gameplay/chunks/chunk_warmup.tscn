@@ -66,9 +66,34 @@ value = 10
 custom_text = "+10"
 gate_action = "add_fleet_1"
 
+[node name="EnemyMob_Rower1" type="Area3D" parent="Entities" unique_id=67668441 groups=["destructible", "enemies"] instance=ExtResource("10_lll5g")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 0.1, -18)
+script = ExtResource("11_xc064")
+max_hp = 5
+current_hp = 5
+forward_speed = 1.6
+doubloons_drop = 2
+
+[node name="EnemyMob_Rower2" type="Area3D" parent="Entities" unique_id=67668442 groups=["destructible", "enemies"] instance=ExtResource("10_lll5g")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 0.1, -26)
+script = ExtResource("11_xc064")
+max_hp = 5
+current_hp = 5
+forward_speed = 1.6
+doubloons_drop = 2
+
+[node name="EnemyMob_Skiff3" type="Area3D" parent="Entities" unique_id=67668443 groups=["destructible", "enemies"] instance=ExtResource("10_lll5g")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0, 0.1, -34)
+script = ExtResource("11_xc064")
+max_hp = 8
+current_hp = 8
+forward_speed = 2.0
+doubloons_drop = 3
+
 [node name="EnemyMob_PracticeSkiff" type="Area3D" parent="Entities" unique_id=67668439 groups=["destructible", "enemies"] instance=ExtResource("10_lll5g")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 0.1, -45)
 script = ExtResource("11_xc064")
-max_hp = 2
-current_hp = 2
-forward_speed = 1.0
+max_hp = 8
+current_hp = 8
+forward_speed = 2.0
+doubloons_drop = 3

@@ -877,9 +877,26 @@ func _check_tutorial_guidance() -> void:
 				_tutorial_overlay.guide_to(back_button, "All battle stations manned! Close the Drydock to sail Level 4!", Vector2.UP, "QUARTERMASTER", "tut_shipyard_close_after_crew")
 
 		GameState.TutorialStep.LEVEL_4_COMPLETED:
+			_lock_tabs_except(TabType.VESSELS)
+			if current_tab != TabType.VESSELS:
+				_on_tab_vessels_pressed()
+				return
+			if selected_vessel_id != "sloop":
+				selected_vessel_id = "sloop"
+				_refresh_card_selections()
+				_update_inspection_drawer()
+			if GameState.get_vessel_tier("sloop") >= 2:
+				GameState.advance_tutorial_to(GameState.TutorialStep.SLOOP_T2_UPGRADED)
+				return
+			if action_button and action_button.is_visible_in_tree() and not action_button.disabled:
+				_tutorial_overlay.guide_to(action_button, "Upgrade Sloop to Tier 2 for reinforced hull timbers and higher speed!", Vector2.UP, "QUARTERMASTER", "tut_shipyard_upgrade_sloop_t2")
+			elif back_button and back_button.is_visible_in_tree():
+				_tutorial_overlay.guide_to(back_button, "Sloop upgraded! Close the Drydock to challenge the Dreadnought!", Vector2.UP, "QUARTERMASTER", "tut_shipyard_close_after_upgrade")
+
+		GameState.TutorialStep.SLOOP_T2_UPGRADED:
 			_unlock_all_tabs()
 			if back_button and back_button.is_visible_in_tree():
-				_tutorial_overlay.guide_to(back_button, "All hands on deck! Close the Drydock to challenge The Phantom Dredge!", Vector2.UP, "QUARTERMASTER", "tut_shipyard_close_after_crew")
+				_tutorial_overlay.guide_to(back_button, "Flagship upgraded to Tier 2! Close the Drydock to sail Level 5!", Vector2.UP, "QUARTERMASTER", "tut_shipyard_close_after_upgrade")
 
 
 

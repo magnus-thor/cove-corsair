@@ -47,6 +47,14 @@ signal boss_spawned_event(boss_name: String, max_val: int)
 @warning_ignore("unused_signal")
 signal boss_health_changed(current: int, max_val: int)
 
+## Fired by advancing boss to report distance to player (Z standoff).
+@warning_ignore("unused_signal")
+signal boss_distance_updated(current_dist: float, max_dist: float)
+
+## Fired when the player successfully collects/passes a multiplier gate.
+@warning_ignore("unused_signal")
+signal gate_passed(total_gates_passed: int)
+
 ## ── Progress ────────────────────────────────────────────────────────────────
 
 ## Fired when the player's run distance hits the configured level target.

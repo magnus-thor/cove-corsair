@@ -31,6 +31,16 @@ func _ready() -> void:
 	doubloons_drop = 0
 	area_entered.connect(_on_area_entered)
 	
+	var cur_lvl: int = GameState.current_level if GameState else 1
+	if cur_lvl >= 5:
+		max_hp = 5
+	elif cur_lvl >= 3:
+		max_hp = 4
+	elif cur_lvl >= 2:
+		max_hp = 3
+	else:
+		max_hp = 3
+
 	# Wire HealthComponent (Blueprint 1)
 	if health_component:
 		health_component.max_health = max_hp

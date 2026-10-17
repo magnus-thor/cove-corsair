@@ -33,12 +33,22 @@ func _apply_level_tuning() -> void:
 	if cur_lvl <= 3:
 		max_hp = 3
 		current_hp = 3
-		forward_speed = 2.8
-		steer_speed = 1.8
+		forward_speed = 2.5
+		steer_speed = 1.5
 	elif cur_lvl <= 6:
+		max_hp = 4
+		current_hp = 4
+		forward_speed = 3.2
+		steer_speed = 2.0
+	elif cur_lvl <= 10:
+		max_hp = 6
+		current_hp = 6
+		forward_speed = 4.0
+		steer_speed = 2.5
+	else:
 		max_hp = 8
 		current_hp = 8
-		forward_speed = 5.0
+		forward_speed = 4.8
 		steer_speed = 3.0
 
 func _physics_process(delta: float) -> void:

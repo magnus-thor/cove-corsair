@@ -119,6 +119,9 @@ func _trigger_gate_collect(node: Node) -> void:
 		elif player_node.has_method("spawn_floating_text_at_position"):
 			var msg: String = "+%d SLOOP ESCORT!" % ships_to_add
 			player_node.call("spawn_floating_text_at_position", msg, Color(0.2, 0.95, 1.0))
+
+	if EventBus and EventBus.has_signal("gate_passed"):
+		EventBus.gate_passed.emit(1)
 		
 	_play_disappear_animation()
 

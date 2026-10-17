@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" path="res://src/features/boarding/player/deck_player_controller.tscn" id="3_player_scene"]
 [ext_resource type="PackedScene" uid="uid://cphhvef8ckpip" path="res://src/features/boarding/rigs/player/rig_sloop.tscn" id="4_l0o87"]
 [ext_resource type="PackedScene" path="res://src/features/boarding/player/deck_reticle_3d.tscn" id="4_reticle_scene"]
-[ext_resource type="PackedScene" uid="uid://e4gxvth0ird8" path="res://src/features/boarding/rigs/enemy/rig_siege_fortress.tscn" id="5_li856"]
+[ext_resource type="PackedScene" uid="uid://cdbw1gpdqfg2a" path="res://src/features/boarding/rigs/enemy/rig_war_barge.tscn" id="5_li856"]
 [ext_resource type="Script" uid="uid://cq2k882f3urib" path="res://src/features/boarding/player/deck_targeting_system.gd" id="6_target_script"]
 [ext_resource type="PackedScene" path="res://src/features/boarding/ui/boarding_hud.tscn" id="7_hud_scene"]
 
@@ -24,12 +24,13 @@ ambient_light_color = Color(0.75, 0.85, 0.95, 1)
 ambient_light_energy = 0.85
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ocean"]
-albedo_color = Color(0.08, 0.38, 0.55, 0.85)
+transparency = 1
+albedo_color = Color(0.08, 0.38, 0.55, 0.82)
 roughness = 0.2
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_ocean"]
 material = SubResource("StandardMaterial3D_ocean")
-size = Vector2(120, 120)
+size = Vector2(40, 40)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_deck_floor"]
 size = Vector3(6, 0.4, 15)
@@ -37,7 +38,7 @@ size = Vector3(6, 0.4, 15)
 
 [node name="BoardingDefenseArena" type="Node3D" unique_id=186159711 node_paths=PackedStringArray("player_ship_container", "enemy_ship_container", "player_controller", "hud", "boarding_camera", "targeting_system")]
 script = ExtResource("1_arena_script")
-preview_enemy_vessel = "siege_fortress"
+preview_enemy_vessel = "war_barge"
 plank_width = 0.2
 plank_thickness = 0.02
 player_ship_container = NodePath("PlayerShipContainer")
@@ -47,6 +48,10 @@ hud = NodePath("BoardingHUD")
 boarding_camera = NodePath("PlayerShipContainer/BoardingCamera3D")
 targeting_system = NodePath("DeckTargetingSystem")
 
+[node name="ArenaFocusCenter" type="Marker3D" parent="." unique_id=198421098]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, 0, 0)
+gizmo_extents = 2.0
+
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=264532659]
 environment = SubResource("Environment_arena")
 
@@ -55,7 +60,7 @@ transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0
 shadow_enabled = true
 
 [node name="OceanPlane" type="MeshInstance3D" parent="." unique_id=376365588]
-transform = Transform3D(0.9990482, -0.043619383, 0, 0.043619383, 0.9990482, 0, 0, 0, 1, 0, -0.7, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.7, 0)
 mesh = SubResource("PlaneMesh_ocean")
 
 [node name="PlayerShipContainer" type="Node3D" parent="." unique_id=228973526]
@@ -85,7 +90,7 @@ visible = false
 shape = SubResource("BoxShape3D_deck_floor")
 
 [node name="EnemyShipContainer" type="Node3D" parent="." unique_id=671411793]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.5, 0.287, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.323, 0.28704664, 0.385655)
 
 [node name="EnemyBoardingRig" parent="EnemyShipContainer" unique_id=1647371874 instance=ExtResource("5_li856")]
 

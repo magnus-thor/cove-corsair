@@ -32,6 +32,7 @@ func _ready() -> void:
 	_test_settlement_and_hub_routing()
 	_test_save_migration()
 	_test_crew_and_sloop_fast_forward_recovery()
+	_test_level_4_victory_and_sloop_t2_flow()
 
 	print("\n========================================================")
 	print("  RESULTS: %d PASSED, %d FAILED" % [_pass_count, _fail_count])
@@ -252,6 +253,8 @@ func _test_save_migration() -> void:
 func _test_crew_and_sloop_fast_forward_recovery() -> void:
 	print("\n--- 10. Tutorial Fast-Forward & Pre-Owned Assets Recovery ---")
 	# 1. Test Sloop pre-owned at LEVEL_2_COMPLETED
+	GameState.highest_unlocked_level = 2
+	GameState.current_level = 2
 	GameState.tutorial_step = GameState.TutorialStep.LEVEL_2_COMPLETED
 	GameState.owned_vessels = ["dinghy", "sloop"]
 	GameState.active_vessel = "dinghy"
@@ -260,6 +263,8 @@ func _test_crew_and_sloop_fast_forward_recovery() -> void:
 	assert_test(GameState.active_vessel == "sloop", "Pre-owned Sloop is automatically set as active vessel")
 
 	# 2. Test Monkey Bomber pre-owned at LEVEL_3_COMPLETED
+	GameState.highest_unlocked_level = 3
+	GameState.current_level = 3
 	GameState.tutorial_step = GameState.TutorialStep.LEVEL_3_COMPLETED
 	GameState.unlocked_crew = {"monkey_bomber": 1}
 	GameState.equipped_crew = {}
@@ -283,3 +288,36 @@ func _test_crew_and_sloop_fast_forward_recovery() -> void:
 
 	dummy_btn.queue_free()
 	overlay.queue_free()
+
+func _test_level_4_victory_and_sloop_t2_flow() -> void:
+	print("\n--- 11. Level 4 Victory, Sloop T2 Upgrade & Level 5 Boss Transition ---")
+	GameState.current_level = 4
+	GameState.highest_unlocked_level = 4
+	GameState.tutorial_step = GameState.TutorialStep.CREW_EQUIPPED
+	GameState.is_game_active = false
+	GameState.vessel_tiers["sloop"] = 1
+
+	var settle_scene: PackedScene = load("res://src/ui/settlement_screen.tscn") as PackedScene
+	var settle_node: SettlementScreen = settle_scene.instantiate() as SettlementScreen
+	add_child(settle_node)
+
+	settle_node.show_victory(70, 70, 140, 3)
+	assert_test(GameState.tutorial_step == GameState.TutorialStep.LEVEL_4_COMPLETED, "Tutorial step advanced to LEVEL_4_COMPLETED after Level 4 victory")
+	assert_test(settle_node.map_button != null and settle_node.map_button.text == "RETURN TO COVE", "Settlement directs player back to Cove after Level 4")
+	assert_test(settle_node.primary_button != null and not settle_node.primary_button.visible, "Primary continue button hidden to ensure player visits Shipyard")
+	settle_node.queue_free()
+
+	# In Shipyard, Sloop upgrade to Tier 2 succeeds even with 0 doubloons
+	GameState.doubloons = 0
+	GameState.active_vessel = "sloop"
+	assert_test(GameState.can_afford_active_vessel_upgrade(), "can_afford_active_vessel_upgrade is true during LEVEL_4_COMPLETED")
+	var upgrade_success: bool = GameState.upgrade_vessel_tier("sloop")
+	assert_test(upgrade_success, "Sloop Tier 2 upgrade succeeded with dynamic discount")
+	assert_test(GameState.get_vessel_tier("sloop") == 2, "Sloop is now Tier 2")
+	assert_test(GameState.tutorial_step == GameState.TutorialStep.SLOOP_T2_UPGRADED, "Tutorial step advanced to SLOOP_T2_UPGRADED")
+
+	# Clearing Level 5 advances to COMPLETED
+	GameState.current_level = 5
+	GameState.advance_tutorial_to(GameState.TutorialStep.COMPLETED)
+	assert_test(GameState.is_tutorial_completed(), "Tutorial completed after Level 5")
+

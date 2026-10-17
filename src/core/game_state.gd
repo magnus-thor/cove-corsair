@@ -26,11 +26,11 @@ enum TutorialStep {
 	LEVEL_2_COMPLETED = 4,   # Shipyard unlocked! Guided to buy Sloop
 	SLOOP_PURCHASED = 5,     # Sloop bought & equipped, ready for Level 3
 	LEVEL_3_IN_PROGRESS = 6, # Sailing Level 3
-	LEVEL_3_COMPLETED = 7,   # Guided to upgrade Sloop to Tier 2
-	SLOOP_T2_UPGRADED = 8,   # Sloop upgraded, ready for Level 4
+	LEVEL_3_COMPLETED = 7,   # Level 3 victory -> Guided to recruit Monkey Bomber
+	CREW_EQUIPPED = 8,       # Monkey Bomber recruited & equipped, ready for Level 4
 	LEVEL_4_IN_PROGRESS = 9, # Sailing Level 4
-	LEVEL_4_COMPLETED = 10,  # Guided to recruit Monkey Bomber
-	CREW_EQUIPPED = 11,      # Monkey Bomber auto-equipped, ready for Level 5
+	LEVEL_4_COMPLETED = 10,  # Level 4 victory -> Guided to upgrade Sloop to Tier 2
+	SLOOP_T2_UPGRADED = 11,  # Sloop upgraded to Tier 2, ready for Level 5
 	COMPLETED = 12           # Full tutorial complete
 }
 
@@ -613,11 +613,17 @@ func get_vessel_tier(vessel_id: String) -> int:
 func get_upgrade_cost(vessel_id: String, target_tier: int) -> int:
 	var res := get_vessel_resource(vessel_id)
 	if res and res.upgrade_costs.size() >= target_tier and target_tier >= 1:
-		return res.upgrade_costs[target_tier - 1]
+		var base_cost: int = res.upgrade_costs[target_tier - 1]
+		if (tutorial_step == TutorialStep.LEVEL_3_COMPLETED or tutorial_step == TutorialStep.LEVEL_4_COMPLETED) and vessel_id == "sloop" and target_tier == 2:
+			return mini(base_cost, doubloons)
+		return base_cost
 	if VESSEL_CATALOG.has(vessel_id):
 		var v_dict: Dictionary = VESSEL_CATALOG[vessel_id] as Dictionary
 		var prices: Dictionary = v_dict.get("tier_prices", {}) as Dictionary
-		return int(prices.get(target_tier, 0))
+		var base_cost: int = int(prices.get(target_tier, 0))
+		if (tutorial_step == TutorialStep.LEVEL_3_COMPLETED or tutorial_step == TutorialStep.LEVEL_4_COMPLETED) and vessel_id == "sloop" and target_tier == 2:
+			return mini(base_cost, doubloons)
+		return base_cost
 	return 0
 
 func can_afford(cost: int) -> bool:
@@ -676,7 +682,7 @@ func upgrade_vessel_tier(vessel_id: String) -> bool:
 	var next_tier := cur_tier + 1
 	var cost := get_upgrade_cost(vessel_id, next_tier)
 	# Tutorial Discount: Guarantee affordable Sloop Tier 2 upgrade during tutorial
-	if tutorial_step == TutorialStep.LEVEL_3_COMPLETED and vessel_id == "sloop" and next_tier == 2:
+	if (tutorial_step == TutorialStep.LEVEL_3_COMPLETED or tutorial_step == TutorialStep.LEVEL_4_COMPLETED) and vessel_id == "sloop" and next_tier == 2:
 		cost = mini(cost, doubloons)
 	if doubloons < cost:
 		if EventBus and EventBus.has_signal("shipyard_item_action"):
@@ -689,7 +695,7 @@ func upgrade_vessel_tier(vessel_id: String) -> bool:
 	if EventBus and EventBus.has_signal("shipyard_item_action"):
 		EventBus.shipyard_item_action.emit("%s_t%d" % [vessel_id, next_tier], "vessel_upgrade", cost, doubloons + cost, true, "upgraded")
 	doubloons_changed.emit(doubloons)
-	if tutorial_step == TutorialStep.LEVEL_3_COMPLETED and vessel_id == "sloop" and next_tier == 2:
+	if (tutorial_step == TutorialStep.LEVEL_3_COMPLETED or tutorial_step == TutorialStep.LEVEL_4_COMPLETED) and vessel_id == "sloop" and next_tier == 2:
 		advance_tutorial_to(TutorialStep.SLOOP_T2_UPGRADED)
 	return true
 
@@ -711,6 +717,8 @@ func can_afford_active_vessel_upgrade() -> bool:
 	if cur_tier >= max_tier:
 		return false
 	var next_tier := cur_tier + 1
+	if (tutorial_step == TutorialStep.LEVEL_3_COMPLETED or tutorial_step == TutorialStep.LEVEL_4_COMPLETED) and active_vessel == "sloop" and next_tier == 2:
+		return true
 	var cost := get_upgrade_cost(active_vessel, next_tier)
 	return cost > 0 and doubloons >= cost
 
@@ -1371,6 +1379,15 @@ func is_tutorial_in_progress() -> bool:
 	return tutorial_step < TutorialStep.COMPLETED
 
 func check_and_fast_forward_tutorial() -> void:
+	if highest_unlocked_level > 5:
+		advance_tutorial_to(TutorialStep.COMPLETED)
+		return
+	if tutorial_step == TutorialStep.CREW_EQUIPPED and (highest_unlocked_level >= 5 or current_level >= 5):
+		if get_vessel_tier("sloop") >= 2:
+			advance_tutorial_to(TutorialStep.SLOOP_T2_UPGRADED)
+		else:
+			advance_tutorial_to(TutorialStep.LEVEL_4_COMPLETED)
+		return
 	if tutorial_step == TutorialStep.LEVEL_2_COMPLETED and is_vessel_owned("sloop"):
 		if active_vessel != "sloop":
 			set_active_vessel("sloop")
@@ -1379,6 +1396,8 @@ func check_and_fast_forward_tutorial() -> void:
 		if not is_crew_equipped_on_active_ship("monkey_bomber"):
 			auto_equip_crew_to_vessel(active_vessel, "monkey_bomber")
 		advance_tutorial_to(TutorialStep.CREW_EQUIPPED)
+	elif tutorial_step == TutorialStep.LEVEL_4_COMPLETED and get_vessel_tier("sloop") >= 2:
+		advance_tutorial_to(TutorialStep.SLOOP_T2_UPGRADED)
 
 func advance_tutorial_to(step: int) -> void:
 	if step > tutorial_step:

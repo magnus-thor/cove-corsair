@@ -474,13 +474,26 @@ func _check_tutorial_guidance() -> void:
 					"tut_hub_open_map_lvl4"
 				)
 		GameState.TutorialStep.LEVEL_4_COMPLETED:
+			if GameState.get_vessel_tier("sloop") >= 2:
+				GameState.advance_tutorial_to(GameState.TutorialStep.SLOOP_T2_UPGRADED)
+				return
+			if hotspot_drydock:
+				hotspot_drydock.refresh_lock_state()
+				_tutorial_overlay.guide_to(
+					hotspot_drydock,
+					"The waters ahead are treacherous! Visit the Drydock to upgrade your Sloop to Tier 2!",
+					Vector2.UP,
+					"QUARTERMASTER",
+					"tut_hub_drydock_for_upgrade"
+				)
+		GameState.TutorialStep.SLOOP_T2_UPGRADED:
 			if hotspot_chart_house:
 				_tutorial_overlay.guide_to(
 					hotspot_chart_house,
-					"With the Sloop and Monkey Bomber at your command, you're ready for anything! Open the Chart House!",
+					"Your flagship is reinforced and ready! Chart a course for River Level 5 to challenge the Dreadnought!",
 					Vector2.UP,
 					"QUARTERMASTER",
-					"tut_hub_final_launch"
+					"tut_hub_open_map_lvl5"
 				)
 
 		_:

@@ -141,6 +141,7 @@ const APPROACH_DURATION_SEC: float = 1.8
 @export var debug_disable_spawns: bool = false
 @export var boss_tier: int = 0
 @export var single_plank_mode: bool = false
+var boss_hp_threat_pct: float = 0.15
 
 # Active instantiated rigs
 var player_rig: PlayerBoardingRig = null
@@ -740,10 +741,14 @@ func _select_initial_plank() -> void:
 		if is_instance_valid(p) and is_instance_valid(player_controller):
 			player_controller.select_plank(p)
 
-func setup_encounter_difficulty(level_index: int, is_endless: bool = false, endless_distance: float = 0.0) -> void:
+func setup_encounter_difficulty(level_index: int, is_endless: bool = false, endless_distance: float = 0.0, boss_hp_pct: float = -1.0) -> void:
 	current_level_index = level_index
 	is_endless_encounter = is_endless
 	endless_encounter_distance = endless_distance
+	if boss_hp_pct >= 0.0:
+		boss_hp_threat_pct = clampf(boss_hp_pct, 0.01, 0.15)
+	else:
+		boss_hp_threat_pct = 0.05
 
 	if is_endless:
 		if endless_distance < 800.0:
@@ -782,6 +787,18 @@ func setup_encounter_difficulty(level_index: int, is_endless: bool = false, endl
 			total_waves_to_win = 4
 			wave_interval_sec = 7.0
 			single_plank_mode = false
+
+		# If explicit HP % provided from in-run boss:
+		if boss_hp_pct >= 0.0:
+			if boss_hp_threat_pct <= 0.05:
+				total_waves_to_win = 2
+				wave_interval_sec = 8.5
+			elif boss_hp_threat_pct <= 0.09:
+				total_waves_to_win = 3
+				wave_interval_sec = 7.5
+			else:
+				total_waves_to_win = 4
+				wave_interval_sec = 6.0
 
 	if is_instance_valid(hud):
 		hud.update_wave(maxi(1, current_wave), total_waves_to_win)

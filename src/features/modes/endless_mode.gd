@@ -491,7 +491,7 @@ func _spawn_random_endless_boss() -> void:
 	spawn_parent.add_child(boss)
 	var player: Node3D = get_tree().get_first_node_in_group("player") as Node3D if get_tree() else null
 	var player_z: float = player.global_position.z if player and is_instance_valid(player) else 0.0
-	var spawn_z: float = player_z - 18.0 if player else -18.0
+	var spawn_z: float = player_z - 60.0 if player else -60.0
 	boss.global_position = Vector3(0.0, 0.0, spawn_z)
 	
 	if "current_state" in boss:

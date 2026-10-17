@@ -691,7 +691,7 @@ func _on_node_pressed(lvl: int) -> void:
 				allowed_lvl = 3
 			GameState.TutorialStep.CREW_EQUIPPED:
 				allowed_lvl = 4
-			GameState.TutorialStep.LEVEL_4_COMPLETED:
+			GameState.TutorialStep.SLOOP_T2_UPGRADED:
 				allowed_lvl = 5
 		if lvl != allowed_lvl:
 			AudioManager.play_sfx("barrel_hits", 1.2, 1.4)
@@ -879,7 +879,13 @@ func _check_tutorial_guidance() -> void:
 		GameState.TutorialStep.CREW_EQUIPPED:
 			_guide_to_milestone_node(4, "Crew stationed! Select Level 4 to test explosive coconuts!", "tut_map_select_level_4")
 		GameState.TutorialStep.LEVEL_4_COMPLETED:
-			_guide_to_milestone_node(5, "Plot your course for Level 5 to challenge The Phantom Dredge!", "tut_map_select_level_5")
+			var parent_hub: Node = get_parent()
+			if parent_hub:
+				var back_btn: BaseButton = parent_hub.find_child("BtnCloseRiverMap", true, false) as BaseButton
+				if back_btn:
+					_tutorial_overlay.guide_to(back_btn, "Upgrade your vessel first! Return to Smuggler's Cove to visit the Drydock!", Vector2.UP, "QUARTERMASTER", "tut_map_return_to_hub_upgrade")
+		GameState.TutorialStep.SLOOP_T2_UPGRADED:
+			_guide_to_milestone_node(5, "Plot your course for Level 5 to challenge the Dreadnought!", "tut_map_select_level_5")
 		_:
 			if _tutorial_overlay and is_instance_valid(_tutorial_overlay):
 				_tutorial_overlay.dismiss()

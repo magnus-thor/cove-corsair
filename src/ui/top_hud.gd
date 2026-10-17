@@ -13,12 +13,15 @@ var _multiplier_tween: Tween
 var _progress_tween: Tween
 var _displayed_gold: int = 0
 var is_boss_mode: bool = false
+var _active_boss_name: String = ""
+var _danger_vignette: Panel = null
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	# Ensure pivot centers for punch scale animations
 	_update_pivots()
 	get_viewport().size_changed.connect(_update_pivots)
+	_setup_danger_vignette()
 	
 	if pause_button:
 		pause_button.pressed.connect(_on_pause_button_pressed)
@@ -31,6 +34,20 @@ func _ready() -> void:
 	if get_node_or_null("/root/EventBus"):
 		EventBus.boss_spawned_event.connect(_on_boss_spawned)
 		EventBus.boss_health_changed.connect(_on_boss_health_changed)
+		if EventBus.has_signal("boss_distance_updated"):
+			EventBus.boss_distance_updated.connect(_on_boss_distance_updated)
+		if EventBus.has_signal("boarding_encounter_started"):
+			EventBus.boarding_encounter_started.connect(func(_a: String, _b: int, _c: int, _d: String, _e: String) -> void:
+				_clear_danger_vignette()
+			)
+		if EventBus.has_signal("level_completed"):
+			EventBus.level_completed.connect(func(_d: int, _t: int) -> void:
+				_clear_danger_vignette()
+			)
+		if EventBus.has_signal("run_failed"):
+			EventBus.run_failed.connect(func(_c: int, _dist: float) -> void:
+				_clear_danger_vignette()
+			)
 	
 	# Set initial state
 	_displayed_gold = GameState.doubloons
@@ -66,6 +83,7 @@ func _on_pause_button_pressed() -> void:
 
 func _on_boss_spawned(boss_name: String, max_hp: int) -> void:
 	is_boss_mode = true
+	_active_boss_name = boss_name
 	if level_title:
 		level_title.text = "⚔ " + boss_name.to_upper() + " ⚔"
 		level_title.modulate = Color(1.0, 0.3, 0.3)
@@ -88,6 +106,60 @@ func _on_boss_health_changed(current: int, max_hp: int) -> void:
 		_progress_tween.kill()
 	_progress_tween = create_tween()
 	_progress_tween.tween_property(level_progress_bar, "value", clamp(current, 0, max_hp), 0.1).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+func _setup_danger_vignette() -> void:
+	if _danger_vignette and is_instance_valid(_danger_vignette):
+		return
+	var panel: Panel = Panel.new()
+	panel.name = "BossDangerVignette"
+	panel.set_anchors_preset(Control.PRESET_FULL_RECT)
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sb: StyleBoxFlat = StyleBoxFlat.new()
+	sb.bg_color = Color(0.8, 0.05, 0.05, 0.12)
+	sb.border_width_left = 14
+	sb.border_width_top = 14
+	sb.border_width_right = 14
+	sb.border_width_bottom = 14
+	sb.border_color = Color(1.0, 0.1, 0.1, 0.85)
+	sb.shadow_color = Color(1.0, 0.0, 0.0, 0.5)
+	sb.shadow_size = 22
+	panel.add_theme_stylebox_override("panel", sb)
+	panel.modulate.a = 0.0
+	panel.visible = false
+	add_child(panel)
+	_danger_vignette = panel
+
+func _on_boss_distance_updated(current_dist: float, _max_dist: float) -> void:
+	if not is_boss_mode:
+		return
+	var safe_dist: float = maxf(0.0, current_dist)
+	if level_title and not _active_boss_name.is_empty():
+		if safe_dist <= 8.0:
+			level_title.text = "⚠️ RAM IMMINENT: %dm ⚠️" % int(safe_dist)
+			level_title.modulate = Color(1.0, 0.2, 0.2)
+		else:
+			level_title.text = "⚔ %s (%dm) ⚔" % [_active_boss_name.to_upper(), int(safe_dist)]
+			level_title.modulate = Color(1.0, 0.45, 0.45)
+
+	if _danger_vignette:
+		if safe_dist <= 15.0:
+			_danger_vignette.visible = true
+			var urgency: float = clampf((15.0 - safe_dist) / 15.0, 0.0, 1.0)
+			if safe_dist <= 5.0:
+				var pulse: float = 0.55 + sin(float(Time.get_ticks_msec()) * 0.025) * 0.40
+				_danger_vignette.modulate.a = pulse
+			else:
+				var target_alpha: float = lerpf(0.15, 0.85, urgency)
+				_danger_vignette.modulate.a = target_alpha
+		else:
+			_danger_vignette.modulate.a = 0.0
+			_danger_vignette.visible = false
+
+func _clear_danger_vignette() -> void:
+	is_boss_mode = false
+	if _danger_vignette and is_instance_valid(_danger_vignette):
+		_danger_vignette.modulate.a = 0.0
+		_danger_vignette.visible = false
 
 func _update_pivots() -> void:
 	if gold_container:

@@ -218,7 +218,7 @@ func _present_modal() -> void:
 			bonus_claim_button.disabled = false
 			bonus_claim_button.text = "✦ CLAIM 2X BONUS DOUBLOONS"
 		if map_button:
-			if GameState.is_tutorial_in_progress() and GameState.last_cleared_level in [2, 3]:
+			if GameState.is_tutorial_in_progress() and GameState.last_cleared_level in [2, 3, 4]:
 				map_button.text = "RETURN TO COVE"
 			else:
 				map_button.text = "LEVEL MAP"
@@ -492,7 +492,7 @@ func _check_tutorial_guidance() -> void:
 		add_child(_tutorial_overlay)
 
 	var cleared_lvl: int = GameState.last_cleared_level
-	if cleared_lvl in [2, 3]:
+	if cleared_lvl in [2, 3, 4]:
 		if primary_button:
 			primary_button.visible = false
 		if map_button:
@@ -554,15 +554,36 @@ func _check_tutorial_guidance() -> void:
 				"QUARTERMASTER",
 				"tut_settle_return_to_hub"
 			)
+	elif cleared_lvl == 4:
+		# Level 4 victory: return to cove / upgrade vessel to Tier 2
+		if primary_button:
+			primary_button.visible = false
+		if map_button and map_button.visible:
+			map_button.text = "RETURN TO COVE"
+			_tutorial_overlay.guide_to(
+				map_button,
+				"The Dreadnought awaits! Return to Smuggler's Cove to upgrade your flagship at the Drydock!",
+				Vector2.UP,
+				"QUARTERMASTER",
+				"tut_settle_return_to_hub_upgrade"
+			)
+		elif shipyard_button and shipyard_button.visible:
+			_tutorial_overlay.guide_to(
+				shipyard_button,
+				"To the Drydock! Upgrade your Sloop to Tier 2 before the boss!",
+				Vector2.UP,
+				"QUARTERMASTER",
+				"tut_settle_return_to_hub_upgrade"
+			)
 	else:
-		# Levels 4+: proceed to next level (or boss)
+		# Levels 5+: tutorial complete / proceed to next level
 		if primary_button and primary_button.visible:
 			_tutorial_overlay.guide_to(
 				primary_button,
-				"The final showdown awaits! Onward to The Phantom Dredge!",
+				"Victory achieved! Onward to the next voyage!",
 				Vector2.UP,
 				"QUARTERMASTER",
-				"tut_settle_continue_4"
+				"tut_settle_continue_5"
 			)
 		elif map_button and map_button.visible:
 			_tutorial_overlay.guide_to(

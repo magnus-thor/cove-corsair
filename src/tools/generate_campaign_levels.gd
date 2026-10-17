@@ -8,6 +8,7 @@ extends SceneTree
 const WARMUP_CHUNK_PATH: String = "res://src/gameplay/chunks/chunk_warmup.tscn"
 const MINE_CHUNK_PATH: String = "res://src/gameplay/chunks/chunk_mine_gauntlet.tscn"
 const BARRICADE_CHUNK_PATH: String = "res://src/gameplay/chunks/chunk_barricade_siege.tscn"
+const CLIMAX_CHUNK_PATH: String = "res://src/gameplay/chunks/chunk_vanguard_climax.tscn"
 
 const BOSS_CHUNKS: Dictionary = {
 	"bonebeard": "res://src/gameplay/chunks/chunk_boss_bonebeard.tscn",
@@ -74,6 +75,7 @@ func generate_all_levels() -> bool:
 	var warmup_scene = load(WARMUP_CHUNK_PATH) as PackedScene
 	var mine_scene = load(MINE_CHUNK_PATH) as PackedScene
 	var barricade_scene = load(BARRICADE_CHUNK_PATH) as PackedScene
+	var climax_scene = load(CLIMAX_CHUNK_PATH) as PackedScene
 	var horizon_tex = load(HORIZON_PATH) as Texture2D
 	
 	var boss_scenes: Dictionary = {}
@@ -188,11 +190,11 @@ func generate_all_levels() -> bool:
 				else:
 					chunks.append(barricade_scene if (i % 3 != 1) else mine_scene)
 		
-		# Final Chunk: Boss chunk on milestones (every 5 levels), or intense siege chunk
+		# Final Chunk: Boss chunk on milestones (every 5 levels), or Swarm Climax chunk on normal levels
 		if boss_key != "":
 			chunks.append(boss_scenes[boss_key])
 		else:
-			chunks.append(barricade_scene)
+			chunks.append(climax_scene)
 			
 		data.chunk_scenes = chunks
 		

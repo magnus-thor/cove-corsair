@@ -45,11 +45,15 @@ var riverbank_chunks: Array[Node3D] = []     # Layer 2 framing strips (new syste
 var _horizon_backdrop: Node3D = null         # Layer 1 horizon quad
 var is_boss_spawned: bool = false
 var chunk_assembler: ChunkAssembler = null
+var gates_passed_count: int = 0
 
 func _ready() -> void:
 	add_to_group("level_controller")
 	_setup_boundary_walls()
 	_ensure_chunk_assembler()
+	
+	if EventBus and EventBus.has_signal("gate_passed"):
+		EventBus.gate_passed.connect(_on_gate_passed)
 	
 	if debug_level_override > 0:
 		GameState.current_level = debug_level_override
@@ -58,6 +62,41 @@ func _ready() -> void:
 	var active_res := GameState.get_current_level_resource()
 	if active_res:
 		load_level_resource(active_res)
+
+func _on_gate_passed(count: int) -> void:
+	gates_passed_count += count
+	_spawn_gate_escalation_wave()
+
+func _spawn_gate_escalation_wave() -> void:
+	var player := get_tree().get_first_node_in_group("player") as Node3D
+	var player_z: float = player.global_position.z if player and is_instance_valid(player) else 0.0
+	var mob_scene: PackedScene = preload("res://src/gameplay/enemies/enemy_mob.tscn")
+	var rower_data: Resource = preload("res://src/data/resources/enemy_vessels/skeleton_rower.tres")
+	
+	var wave_count: int = mini(2 + gates_passed_count * 2, 6)
+	var spawn_z: float = player_z - 38.0
+	var lanes: Array[float] = [-3.0, -1.8, -0.6, 0.6, 1.8, 3.0]
+	lanes.shuffle()
+	
+	var cur_lvl: int = GameState.current_level if GameState else 1
+	var extra_hp: int = 1 if cur_lvl > 5 else 0
+	var mob_hp: int = 2 + extra_hp
+	var move_speed: float = 3.8 + minf(1.5, float(gates_passed_count) * 0.3)
+	
+	for i: int in range(mini(wave_count, lanes.size())):
+		var mob: EnemyMob = mob_scene.instantiate() as EnemyMob
+		if not mob:
+			continue
+		add_child(mob)
+		mob.position = Vector3(lanes[i], 0.1, spawn_z - randf_range(0.0, 6.0))
+		if mob.has_method("apply_enemy_data"):
+			mob.call("apply_enemy_data", rower_data)
+		mob.max_hp = mob_hp
+		mob.forward_speed = move_speed
+		mob.doubloons_drop = 1
+
+func get_gate_escalation_tier() -> int:
+	return gates_passed_count
 
 func _ensure_chunk_assembler() -> void:
 	if not chunk_assembler:

@@ -79,7 +79,7 @@ func _on_spawners_activated() -> void:
 		if not existing or existing.is_queued_for_deletion():
 			var boss = boss_scene.instantiate() as Node3D
 			add_child(boss)
-			boss.position = Vector3(0.0, 0.0, -35.0)
+			boss.position = Vector3(0.0, 0.0, -60.0)
 			var camera = get_tree().get_first_node_in_group("game_camera")
 			if camera and camera.has_method("start_boss_focus"):
 				camera.start_boss_focus(boss)
