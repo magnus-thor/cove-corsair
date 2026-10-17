@@ -853,9 +853,16 @@ func _check_tutorial_guidance() -> void:
 	# If level popup modal is open, guide directly to "SET SAIL" button
 	if popup_scrim and popup_scrim.visible and btn_set_sail and is_instance_valid(btn_set_sail):
 		var target_lvl: int = popup_selected_level
+		var sail_text: String = "All hands on deck! Tap SET SAIL to enter the river!"
+		match target_lvl:
+			1: sail_text = "All hands on deck! Tap SET SAIL to enter the river!"
+			2: sail_text = "Cast off! Let's conquer the second stretch!"
+			3: sail_text = "Set Sail! Show those scoundrels the might of a true pirate sloop!"
+			4: sail_text = "Cast off! Let's rain coconuts down the river!"
+			5: sail_text = "All hands on deck! Tap SET SAIL to challenge the Dreadnought!"
 		_tutorial_overlay.guide_to(
 			btn_set_sail,
-			"All hands on deck! Set sail into the shallows!",
+			sail_text,
 			Vector2.UP,
 			"QUARTERMASTER",
 			"tut_map_set_sail_%d" % target_lvl
@@ -865,11 +872,11 @@ func _check_tutorial_guidance() -> void:
 	# Otherwise, guide to the appropriate level milestone node on the river
 	match GameState.tutorial_step:
 		GameState.TutorialStep.NOT_STARTED:
-			_guide_to_milestone_node(1, "Smuggler's Run awaits! Tap the first outpost to inspect the voyage.", "tut_map_select_level_1")
+			_guide_to_milestone_node(1, "Select the first river channel to begin yer voyage!", "tut_map_select_level_1")
 		GameState.TutorialStep.LEVEL_1_COMPLETED:
-			_guide_to_milestone_node(2, "Palm Shallows ahead! Select Level 2.", "tut_map_select_level_2")
+			_guide_to_milestone_node(2, "Channel Two lies ahead! Prepare to maneuver through treacherous rocks!", "tut_map_select_level_2")
 		GameState.TutorialStep.SLOOP_PURCHASED:
-			_guide_to_milestone_node(3, "The Sloop is ready! Select Level 3 for her maiden run.", "tut_map_select_level_3")
+			_guide_to_milestone_node(3, "Select Channel Three! Time to unleash the Sloop's twin cannons!", "tut_map_select_level_3")
 		GameState.TutorialStep.LEVEL_3_COMPLETED:
 			var parent_hub: Node = get_parent()
 			if parent_hub:
@@ -885,7 +892,7 @@ func _check_tutorial_guidance() -> void:
 				if back_btn:
 					_tutorial_overlay.guide_to(back_btn, "Upgrade your vessel first! Return to Smuggler's Cove to visit the Drydock!", Vector2.UP, "QUARTERMASTER", "tut_map_return_to_hub_upgrade")
 		GameState.TutorialStep.SLOOP_T2_UPGRADED:
-			_guide_to_milestone_node(5, "Plot your course for Level 5 to challenge the Dreadnought!", "tut_map_select_level_5")
+			_guide_to_milestone_node(5, "Plot your course for Channel 5, Captain! The river belongs to you!", "tut_map_select_level_5")
 		_:
 			if _tutorial_overlay and is_instance_valid(_tutorial_overlay):
 				_tutorial_overlay.dismiss()

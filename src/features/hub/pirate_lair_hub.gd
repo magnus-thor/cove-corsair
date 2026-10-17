@@ -411,7 +411,7 @@ func _check_tutorial_guidance() -> void:
 			if hotspot_chart_house:
 				_tutorial_overlay.guide_to(
 					hotspot_chart_house,
-					"Ahoy, recruit! Open the Chart House to map our voyage up the river!",
+					"Ahoy, Captain! Tap the Chart House to plot yer course and open the river roadmap!",
 					Vector2.UP,
 					"QUARTERMASTER",
 					"tut_hub_open_charthouse"
@@ -435,7 +435,7 @@ func _check_tutorial_guidance() -> void:
 				hotspot_drydock.refresh_lock_state()
 				_tutorial_overlay.guide_to(
 					hotspot_drydock,
-					"That rowboat won't survive what's ahead! Head to the Drydock to commission THE SLOOP!",
+					"Well rowed, Captain! But that rowboat won't survive the open waters ahead. To the Drydock! Commission THE SLOOP!",
 					Vector2.UP,
 					"QUARTERMASTER",
 					"tut_hub_open_drydock"

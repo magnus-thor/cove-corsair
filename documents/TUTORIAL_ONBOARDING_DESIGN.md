@@ -209,9 +209,10 @@ The game automatically plays the audio in sync with the typewriter text animatio
 * **ElevenLabs Recommended Voice:** Grizzled, weathered pirate veteran, warm mentor tone, confident and enthusiastic.
 * **Format:** 44.1kHz MP3, standard mono or stereo.
 
-| Audio File Name (`<voice_id>.mp3`) | Action / Trigger | In-Game Target | Dialogue Script (Copy & Paste to ElevenLabs) |
+| Audio File Name (`<voice_id>.mp3`) | Action / Trigger | In-Game Target | Dialogue Script |
 |---|---|---|---|
 | `tut_hub_open_charthouse.mp3` | Fresh Start in Cove Hub | Chart House hotspot | *"Ahoy, Captain! Tap the Chart House to plot yer course and open the river roadmap!"* |
+| `tut_hub_open_charthouse_lvl2.mp3` | Post-Lvl 1 in Cove Hub | Chart House hotspot | *"First voyage survived! Chart your course for River Level 2!"* |
 | `tut_map_select_level_1.mp3` | Roadmap Opened (Fresh) | Level 1 Milestone Node | *"Select the first river channel to begin yer voyage!"* |
 | `tut_map_set_sail_1.mp3` | Level 1 Detail Modal Open | "SET SAIL" Button | *"All hands on deck! Tap SET SAIL to enter the river!"* |
 | `tut_settle_claim_2x.mp3` | Level Complete Victory | "CLAIM 2X GOLD" Button | *"A true corsair always doubles their haul! Claim yer bonus gold!"* |
@@ -231,6 +232,19 @@ The game automatically plays the audio in sync with the typewriter text animatio
 | `tut_hub_open_map_lvl4.mp3` | Crew Equipped in Hub | Chart House hotspot | *"Crew battle stations manned! Set sail on River Level 4!"* |
 | `tut_map_select_level_4.mp3` | Roadmap after Crew | Level 4 Milestone Node | *"Crew stationed! Select Level 4 to test explosive coconuts!"* |
 | `tut_map_set_sail_4.mp3` | Level 4 Detail Modal Open | "SET SAIL" Button | *"Cast off! Let's rain coconuts down the river!"* |
+| `tut_map_return_to_hub.mp3` | Roadmap Lvl 3/4 Back Button | Return to Cove Button | *"Recruit crew first! Return to Smuggler's Cove to visit the Drydock!"* |
+| `tut_map_return_to_hub_upgrade.mp3` | Roadmap Lvl 4 Back Button | Return to Cove Button | *"Upgrade your vessel first! Return to Smuggler's Cove to visit the Drydock!"* |
 | `tut_settle_continue_4.mp3` | Level 4 Victory Claimed | "NEXT LEVEL" Button | *"The final showdown awaits! Onward to The Phantom Dredge!"* |
+| `tut_settle_return_to_hub_upgrade.mp3` | Level 4 Settle Screen | "RETURN TO COVE" Button | *"The Dreadnought awaits! Return to Smuggler's Cove to upgrade your flagship at the Drydock!"* |
+| `tut_hub_drydock_for_upgrade.mp3` | Post-Lvl 4 in Cove Hub | Drydock hotspot | *"The waters ahead are treacherous! Visit the Drydock to upgrade your Sloop to Tier 2!"* |
+| `tut_shipyard_upgrade_sloop_t2.mp3` | Shipyard Upgrade Tab | "UPGRADE SLOOP" Button | *"Upgrade Sloop to Tier 2 for reinforced hull timbers and higher speed!"* |
+| `tut_shipyard_close_after_upgrade.mp3`| Sloop Upgraded | Close / Return Button | *"Sloop upgraded! Close the Drydock to challenge the Dreadnought!"* |
+| `tut_hub_open_map_lvl5.mp3` | Post-Upgrade in Hub | Chart House hotspot | *"Your flagship is reinforced and ready! Chart a course for River Level 5 to challenge the Dreadnought!"* |
 | `tut_map_select_level_5.mp3` | Roadmap before Boss | Level 5 Milestone Node | *"Plot your course for Channel 5, Captain! The river belongs to you!"* |
+| `tut_map_set_sail_5.mp3` | Level 5 Detail Modal Open | "SET SAIL" Button | *"All hands on deck! Tap SET SAIL to challenge the Dreadnought!"* |
+| `tut_settle_continue_5.mp3` | Boss Cleared / Endless | "NEXT LEVEL" Button | *"Victory achieved! Onward to the next voyage!"* |
+
+> [!NOTE]
+> All 32 clips above have been generated via ElevenLabs API using voice ID `4Vl3K2x290GidNvuaLm7`, saved to `res://assets/audio/voice/tutorial/`, and imported into Godot Engine.
+
 

@@ -841,14 +841,14 @@ func _check_tutorial_guidance() -> void:
 				_refresh_card_selections()
 				_update_inspection_drawer()
 			if action_button and action_button.is_visible_in_tree() and not action_button.disabled:
-				_tutorial_overlay.guide_to(action_button, "Commission THE SLOOP for twin bow chasers and rapid sea speed!", Vector2.UP, "QUARTERMASTER", "tut_shipyard_buy_sloop")
+				_tutorial_overlay.guide_to(action_button, "Here she is! Commission THE SLOOP with twin bow chasers and reinforced hull!", Vector2.UP, "QUARTERMASTER", "tut_shipyard_buy_sloop")
 			elif back_button and back_button.is_visible_in_tree():
-				_tutorial_overlay.guide_to(back_button, "Sloop is ready! Close the Drydock to return to the Cove!", Vector2.UP, "QUARTERMASTER", "tut_shipyard_close_after_sloop")
+				_tutorial_overlay.guide_to(back_button, "The Sloop is yours and equipped as flagship! Close the Drydock to return to the Cove!", Vector2.UP, "QUARTERMASTER", "tut_shipyard_close_after_sloop")
 
 		GameState.TutorialStep.SLOOP_PURCHASED:
 			_lock_tabs_except(TabType.VESSELS)
 			if back_button and back_button.is_visible_in_tree():
-				_tutorial_overlay.guide_to(back_button, "Close the Drydock and set sail from the Chart House!", Vector2.UP, "QUARTERMASTER", "tut_shipyard_close_after_sloop")
+				_tutorial_overlay.guide_to(back_button, "The Sloop is yours and equipped as flagship! Close the Drydock to return to the Cove!", Vector2.UP, "QUARTERMASTER", "tut_shipyard_close_after_sloop")
 
 		GameState.TutorialStep.LEVEL_3_COMPLETED:
 			if GameState.is_crew_unlocked("monkey_bomber"):
@@ -867,14 +867,14 @@ func _check_tutorial_guidance() -> void:
 				if recruit_btn and recruit_btn.is_visible_in_tree() and not recruit_btn.disabled:
 					_tutorial_overlay.guide_to(recruit_btn, "Recruit Monkey Bomber! They auto-equip to your mid-deck!", Vector2.UP, "QUARTERMASTER", "tut_shipyard_hire_monkey_bomber")
 				elif back_button and back_button.is_visible_in_tree():
-					_tutorial_overlay.guide_to(back_button, "Monkey Bomber equipped! Close the Drydock to sail!", Vector2.UP, "QUARTERMASTER", "tut_shipyard_close_after_crew")
+					_tutorial_overlay.guide_to(back_button, "Monkey Bomber equipped! Close the Drydock to set sail!", Vector2.UP, "QUARTERMASTER", "tut_shipyard_close_after_crew")
 			elif back_button and back_button.is_visible_in_tree():
-				_tutorial_overlay.guide_to(back_button, "Monkey Bomber equipped! Close the Drydock to sail!", Vector2.UP, "QUARTERMASTER", "tut_shipyard_close_after_crew")
+				_tutorial_overlay.guide_to(back_button, "Monkey Bomber equipped! Close the Drydock to set sail!", Vector2.UP, "QUARTERMASTER", "tut_shipyard_close_after_crew")
 
 		GameState.TutorialStep.CREW_EQUIPPED:
 			_lock_tabs_except(TabType.CREW)
 			if back_button and back_button.is_visible_in_tree():
-				_tutorial_overlay.guide_to(back_button, "All battle stations manned! Close the Drydock to sail Level 4!", Vector2.UP, "QUARTERMASTER", "tut_shipyard_close_after_crew")
+				_tutorial_overlay.guide_to(back_button, "Monkey Bomber equipped! Close the Drydock to set sail!", Vector2.UP, "QUARTERMASTER", "tut_shipyard_close_after_crew")
 
 		GameState.TutorialStep.LEVEL_4_COMPLETED:
 			_lock_tabs_except(TabType.VESSELS)
