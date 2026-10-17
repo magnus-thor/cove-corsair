@@ -71,7 +71,7 @@ station_id = "stern"
 assigned_zone = NodePath("../../DeckZones/ZoneStern")
 
 [node name="PlayerSpawn" type="Marker3D" parent="." unique_id=664192570]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29295945, 0.28, -0.025)
+transform = Transform3D(0.17243265, 0, 0.98502123, 0, 1, 0, -0.98502123, 0, 0.17243265, 0.29295945, 0.28, -0.025)
 
 [node name="CameraMount" type="Marker3D" parent="." unique_id=215712857]
 transform = Transform3D(-0.2905836, -0.1455355, -3.4547474, 0.07199586, 3.4659188, -0.15206176, 3.457062, -0.08441331, -0.28722224, -4.7288647, 1.8908594, -0.57060933)

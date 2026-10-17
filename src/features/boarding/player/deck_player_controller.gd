@@ -58,7 +58,7 @@ var has_crew: bool = false
 @onready var muzzle_point: Marker3D = %MuzzlePoint
 @onready var muzzle_light: OmniLight3D = %MuzzleLight
 
-@export var crew_scale: Vector3 = Vector3(0.55, 0.55, 0.55)
+@export var crew_scale: Vector3 = Vector3(0.15, 0.15, 0.15)
 
 @export_group("Deck Clamping")
 @export var deck_half_width: float = 1.6
@@ -72,6 +72,19 @@ const CREW_MODELS: Dictionary = {
 	"grease_monkey": "res://assets/models/user/crew/artillery_grease__monkey.glb",
 	"deckhand_sniper": "res://assets/models/user/crew/weapon_deckhand_sniper.glb"
 }
+const CREW_SCALE_MULTIPLIERS: Dictionary = {
+	"monkey_bomber": 1.0,
+	"skeleton_tosser": 1.90,
+	"grease_monkey": 1.13,
+	"deckhand_sniper": 1.0
+}
+const CREW_OFFSETS: Dictionary = {
+	"monkey_bomber": Vector3.ZERO,
+	"skeleton_tosser": Vector3.ZERO,
+	"grease_monkey": Vector3.ZERO,
+	"deckhand_sniper": Vector3.ZERO
+}
+@export var custom_crew_offsets: Dictionary = {}
 const PLAYER_MODEL_PATH: String = "res://assets/models/user/crew/weapon_deckhand_sniper.glb"
 
 func _ready() -> void:
@@ -170,7 +183,13 @@ func _load_player_model(glb_path: String = "") -> void:
 		var scene: PackedScene = load(glb_path) as PackedScene
 		if scene:
 			var model: Node3D = scene.instantiate() as Node3D
-			model.scale = crew_scale
+			var mult: float = float(CREW_SCALE_MULTIPLIERS.get(current_crew_id, 1.0))
+			var offset: Vector3 = CREW_OFFSETS.get(current_crew_id, Vector3.ZERO) as Vector3
+			if custom_crew_offsets != null and custom_crew_offsets.has(current_crew_id):
+				offset += custom_crew_offsets[current_crew_id] as Vector3
+			model.scale = crew_scale * mult
+			var foot_drop: float = -(0.238 - 0.952251 * model.scale.y)
+			model.position = offset + Vector3(0.0, foot_drop, 0.0)
 			model_container.add_child(model)
 			model_container.rotation.y = PI
 			if is_instance_valid(placeholder_mesh):

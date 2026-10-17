@@ -9,7 +9,7 @@ signal crew_action_triggered(crew_id: String, action_name: String, target_pos: V
 @export var station_id: String = "bow" # "bow", "midship", "stern"
 @export var assigned_zone: BoardingZone = null
 @export var action_interval_sec: float = 3.5
-@export var crew_scale: Vector3 = Vector3(0.55, 0.55, 0.55)
+@export var crew_scale: Vector3 = Vector3(0.15, 0.15, 0.15)
 
 var crew_id: String = ""
 var crew_role: String = "deckhand" # "bomber", "sniper", "tosser", "mechanic", "deckhand"
@@ -23,6 +23,18 @@ const CREW_MODELS: Dictionary = {
 	"skeleton_tosser": "res://assets/models/user/crew/skeleton_crew.glb",
 	"grease_monkey": "res://assets/models/user/crew/artillery_grease__monkey.glb",
 	"deckhand_sniper": "res://assets/models/user/crew/weapon_deckhand_sniper.glb"
+}
+const CREW_SCALE_MULTIPLIERS: Dictionary = {
+	"monkey_bomber": 1.0,
+	"skeleton_tosser": 1.90,
+	"grease_monkey": 1.13,
+	"deckhand_sniper": 1.0
+}
+const CREW_OFFSETS: Dictionary = {
+	"monkey_bomber": Vector3.ZERO,
+	"skeleton_tosser": Vector3.ZERO,
+	"grease_monkey": Vector3.ZERO,
+	"deckhand_sniper": Vector3.ZERO
 }
 
 func _ready() -> void:
@@ -65,7 +77,11 @@ func _load_crew_model() -> void:
 			var scene: PackedScene = load(glb_path) as PackedScene
 			if scene:
 				var inst: Node3D = scene.instantiate() as Node3D
-				inst.scale = crew_scale
+				var mult: float = float(CREW_SCALE_MULTIPLIERS.get(crew_id, 1.0))
+				var offset: Vector3 = CREW_OFFSETS.get(crew_id, Vector3.ZERO) as Vector3
+				inst.scale = crew_scale * mult
+				var foot_drop: float = -(0.238 - 0.952251 * inst.scale.y)
+				inst.position = offset + Vector3(0.0, foot_drop, 0.0)
 				model_container.add_child(inst)
 
 func _process(delta: float) -> void:

@@ -2,11 +2,12 @@
 
 [ext_resource type="Script" uid="uid://b11wy3xj5s5q8" path="res://src/features/boarding/boarding_defense_arena.gd" id="1_arena_script"]
 [ext_resource type="PackedScene" path="res://src/features/boarding/player/deck_player_controller.tscn" id="3_player_scene"]
-[ext_resource type="PackedScene" uid="uid://cphhvef8ckpip" path="res://src/features/boarding/rigs/player/rig_sloop.tscn" id="4_l0o87"]
+[ext_resource type="PackedScene" uid="uid://cvk7222bo75e5" path="res://src/features/boarding/rigs/player/rig_ironclad.tscn" id="4_qrrfi"]
 [ext_resource type="PackedScene" path="res://src/features/boarding/player/deck_reticle_3d.tscn" id="4_reticle_scene"]
-[ext_resource type="PackedScene" uid="uid://cdbw1gpdqfg2a" path="res://src/features/boarding/rigs/enemy/rig_war_barge.tscn" id="5_li856"]
+[ext_resource type="PackedScene" uid="uid://b13p2y6se7g8g" path="res://src/features/boarding/rigs/enemy/rig_phantom_dredge.tscn" id="5_li856"]
 [ext_resource type="Script" uid="uid://cq2k882f3urib" path="res://src/features/boarding/player/deck_targeting_system.gd" id="6_target_script"]
 [ext_resource type="PackedScene" path="res://src/features/boarding/ui/boarding_hud.tscn" id="7_hud_scene"]
+[ext_resource type="Script" uid="uid://db51j6c1n8vuh" path="res://src/features/boarding/rigs/enemy_boarding_rig.gd" id="9_udspo"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 sky_top_color = Color(0.24, 0.52, 0.88, 1)
@@ -35,10 +36,56 @@ size = Vector2(40, 40)
 [sub_resource type="BoxShape3D" id="BoxShape3D_deck_floor"]
 size = Vector3(6, 0.4, 15)
 
+[sub_resource type="Gradient" id="Gradient_color_wake"]
+offsets = PackedFloat32Array(0, 0.3, 0.7, 1)
+colors = PackedColorArray(0.9, 0.98, 1, 0.75, 0.88, 0.96, 1, 0.65, 0.8, 0.94, 1, 0.3, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_color_wake"]
+gradient = SubResource("Gradient_color_wake")
+
+[sub_resource type="Curve" id="Curve_scale_wake"]
+_data = [Vector2(0, 0.3), 0.0, 1.2, 0, 0, Vector2(1, 1), 0.3, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_scale_wake"]
+curve = SubResource("Curve_scale_wake")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_wake"]
+emission_shape = 3
+emission_box_extents = Vector3(0.3, 0.01, 0.1)
+direction = Vector3(0, 0, 1)
+spread = 20.0
+initial_velocity_min = 0.3
+initial_velocity_max = 0.6
+gravity = Vector3(0, 0, 0)
+scale_curve = SubResource("CurveTexture_scale_wake")
+color_ramp = SubResource("GradientTexture1D_color_wake")
+
+[sub_resource type="Gradient" id="Gradient_radial_foam"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_radial_foam"]
+gradient = SubResource("Gradient_radial_foam")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wake"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.95, 0.98, 1, 0.85)
+albedo_texture = SubResource("GradientTexture2D_radial_foam")
+
+[sub_resource type="QuadMesh" id="QuadMesh_wake"]
+material = SubResource("StandardMaterial3D_wake")
+size = Vector2(0.75, 0.75)
+orientation = 1
 
 [node name="BoardingDefenseArena" type="Node3D" unique_id=186159711 node_paths=PackedStringArray("player_ship_container", "enemy_ship_container", "player_controller", "hud", "boarding_camera", "targeting_system")]
 script = ExtResource("1_arena_script")
-preview_enemy_vessel = "war_barge"
+preview_player_vessel = "ironclad"
+preview_enemy_vessel = "ghost_sloop"
 plank_width = 0.2
 plank_thickness = 0.02
 player_ship_container = NodePath("PlayerShipContainer")
@@ -78,21 +125,60 @@ transform = Transform3D(0.05715192, 0, 0.45240414, 0, 0.45599973, 0, -0.45240414
 visible = false
 targeting_system = NodePath("../../DeckTargetingSystem")
 reticle_visual = NodePath("../DeckReticle3D")
-crew_scale = Vector3(0.44, 0.55, 0.55)
 
 [node name="DeckReticle3D" parent="PlayerShipContainer" unique_id=90472150 instance=ExtResource("4_reticle_scene")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08729172, 0.54320914, 0)
 visible = false
 
-[node name="PlayerBoardingRig" parent="PlayerShipContainer" unique_id=893271766 instance=ExtResource("4_l0o87")]
+[node name="PlayerBoardingRig" parent="PlayerShipContainer" unique_id=138725965 instance=ExtResource("4_qrrfi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.28216362, 0, 0)
 
-[node name="CollisionShape3D" parent="PlayerShipContainer/PlayerBoardingRig/DeckFloor" parent_id_path=PackedInt32Array(893271766, 418219926) index="0" unique_id=352705035]
+[node name="DeckFloor" parent="PlayerShipContainer/PlayerBoardingRig" index="0" unique_id=1412410740]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.52509, 0, 0.823544)
+
+[node name="CollisionShape3D" parent="PlayerShipContainer/PlayerBoardingRig/DeckFloor" index="0" unique_id=1218359787]
 shape = SubResource("BoxShape3D_deck_floor")
 
-[node name="EnemyShipContainer" type="Node3D" parent="." unique_id=671411793]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.323, 0.28704664, 0.385655)
+[node name="ZoneBow" parent="PlayerShipContainer/PlayerBoardingRig/DeckZones" parent_id_path=PackedInt32Array(138725965, 568424734) index="0" unique_id=2024346982]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.46384382, 0.035678446, -0.79647374)
 
-[node name="EnemyBoardingRig" parent="EnemyShipContainer" unique_id=1647371874 instance=ExtResource("5_li856")]
+[node name="ZoneMidship" parent="PlayerShipContainer/PlayerBoardingRig/DeckZones" parent_id_path=PackedInt32Array(138725965, 568424734) index="1" unique_id=101303190]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.48575354, -0.033415735, -0.046703592)
+
+[node name="PlayerSpawn" parent="PlayerShipContainer/PlayerBoardingRig" index="3" unique_id=519124242]
+transform = Transform3D(0.4062045, 1.6952151e-10, 0.9137823, -6.916116e-11, 1, -1.5477201e-10, -0.9137823, -3.2828067e-13, 0.4062045, 0.55368876, 0.22592285, -0.48503903)
+
+[node name="EnemyShipContainer" type="Node3D" parent="." unique_id=671411793]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.32, 0.287, 0)
+
+[node name="EnemyBoardingRig" parent="EnemyShipContainer" unique_id=1780823999 node_paths=PackedStringArray("plank_origin_bow", "plank_origin_mid", "plank_origin_stern", "wake") instance=ExtResource("5_li856")]
+script = ExtResource("9_udspo")
+plank_origin_bow = NodePath("PlankOrigins/MarkerBow")
+plank_origin_mid = NodePath("PlankOrigins/MarkerMid")
+plank_origin_stern = NodePath("PlankOrigins/MarkerStern")
+wake = NodePath("EnemyBoatWake")
+dock_position = Vector3(13.32, 0.287, 0)
+
+[node name="MarkerBow" parent="EnemyShipContainer/EnemyBoardingRig/PlankOrigins" parent_id_path=PackedInt32Array(1780823999, 1320160932) index="0" unique_id=1064031795]
+transform = Transform3D(0.99999845, -0.0016032733, -0.0007428069, 0.0016030519, 0.9999987, -0.00029772625, 0.0007432844, 0.000296532, 0.99999964, -13.490774, -0.5874772, -0.5268842)
+
+[node name="MarkerMid" parent="EnemyShipContainer/EnemyBoardingRig/PlankOrigins" parent_id_path=PackedInt32Array(1780823999, 1320160932) index="1" unique_id=1057139486]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.613881, -0.7274492, 0.0861896)
+
+[node name="MarkerStern" parent="EnemyShipContainer/EnemyBoardingRig/PlankOrigins" parent_id_path=PackedInt32Array(1780823999, 1320160932) index="2" unique_id=1288457501]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.53614, -0.57860035, 1.0998602)
+
+[node name="EnemyBoatWake" parent="EnemyShipContainer/EnemyBoardingRig" index="1" unique_id=2089460132]
+transform = Transform3D(0.016743997, 7.702577e-09, -1.1449889, 1.0025384e-10, 1.145, 7.702783e-09, 3.814963, -6.3896444e-11, 0.0050253933, -14.430881, -0.987, 0.111222744)
+extra_cull_margin = 8.0
+lod_bias = 0.001
+amount = 28
+preprocess = 0.2
+process_material = SubResource("ParticleProcessMaterial_wake")
+draw_pass_1 = SubResource("QuadMesh_wake")
+
+[node name="Model" parent="EnemyShipContainer/EnemyBoardingRig" index="2" unique_id=861431229]
+transform = Transform3D(-2.0588067e-07, -2.9802322e-08, -4.71, -1.7763568e-15, 4.71, -2.9802322e-08, 4.71, 1.7020028e-15, -2.0588064e-07, -12.611379, -0.07, 0.2053442)
 
 [node name="DeckTargetingSystem" type="Node" parent="." unique_id=1084553511 node_paths=PackedStringArray("camera")]
 script = ExtResource("6_target_script")
@@ -104,4 +190,4 @@ camera = NodePath("../PlayerShipContainer/BoardingCamera3D")
 [editable path="PlayerShipContainer/PlayerBoardingRig/DeckZones/ZoneBow"]
 [editable path="PlayerShipContainer/PlayerBoardingRig/DeckZones/ZoneMidship"]
 [editable path="PlayerShipContainer/PlayerBoardingRig/DeckZones/ZoneStern"]
-
+[editable path="EnemyShipContainer/EnemyBoardingRig"]

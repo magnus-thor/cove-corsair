@@ -31,7 +31,7 @@ shape = SubResource("BoxShape3D_deck_floor")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6250849, 0, -0.34095526)
 
 [node name="ZoneBow" parent="DeckZones" unique_id=1290480101 instance=ExtResource("2_zone")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15231872, 0.10735583, -0.5055567)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.36922455, 0.059571713, -0.5055567)
 zone_id = "bow"
 
 [node name="CollisionShape3D" parent="DeckZones/ZoneBow" index="0"]
@@ -41,7 +41,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.363, 0.09, 0)
 
 [node name="ZoneMidship" parent="DeckZones" unique_id=1817592958 instance=ExtResource("2_zone")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.017321348, 0.037170827, 0.043811917)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1491425, -0.112338245, 0.043811917)
 
 [node name="CollisionShape3D" parent="DeckZones/ZoneMidship" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
@@ -50,7 +50,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.194, 0.16, 0)
 
 [node name="ZoneStern" parent="DeckZones" unique_id=979117485 instance=ExtResource("2_zone")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1546967, 0.1339651, 0.77247405)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.40976262, 0.09719235, 0.77247405)
 zone_id = "stern"
 
 [node name="CollisionShape3D" parent="DeckZones/ZoneStern" index="0"]
@@ -72,7 +72,7 @@ station_id = "stern"
 assigned_zone = NodePath("../../DeckZones/ZoneStern")
 
 [node name="PlayerSpawn" type="Marker3D" parent="." unique_id=1604427623]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6192987, 0.07685107, -0.025)
+transform = Transform3D(-0.0071662962, 0, 0.9999743, 0, 1, 0, -0.9999743, 0, -0.0071662962, 0.7397821, 0.2322771, -0.024267584)
 
 [node name="CameraMount" type="Marker3D" parent="." unique_id=16489876]
 transform = Transform3D(-0.08458755, -0.04236471, -1.0056611, 0.020957664, 1.008913, -0.04426448, 1.0063349, -0.024572324, -0.08360908, -4.7288647, 1.8908594, -0.57060933)

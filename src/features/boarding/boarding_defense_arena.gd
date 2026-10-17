@@ -31,6 +31,15 @@ const APPROACH_DURATION_SEC: float = 1.8
 		if is_instance_valid(enemy_ship_container):
 			setup_enemy_vessel(preview_enemy_vessel)
 
+@export_enum("monkey_bomber", "skeleton_tosser", "grease_monkey", "deckhand_sniper", "none") var preview_defender_crew: String = "monkey_bomber":
+	set(value):
+		preview_defender_crew = value
+		if is_inside_tree():
+			if Engine.is_editor_hint():
+				_update_editor_preview_crew()
+			else:
+				_setup_crew_from_gamestate()
+
 @export var show_editor_planks: bool = true:
 	set(value):
 		show_editor_planks = value
@@ -213,8 +222,6 @@ var encounter_telemetry_ended: bool = false
 func _get_editor_scene_root() -> Node:
 	if not Engine.is_editor_hint():
 		return null
-	if get_tree() and is_instance_valid(get_tree().edited_scene_root):
-		return get_tree().edited_scene_root
 	if is_instance_valid(owner):
 		return owner
 	return self
@@ -255,6 +262,8 @@ func _ready() -> void:
 	if Engine.is_editor_hint():
 		_rebuild_editor_preview()
 		return
+
+	_clear_editor_preview_crew()
 
 	if not show_editor_planks and not disable_enemies:
 		_clear_editor_preview_planks()
@@ -532,6 +541,7 @@ func _rebuild_editor_preview() -> void:
 		enemy_ship_container.rotation = Vector3.ZERO
 	if show_editor_planks:
 		_update_editor_preview_planks()
+	_update_editor_preview_crew()
 
 func _start_approach_sequence() -> void:
 	if not is_instance_valid(enemy_ship_container) or not is_instance_valid(enemy_rig):
@@ -953,11 +963,105 @@ func _clear_editor_preview_planks() -> void:
 			container.free()
 		else:
 			container.queue_free()
+const CREW_SCALE_MULTIPLIERS: Dictionary = {
+	"monkey_bomber": 1.0,
+	"skeleton_tosser": 1.90,
+	"grease_monkey": 1.13,
+	"deckhand_sniper": 1.0
+}
+const CREW_OFFSETS: Dictionary = {
+	"monkey_bomber": Vector3.ZERO,
+	"skeleton_tosser": Vector3.ZERO,
+	"grease_monkey": Vector3.ZERO,
+	"deckhand_sniper": Vector3.ZERO
+}
+@export var custom_crew_offsets: Dictionary = {}
+
+func _update_editor_preview_crew() -> void:
+	if not is_inside_tree() or not Engine.is_editor_hint():
+		return
+
+	var container: Node3D = get_node_or_null("EditorPreviewCrew") as Node3D
+	if preview_defender_crew.is_empty() or preview_defender_crew == "none":
+		if is_instance_valid(container):
+			container.free()
+		return
+
+	if not is_instance_valid(container):
+		container = Node3D.new()
+		container.name = "EditorPreviewCrew"
+		add_child(container)
+
+	var glb_path: String = _get_crew_model_path(preview_defender_crew)
+	if glb_path.is_empty() or not ResourceLoader.exists(glb_path):
+		return
+
+	var defender_node: Node3D = container.get_node_or_null("PreviewDefender") as Node3D
+	var current_path: String = String(defender_node.get_meta("glb_path", "")) if is_instance_valid(defender_node) else ""
+	if not is_instance_valid(defender_node) or current_path != glb_path:
+		if is_instance_valid(defender_node):
+			defender_node.free()
+		var scene: PackedScene = load(glb_path) as PackedScene
+		if scene:
+			defender_node = scene.instantiate() as Node3D
+			defender_node.name = "PreviewDefender"
+			defender_node.set_meta("glb_path", glb_path)
+			container.add_child(defender_node)
+
+	if is_instance_valid(defender_node):
+		var target_scale: Vector3 = Vector3(0.15, 0.15, 0.15)
+		if is_instance_valid(player_controller):
+			target_scale = player_controller.crew_scale
+			if not player_controller.scale.is_zero_approx():
+				target_scale = Vector3(target_scale.x * player_controller.scale.x, target_scale.y * player_controller.scale.y, target_scale.z * player_controller.scale.z)
+
+		var mult: float = float(CREW_SCALE_MULTIPLIERS.get(preview_defender_crew, 1.0))
+		target_scale *= mult
+
+		var target_pos: Vector3 = Vector3.ZERO
+		var target_rot_y: float = PI
+		if is_instance_valid(player_rig) and is_instance_valid(player_rig.player_spawn):
+			target_pos = player_rig.player_spawn.global_position
+			target_rot_y = player_rig.player_spawn.global_rotation.y
+		elif is_instance_valid(player_ship_container):
+			target_pos = player_ship_container.global_position + Vector3(0.15, 0.28, -0.02)
+
+		var offset: Vector3 = CREW_OFFSETS.get(preview_defender_crew, Vector3.ZERO) as Vector3
+		if custom_crew_offsets != null and custom_crew_offsets.has(preview_defender_crew):
+			offset += custom_crew_offsets[preview_defender_crew] as Vector3
+
+		defender_node.scale = target_scale
+		var foot_drop: float = -(0.238 - 0.952251 * defender_node.scale.y)
+		defender_node.global_position = target_pos + offset + Vector3(0.0, foot_drop, 0.0)
+		defender_node.rotation.y = target_rot_y
+
+func _get_crew_model_path(cid: String) -> String:
+	match cid:
+		"monkey_bomber":
+			return "res://assets/models/user/crew/monkey_crew.glb"
+		"skeleton_tosser":
+			return "res://assets/models/user/crew/skeleton_crew.glb"
+		"grease_monkey":
+			return "res://assets/models/user/crew/artillery_grease__monkey.glb"
+		"deckhand_sniper":
+			return "res://assets/models/user/crew/weapon_deckhand_sniper.glb"
+		_:
+			return "res://assets/models/user/crew/monkey_crew.glb"
+
+func _clear_editor_preview_crew() -> void:
+	var container: Node = get_node_or_null("EditorPreviewCrew")
+	if is_instance_valid(container):
+		if Engine.is_editor_hint():
+			container.free()
+		else:
+			container.queue_free()
 
 func _setup_crew_from_gamestate() -> void:
+	if Engine.is_editor_hint():
+		return
 	var equipped_ids: Array[String] = []
 	var gs: Node = _get_game_state()
-	if not Engine.is_editor_hint() and gs:
+	if gs:
 		var active_ship: String = str(gs.get("active_vessel"))
 		var eq_crew: Variant = gs.get("equipped_crew")
 		if eq_crew is Dictionary and (eq_crew as Dictionary).has(active_ship):
@@ -966,6 +1070,10 @@ func _setup_crew_from_gamestate() -> void:
 				var cid: String = str(ship_map[socket_key]).strip_edges()
 				if not cid.is_empty() and not equipped_ids.has(cid):
 					equipped_ids.append(cid)
+
+	# Fallback to preview_defender_crew for standalone testing or cinematic preview
+	if equipped_ids.is_empty() and not preview_defender_crew.is_empty() and preview_defender_crew != "none":
+		equipped_ids.append(preview_defender_crew)
 
 	if not equipped_ids.is_empty():
 		var defender_crew_id: String = equipped_ids[0]
@@ -1011,6 +1119,7 @@ func _process(delta: float) -> void:
 	if Engine.is_editor_hint():
 		if show_editor_planks:
 			_update_editor_preview_planks()
+		_update_editor_preview_crew()
 		return
 
 	if show_editor_planks or disable_enemies:
