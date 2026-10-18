@@ -1234,7 +1234,8 @@ func load_game() -> void:
 			for k: Variant in tiers_dict:
 				var v_key := str(k)
 				if v_key in VESSEL_CATALOG:
-					vessel_tiers[v_key] = clamp(int(tiers_dict[k]), 1, 3)
+					var max_tier: int = get_max_vessel_tier(v_key)
+					vessel_tiers[v_key] = clampi(int(tiers_dict[k]), 1, max_tier)
 
 		# Strict active vessel sanitization: MUST exist in owned_vessels
 		if data.has("active_vessel"):

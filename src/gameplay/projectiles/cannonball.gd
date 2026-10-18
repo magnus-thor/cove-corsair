@@ -666,20 +666,44 @@ func _apply_splash_damage(exclude_target: Variant = null) -> void:
 	var base_radius := ammo_data.splash_radius if (ammo_data and ammo_data.splash_radius > 0.0) else 2.5
 	var radius := base_radius * splash_radius_multiplier
 	var splash_dmg := ammo_data.aoe_damage if (ammo_data and "aoe_damage" in ammo_data and ammo_data.aoe_damage > 0) else damage
-	var targets: Array[Node] = []
-	targets.append_array(get_tree().get_nodes_in_group("destructible"))
-	targets.append_array(get_tree().get_nodes_in_group("enemies"))
-	
-	var processed: Dictionary = {}
-	for obj in targets:
-		if obj != null and is_instance_valid(obj) and obj != self and not processed.has(obj):
-			processed[obj] = true
-			if valid_exclude and (obj == valid_exclude or obj == valid_exclude.get_parent()):
-				continue
-			if obj is Node3D:
-				var dist := (obj as Node3D).global_position.distance_to(global_position)
-				if dist <= radius and obj.has_method("take_damage"):
-					obj.call("take_damage", splash_dmg)
+
+	var space_state := get_world_3d().direct_space_state if get_world_3d() else null
+	if space_state:
+		var query := PhysicsShapeQueryParameters3D.new()
+		var sphere := SphereShape3D.new()
+		sphere.radius = radius
+		query.shape = sphere
+		query.transform = Transform3D(Basis.IDENTITY, global_position)
+		query.collision_mask = 1 | 4 | 8 | 16
+		query.collide_with_areas = true
+		query.collide_with_bodies = true
+
+		var hits := space_state.intersect_shape(query, 32)
+		var processed: Dictionary = {}
+		for hit: Dictionary in hits:
+			var collider: Node = hit.get("collider") as Node
+			if collider and is_instance_valid(collider) and not processed.has(collider):
+				processed[collider] = true
+				if valid_exclude and (collider == valid_exclude or collider == valid_exclude.get_parent()):
+					continue
+				if collider.has_method("take_damage"):
+					collider.call("take_damage", splash_dmg)
+				elif collider.get_parent() and collider.get_parent().has_method("take_damage"):
+					collider.get_parent().call("take_damage", splash_dmg)
+	else:
+		var targets: Array[Node] = []
+		targets.append_array(get_tree().get_nodes_in_group("destructible"))
+		targets.append_array(get_tree().get_nodes_in_group("enemies"))
+		var processed: Dictionary = {}
+		for obj: Node in targets:
+			if obj != null and is_instance_valid(obj) and obj != self and not processed.has(obj):
+				processed[obj] = true
+				if valid_exclude and (obj == valid_exclude or obj == valid_exclude.get_parent()):
+					continue
+				if obj is Node3D:
+					var dist := (obj as Node3D).global_position.distance_to(global_position)
+					if dist <= radius and obj.has_method("take_damage"):
+						obj.call("take_damage", splash_dmg)
 
 	if crew_id == "monkey_bomber" and crew_level >= 3 and not has_meta("is_cluster_sub"):
 		_trigger_cluster_bounce()

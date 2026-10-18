@@ -1122,9 +1122,6 @@ func _process(delta: float) -> void:
 		_update_editor_preview_crew()
 		return
 
-	if show_editor_planks or disable_enemies:
-		_update_editor_preview_planks()
-
 	if not is_encounter_active:
 		return
 
