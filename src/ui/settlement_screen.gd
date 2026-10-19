@@ -27,6 +27,7 @@ signal map_requested
 @onready var vault_balance_label: Label = get_node_or_null("%VaultBalanceLabel")
 
 @onready var primary_button: Button = %PrimaryButton
+@onready var endless_button: Button = get_node_or_null("%EndlessButton") as Button
 @onready var bonus_claim_button: Button = %BonusClaimButton
 @onready var shipyard_button: Button = %ShipyardButton
 @onready var shipyard_badge: PanelContainer = %ShipyardBadge
@@ -65,6 +66,8 @@ func _ready() -> void:
 
 	if primary_button:
 		primary_button.pressed.connect(_on_primary_pressed)
+	if endless_button:
+		endless_button.pressed.connect(_on_endless_pressed)
 	if bonus_claim_button:
 		bonus_claim_button.pressed.connect(_on_bonus_claim_pressed)
 	if shipyard_button:
@@ -213,6 +216,8 @@ func _present_modal() -> void:
 				primary_button.text = "NEXT LEVEL"
 				primary_button.visible = true
 		_bonus_claimed = false
+		if endless_button:
+			endless_button.visible = false
 		if bonus_claim_button:
 			bonus_claim_button.visible = true
 			bonus_claim_button.disabled = false
@@ -239,6 +244,9 @@ func _present_modal() -> void:
 			bonus_row.visible = false
 		if bonus_claim_button:
 			bonus_claim_button.visible = false
+		if endless_button:
+			var show_endless: bool = GameState.current_level >= 3 if GameState else true
+			endless_button.visible = show_endless
 		if primary_button:
 			primary_button.text = "RETRY"
 		if map_button:
@@ -443,6 +451,18 @@ func _on_primary_pressed() -> void:
 		GameState.should_auto_start = true
 		GameState.reset_level()
 		get_tree().reload_current_scene()
+
+func _on_endless_pressed() -> void:
+	if _tutorial_overlay and is_instance_valid(_tutorial_overlay):
+		_tutorial_overlay.dismiss()
+	if AudioManager and AudioManager.has_method("play_sfx"):
+		AudioManager.play_sfx("gate_passes")
+	get_tree().paused = false
+	retry_requested.emit()
+	GameState.should_auto_start = false
+	GameState.should_auto_start_endless = true
+	GameState.reset_level()
+	get_tree().reload_current_scene()
 
 func _on_shipyard_pressed() -> void:
 	if _tutorial_overlay and is_instance_valid(_tutorial_overlay):

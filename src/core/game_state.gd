@@ -1126,6 +1126,9 @@ func reset_save_data() -> void:
 	level_high_scores = {}
 	level_stars = {}
 	tutorial_step = TutorialStep.NOT_STARTED
+	should_open_map = false
+	should_auto_start = false
+	should_auto_start_endless = false
 	reset_level()
 	if FileAccess.file_exists(SAVE_PATH):
 		DirAccess.remove_absolute(SAVE_PATH)

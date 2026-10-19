@@ -2,7 +2,7 @@
 level_id: 45
 level_title: "Level 45: Bonebeard's Throne (Boss Threat)"
 biome_name: "brimstone"
-base_scroll_speed: 12.0
+base_scroll_speed: 12.5
 completion_doubloon_reward: 1134
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_45.tres"

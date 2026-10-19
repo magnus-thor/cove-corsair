@@ -2,7 +2,7 @@
 level_id: 35
 level_title: "Level 35: Ironjaw's Crucible (Boss Threat)"
 biome_name: "brimstone"
-base_scroll_speed: 10.9
+base_scroll_speed: 11.6
 completion_doubloon_reward: 909
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_35.tres"

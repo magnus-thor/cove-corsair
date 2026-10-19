@@ -2,7 +2,7 @@
 level_id: 24
 level_title: "Level 24: Blackwater Hollow (Hazard Nav)"
 biome_name: "bayou"
-base_scroll_speed: 9.6
+base_scroll_speed: 10.0
 completion_doubloon_reward: 356
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_24.tres"

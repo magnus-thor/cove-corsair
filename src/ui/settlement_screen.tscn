@@ -165,6 +165,25 @@ corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_endless"]
+content_margin_left = 16.0
+content_margin_top = 11.0
+content_margin_right = 16.0
+content_margin_bottom = 11.0
+bg_color = Color(0.52, 0.22, 0.12, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1.0, 0.72, 0.28, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0.7, 0.25, 0.08, 0.45)
+shadow_size = 6
+shadow_offset = Vector2(0, 3)
+
 [node name="SettlementScreen" type="CanvasLayer" unique_id=73910284]
 process_mode = 3
 layer = 25
@@ -396,6 +415,17 @@ theme_override_font_sizes/font_size = 22
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_primary")
 text = "RETRY"
+
+[node name="EndlessButton" type="Button" parent="CenterContainer/ModalPanel/MainVBox" unique_id=19284742]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font_lilita")
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(1, 0.9, 0.4, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_endless")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_endless")
+text = "⚡ FARM IN ENDLESS EXPEDITION"
 
 [node name="ShipyardWrapper" type="Control" parent="CenterContainer/ModalPanel/MainVBox" unique_id=19284736]
 custom_minimum_size = Vector2(0, 48)

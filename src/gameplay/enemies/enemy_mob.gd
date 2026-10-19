@@ -101,8 +101,12 @@ func apply_enemy_data(data: EnemyData) -> void:
 		hp_mult = 2.4
 	elif cur_lvl > 15:
 		hp_mult = 1.6
-	elif cur_lvl > 6:
+	elif cur_lvl > 5:
 		hp_mult = 1.25
+	elif cur_lvl <= 2:
+		hp_mult = 0.5
+	elif cur_lvl <= 4:
+		hp_mult = 0.75
 	max_hp = int(ceil(float(data.max_hp) * hp_mult))
 	forward_speed = data.forward_speed
 	doubloons_drop = data.doubloon_drop_count

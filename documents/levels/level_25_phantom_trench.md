@@ -2,7 +2,7 @@
 level_id: 25
 level_title: "Level 25: Phantom Trench (Boss Threat)"
 biome_name: "bayou"
-base_scroll_speed: 9.8
+base_scroll_speed: 10.1
 completion_doubloon_reward: 684
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_25.tres"

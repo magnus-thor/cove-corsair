@@ -16,8 +16,8 @@ func _apply_level_tuning() -> void:
 	var gs: Node = get_node_or_null("/root/GameState")
 	if gs and "current_level" in gs:
 		cur_lvl = int(gs.get("current_level"))
-	# Skip extra ambush rowers if chunk is opener, at start of track, or level 1
-	if chunk_id == "opener_ambush" or position.z >= -10.0 or cur_lvl <= 1:
+	# Skip extra ambush rowers if chunk is opener or at start of track
+	if chunk_id == "opener_ambush" or position.z >= -10.0:
 		return
 	_spawn_escort_rowers(cur_lvl)
 
@@ -32,7 +32,7 @@ func _spawn_escort_rowers(cur_lvl: int) -> void:
 		Vector3(2.2, 0.1, -40.0),
 		Vector3(0.0, 0.1, -44.0),
 	]
-	var count: int = 3 if cur_lvl <= 3 else (4 if cur_lvl <= 10 else 5)
+	var count: int = 2 if cur_lvl <= 1 else (3 if cur_lvl <= 3 else (4 if cur_lvl <= 10 else 5))
 	for i: int in range(count):
 		var rower: Area3D = ENEMY_SCENE.instantiate() as Area3D
 		if not rower:

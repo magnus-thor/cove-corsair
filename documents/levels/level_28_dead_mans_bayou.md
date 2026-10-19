@@ -2,7 +2,7 @@
 level_id: 28
 level_title: "Level 28: Dead Man's Bayou (Hazard Nav)"
 biome_name: "bayou"
-base_scroll_speed: 10.1
+base_scroll_speed: 10.4
 completion_doubloon_reward: 410
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_28.tres"

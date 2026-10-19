@@ -1,13 +1,11 @@
 [gd_resource type="Resource" script_class="LevelData" format=3]
 
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_opener_gauntlet.tscn" id="chunk_1"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_warmup.tscn" id="chunk_1"]
 [ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_reef_slalom.tscn" id="chunk_2"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_warmup.tscn" id="chunk_3"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_mine_gauntlet.tscn" id="chunk_4"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_gunner_ambush.tscn" id="chunk_5"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_barricade_siege.tscn" id="chunk_6"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_vanguard_climax.tscn" id="chunk_7"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_finish_line.tscn" id="chunk_8"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_mine_gauntlet.tscn" id="chunk_3"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_barricade_siege.tscn" id="chunk_4"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_vanguard_climax.tscn" id="chunk_5"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_finish_line.tscn" id="chunk_6"]
 [ext_resource type="Texture2D" path="res://assets/textures/horizon_smugglers_run.png" id="ext_horizon"]
 [ext_resource type="Script" path="res://src/data/resources/level_data.gd" id="ext_script"]
 
@@ -17,7 +15,7 @@ level_id = 7
 level_title = "Level 7: Bone Cay (Swarm Threat)"
 biome_name = "tropical"
 base_scroll_speed = 7.7
-chunk_scenes = Array[PackedScene]([ExtResource("chunk_1"), ExtResource("chunk_2"), ExtResource("chunk_3"), ExtResource("chunk_4"), ExtResource("chunk_5"), ExtResource("chunk_6"), ExtResource("chunk_7"), ExtResource("chunk_8")])
+chunk_scenes = Array[PackedScene]([ExtResource("chunk_1"), ExtResource("chunk_2"), ExtResource("chunk_3"), ExtResource("chunk_4"), ExtResource("chunk_5"), ExtResource("chunk_6")])
 completion_doubloon_reward = 126
 horizon_texture = ExtResource("ext_horizon")
 water_albedo = Color(0.06, 0.52, 0.66, 0.88)

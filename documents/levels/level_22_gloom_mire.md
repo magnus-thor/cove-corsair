@@ -2,7 +2,7 @@
 level_id: 22
 level_title: "Level 22: Gloom Mire (Hazard Nav)"
 biome_name: "bayou"
-base_scroll_speed: 9.4
+base_scroll_speed: 9.8
 completion_doubloon_reward: 328
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_22.tres"

@@ -16,19 +16,18 @@ signal settings_closed
 @onready var sfx_mute_btn: Button = %SFXMuteBtn
 
 @onready var reset_button: Button = %ResetButton
-@onready var reset_tutorial_button: Button = %ResetTutorialButton
 @onready var close_button: Button = %CloseButton
 @onready var panel_container: PanelContainer = %PanelContainer
 @onready var backdrop: ColorRect = %Backdrop
 
 var is_confirming_reset: bool = false
-var reset_confirm_timer: SceneTreeTimer
+var reset_confirm_timer: SceneTreeTimer = null
 
 # Toggle button styles
-var style_mute_on: StyleBoxFlat
-var style_mute_off: StyleBoxFlat
-var style_reset_normal: StyleBoxFlat
-var style_reset_confirm: StyleBoxFlat
+var style_mute_on: StyleBoxFlat = null
+var style_mute_off: StyleBoxFlat = null
+var style_reset_normal: StyleBoxFlat = null
+var style_reset_confirm: StyleBoxFlat = null
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -101,31 +100,32 @@ func _init_styles() -> void:
 	_setup_slider_styles()
 
 func _setup_slider_styles() -> void:
-	var grabber_normal = _create_grabber_texture(false)
-	var grabber_highlight = _create_grabber_texture(true)
+	var grabber_normal: ImageTexture = _create_grabber_texture(false)
+	var grabber_highlight: ImageTexture = _create_grabber_texture(true)
 	
-	for s in [master_slider, music_slider, sfx_slider]:
+	var sliders: Array[HSlider] = [master_slider, music_slider, sfx_slider]
+	for s: HSlider in sliders:
 		if s:
 			s.add_theme_icon_override("grabber", grabber_normal)
 			s.add_theme_icon_override("grabber_highlight", grabber_highlight)
 
 func _create_grabber_texture(highlighted: bool) -> ImageTexture:
-	var img_size = 24
-	var img = Image.create(img_size, img_size, false, Image.FORMAT_RGBA8)
-	var center = Vector2(img_size * 0.5, img_size * 0.5)
-	var r_outer = 10.5
-	var r_border = 9.0
-	var r_rim = 7.5
-	var r_core = 5.5
+	var img_size: int = 24
+	var img: Image = Image.create(img_size, img_size, false, Image.FORMAT_RGBA8)
+	var center := Vector2(float(img_size) * 0.5, float(img_size) * 0.5)
+	var r_outer: float = 10.5
+	var r_border: float = 9.0
+	var r_rim: float = 7.5
+	var r_core: float = 5.5
 
-	var border_color = Color(0.12, 0.07, 0.03, 1.0) # Dark engraved outline (#1A1108)
-	var highlight_rim = Color(1.0, 1.0, 0.92, 1.0) if highlighted else Color(1.0, 0.95, 0.72, 1.0) # Bright glowing rim
-	var gold_high = Color(1.0, 0.92, 0.45, 1.0) if highlighted else Color(0.96, 0.82, 0.38, 1.0) # #F5D061
-	var gold_dark = Color(0.83, 0.64, 0.22, 1.0) # #D4A338
+	var border_color := Color(0.12, 0.07, 0.03, 1.0) # Dark engraved outline (#1A1108)
+	var highlight_rim: Color = Color(1.0, 1.0, 0.92, 1.0) if highlighted else Color(1.0, 0.95, 0.72, 1.0) # Bright glowing rim
+	var gold_high: Color = Color(1.0, 0.92, 0.45, 1.0) if highlighted else Color(0.96, 0.82, 0.38, 1.0) # #F5D061
+	var gold_dark := Color(0.83, 0.64, 0.22, 1.0) # #D4A338
 
-	for y in range(img_size):
-		for x in range(img_size):
-			var d = (Vector2(x + 0.5, y + 0.5) - center).length()
+	for y: int in range(img_size):
+		for x: int in range(img_size):
+			var d: float = (Vector2(float(x) + 0.5, float(y) + 0.5) - center).length()
 			if d <= r_outer:
 				if d > r_border:
 					img.set_pixel(x, y, border_color)
@@ -137,7 +137,7 @@ func _create_grabber_texture(highlighted: bool) -> ImageTexture:
 					img.set_pixel(x, y, gold_high)
 				else:
 					# Inner embossed brass core
-					var t = float(y) / float(img_size)
+					var t: float = float(y) / float(img_size)
 					img.set_pixel(x, y, gold_high.lerp(gold_dark, t))
 			else:
 				img.set_pixel(x, y, Color(0, 0, 0, 0))
@@ -176,27 +176,25 @@ func _connect_signals() -> void:
 		
 	if reset_button:
 		reset_button.pressed.connect(_on_reset_pressed)
-	if reset_tutorial_button:
-		reset_tutorial_button.pressed.connect(_on_reset_tutorial_pressed)
 	if close_button:
 		close_button.pressed.connect(_on_close_pressed)
 
 func _animate_open() -> void:
 	if backdrop:
 		backdrop.color.a = 0.0
-		var t1 = create_tween()
+		var t1: Tween = create_tween()
 		t1.tween_property(backdrop, "color:a", 0.75, 0.25).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		
 	if panel_container:
 		panel_container.pivot_offset = panel_container.size * 0.5
 		panel_container.scale = Vector2(0.85, 0.85)
 		panel_container.modulate.a = 0.0
-		var t2 = create_tween().set_parallel(true).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		var t2: Tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		t2.tween_property(panel_container, "scale", Vector2.ONE, 0.3)
 		t2.tween_property(panel_container, "modulate:a", 1.0, 0.2)
 
 func _on_master_slider_changed(val: float) -> void:
-	var linear_vol = val / 100.0
+	var linear_vol: float = val / 100.0
 	GameState.master_volume = linear_vol
 	if AudioManager and AudioManager.has_method("set_bus_volume"):
 		AudioManager.set_bus_volume("Master", linear_vol)
@@ -204,7 +202,7 @@ func _on_master_slider_changed(val: float) -> void:
 	GameState.save_game()
 
 func _on_music_slider_changed(val: float) -> void:
-	var linear_vol = val / 100.0
+	var linear_vol: float = val / 100.0
 	GameState.music_volume = linear_vol
 	if AudioManager and AudioManager.has_method("set_bus_volume"):
 		AudioManager.set_bus_volume("BGM", linear_vol)
@@ -212,7 +210,7 @@ func _on_music_slider_changed(val: float) -> void:
 	GameState.save_game()
 
 func _on_sfx_slider_changed(val: float) -> void:
-	var linear_vol = val / 100.0
+	var linear_vol: float = val / 100.0
 	GameState.sfx_volume = linear_vol
 	if AudioManager and AudioManager.has_method("set_bus_volume"):
 		AudioManager.set_bus_volume("SFX", linear_vol)
@@ -273,18 +271,19 @@ func _update_reset_button_ui() -> void:
 		reset_button.text = "⚠️ CONFIRM RESET? (CLICK AGAIN)"
 		reset_button.add_theme_stylebox_override("normal", style_reset_confirm)
 	else:
-		reset_button.text = "⚠️ RESET GAME PROGRESS"
+		reset_button.text = "⚠️ RESET GAME & TUTORIAL"
 		reset_button.add_theme_stylebox_override("normal", style_reset_normal)
 
 func _on_reset_pressed() -> void:
 	if not is_confirming_reset:
 		is_confirming_reset = true
 		_update_reset_button_ui()
-		AudioManager.play_sfx("barrel_hits")
+		if AudioManager and AudioManager.has_method("play_sfx"):
+			AudioManager.play_sfx("barrel_hits")
 		
 		# 4 second timeout to cancel confirmation
 		reset_confirm_timer = get_tree().create_timer(4.0, true, false, true)
-		reset_confirm_timer.timeout.connect(func():
+		reset_confirm_timer.timeout.connect(func() -> void:
 			if is_confirming_reset:
 				is_confirming_reset = false
 				_update_reset_button_ui()
@@ -293,30 +292,25 @@ func _on_reset_pressed() -> void:
 		# Confirmed reset
 		is_confirming_reset = false
 		GameState.reset_save_data()
-		_load_current_values()
-		AudioManager.play_sfx("coin_pickups", 0.8, 0.8)
+		GameState.reset_tutorial()
+		if AudioManager and AudioManager.has_method("play_sfx"):
+			AudioManager.play_sfx("coin_pickups", 0.8, 0.8)
 		if reset_button:
-			reset_button.text = "PROGRESS RESET ✓"
+			reset_button.text = "RELOADING GAME..."
 			reset_button.add_theme_stylebox_override("normal", style_mute_on)
-			await get_tree().create_timer(1.5, true, false, true).timeout
-			_update_reset_button_ui()
-
-func _on_reset_tutorial_pressed() -> void:
-	GameState.reset_tutorial()
-	if AudioManager and AudioManager.has_method("play_sfx"):
-		AudioManager.play_sfx("coin_pickups", 0.9, 1.0)
-	if reset_tutorial_button:
-		reset_tutorial_button.text = "TUTORIAL RESET ✓"
-		await get_tree().create_timer(1.5, true, false, true).timeout
-		if is_instance_valid(reset_tutorial_button):
-			reset_tutorial_button.text = "🔄 REPLAY TUTORIAL (RESET TO LVL 1)"
+		get_tree().paused = false
+		await get_tree().create_timer(0.35, true, false, true).timeout
+		var err: Error = get_tree().reload_current_scene()
+		if err != OK:
+			get_tree().change_scene_to_file("res://src/features/hub/pirate_lair_hub.tscn")
 
 func _on_close_pressed() -> void:
-	AudioManager.play_sfx("gate_passes", 0.9, 1.0)
+	if AudioManager and AudioManager.has_method("play_sfx"):
+		AudioManager.play_sfx("gate_passes", 0.9, 1.0)
 		
 	if panel_container:
 		panel_container.pivot_offset = panel_container.size * 0.5
-		var t = create_tween().set_parallel(true).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		var t: Tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 		t.tween_property(panel_container, "scale", Vector2(0.85, 0.85), 0.18)
 		t.tween_property(panel_container, "modulate:a", 0.0, 0.18)
 		if backdrop:

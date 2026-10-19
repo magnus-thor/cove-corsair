@@ -2,7 +2,7 @@
 level_id: 10
 level_title: "Level 10: The Phantom Dredge (Boss Threat)"
 biome_name: "tropical"
-base_scroll_speed: 8.1
+base_scroll_speed: 8.0
 completion_doubloon_reward: 346
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_10.tres"

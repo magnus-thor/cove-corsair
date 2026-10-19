@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" path="res://src/gameplay/obstacles/barricade_wall.tscn" id="6_barricade"]
 [ext_resource type="PackedScene" path="res://src/gameplay/enemies/enemy_mob.tscn" id="7_mob"]
 [ext_resource type="Script" path="res://src/gameplay/enemies/enemy_mob.gd" id="8_mob_script"]
+[ext_resource type="PackedScene" path="res://src/gameplay/enemies/enemy_fodder_skiff.tscn" id="9_fodder"]
 
 [node name="ChunkVanguardClimax" type="Node3D"]
 script = ExtResource("1_chunk")
@@ -95,3 +96,22 @@ script = ExtResource("8_mob_script")
 max_hp = 2
 current_hp = 2
 forward_speed = 1.4
+
+[node name="FodderSwarm_L1" type="Area3D" parent="Entities" groups=["destructible", "enemies", "fodder"] instance=ExtResource("9_fodder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2, 0.1, -22)
+
+[node name="FodderSwarm_R1" type="Area3D" parent="Entities" groups=["destructible", "enemies", "fodder"] instance=ExtResource("9_fodder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, 0.1, -22)
+
+[node name="FodderSwarm_L2" type="Area3D" parent="Entities" groups=["destructible", "enemies", "fodder"] instance=ExtResource("9_fodder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0, 0.1, -30)
+
+[node name="FodderSwarm_R2" type="Area3D" parent="Entities" groups=["destructible", "enemies", "fodder"] instance=ExtResource("9_fodder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.0, 0.1, -30)
+
+[node name="FodderSwarm_L3" type="Area3D" parent="Entities" groups=["destructible", "enemies", "fodder"] instance=ExtResource("9_fodder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0.1, -38)
+
+[node name="FodderSwarm_R3" type="Area3D" parent="Entities" groups=["destructible", "enemies", "fodder"] instance=ExtResource("9_fodder")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 0.1, -38)
+

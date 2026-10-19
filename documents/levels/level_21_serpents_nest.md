@@ -2,7 +2,7 @@
 level_id: 21
 level_title: "Level 21: Serpent's Nest (Swarm Threat)"
 biome_name: "bayou"
-base_scroll_speed: 9.3
+base_scroll_speed: 9.7
 completion_doubloon_reward: 315
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_21.tres"

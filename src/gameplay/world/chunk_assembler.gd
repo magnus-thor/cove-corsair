@@ -200,9 +200,9 @@ func assemble_level(data: LevelData = null) -> void:
 		current_z_offset -= c_len
 		active_chunks.append(chunk_instance)
 
-		# If this is the starting chunk (index 0), enforce safe clearance runway (>= 16.0m) from player start
+		# If this is the starting chunk (index 0), enforce safe clearance runway (>= 22.0m) from player start
 		if active_chunks.size() == 1:
-			_enforce_start_clearance_in_chunk(chunk_instance, 16.0)
+			_enforce_start_clearance_in_chunk(chunk_instance, 22.0)
 		
 	# Calculate total track distance (distance until boss arena is reached)
 	total_track_distance = 0.0

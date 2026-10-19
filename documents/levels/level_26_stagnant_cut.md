@@ -2,7 +2,7 @@
 level_id: 26
 level_title: "Level 26: Stagnant Cut (Hazard Nav)"
 biome_name: "bayou"
-base_scroll_speed: 9.9
+base_scroll_speed: 10.2
 completion_doubloon_reward: 382
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_26.tres"

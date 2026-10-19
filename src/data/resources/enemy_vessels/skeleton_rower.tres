@@ -8,5 +8,5 @@ script = ExtResource("1_script")
 mob_name = "Skeleton Rower"
 sprite_texture = ExtResource("2_tex")
 pixel_size = 0.0021
-max_hp = 5
+max_hp = 4
 y_offset = 0.87

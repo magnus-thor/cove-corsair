@@ -2,7 +2,7 @@
 level_id: 18
 level_title: "Level 18: Witch's Channel (Hazard Nav)"
 biome_name: "bayou"
-base_scroll_speed: 9.0
+base_scroll_speed: 9.4
 completion_doubloon_reward: 274
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_18.tres"

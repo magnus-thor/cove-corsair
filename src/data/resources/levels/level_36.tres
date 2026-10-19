@@ -1,13 +1,12 @@
 [gd_resource type="Resource" script_class="LevelData" format=3]
 
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_opener_ambush.tscn" id="chunk_1"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_warmup.tscn" id="chunk_2"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_reef_slalom.tscn" id="chunk_3"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_gunner_ambush.tscn" id="chunk_4"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_mine_gauntlet.tscn" id="chunk_5"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_barricade_siege.tscn" id="chunk_6"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_vanguard_climax.tscn" id="chunk_7"]
-[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_finish_line.tscn" id="chunk_8"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_warmup.tscn" id="chunk_1"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_reef_slalom.tscn" id="chunk_2"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_gunner_ambush.tscn" id="chunk_3"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_mine_gauntlet.tscn" id="chunk_4"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_barricade_siege.tscn" id="chunk_5"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_vanguard_climax.tscn" id="chunk_6"]
+[ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_finish_line.tscn" id="chunk_7"]
 [ext_resource type="Texture2D" path="res://assets/textures/horizon_brimstone.png" id="ext_horizon"]
 [ext_resource type="Script" path="res://src/data/resources/level_data.gd" id="ext_script"]
 
@@ -16,8 +15,8 @@ script = ExtResource("ext_script")
 level_id = 36
 level_title = "Level 36: Pyroclast Pass (Hazard Nav)"
 biome_name = "brimstone"
-base_scroll_speed = 11.0
-chunk_scenes = Array[PackedScene]([ExtResource("chunk_1"), ExtResource("chunk_2"), ExtResource("chunk_3"), ExtResource("chunk_4"), ExtResource("chunk_5"), ExtResource("chunk_3"), ExtResource("chunk_4"), ExtResource("chunk_6"), ExtResource("chunk_7"), ExtResource("chunk_8")])
+base_scroll_speed = 11.7
+chunk_scenes = Array[PackedScene]([ExtResource("chunk_1"), ExtResource("chunk_2"), ExtResource("chunk_3"), ExtResource("chunk_4"), ExtResource("chunk_2"), ExtResource("chunk_5"), ExtResource("chunk_6"), ExtResource("chunk_7")])
 completion_doubloon_reward = 518
 horizon_texture = ExtResource("ext_horizon")
 water_albedo = Color(0.38, 0.12, 0.08, 0.94)
