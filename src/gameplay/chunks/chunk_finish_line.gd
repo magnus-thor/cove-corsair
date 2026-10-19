@@ -1,6 +1,8 @@
 class_name ChunkFinishLine
 extends BaseTrackChunk
 
+@export_enum("tropical", "bayou", "brimstone") var theme_name: String = "tropical"
+@export var custom_chunk_id: String = ""
 @export var doubloon_scene: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
 @export var explosion_scene: PackedScene = preload("res://src/vfx/barrel_explosion.tscn")
 
@@ -14,7 +16,15 @@ const ROWER_DATA: Resource = preload("res://src/data/resources/enemy_vessels/ske
 
 func _ready() -> void:
 	super._ready()
-	chunk_id = "finish_line"
+	if not custom_chunk_id.is_empty():
+		chunk_id = custom_chunk_id
+	elif theme_name == "bayou":
+		chunk_id = "finish_line_bayou"
+	elif theme_name == "brimstone":
+		chunk_id = "finish_line_brimstone"
+	else:
+		chunk_id = "finish_line"
+
 	if finish_trigger:
 		if not finish_trigger.area_entered.is_connected(_on_finish_area_entered):
 			finish_trigger.area_entered.connect(_on_finish_area_entered)
@@ -27,15 +37,24 @@ func _spawn_finish_wave() -> void:
 	if not entities:
 		return
 	var lanes: Array[float] = [-1.8, -0.6, 0.6, 1.8]
+	var guard_hp: int = 2
+	var guard_speed: float = 1.2
+	if theme_name == "bayou":
+		guard_hp = 4
+		guard_speed = 1.4
+	elif theme_name == "brimstone":
+		guard_hp = 5
+		guard_speed = 1.5
+
 	for lx: float in lanes:
 		var mob: Area3D = ENEMY_MOB_SCENE.instantiate() as Area3D
 		entities.add_child(mob)
 		mob.position = Vector3(lx, 0.1, -10.0)
 		if mob.has_method("apply_enemy_data"):
 			mob.call("apply_enemy_data", ROWER_DATA)
-		mob.set("max_hp", 2)
-		mob.set("current_hp", 2)
-		mob.set("forward_speed", 1.2)
+		mob.set("max_hp", guard_hp)
+		mob.set("current_hp", guard_hp)
+		mob.set("forward_speed", guard_speed)
 		mob.set("doubloons_drop", 1)
 
 func _on_finish_area_entered(area: Area3D) -> void:
@@ -57,7 +76,12 @@ func _trigger_victory() -> void:
 	
 	if AudioManager:
 		AudioManager.play_sfx("gate_passes")
-		AudioManager.play_sfx("barrel_breaks")
+		if theme_name == "brimstone":
+			AudioManager.play_sfx("sfx_mine_detonate")
+		elif theme_name == "bayou":
+			AudioManager.play_sfx("water_splashes")
+		else:
+			AudioManager.play_sfx("barrel_breaks")
 		
 	_spawn_celebration_effects()
 	
@@ -79,19 +103,23 @@ func _spawn_celebration_effects() -> void:
 	var root: Node = get_tree().current_scene
 	var spawn_parent: Node = root if root else self
 	
+	var burst_count: int = 12 if theme_name == "tropical" else (16 if theme_name == "bayou" else 20)
+	var coin_count: int = 15 if theme_name == "tropical" else 18
+	
 	# Spawn coin fountain & firework bursts across the gate arch
-	for i in range(12):
+	for i in range(burst_count):
 		if explosion_scene:
 			var vfx := explosion_scene.instantiate() as Node3D
 			if vfx:
 				spawn_parent.add_child(vfx)
-				var offset := Vector3(randf_range(-5.0, 5.0), randf_range(2.0, 5.5), global_position.z - 34.0 + randf_range(-1.0, 1.0))
+				var spread_y: float = randf_range(2.0, 6.0) if theme_name != "brimstone" else randf_range(2.5, 7.5)
+				var offset := Vector3(randf_range(-5.5, 5.5), spread_y, global_position.z - 34.0 + randf_range(-1.5, 1.5))
 				vfx.global_position = offset
 			
 	if doubloon_scene:
-		for d_i in range(15):
+		for d_i in range(coin_count):
 			var d := doubloon_scene.instantiate() as CollectibleDoubloon
 			if d:
 				spawn_parent.add_child(d)
-				d.global_position = Vector3(randf_range(-4.0, 4.0), 0.2, global_position.z - 34.0)
-				d._trigger_spawn_bounce(Vector2(randf_range(-2.0, 2.0), randf_range(-2.0, 2.0)))
+				d.global_position = Vector3(randf_range(-4.5, 4.5), 0.2, global_position.z - 34.0)
+				d._trigger_spawn_bounce(Vector2(randf_range(-2.5, 2.5), randf_range(-2.5, 2.5)))

@@ -1,0 +1,94 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/gameplay/chunks/chunk_finish_line.gd" id="1_finish"]
+[ext_resource type="PackedScene" path="res://assets/models/scenery/The_Withered_Willow.glb" id="2_willow"]
+[ext_resource type="PackedScene" path="res://assets/models/scenery/Totem_of_the_Painted.glb" id="3_totem"]
+[ext_resource type="PackedScene" path="res://assets/models/scenery/Cattails_in_Water.glb" id="4_cattails"]
+[ext_resource type="PackedScene" path="res://assets/models/scenery/Mournwood_Tree.glb" id="5_mournwood"]
+[ext_resource type="PackedScene" path="res://assets/models/structure-platform-dock.glb" id="6_dock"]
+[ext_resource type="PackedScene" path="res://assets/models/castle-gate.glb" id="7_gate"]
+[ext_resource type="PackedScene" path="res://src/gameplay/obstacles/barricade_wall.tscn" id="8_barricade"]
+[ext_resource type="PackedScene" path="res://src/gameplay/enemies/enemy_mob.tscn" id="9_enemy"]
+[ext_resource type="Script" path="res://src/gameplay/enemies/enemy_mob.gd" id="10_enemy_script"]
+[ext_resource type="PackedScene" path="res://assets/models/flag-pirate-high.glb" id="11_flag"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_finish"]
+size = Vector3(12, 4, 3)
+
+[node name="ChunkFinishLineBayou" type="Node3D" unique_id=9812501]
+script = ExtResource("1_finish")
+theme_name = "bayou"
+chunk_id = "finish_line_bayou"
+
+[node name="ChunkStart" type="Marker3D" parent="." unique_id=9812502]
+
+[node name="ChunkEnd" type="Marker3D" parent="." unique_id=9812503]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -50)
+
+[node name="Banks" type="Node3D" parent="." unique_id=9812504]
+
+[node name="Willow_Left" type="Node3D" parent="Banks" unique_id=9812505 instance=ExtResource("2_willow")]
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, -9.5, 0, -18)
+
+[node name="Willow_Right" type="Node3D" parent="Banks" unique_id=9812506 instance=ExtResource("2_willow")]
+transform = Transform3D(-1.4, 0, 0, 0, 1.4, 0, 0, 0, -1.4, 9.5, 0, -18)
+
+[node name="Mournwood_Left" type="Node3D" parent="Banks" unique_id=9812507 instance=ExtResource("5_mournwood")]
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, -10.0, 0, -28)
+
+[node name="Mournwood_Right" type="Node3D" parent="Banks" unique_id=9812508 instance=ExtResource("5_mournwood")]
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, 10.0, 0, -28)
+
+[node name="Dock_Left" type="Node3D" parent="Banks" unique_id=9812509 instance=ExtResource("6_dock")]
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, -7.5, 0, -33)
+
+[node name="Dock_Right" type="Node3D" parent="Banks" unique_id=9812510 instance=ExtResource("6_dock")]
+transform = Transform3D(-1.2, 0, 0, 0, 1.2, 0, 0, 0, -1.2, 7.5, 0, -33)
+
+[node name="Cattails_Left" type="Node3D" parent="Banks" unique_id=9812511 instance=ExtResource("4_cattails")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -6.8, 0, -24)
+
+[node name="Cattails_Right" type="Node3D" parent="Banks" unique_id=9812512 instance=ExtResource("4_cattails")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 6.8, 0, -24)
+
+[node name="Entities" type="Node3D" parent="." unique_id=9812513]
+
+[node name="GateCenter" type="Node3D" parent="Entities" unique_id=9812514 instance=ExtResource("7_gate")]
+transform = Transform3D(2.5, 0, 0, 0, 2.2, 0, 0, 0, 2.0, 0, 0, -34)
+
+[node name="Totem_Left" type="Node3D" parent="Entities" unique_id=9812515 instance=ExtResource("3_totem")]
+transform = Transform3D(1.3, 0, 0, 0, 1.3, 0, 0, 0, 1.3, -5.8, 0, -34)
+
+[node name="Totem_Right" type="Node3D" parent="Entities" unique_id=9812516 instance=ExtResource("3_totem")]
+transform = Transform3D(1.3, 0, 0, 0, 1.3, 0, 0, 0, 1.3, 5.8, 0, -34)
+
+[node name="Flag_Left" type="Node3D" parent="Entities" unique_id=9812517 instance=ExtResource("11_flag")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 2.5, -34)
+
+[node name="Flag_Right" type="Node3D" parent="Entities" unique_id=9812518 instance=ExtResource("11_flag")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 2.5, -34)
+
+[node name="FinishBarricade" parent="Entities" unique_id=9812519 instance=ExtResource("8_barricade")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -22)
+
+[node name="GuardRower_Left" type="Area3D" parent="Entities" unique_id=9812520 groups=["destructible", "enemies"] instance=ExtResource("9_enemy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0.1, -16)
+script = ExtResource("10_enemy_script")
+max_hp = 4
+current_hp = 4
+forward_speed = 1.3
+
+[node name="GuardRower_Right" type="Area3D" parent="Entities" unique_id=9812521 groups=["destructible", "enemies"] instance=ExtResource("9_enemy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.1, -16)
+script = ExtResource("10_enemy_script")
+max_hp = 4
+current_hp = 4
+forward_speed = 1.3
+
+[node name="FinishTrigger" type="Area3D" parent="." unique_id=9812522]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -34)
+collision_layer = 0
+collision_mask = 3
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="FinishTrigger" unique_id=9812523]
+shape = SubResource("BoxShape3D_finish")

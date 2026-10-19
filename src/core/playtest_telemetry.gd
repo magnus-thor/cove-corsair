@@ -227,6 +227,14 @@ func start_level_run(level_index: int) -> void:
 	var active_plating: String = GameState.get_active_plating() if GameState else "none"
 	var vault: int = GameState.doubloons if GameState else 0
 	
+	var lvl_res: LevelData = GameState.get_current_level_resource() as LevelData if GameState else null
+	var chunk_names: Array[String] = []
+	if lvl_res and "chunk_scenes" in lvl_res:
+		for sc: Variant in lvl_res.chunk_scenes:
+			if sc is PackedScene and sc != null:
+				var c_path: String = (sc as PackedScene).resource_path
+				chunk_names.append(c_path.get_file().get_basename().replace("chunk_", ""))
+
 	current_run = {
 		"run_number": runs.size() + 1,
 		"level_index": level_index,
@@ -237,6 +245,7 @@ func start_level_run(level_index: int) -> void:
 		"ammo": active_ammo,
 		"plating": active_plating,
 		"vault_at_start": vault,
+		"chunk_pipeline": chunk_names,
 		"coins_collected": 0,
 		"completion_bonus": 0,
 		"total_earned": 0,
@@ -271,6 +280,8 @@ func start_level_run(level_index: int) -> void:
 		active_plating,
 		vault
 	])
+	if not chunk_names.is_empty():
+		print("   🗺️ Level Layout : [%s]" % " ➜ ".join(chunk_names))
 	print("--------------------------------------------------------------------------------")
 
 func _on_level_started(level_index: int) -> void:
