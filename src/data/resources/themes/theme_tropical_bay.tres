@@ -1,38 +1,32 @@
-[gd_resource type="Resource" script_class="ThemeSceneryData" format=3]
+[gd_resource type="Resource" script_class="ThemeSceneryData" format=3 uid="uid://qfp0ah7oam8"]
 
-[ext_resource type="Script" path="res://src/data/resources/theme_scenery_data.gd" id="1_script"]
-[ext_resource type="Shader" path="res://src/shaders/harmonized_scenery.gdshader" id="2_shader"]
-[ext_resource type="PackedScene" path="res://assets/models/structure-platform-dock-small.glb" id="near_1"]
-[ext_resource type="PackedScene" path="res://assets/models/structure-platform-dock.glb" id="near_2"]
-[ext_resource type="PackedScene" path="res://assets/models/boat-row-small.glb" id="near_3"]
-[ext_resource type="PackedScene" path="res://assets/models/scenery/Rustbound_Anchor.glb" id="near_4"]
-[ext_resource type="PackedScene" path="res://assets/models/scenery/Tropical_Hibiscus_Blo.glb" id="near_5"]
-[ext_resource type="PackedScene" path="res://assets/models/rocks-sand-a.glb" id="near_6"]
-[ext_resource type="PackedScene" path="res://assets/models/rocks-sand-b.glb" id="near_7"]
-[ext_resource type="PackedScene" path="res://assets/models/patch-sand-foliage.glb" id="near_8"]
-[ext_resource type="PackedScene" path="res://assets/models/crate.glb" id="near_9"]
-[ext_resource type="PackedScene" path="res://assets/models/palm-detailed-bend.glb" id="mid_1"]
-[ext_resource type="PackedScene" path="res://assets/models/palm-detailed-straight.glb" id="mid_2"]
-[ext_resource type="PackedScene" path="res://assets/models/scenery/Coconut_Palm_Tree.glb" id="mid_3"]
-[ext_resource type="PackedScene" path="res://assets/models/scenery/Emerald_Mangrove_Grov.glb" id="mid_4"]
-[ext_resource type="PackedScene" path="res://assets/models/tower-complete-small.glb" id="mid_5"]
-[ext_resource type="PackedScene" path="res://assets/models/tower-watch.glb" id="mid_6"]
-[ext_resource type="PackedScene" path="res://assets/models/rocks-a.glb" id="mid_7"]
-[ext_resource type="PackedScene" path="res://assets/models/rocks-b.glb" id="mid_8"]
-[ext_resource type="PackedScene" path="res://assets/models/scenery/Low_Poly_Palm_Island.glb" id="far_1"]
-[ext_resource type="PackedScene" path="res://assets/models/ship-wreck.glb" id="far_2"]
-[ext_resource type="PackedScene" path="res://assets/models/tower-complete-large.glb" id="far_3"]
-[ext_resource type="PackedScene" path="res://assets/models/rocks-sand-c.glb" id="far_4"]
-[ext_resource type="PackedScene" path="res://assets/models/rocks-c.glb" id="far_5"]
+[ext_resource type="Script" uid="uid://dksgm6ou6oyo1" path="res://src/data/resources/theme_scenery_data.gd" id="1_script"]
+[ext_resource type="Shader" uid="uid://b6ppaj15cdn1n" path="res://src/shaders/harmonized_scenery.gdshader" id="2_shader"]
+[ext_resource type="PackedScene" uid="uid://caew2iehybpfv" path="res://assets/models/scenery/Low_Poly_Palm_Island.glb" id="far_1"]
+[ext_resource type="PackedScene" uid="uid://ci3hl1uao0tcc" path="res://assets/models/ship-wreck.glb" id="far_2"]
+[ext_resource type="PackedScene" uid="uid://tfe2ng830lfx" path="res://assets/models/tower-complete-large.glb" id="far_3"]
+[ext_resource type="PackedScene" uid="uid://cd54qfdd0w8f6" path="res://assets/models/rocks-sand-c.glb" id="far_4"]
+[ext_resource type="PackedScene" uid="uid://bjc3evh6cn47n" path="res://assets/models/rocks-c.glb" id="far_5"]
+[ext_resource type="PackedScene" uid="uid://bdva45p0rkxj7" path="res://assets/models/palm-detailed-bend.glb" id="mid_1"]
+[ext_resource type="PackedScene" uid="uid://dhi51becqg1lr" path="res://assets/models/palm-detailed-straight.glb" id="mid_2"]
+[ext_resource type="PackedScene" uid="uid://c5n6ebsqhrkxe" path="res://assets/models/scenery/Coconut_Palm_Tree.glb" id="mid_3"]
+[ext_resource type="PackedScene" uid="uid://bhpvs8epef8ef" path="res://assets/models/scenery/Emerald_Mangrove_Grov.glb" id="mid_4"]
+[ext_resource type="PackedScene" uid="uid://lanikqwb30ar" path="res://assets/models/tower-complete-small.glb" id="mid_5"]
+[ext_resource type="PackedScene" uid="uid://psnn1awv1xbe" path="res://assets/models/tower-watch.glb" id="mid_6"]
+[ext_resource type="PackedScene" uid="uid://b7hd3di5q1md4" path="res://assets/models/rocks-a.glb" id="mid_7"]
+[ext_resource type="PackedScene" uid="uid://bdljhmgem460" path="res://assets/models/rocks-b.glb" id="mid_8"]
+[ext_resource type="PackedScene" uid="uid://dnfbeqxcmg3w" path="res://assets/models/structure-platform-dock-small.glb" id="near_1"]
+[ext_resource type="PackedScene" uid="uid://dujek37kj2nw7" path="res://assets/models/structure-platform-dock.glb" id="near_2"]
+[ext_resource type="PackedScene" uid="uid://c1n5cncngbrc8" path="res://assets/models/boat-row-small.glb" id="near_3"]
+[ext_resource type="PackedScene" uid="uid://bg7rn3uffwyr3" path="res://assets/models/scenery/Rustbound_Anchor.glb" id="near_4"]
+[ext_resource type="PackedScene" uid="uid://dxqh5unxua3gt" path="res://assets/models/scenery/Tropical_Hibiscus_Blo.glb" id="near_5"]
+[ext_resource type="PackedScene" uid="uid://boctqgm0oocyf" path="res://assets/models/rocks-sand-a.glb" id="near_6"]
+[ext_resource type="PackedScene" uid="uid://cx2s8bj1r2sd" path="res://assets/models/rocks-sand-b.glb" id="near_7"]
+[ext_resource type="PackedScene" uid="uid://dnhsmsynwprhp" path="res://assets/models/patch-sand-foliage.glb" id="near_8"]
+[ext_resource type="PackedScene" uid="uid://xgtnqujkgurj" path="res://assets/models/crate.glb" id="near_9"]
 
 [resource]
 script = ExtResource("1_script")
-theme_name = "tropical"
-scenery_shader = ExtResource("2_shader")
 near_lane_props = Array[PackedScene]([ExtResource("near_1"), ExtResource("near_2"), ExtResource("near_3"), ExtResource("near_4"), ExtResource("near_5"), ExtResource("near_6"), ExtResource("near_7"), ExtResource("near_8"), ExtResource("near_9")])
 midground_props = Array[PackedScene]([ExtResource("mid_1"), ExtResource("mid_2"), ExtResource("mid_3"), ExtResource("mid_4"), ExtResource("mid_5"), ExtResource("mid_6"), ExtResource("mid_7"), ExtResource("mid_8")])
 far_backdrop_props = Array[PackedScene]([ExtResource("far_1"), ExtResource("far_2"), ExtResource("far_3"), ExtResource("far_4"), ExtResource("far_5")])
-water_albedo = Color(0.08, 0.58, 0.82, 0.88)
-bank_color = Color(0.85, 0.72, 0.48, 1.0)
-fog_color = Color(0.48, 0.76, 0.94, 1.0)
-fog_density = 0.002
