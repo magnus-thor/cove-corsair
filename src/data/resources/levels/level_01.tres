@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_fodder_swarm.tscn" id="chunk_4"]
 [ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_finish_line.tscn" id="chunk_5"]
 [ext_resource type="Texture2D" path="res://assets/textures/horizon_smugglers_run.png" id="ext_horizon"]
+[ext_resource type="Resource" path="res://src/data/resources/themes/theme_tropical_bay.tres" id="ext_theme"]
 [ext_resource type="Script" path="res://src/data/resources/level_data.gd" id="ext_script"]
 
 [resource]
@@ -16,6 +17,7 @@ biome_name = "tropical"
 base_scroll_speed = 6.5
 chunk_scenes = Array[PackedScene]([ExtResource("chunk_1"), ExtResource("chunk_2"), ExtResource("chunk_3"), ExtResource("chunk_4"), ExtResource("chunk_5")])
 completion_doubloon_reward = 45
+scenery_theme = ExtResource("ext_theme")
 horizon_texture = ExtResource("ext_horizon")
 water_albedo = Color(0.08, 0.58, 0.82, 0.88)
 fog_color = Color(0.48, 0.76, 0.94, 1.0)

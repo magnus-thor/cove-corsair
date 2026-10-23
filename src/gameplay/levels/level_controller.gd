@@ -65,6 +65,10 @@ func _ready() -> void:
 
 func _on_gate_passed(count: int) -> void:
 	gates_passed_count += count
+	var active_dist: float = chunk_assembler.distance_traveled if (chunk_assembler and is_instance_valid(chunk_assembler) and chunk_assembler.is_assembled) else current_distance
+	# Skip spawning a sudden ambush wave on the opening settle-in gate (within the first 45m)
+	if active_dist < 45.0:
+		return
 	_spawn_gate_escalation_wave()
 
 func _spawn_gate_escalation_wave() -> void:
@@ -72,26 +76,65 @@ func _spawn_gate_escalation_wave() -> void:
 	var player_z: float = player.global_position.z if player and is_instance_valid(player) else 0.0
 	var mob_scene: PackedScene = preload("res://src/gameplay/enemies/enemy_mob.tscn")
 	var rower_data: Resource = preload("res://src/data/resources/enemy_vessels/skeleton_rower.tres")
-	
-	var wave_count: int = mini(2 + gates_passed_count * 2, 6)
-	var spawn_z: float = player_z - 38.0
-	var lanes: Array[float] = [-3.0, -1.8, -0.6, 0.6, 1.8, 3.0]
-	lanes.shuffle()
+	var raider_data: Resource = preload("res://src/data/resources/enemy_vessels/raider_skiff.tres")
+	var ghost_data: Resource = preload("res://src/data/resources/enemy_vessels/ghost_sloop.tres")
+	var ironclad_data: Resource = preload("res://src/data/resources/enemy_vessels/enemy_elite_ironclad.tres")
 	
 	var cur_lvl: int = GameState.current_level if GameState else 1
+	var biome: String = level_data.biome_name.to_lower() if (level_data and not level_data.biome_name.is_empty()) else ("brimstone" if cur_lvl >= 31 else ("bayou" if cur_lvl >= 16 else "tropical"))
+	var variant: int = posmod(cur_lvl + gates_passed_count, 4)
+
+	# Spawn beyond the 38m bullet range so the player has time to see and engage the wave
+	var spawn_z: float = player_z - 46.0
+	var lane_patterns: Array[Array] = [
+		[-2.8, 0.0, 2.8],
+		[-3.0, -1.0, 1.0, 3.0],
+		[-2.4, -0.8, 0.8, 2.4],
+		[-3.2, -1.6, 0.0, 1.6, 3.2],
+	]
+	var lanes: Array = lane_patterns[variant]
+	var wave_count: int = mini(2 + gates_passed_count, lanes.size())
+	
 	var extra_hp: int = 1 if cur_lvl > 5 else 0
 	var mob_hp: int = 2 + extra_hp
-	var move_speed: float = 3.8 + minf(1.5, float(gates_passed_count) * 0.3)
+	var move_speed: float = 3.4 + minf(1.4, float(gates_passed_count) * 0.25)
 	
-	for i: int in range(mini(wave_count, lanes.size())):
+	for i: int in range(wave_count):
+		var lx: float = float(lanes[i])
+		var z_off: float = spawn_z - float((i + variant) % 3) * 2.2
+		if biome == "bayou" and i % 2 == 1 and grave_skiff_scene:
+			var skiff: Area3D = grave_skiff_scene.instantiate() as Area3D
+			if skiff:
+				add_child(skiff)
+				skiff.position = Vector3(lx, 0.1, z_off)
+				skiff.set("max_hp", mob_hp + 2)
+				skiff.set("current_hp", mob_hp + 2)
+				skiff.set("forward_speed", move_speed)
+			continue
+		elif biome == "brimstone" and i % 2 == 1 and brimstone_raft_scene:
+			var raft: Area3D = brimstone_raft_scene.instantiate() as Area3D
+			if raft:
+				add_child(raft)
+				raft.position = Vector3(lx, 0.1, z_off)
+				raft.set("max_hp", mob_hp + 2)
+				raft.set("current_hp", mob_hp + 2)
+				raft.set("forward_speed", move_speed + 0.8)
+			continue
+
 		var mob: EnemyMob = mob_scene.instantiate() as EnemyMob
 		if not mob:
 			continue
 		add_child(mob)
-		mob.position = Vector3(lanes[i], 0.1, spawn_z - randf_range(0.0, 6.0))
+		mob.position = Vector3(lx, 0.1, z_off)
+		var v_data: Resource = rower_data if (i % 2 == 0) else raider_data
+		if biome == "bayou":
+			v_data = ghost_data
+		elif biome == "brimstone":
+			v_data = ironclad_data if (i == 0 and cur_lvl >= 36) else ghost_data
 		if mob.has_method("apply_enemy_data"):
-			mob.call("apply_enemy_data", rower_data)
+			mob.call("apply_enemy_data", v_data)
 		mob.max_hp = mob_hp
+		mob.current_hp = mob_hp
 		mob.forward_speed = move_speed
 		mob.doubloons_drop = 1
 
@@ -250,7 +293,16 @@ func load_level_resource(res: LevelData) -> void:
 				_horizon_backdrop.call("bind_texture", htex)
 
 		# ── Layer 2: Riverbank Framing Strips ────────────────────────────────
-		_setup_riverbank_chunks(biome_name)
+		# Modular chunk levels populate depth-sorted harmonized scenery directly inside BaseTrackChunk.
+		# Only spawn legacy riverbank_chunks when chunk_scenes is empty.
+		if not level_data.chunk_scenes.is_empty():
+			for child: Node in get_children():
+				if child.is_in_group("riverbank_chunk"):
+					remove_child(child)
+					child.queue_free()
+			riverbank_chunks.clear()
+		else:
+			_setup_riverbank_chunks(biome_name)
 
 		# Configure Environment Visuals
 		_apply_biome_visuals()

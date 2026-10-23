@@ -78,13 +78,21 @@ func _is_testing_environment() -> bool:
 	var args: PackedStringArray = OS.get_cmdline_args()
 	for arg: String in args:
 		var a_lower: String = arg.to_lower()
-		if a_lower.contains("test_scripts") or a_lower.contains("test_") or a_lower.contains("--headless") or a_lower.contains("sandbox") or a_lower.contains("harness"):
+		if a_lower.contains("--headless"):
+			return true
+		if a_lower.contains("level_test_harness"):
+			continue
+		if a_lower.contains("test_scripts") or a_lower.contains("test_") or a_lower.contains("sandbox") or a_lower.contains("harness"):
 			return true
 			
 	var uargs: PackedStringArray = OS.get_cmdline_user_args()
 	for uarg: String in uargs:
 		var u_lower: String = uarg.to_lower()
-		if u_lower.contains("test_scripts") or u_lower.contains("test_") or u_lower.contains("--headless") or u_lower.contains("sandbox"):
+		if u_lower.contains("--headless"):
+			return true
+		if u_lower.contains("level_test_harness"):
+			continue
+		if u_lower.contains("test_scripts") or u_lower.contains("test_") or u_lower.contains("sandbox"):
 			return true
 
 	var cur_scene: Node = get_tree().current_scene if get_tree() else null
@@ -97,9 +105,11 @@ func _is_test_scene_path(path: String) -> bool:
 	var p_lower: String = path.to_lower()
 	if p_lower.is_empty():
 		return false
+	if p_lower.contains("level_test_harness"):
+		return false
 	if p_lower.contains("/test_scripts/") or p_lower.contains("/tests/") or p_lower.contains("test_"):
 		return true
-	if p_lower.contains("sandbox") or p_lower.contains("level_test_harness") or p_lower.contains("build_chunks"):
+	if p_lower.contains("sandbox") or p_lower.contains("build_chunks"):
 		return true
 	if p_lower.contains("boarding_defense_arena.tscn"):
 		return true
@@ -114,13 +124,13 @@ func _ready() -> void:
 		is_telemetry_enabled = false
 		return
 		
+	_connect_event_bus()
 	call_deferred("_evaluate_and_init_session")
 
 func _evaluate_and_init_session() -> void:
 	if not is_telemetry_enabled:
 		return
-	var cur_scene: Node = get_tree().current_scene if get_tree() else null
-	if is_instance_valid(cur_scene) and _is_test_scene_path(cur_scene.scene_file_path):
+	if _is_testing_environment():
 		is_telemetry_enabled = false
 		return
 	_init_session_if_needed()
@@ -214,6 +224,9 @@ func _connect_event_bus() -> void:
 
 func start_level_run(level_index: int) -> void:
 	if not is_telemetry_enabled:
+		return
+	if _is_testing_environment():
+		is_telemetry_enabled = false
 		return
 	_init_session_if_needed()
 	_finalize_active_run_if_any("SUPERSEDED")

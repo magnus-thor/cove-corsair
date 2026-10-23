@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/test_scripts/test_level_harness_vessel_and_crew.gd" id="1_test"]
+
+[node name="TestLevelHarnessVesselAndCrew" type="Node"]
+script = ExtResource("1_test")

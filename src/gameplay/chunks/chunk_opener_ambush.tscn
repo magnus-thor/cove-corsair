@@ -39,24 +39,27 @@ script = ExtResource("9_barrel_script")
 obstacle_type = 0
 
 [node name="Barrel_Right_Practice" type="Area3D" parent="Entities" unique_id=9836115 groups=["destructible"] instance=ExtResource("8_barrel")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.0, 0.05, -20)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.0, 0.05, -26)
 script = ExtResource("9_barrel_script")
 obstacle_type = 0
 
-[node name="IronGunner_Skirmish" type="Area3D" parent="Entities" unique_id=9836109 groups=["destructible", "enemies"] instance=ExtResource("5_gunner")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 0.1, -33)
-
-[node name="ExplosiveKeg" type="Area3D" parent="Entities" unique_id=9836113 groups=["destructible"] instance=ExtResource("8_barrel")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 0.05, -36)
-script = ExtResource("9_barrel_script")
-obstacle_type = 2
-
 [node name="Gate_Opener" type="Area3D" parent="Entities" unique_id=9836118 groups=["multiplier_gate"] instance=ExtResource("10_gate")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0, 0, -44)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0, 0, -34)
 script = ExtResource("11_gate_script")
 value = 10
 custom_text = "+10"
 gate_action = "add_fleet_1"
 
-[node name="TacticalBarricade" parent="Entities" unique_id=9836112 instance=ExtResource("7_barricade")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0, -44)
+[node name="Barrel_Mid_Practice" type="Area3D" parent="Entities" unique_id=9836113 groups=["destructible"] instance=ExtResource("8_barrel")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 0.05, -42)
+script = ExtResource("9_barrel_script")
+hp = 1
+doubloons_drop = 2
+obstacle_type = 0
+
+[node name="Barrel_Rear_Practice" type="Area3D" parent="Entities" unique_id=9836109 groups=["destructible"] instance=ExtResource("8_barrel")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6, 0.05, -47)
+script = ExtResource("9_barrel_script")
+hp = 1
+doubloons_drop = 2
+obstacle_type = 0

@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_fodder_swarm.tscn" id="chunk_6"]
 [ext_resource type="PackedScene" path="res://src/gameplay/chunks/chunk_finish_line_brimstone.tscn" id="chunk_7"]
 [ext_resource type="Texture2D" path="res://assets/textures/horizon_brimstone.png" id="ext_horizon"]
+[ext_resource type="Resource" path="res://src/data/resources/themes/theme_brimstone_bastion.tres" id="ext_theme"]
 [ext_resource type="Script" path="res://src/data/resources/level_data.gd" id="ext_script"]
 
 [resource]
@@ -18,6 +19,7 @@ biome_name = "brimstone"
 base_scroll_speed = 11.2
 chunk_scenes = Array[PackedScene]([ExtResource("chunk_1"), ExtResource("chunk_2"), ExtResource("chunk_3"), ExtResource("chunk_4"), ExtResource("chunk_2"), ExtResource("chunk_5"), ExtResource("chunk_6"), ExtResource("chunk_7")])
 completion_doubloon_reward = 450
+scenery_theme = ExtResource("ext_theme")
 horizon_texture = ExtResource("ext_horizon")
 water_albedo = Color(0.30, 0.14, 0.12, 0.92)
 fog_color = Color(0.48, 0.24, 0.18, 1.0)

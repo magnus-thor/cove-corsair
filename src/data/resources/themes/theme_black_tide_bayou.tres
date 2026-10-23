@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="ThemeSceneryData" format=3]
+
+[ext_resource type="Script" path="res://src/data/resources/theme_scenery_data.gd" id="1_script"]
+[ext_resource type="Shader" path="res://src/shaders/harmonized_scenery.gdshader" id="2_shader"]
+[ext_resource type="PackedScene" path="res://assets/models/scenery/Cattails.glb" id="near_1"]
+[ext_resource type="PackedScene" path="res://assets/models/scenery/Cattails_in_Water.glb" id="near_2"]
+[ext_resource type="PackedScene" path="res://assets/models/scenery/Mosswood_Drift.glb" id="near_3"]
+[ext_resource type="PackedScene" path="res://assets/models/scenery/Totem_of_the_Painted.glb" id="near_4"]
+[ext_resource type="PackedScene" path="res://assets/models/structure-platform-small.glb" id="near_5"]
+[ext_resource type="PackedScene" path="res://assets/models/platform-planks.glb" id="near_6"]
+[ext_resource type="PackedScene" path="res://assets/models/patch-grass-foliage.glb" id="near_7"]
+[ext_resource type="PackedScene" path="res://assets/models/rocks-c.glb" id="near_8"]
+[ext_resource type="PackedScene" path="res://assets/models/scenery/The_Withered_Willow.glb" id="mid_1"]
+[ext_resource type="PackedScene" path="res://assets/models/scenery/Mournwood_Tree.glb" id="mid_2"]
+[ext_resource type="PackedScene" path="res://assets/models/scenery/Emerald_Mangrove_Grov.glb" id="mid_3"]
+[ext_resource type="PackedScene" path="res://assets/models/tower-watch.glb" id="mid_4"]
+[ext_resource type="PackedScene" path="res://assets/models/structure-fence.glb" id="mid_5"]
+[ext_resource type="PackedScene" path="res://assets/models/rocks-b.glb" id="mid_6"]
+[ext_resource type="PackedScene" path="res://assets/models/ship-wreck.glb" id="far_1"]
+[ext_resource type="PackedScene" path="res://assets/models/rocks-a.glb" id="far_2"]
+
+[resource]
+script = ExtResource("1_script")
+theme_name = "bayou"
+scenery_shader = ExtResource("2_shader")
+near_lane_props = Array[PackedScene]([ExtResource("near_1"), ExtResource("near_2"), ExtResource("near_3"), ExtResource("near_4"), ExtResource("near_5"), ExtResource("near_6"), ExtResource("near_7"), ExtResource("near_8")])
+midground_props = Array[PackedScene]([ExtResource("mid_1"), ExtResource("mid_2"), ExtResource("mid_3"), ExtResource("mid_4"), ExtResource("mid_5"), ExtResource("mid_6")])
+far_backdrop_props = Array[PackedScene]([ExtResource("far_1"), ExtResource("mid_1"), ExtResource("mid_2"), ExtResource("far_2"), ExtResource("near_8")])
+water_albedo = Color(0.07, 0.18, 0.14, 0.95)
+bank_color = Color(0.28, 0.35, 0.25, 1.0)
+fog_color = Color(0.15, 0.28, 0.22, 1.0)
+fog_density = 0.024

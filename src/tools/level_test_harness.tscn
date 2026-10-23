@@ -4,4 +4,5 @@
 
 [node name="LevelTestHarness" type="Node3D" unique_id=1448624258]
 script = ExtResource("1_script")
-target_level = 34
+target_level = 38
+target_vessel = "ironclad"

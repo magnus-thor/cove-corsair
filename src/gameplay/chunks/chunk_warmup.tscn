@@ -6,12 +6,9 @@
 [ext_resource type="PackedScene" path="res://assets/models/rocks-a.glb" id="4_cr020"]
 [ext_resource type="PackedScene" path="res://assets/models/rocks-b.glb" id="5_tv015"]
 [ext_resource type="PackedScene" path="res://src/gameplay/obstacles/destructible_barrel.tscn" id="8_v8m1i"]
-[ext_resource type="PackedScene" path="res://src/gameplay/enemies/enemy_fodder_skiff.tscn" id="10_fodder"]
-[ext_resource type="PackedScene" path="res://src/gameplay/collectibles/collectible_doubloon.tscn" id="11_coin"]
+[ext_resource type="Script" path="res://src/gameplay/obstacles/destructible_barrel.gd" id="9_barrel_script"]
 [ext_resource type="PackedScene" path="res://src/gameplay/obstacles/multiplier_gate.tscn" id="12_obb7d"]
 [ext_resource type="Script" path="res://src/gameplay/obstacles/multiplier_gate.gd" id="13_352l0"]
-[ext_resource type="PackedScene" path="res://src/gameplay/enemies/enemy_mob.tscn" id="14_mob"]
-[ext_resource type="Script" path="res://src/gameplay/enemies/enemy_mob.gd" id="15_mob_script"]
 
 [node name="Warmup" type="Node3D" unique_id=289589071]
 script = ExtResource("1_8b1la")
@@ -45,60 +42,50 @@ transform = Transform3D(-5.2453668e-08, 0, -1.5, 0, 1, 0, 1.2, 0, -6.556708e-08,
 [node name="Entities" type="Node3D" parent="." unique_id=1027259169]
 
 [node name="Barrel_Left_Practice" type="Area3D" parent="Entities" unique_id=81469054 groups=["destructible"] instance=ExtResource("8_v8m1i")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2, 0.05, -16)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0, 0.05, -14)
+script = ExtResource("9_barrel_script")
+hp = 1
+doubloons_drop = 3
+obstacle_type = 0
 
 [node name="Barrel_Right_Practice" type="Area3D" parent="Entities" unique_id=81469055 groups=["destructible"] instance=ExtResource("8_v8m1i")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0.05, -20)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.0, 0.05, -19)
+script = ExtResource("9_barrel_script")
+hp = 1
+doubloons_drop = 3
+obstacle_type = 0
 
-[node name="Doubloon_1" type="Area3D" parent="Entities" unique_id=710001 groups=["collectibles", "doubloons"] instance=ExtResource("11_coin")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0.2, -8)
+[node name="Barrel_Mid_Practice1" type="Area3D" parent="Entities" unique_id=81469056 groups=["destructible"] instance=ExtResource("8_v8m1i")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 0.05, -25)
+script = ExtResource("9_barrel_script")
+hp = 1
+doubloons_drop = 3
+obstacle_type = 0
 
-[node name="Doubloon_2" type="Area3D" parent="Entities" unique_id=710002 groups=["collectibles", "doubloons"] instance=ExtResource("11_coin")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0.2, -12)
-
-[node name="Doubloon_3" type="Area3D" parent="Entities" unique_id=710003 groups=["collectibles", "doubloons"] instance=ExtResource("11_coin")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0, 0.2, -18)
-
-[node name="Doubloon_4" type="Area3D" parent="Entities" unique_id=710004 groups=["collectibles", "doubloons"] instance=ExtResource("11_coin")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0, 0.2, -22)
-
-[node name="EnemyMob_Rower1" type="Area3D" parent="Entities" unique_id=67668443 groups=["destructible", "enemies"] instance=ExtResource("14_mob")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 0.1, -26)
-script = ExtResource("15_mob_script")
-max_hp = 2
-current_hp = 2
-forward_speed = 1.2
-doubloons_drop = 1
-
-[node name="Doubloon_5" type="Area3D" parent="Entities" unique_id=710005 groups=["collectibles", "doubloons"] instance=ExtResource("11_coin")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0.2, -29)
-
-[node name="EnemyMob_Rower2" type="Area3D" parent="Entities" unique_id=67668444 groups=["destructible", "enemies"] instance=ExtResource("14_mob")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0.1, -32)
-script = ExtResource("15_mob_script")
-max_hp = 2
-current_hp = 2
-forward_speed = 1.2
-doubloons_drop = 1
-
-[node name="Doubloon_6" type="Area3D" parent="Entities" unique_id=710006 groups=["collectibles", "doubloons"] instance=ExtResource("11_coin")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0.2, -34)
-
-[node name="Doubloon_7" type="Area3D" parent="Entities" unique_id=710007 groups=["collectibles", "doubloons"] instance=ExtResource("11_coin")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 0.2, -36)
-
-[node name="Doubloon_8" type="Area3D" parent="Entities" unique_id=710008 groups=["collectibles", "doubloons"] instance=ExtResource("11_coin")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0.2, -36)
+[node name="Barrel_Mid_Practice2" type="Area3D" parent="Entities" unique_id=81469057 groups=["destructible"] instance=ExtResource("8_v8m1i")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0.05, -31)
+script = ExtResource("9_barrel_script")
+hp = 1
+doubloons_drop = 3
+obstacle_type = 0
 
 [node name="MultiplierGate" type="Area3D" parent="Entities" unique_id=1807101691 groups=["multiplier_gate"] instance=ExtResource("12_obb7d")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 0, -38)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 0, -37)
 script = ExtResource("13_352l0")
 value = 10
 custom_text = "+10"
 gate_action = "add_fleet_1"
 
-[node name="Fodder_PostGate1" type="Area3D" parent="Entities" unique_id=67668441 groups=["destructible", "enemies", "fodder"] instance=ExtResource("10_fodder")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 0.1, -43)
+[node name="Barrel_Rear_Practice1" type="Area3D" parent="Entities" unique_id=81469058 groups=["destructible"] instance=ExtResource("8_v8m1i")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 0.05, -43)
+script = ExtResource("9_barrel_script")
+hp = 1
+doubloons_drop = 3
+obstacle_type = 0
 
-[node name="Fodder_PostGate2" type="Area3D" parent="Entities" unique_id=67668442 groups=["destructible", "enemies", "fodder"] instance=ExtResource("10_fodder")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0.1, -46)
+[node name="Barrel_Rear_Practice2" type="Area3D" parent="Entities" unique_id=81469059 groups=["destructible"] instance=ExtResource("8_v8m1i")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6, 0.05, -47)
+script = ExtResource("9_barrel_script")
+hp = 1
+doubloons_drop = 3
+obstacle_type = 0

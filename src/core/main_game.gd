@@ -193,7 +193,13 @@ func _on_level_completed(_doubloons: int, _targets: int) -> void:
 	elif victory_screen:
 		victory_screen.show_victory(run_coins + bonus, _targets, stars)
 
+func _exit_tree() -> void:
+	if GameState and GameState.active_vessel_changed.is_connected(_on_active_vessel_changed):
+		GameState.active_vessel_changed.disconnect(_on_active_vessel_changed)
+
 func _on_active_vessel_changed(_vessel_id: String) -> void:
+	if not is_inside_tree():
+		return
 	_update_active_player_vessel()
 
 func _update_active_player_vessel() -> void:

@@ -103,7 +103,12 @@ func _fire_dual_cannons() -> void:
 	
 	var cur_lvl: int = GameState.current_level if GameState else 1
 		
-	var offsets: Array[float] = [0.0] if cur_lvl <= 3 else [-0.6, 0.6]
+	var offsets: Array[float] = []
+	if cur_lvl <= 3:
+		offsets.append(0.0)
+	else:
+		offsets.append(-0.6)
+		offsets.append(0.6)
 	var player: PlayerSwerve = get_tree().get_first_node_in_group("player") as PlayerSwerve
 	for offset_x: float in offsets:
 		var ball: EnemyCannonball = enemy_cannonball_scene.instantiate() as EnemyCannonball
@@ -184,7 +189,7 @@ func die() -> void:
 		vfx.scale = Vector3(1.6, 1.6, 1.6)
 		
 	if doubloon_scene:
-		for i in range(doubloons_drop):
+		for i: int in range(doubloons_drop):
 			var d: CollectibleDoubloon = doubloon_scene.instantiate() as CollectibleDoubloon
 			var root: Node = get_tree().current_scene
 			if root:

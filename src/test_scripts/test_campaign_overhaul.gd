@@ -36,6 +36,7 @@ func _ready() -> void:
 	test_no_floating_coins_in_chunks()
 	test_boss_invulnerability_and_arena_lock()
 	test_riverbank_scenery_clearance()
+	test_level_endings_and_start_clearance()
 	
 	print("==========================================================")
 	print("  VERIFICATION RESULTS: %d / %d PASSED" % [passed_count, passed_count + failed_count])
@@ -240,3 +241,78 @@ func test_riverbank_scenery_clearance() -> void:
 						
 			assert_test(encroaching_vertices == 0, "%s %s bank: 0/%d scenery meshes encroached on [-6.0, 6.0] navigable lane" % [biome.capitalize(), side, total_mesh_instances])
 			props.queue_free()
+
+func test_level_endings_and_start_clearance() -> void:
+	print("\n--- TEST 6: All 45 Levels Start Clearance (>= 42m) & Multi-Biome Ending Variety ---")
+	var opener_paths: Array[String] = [
+		"res://src/gameplay/chunks/chunk_warmup.tscn",
+		"res://src/gameplay/chunks/chunk_opener_slalom.tscn",
+		"res://src/gameplay/chunks/chunk_opener_ambush.tscn",
+		"res://src/gameplay/chunks/chunk_opener_gauntlet.tscn",
+	]
+	for op_path: String in opener_paths:
+		var op_scene: PackedScene = load(op_path) as PackedScene
+		assert_test(op_scene != null, "Opener scene loaded: %s" % op_path)
+		if not op_scene:
+			continue
+		var op_chunk: BaseTrackChunk = op_scene.instantiate() as BaseTrackChunk
+		add_child(op_chunk)
+		var entities: Node = op_chunk.get_node_or_null("Entities")
+		var close_hostiles: int = 0
+		if entities:
+			for child: Node in entities.get_children():
+				var n3d: Node3D = child as Node3D
+				if not n3d:
+					continue
+				var is_hostile: bool = child.is_in_group("enemies") or child.name.begins_with("Enemy") or child.name.begins_with("Mine")
+				if child is DestructibleObstacle and (child as DestructibleObstacle).obstacle_type != DestructibleObstacle.ObstacleType.WOODEN_BARREL:
+					is_hostile = true
+				if is_hostile and n3d.position.z > -42.0:
+					close_hostiles += 1
+					printerr("  [VIOLATION] %s has hostile '%s' at z=%.1f (> -42.0m)" % [op_path.get_file(), child.name, n3d.position.z])
+		assert_test(close_hostiles == 0, "%s: 0 hostile mobs/mines within 42m bullet-range settle zone" % op_path.get_file())
+		op_chunk.queue_free()
+
+	var boss_levels: Array[int] = [5, 10, 15, 20, 25, 30, 35, 40, 45]
+	var gs: Node = get_node_or_null("/root/GameState")
+	var biome_arch_styles: Dictionary = {"tropical": {}, "bayou": {}, "brimstone": {}}
+	var biome_wave_styles: Dictionary = {"tropical": {}, "bayou": {}, "brimstone": {}}
+	var specific_arch_styles: Dictionary = {}
+	var specific_wave_styles: Dictionary = {}
+
+	for lvl: int in range(1, 46):
+		if lvl in boss_levels:
+			continue
+		if gs:
+			gs.set("current_level", lvl)
+		var lvl_res: LevelData = load("res://src/data/resources/levels/level_%02d.tres" % lvl) as LevelData
+		if not lvl_res:
+			continue
+		var finish_packed: PackedScene = lvl_res.chunk_scenes[lvl_res.chunk_scenes.size() - 1]
+		var finish_chunk: ChunkFinishLine = finish_packed.instantiate() as ChunkFinishLine
+		add_child(finish_chunk)
+		var theme_data: ThemeSceneryData = lvl_res.get_effective_theme()
+		finish_chunk.populate_scenery(theme_data, lvl * 7919 + 42, false)
+
+		var arch_node: Node3D = finish_chunk.find_child("FinishArch", true, false) as Node3D
+		assert_test(arch_node != null and arch_node.get_child_count() >= 4, "Level %02d (%s) FinishArch survived populate_scenery (%d props, arch='%s', wave='%s')" % [lvl, lvl_res.biome_name, arch_node.get_child_count() if arch_node else 0, finish_chunk.active_arch_style, finish_chunk.active_wave_style])
+
+		var b_key: String = lvl_res.biome_name.to_lower()
+		if biome_arch_styles.has(b_key):
+			biome_arch_styles[b_key][finish_chunk.active_arch_style] = true
+			biome_wave_styles[b_key][finish_chunk.active_wave_style] = true
+
+		if lvl in [21, 34, 43]:
+			specific_arch_styles[finish_chunk.active_arch_style] = true
+			specific_wave_styles[finish_chunk.active_wave_style] = true
+
+		finish_chunk.queue_free()
+
+	for b_name: String in ["tropical", "bayou", "brimstone"]:
+		assert_test((biome_arch_styles[b_name] as Dictionary).size() >= 3, "Biome '%s' has >= 3 distinct finish arch styles across campaign (%s)" % [b_name, str((biome_arch_styles[b_name] as Dictionary).keys())])
+		assert_test((biome_wave_styles[b_name] as Dictionary).size() >= 4, "Biome '%s' has >= 4 distinct finish mob wave formations across campaign (%s)" % [b_name, str((biome_wave_styles[b_name] as Dictionary).keys())])
+
+	assert_test(specific_arch_styles.size() == 3, "Levels 21, 34, and 43 have 3 distinct finish arch styles (%s)" % str(specific_arch_styles.keys()))
+	assert_test(specific_wave_styles.size() == 3, "Levels 21, 34, and 43 have 3 distinct finish mob wave formations (%s)" % str(specific_wave_styles.keys()))
+	if gs:
+		gs.set("current_level", 1)

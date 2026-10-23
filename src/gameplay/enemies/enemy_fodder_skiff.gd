@@ -35,9 +35,13 @@ func _ready() -> void:
 	if cur_lvl > 30:
 		max_hp = 2
 		forward_speed = 5.5
+		if sprite_node:
+			sprite_node.modulate = Color(1.0, 0.58, 0.35, 1.0)
 	elif cur_lvl > 15:
 		max_hp = 1
 		forward_speed = 4.0
+		if sprite_node:
+			sprite_node.modulate = Color(0.65, 1.0, 0.82, 1.0)
 	elif cur_lvl > 5:
 		max_hp = 1
 		forward_speed = 3.0
