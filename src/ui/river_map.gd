@@ -7,6 +7,7 @@ extends Control
 
 signal level_selected(level_num: int)
 signal sail_requested(level_num: int)
+signal cove_requested
 
 @onready var scroll_container: ScrollContainer = %ScrollContainer
 @onready var map_canvas: Control = %MapCanvas
@@ -162,50 +163,262 @@ func _setup_river_path_draw() -> void:
 	if river_path_layer:
 		river_path_layer.draw.connect(_on_river_path_draw)
 
+## ---- Biome-themed drawing (new) ----
+
+const PALETTES: Array = [
+	{ # Tropical Reef
+		"bg": Color(0.95, 0.88, 0.68), "bank": Color(0.96, 0.86, 0.58), "shore": Color(0.08, 0.42, 0.52),
+		"deep": Color(0.10, 0.60, 0.72), "core": Color(0.28, 0.82, 0.86), "glint": Color(0.92, 1.0, 0.95),
+	},
+	{ # Murky Bayou
+		"bg": Color(0.20, 0.28, 0.18), "bank": Color(0.36, 0.30, 0.16), "shore": Color(0.10, 0.17, 0.12),
+		"deep": Color(0.18, 0.31, 0.22), "core": Color(0.32, 0.45, 0.27), "glint": Color(0.72, 0.86, 0.48),
+	},
+	{ # Volcanic Brimstone
+		"bg": Color(0.15, 0.08, 0.08), "bank": Color(0.27, 0.12, 0.09), "shore": Color(0.30, 0.06, 0.03),
+		"deep": Color(0.62, 0.16, 0.05), "core": Color(0.96, 0.46, 0.08), "glint": Color(1.0, 0.86, 0.42),
+	},
+]
+
+var _decor_items: Array[Dictionary] = []
+
+## Returns 0.0 (tropical) .. 1.0 (bayou) .. 2.0 (brimstone), smoothly blended across biome borders.
+static func _biome_level(y: float) -> float:
+	return smoothstep(10500.0, 9500.0, y) + smoothstep(5500.0, 4500.0, y)
+
+static func _palette_color(key: String, y: float) -> Color:
+	var lv: float = _biome_level(y)
+	var i: int = clampi(int(floorf(lv)), 0, 1)
+	var a: Color = (PALETTES[i] as Dictionary)[key]
+	var b: Color = (PALETTES[i + 1] as Dictionary)[key]
+	return a.lerp(b, lv - float(i))
+
 func _on_terrain_draw() -> void:
-	var canvas_rect := Rect2(Vector2.ZERO, Vector2(720, 15000))
-	# Lush vintage pirate chart background
-	terrain_layer.draw_rect(canvas_rect, Color(0.93, 0.88, 0.77, 1.0), true)
-	
-	# Decorative map grid & nautical borders
-	var line_color := Color(0.82, 0.75, 0.62, 0.45)
-	for y in range(100, 14950, 200):
-		terrain_layer.draw_line(Vector2(40, y), Vector2(680, y), line_color, 1.5)
-	for x in range(120, 680, 120):
-		terrain_layer.draw_line(Vector2(x, 60), Vector2(x, 14940), line_color, 1.5)
-		
-	# Biome background tint zones across 15,000px
-	# Cove 1 (L1-L15, 10000-15000px): Tropical Reef cyan parchment wash
-	terrain_layer.draw_rect(Rect2(0, 10000, 720, 5000), Color(0.2, 0.65, 0.7, 0.10), true)
-	# Cove 2 (L16-L30, 5000-10000px): Murky Bayou mossy wash
-	terrain_layer.draw_rect(Rect2(0, 5000, 720, 5000), Color(0.3, 0.5, 0.35, 0.09), true)
-	# Cove 3 (L31-L45, 0-5000px): Volcanic Brimstone & Caldera crimson wash
-	terrain_layer.draw_rect(Rect2(0, 0, 720, 5000), Color(0.75, 0.2, 0.1, 0.13), true)
+	# Biome gradient ground
+	for y in range(0, 15000, 50):
+		terrain_layer.draw_rect(Rect2(0, y, 720, 51), _palette_color("bg", float(y) + 25.0), true)
+
+	# Soft bank halo hugging the river
+	var baked: PackedVector2Array = river_curve.get_baked_points()
+	if baked.size() >= 2:
+		var bank_cols := PackedColorArray()
+		for p: Vector2 in baked:
+			var c: Color = _palette_color("bank", p.y)
+			c.a = 0.9
+			bank_cols.append(c)
+		terrain_layer.draw_polyline_colors(baked, bank_cols, 250.0, true)
+		var halo_cols := PackedColorArray()
+		for p: Vector2 in baked:
+			var c2: Color = _palette_color("bank", p.y).lightened(0.12)
+			c2.a = 0.85
+			halo_cols.append(c2)
+		terrain_layer.draw_polyline_colors(baked, halo_cols, 190.0, true)
+
+	# Vignette edges
+	terrain_layer.draw_rect(Rect2(0, 0, 26, 15000), Color(0, 0, 0, 0.28), true)
+	terrain_layer.draw_rect(Rect2(694, 0, 26, 15000), Color(0, 0, 0, 0.28), true)
+
+	# Biome-specific scenery
+	if _decor_items.is_empty():
+		_generate_decor()
+	for item: Dictionary in _decor_items:
+		_draw_decor_item(item)
+
+	# Biome zone banners at the border lines
+	_draw_biome_banner("~ MURKY BAYOU ~", 10000.0)
+	_draw_biome_banner("~ VOLCANIC BRIMSTONE ~", 5000.0)
+
+	_draw_cove_landmark()
+
+func _draw_biome_banner(text: String, y: float) -> void:
+	var col: Color = _palette_color("glint", y)
+	terrain_layer.draw_rect(Rect2(Vector2(60, y), Vector2(120, 3)), col, true)
+	terrain_layer.draw_rect(Rect2(Vector2(540, y), Vector2(120, 3)), col, true)
+	terrain_layer.draw_string(FONT_LILITA, Vector2(0, y + 8), text, HORIZONTAL_ALIGNMENT_CENTER, 720.0, 22, col)
+
+func _generate_decor() -> void:
+	_decor_items.clear()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 424242
+	var samples := PackedVector2Array()
+	var baked: PackedVector2Array = river_curve.get_baked_points()
+	for i in range(0, baked.size(), 4):
+		samples.append(baked[i])
+	var y: float = 70.0
+	while y < 14680.0:
+		for attempt in range(2):
+			var pos := Vector2(rng.randf_range(34.0, 686.0), y + rng.randf_range(-30.0, 30.0))
+			if _decor_blocked(pos, samples):
+				continue
+			var biome: int = clampi(roundi(_biome_level(pos.y)), 0, 2)
+			_decor_items.append({
+				"pos": pos,
+				"biome": biome,
+				"variant": rng.randf(),
+				"scale": rng.randf_range(0.8, 1.35),
+				"flip": -1.0 if rng.randf() < 0.5 else 1.0,
+			})
+		y += 62.0
+
+func _decor_blocked(pos: Vector2, samples: PackedVector2Array) -> bool:
+	for s: Vector2 in samples:
+		if absf(s.y - pos.y) < 170.0 and s.distance_squared_to(pos) < 150.0 * 150.0:
+			return true
+	for lvl: int in MILESTONES.keys():
+		var p: Vector2 = MILESTONES[lvl]["pos"]
+		if Rect2(p.x - 80.0, p.y - 40.0, 340.0, 220.0).has_point(pos):
+			return true
+	return false
+
+func _draw_decor_item(item: Dictionary) -> void:
+	var pos: Vector2 = item["pos"]
+	var sc: float = float(item["scale"]) * float(item["flip"])
+	var sy: float = float(item["scale"])
+	var variant: float = float(item["variant"])
+	terrain_layer.draw_set_transform(pos, 0.0, Vector2(sc, sy))
+	match int(item["biome"]):
+		0:
+			if variant < 0.68:
+				_draw_palm()
+			else:
+				_draw_shrub(Color(0.22, 0.62, 0.30), Color(0.96, 0.45, 0.50))
+		1:
+			if variant < 0.55:
+				_draw_cypress()
+			else:
+				_draw_reeds()
+		_:
+			if variant < 0.5:
+				_draw_lava_rock()
+			else:
+				_draw_mini_volcano()
+	terrain_layer.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
+func _draw_palm() -> void:
+	terrain_layer.draw_circle(Vector2(0, 2), 16.0, Color(0, 0, 0, 0.14))
+	var trunk := PackedVector2Array([Vector2(0, 0), Vector2(7, -24), Vector2(5, -48), Vector2(-3, -70)])
+	terrain_layer.draw_polyline(trunk, Color(0.45, 0.30, 0.16), 7.0, true)
+	terrain_layer.draw_polyline(trunk, Color(0.62, 0.44, 0.24), 3.5, true)
+	var top := Vector2(-3, -70)
+	var leaf_cols: Array[Color] = [Color(0.16, 0.55, 0.28), Color(0.24, 0.68, 0.34)]
+	for i in range(7):
+		var ang: float = -PI + (float(i) / 6.0) * PI
+		var dir := Vector2.from_angle(ang)
+		var tip: Vector2 = top + dir * 40.0 + Vector2(0, 14.0 * absf(cos(ang)))
+		var perp := dir.orthogonal() * 7.0
+		terrain_layer.draw_colored_polygon(PackedVector2Array([top, top + dir * 20.0 + perp, tip, top + dir * 20.0 - perp]), leaf_cols[i % 2])
+	terrain_layer.draw_circle(top + Vector2(-3, 4), 4.0, Color(0.40, 0.25, 0.10))
+	terrain_layer.draw_circle(top + Vector2(4, 5), 4.0, Color(0.40, 0.25, 0.10))
+
+func _draw_shrub(leaf: Color, flower: Color) -> void:
+	terrain_layer.draw_circle(Vector2(0, 2), 18.0, Color(0, 0, 0, 0.14))
+	terrain_layer.draw_circle(Vector2(-10, -8), 12.0, leaf.darkened(0.15))
+	terrain_layer.draw_circle(Vector2(10, -8), 12.0, leaf.darkened(0.15))
+	terrain_layer.draw_circle(Vector2(0, -14), 14.0, leaf)
+	terrain_layer.draw_circle(Vector2(-4, -18), 3.0, flower)
+	terrain_layer.draw_circle(Vector2(7, -12), 3.0, flower)
+
+func _draw_cypress() -> void:
+	terrain_layer.draw_circle(Vector2(0, 2), 18.0, Color(0, 0, 0, 0.22))
+	terrain_layer.draw_colored_polygon(PackedVector2Array([Vector2(-13, 0), Vector2(13, 0), Vector2(5, -42), Vector2(-5, -42)]), Color(0.28, 0.20, 0.12))
+	var green := Color(0.14, 0.30, 0.18)
+	terrain_layer.draw_circle(Vector2(0, -56), 24.0, green)
+	terrain_layer.draw_circle(Vector2(-20, -46), 17.0, green.lightened(0.05))
+	terrain_layer.draw_circle(Vector2(19, -48), 17.0, green.lightened(0.05))
+	var moss := Color(0.62, 0.72, 0.46, 0.7)
+	for mx: float in [-24.0, -12.0, 8.0, 22.0]:
+		terrain_layer.draw_line(Vector2(mx, -46), Vector2(mx + 2.0, -28), moss, 2.0, true)
+
+func _draw_reeds() -> void:
+	terrain_layer.draw_circle(Vector2(0, 2), 16.0, Color(0.05, 0.10, 0.06, 0.35))
+	for i in range(5):
+		var rx: float = -12.0 + i * 6.0
+		var h: float = 34.0 + float((i * 7) % 5) * 5.0
+		terrain_layer.draw_line(Vector2(rx, 0), Vector2(rx + float(i - 2) * 2.0, -h), Color(0.50, 0.62, 0.26), 2.5, true)
+		if i % 2 == 0:
+			terrain_layer.draw_line(Vector2(rx + float(i - 2) * 2.0, -h), Vector2(rx + float(i - 2) * 2.0, -h - 9.0), Color(0.36, 0.20, 0.10), 5.0, true)
+
+func _draw_lava_rock() -> void:
+	terrain_layer.draw_circle(Vector2(0, 2), 20.0, Color(0, 0, 0, 0.3))
+	var pts := PackedVector2Array([Vector2(-22, 0), Vector2(-16, -22), Vector2(-4, -30), Vector2(10, -20), Vector2(24, -4), Vector2(14, 2)])
+	terrain_layer.draw_colored_polygon(pts, Color(0.12, 0.09, 0.09))
+	terrain_layer.draw_polyline(PackedVector2Array([Vector2(-16, -22), Vector2(-4, -30), Vector2(10, -20)]), Color(0.85, 0.30, 0.08, 0.9), 2.5, true)
+	terrain_layer.draw_line(Vector2(-6, -24), Vector2(-2, -6), Color(1.0, 0.55, 0.12, 0.85), 2.0, true)
+
+func _draw_mini_volcano() -> void:
+	terrain_layer.draw_circle(Vector2(0, -22), 46.0, Color(1.0, 0.4, 0.05, 0.10))
+	terrain_layer.draw_colored_polygon(PackedVector2Array([Vector2(-44, 0), Vector2(-9, -54), Vector2(9, -54), Vector2(44, 0)]), Color(0.18, 0.11, 0.10))
+	terrain_layer.draw_colored_polygon(PackedVector2Array([Vector2(-9, -54), Vector2(9, -54), Vector2(16, -40), Vector2(-16, -40)]), Color(0.26, 0.15, 0.12))
+	terrain_layer.draw_rect(Rect2(-9, -58, 18, 6), Color(1.0, 0.55, 0.1), true)
+	terrain_layer.draw_line(Vector2(0, -52), Vector2(-8, -20), Color(1.0, 0.5, 0.1, 0.9), 3.0, true)
+	terrain_layer.draw_line(Vector2(3, -52), Vector2(14, -14), Color(1.0, 0.45, 0.1, 0.8), 2.5, true)
+	terrain_layer.draw_circle(Vector2(-4, -70), 6.0, Color(0.35, 0.25, 0.25, 0.5))
+	terrain_layer.draw_circle(Vector2(4, -84), 8.0, Color(0.35, 0.25, 0.25, 0.35))
+
+func _draw_cove_landmark() -> void:
+	var c := Vector2(360, 14900)
+	terrain_layer.draw_circle(c, 250.0, Color(0.97, 0.88, 0.62, 0.95))
+	terrain_layer.draw_circle(c, 214.0, Color(0.98, 0.92, 0.72))
+	terrain_layer.draw_circle(c, 168.0, Color(0.08, 0.46, 0.56))
+	terrain_layer.draw_circle(c, 152.0, Color(0.20, 0.72, 0.80))
+	terrain_layer.draw_circle(c, 100.0, Color(0.38, 0.84, 0.88, 0.7))
+	# Wooden dock jutting into the lagoon
+	for i in range(8):
+		terrain_layer.draw_rect(Rect2(150 + i * 17, 14868, 14, 54), Color(0.52, 0.34, 0.16), true)
+		terrain_layer.draw_rect(Rect2(150 + i * 17, 14868, 14, 54), Color(0.28, 0.17, 0.08), false, 1.5)
+	for px: int in [150, 252]:
+		terrain_layer.draw_circle(Vector2(px, 14866), 5.0, Color(0.30, 0.18, 0.08))
+		terrain_layer.draw_circle(Vector2(px, 14924), 5.0, Color(0.30, 0.18, 0.08))
+	# Sandy palms flanking the cove
+	terrain_layer.draw_set_transform(Vector2(160, 14780), 0.0, Vector2(1.3, 1.3))
+	_draw_palm()
+	terrain_layer.draw_set_transform(Vector2(570, 14800), 0.0, Vector2(-1.2, 1.2))
+	_draw_palm()
+	terrain_layer.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 func _on_river_path_draw() -> void:
 	var baked := river_curve.get_baked_points()
 	if baked.size() < 2:
 		return
-		
-	# 1. Outer sandy riverbank border
-	river_path_layer.draw_polyline(baked, Color(0.74, 0.63, 0.44, 0.95), 116.0, true)
-	# 2. Outer shoreline shadow
-	river_path_layer.draw_polyline(baked, Color(0.12, 0.38, 0.48, 0.85), 98.0, true)
-	# 3. Vibrant tropical deep-river water channel
-	river_path_layer.draw_polyline(baked, Color(0.16, 0.52, 0.65, 0.98), 84.0, true)
-	# 4. Sunlit water current core
-	river_path_layer.draw_polyline(baked, Color(0.24, 0.68, 0.82, 0.90), 52.0, true)
-	# 5. Shimmer flow highlight center dash
-	river_path_layer.draw_dashed_line(baked[0], baked[baked.size() - 1], Color(0.95, 0.95, 0.80, 0.65), 5.0, 14.0, true)
 
-	# Stepping stone waypoints along the baked curve
-	var total_len := river_curve.get_baked_length()
-	var step := 45.0
-	var cur := step
-	while cur < total_len - 30.0:
-		var pt := river_curve.sample_baked(cur)
-		river_path_layer.draw_circle(pt, 4.0, Color(0.96, 0.88, 0.55, 0.6))
-		cur += step
+	var bank_cols := PackedColorArray()
+	var shore_cols := PackedColorArray()
+	var deep_cols := PackedColorArray()
+	var core_cols := PackedColorArray()
+	var glow_cols := PackedColorArray()
+	for p: Vector2 in baked:
+		var bank: Color = _palette_color("bank", p.y).darkened(0.1)
+		bank.a = 0.95
+		bank_cols.append(bank)
+		shore_cols.append(_palette_color("shore", p.y))
+		deep_cols.append(_palette_color("deep", p.y))
+		core_cols.append(_palette_color("core", p.y))
+		var lava: float = clampf(_biome_level(p.y) - 1.0, 0.0, 1.0)
+		glow_cols.append(Color(1.0, 0.45, 0.08, 0.38 * lava))
+
+	# Lava glow aura (only visible in Brimstone)
+	river_path_layer.draw_polyline_colors(baked, glow_cols, 150.0, true)
+	# 1. Riverbank edge
+	river_path_layer.draw_polyline_colors(baked, bank_cols, 116.0, true)
+	# 2. Shoreline
+	river_path_layer.draw_polyline_colors(baked, shore_cols, 98.0, true)
+	# 3. Deep water channel
+	river_path_layer.draw_polyline_colors(baked, deep_cols, 84.0, true)
+	# 4. Water current core
+	river_path_layer.draw_polyline_colors(baked, core_cols, 52.0, true)
+
+	# Flow dashes + stepping-stone waypoints following the curve
+	var total_len: float = river_curve.get_baked_length()
+	var cur: float = 30.0
+	while cur < total_len - 40.0:
+		var pt: Vector2 = river_curve.sample_baked(cur)
+		var pt2: Vector2 = river_curve.sample_baked(cur + 14.0)
+		var glint: Color = _palette_color("glint", pt.y)
+		glint.a = 0.55
+		river_path_layer.draw_line(pt, pt2, glint, 4.0, true)
+		river_path_layer.draw_circle(river_curve.sample_baked(cur + 30.0), 3.5, Color(glint.r, glint.g, glint.b, 0.4))
+		cur += 70.0
+
 
 func _build_milestone_nodes() -> void:
 	for child in nodes_layer.get_children():
@@ -218,7 +431,40 @@ func _build_milestone_nodes() -> void:
 		nodes_layer.add_child(node_btn)
 		node_controls[lvl] = node_btn
 		
+	_build_cove_button()
 	_refresh_all_node_states()
+
+## "Smuggler's Cove" harbor sign at the river's starting point; returns the player to the hub.
+func _build_cove_button() -> void:
+	var cove_btn := Button.new()
+	cove_btn.name = "CoveButton"
+	cove_btn.text = "SMUGGLER'S COVE"
+	cove_btn.size = Vector2(280, 64)
+	cove_btn.custom_minimum_size = Vector2(280, 64)
+	cove_btn.position = Vector2(360.0 - 140.0, 14745.0)
+	cove_btn.focus_mode = Control.FOCUS_NONE
+	cove_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	cove_btn.add_theme_font_override("font", FONT_CARTER)
+	cove_btn.add_theme_font_size_override("font_size", 24)
+	cove_btn.add_theme_color_override("font_color", Color(1.0, 0.92, 0.6))
+	cove_btn.add_theme_color_override("font_hover_color", Color(1.0, 1.0, 0.85))
+	cove_btn.add_theme_color_override("font_outline_color", Color(0.18, 0.09, 0.03))
+	cove_btn.add_theme_constant_override("outline_size", 6)
+	for state: String in ["normal", "hover", "pressed", "focus"]:
+		var sb := StyleBoxFlat.new()
+		sb.bg_color = Color(0.42, 0.26, 0.12) if state != "hover" else Color(0.52, 0.33, 0.16)
+		sb.set_border_width_all(4)
+		sb.border_color = Color(0.86, 0.66, 0.26)
+		sb.set_corner_radius_all(14)
+		sb.shadow_color = Color(0, 0, 0, 0.45)
+		sb.shadow_size = 6
+		sb.shadow_offset = Vector2(0, 4)
+		cove_btn.add_theme_stylebox_override(state, sb)
+	cove_btn.pressed.connect(func() -> void:
+		AudioManager.play_sfx("gate_passes", 0.9, 1.0)
+		cove_requested.emit()
+	)
+	nodes_layer.add_child(cove_btn)
 
 func _create_milestone_button(lvl: int, data: Dictionary) -> Control:
 	var container := Control.new()
@@ -488,31 +734,27 @@ func _pulse_active_aura(aura: Control) -> void:
 	t.tween_property(aura, "modulate:a", 0.85, 0.01)
 	aura.set_meta("pulse_tween", t)
 
-const VESSEL_CROP_REGIONS: Dictionary = {
-	"dinghy": Rect2(1006, 136, 804, 1355),
-	"sloop": Rect2(1112, 186, 592, 1301),
-	"ironclad": Rect2(228, 92, 1075, 2588),
+## Dedicated, pre-cropped river map icons. These are intentionally decoupled from
+## the shipyard/gameplay vessel art so editing a vessel elsewhere never alters the map.
+const RIVER_VESSEL_ICONS: Dictionary = {
+	"dinghy": "res://assets/sprites/ui/river_map_vessels/dinghy.png",
+	"sloop": "res://assets/sprites/ui/river_map_vessels/sloop.png",
+	"ironclad": "res://assets/sprites/ui/river_map_vessels/ironclad.png",
+	"bombard_skiff": "res://assets/sprites/ui/river_map_vessels/bombard_skiff.png",
 }
 
 func _setup_mini_vessel() -> void:
 	if not mini_vessel or not mini_vessel_icon:
 		return
 		
-	var active_id := GameState.active_vessel
+	var active_id: String = GameState.active_vessel
 	var tex_loaded := false
-	if active_id in GameState.VESSEL_CATALOG:
-		var v_dict: Dictionary = GameState.VESSEL_CATALOG[active_id] as Dictionary
-		var p_tex: String = str(v_dict.get("preview_texture", ""))
-		if ResourceLoader.exists(p_tex):
-			var t := ResourceLoader.load(p_tex) as Texture2D
+	if RIVER_VESSEL_ICONS.has(active_id):
+		var icon_path: String = str(RIVER_VESSEL_ICONS[active_id])
+		if ResourceLoader.exists(icon_path):
+			var t := ResourceLoader.load(icon_path) as Texture2D
 			if t:
-				if VESSEL_CROP_REGIONS.has(active_id):
-					var atlas := AtlasTexture.new()
-					atlas.atlas = t
-					atlas.region = VESSEL_CROP_REGIONS[active_id]
-					mini_vessel_icon.texture = atlas
-				else:
-					mini_vessel_icon.texture = t
+				mini_vessel_icon.texture = t
 				tex_loaded = true
 				
 	if not tex_loaded:

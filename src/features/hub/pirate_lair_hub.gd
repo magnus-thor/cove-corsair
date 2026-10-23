@@ -150,6 +150,8 @@ func _setup_river_map() -> void:
 			river_map_instance.connect("sail_requested", Callable(self, "_on_sail_requested"))
 		if river_map_instance.has_signal("level_selected"):
 			river_map_instance.connect("level_selected", Callable(self, "_on_level_selected"))
+		if river_map_instance.has_signal("cove_requested"):
+			river_map_instance.connect("cove_requested", Callable(self, "_close_river_map"))
 
 func _update_hud_display() -> void:
 	if doubloons_label:
