@@ -3,6 +3,10 @@
 [ext_resource type="Script" path="res://scenes/cove_hub/cove_main_hub.gd" id="1_hub_script"]
 [ext_resource type="Texture2D" uid="uid://5vknw81bp1u1" path="res://assets/ui/pirate_lair.png" id="2_cove_art"]
 [ext_resource type="PackedScene" path="res://scenes/cove_hub/building_plot.tscn" id="3_plot_scene"]
+[ext_resource type="PackedScene" path="res://assets/models/cove/SM_Plot_Foundation.glb" id="4_foundation_model"]
+[ext_resource type="PackedScene" path="res://assets/models/cove/SM_Blacksmith_Forge.glb" id="5_forge_model"]
+[ext_resource type="PackedScene" path="res://assets/models/cove/SM_Tavern_Inn.glb" id="6_tavern_model"]
+[ext_resource type="PackedScene" path="res://assets/models/cove/SM_Harbor_Office.glb" id="7_harbor_model"]
 
 [sub_resource type="Environment" id="Environment_cove_hub"]
 ambient_light_source = 2
@@ -31,16 +35,24 @@ environment = SubResource("Environment_cove_hub")
 [node name="Moonlight" type="DirectionalLight3D" parent="."]
 unique_name_in_owner = true
 transform = Transform3D(0.866025, 0.25, -0.433013, 0, 0.866025, 0.5, 0.5, -0.433013, 0.75, 4, 10, 4)
-light_color = Color(0.72, 0.86, 1, 1)
-light_energy = 1.5
+light_color = Color(0.74, 0.88, 1, 1)
+light_energy = 1.6
 shadow_enabled = true
-shadow_bias = 0.04
+shadow_bias = 0.03
+shadow_normal_bias = 1.6
+directional_shadow_mode = 2
+directional_shadow_split_1 = 0.12
+directional_shadow_split_2 = 0.28
+directional_shadow_split_3 = 0.6
+directional_shadow_max_distance = 32.0
+directional_shadow_fade_start = 0.85
+directional_shadow_pancake_size = 8.0
 
 [node name="PierLanternLight" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0.8, 1.2)
 light_color = Color(1, 0.68, 0.28, 1)
-light_energy = 2.0
-omni_range = 5.0
+light_energy = 2.2
+omni_range = 6.0
 
 [node name="HubCamera" type="Camera3D" parent="."]
 unique_name_in_owner = true
@@ -64,6 +76,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 0.2, 0.8)
 plot_id = "forge"
 display_name = "Blacksmith & Forge"
 is_unlocked = true
+building_scene = ExtResource("5_forge_model")
+foundation_scene = ExtResource("4_foundation_model")
 
 [node name="Plot_Tavern" parent="BuildingPlots" instance=ExtResource("3_plot_scene")]
 unique_name_in_owner = true
@@ -71,6 +85,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 1.6, -3.5)
 plot_id = "tavern"
 display_name = "Tavern & Inn"
 is_unlocked = true
+building_scene = ExtResource("6_tavern_model")
+foundation_scene = ExtResource("4_foundation_model")
 
 [node name="Plot_ChartHouse" parent="BuildingPlots" instance=ExtResource("3_plot_scene")]
 unique_name_in_owner = true
@@ -78,6 +94,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 3.6, -7)
 plot_id = "chart_house"
 display_name = "Harbor Master"
 is_unlocked = false
+building_scene = ExtResource("7_harbor_model")
+foundation_scene = ExtResource("4_foundation_model")
 
 [node name="Plot_Expansion" parent="BuildingPlots" instance=ExtResource("3_plot_scene")]
 unique_name_in_owner = true
@@ -85,6 +103,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0.3, 2.2)
 plot_id = "expansion"
 display_name = "Plot Foundation"
 is_unlocked = false
+foundation_scene = ExtResource("4_foundation_model")
 
 [node name="DockAnchor" type="Marker3D" parent="."]
 unique_name_in_owner = true

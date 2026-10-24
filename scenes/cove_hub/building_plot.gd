@@ -111,12 +111,15 @@ func refresh_visuals() -> void:
 	if not mesh_root:
 		return
 
-	# Remove prior instantiated child
+	# Immediately detach and free prior instantiated child
 	if _current_instantiated_model and is_instance_valid(_current_instantiated_model):
+		if _current_instantiated_model.get_parent() == mesh_root:
+			mesh_root.remove_child(_current_instantiated_model)
 		_current_instantiated_model.queue_free()
 		_current_instantiated_model = null
 
 	for child: Node in mesh_root.get_children():
+		mesh_root.remove_child(child)
 		child.queue_free()
 
 	if is_unlocked and building_scene:
@@ -166,15 +169,23 @@ func _on_input_event(_camera: Camera3D, event: InputEvent, _position: Vector3, _
 	if event is InputEventMouseButton:
 		var mouse_event: InputEventMouseButton = event as InputEventMouseButton
 		if mouse_event.button_index == MOUSE_BUTTON_LEFT and mouse_event.pressed:
+			_animate_click()
 			plot_clicked.emit(self)
 
 func _animate_hover(hovered: bool) -> void:
 	if _hover_tween and _hover_tween.is_valid():
 		_hover_tween.kill()
 
-	_hover_tween = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_hover_tween = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	var target_scale: Vector3 = _original_scale * (1.06 if hovered else 1.0)
-	_hover_tween.tween_property(self, "scale", target_scale, 0.15)
+	_hover_tween.tween_property(self, "scale", target_scale, 0.18)
+
+func _animate_click() -> void:
+	var click_tween: Tween = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	var squashed_scale: Vector3 = _original_scale * 0.94
+	var restored_scale: Vector3 = _original_scale * (1.06 if is_hovered else 1.0)
+	click_tween.tween_property(self, "scale", squashed_scale, 0.08)
+	click_tween.tween_property(self, "scale", restored_scale, 0.14)
 
 func set_unlocked_state(unlocked: bool) -> void:
 	is_unlocked = unlocked

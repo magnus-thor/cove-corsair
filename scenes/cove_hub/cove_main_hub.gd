@@ -22,10 +22,15 @@ signal dock_selected()
 @onready var plot_expansion: BuildingPlot = %Plot_Expansion as BuildingPlot
 
 var all_plots: Array[BuildingPlot] = []
+var _flagship_mesh: Node3D = null
+var _dock_bob_tween: Tween = null
+
+const DINGHY_FALLBACK_MESH: PackedScene = preload("res://assets/models/user/vessels/dinghy.glb")
 
 func _ready() -> void:
 	_collect_plots()
 	_connect_plot_signals()
+	_setup_docked_flagship()
 
 func _collect_plots() -> void:
 	all_plots.clear()
@@ -46,6 +51,47 @@ func _connect_plot_signals() -> void:
 			plot.plot_clicked.connect(_on_plot_clicked)
 		if not plot.plot_hover_changed.is_connected(_on_plot_hover_changed):
 			plot.plot_hover_changed.connect(_on_plot_hover_changed)
+
+func _setup_docked_flagship() -> void:
+	if not dock_anchor:
+		return
+
+	if _dock_bob_tween and _dock_bob_tween.is_valid():
+		_dock_bob_tween.kill()
+
+	if _flagship_mesh and is_instance_valid(_flagship_mesh):
+		_flagship_mesh.queue_free()
+		_flagship_mesh = null
+
+	var pivot := Node3D.new()
+	pivot.name = "DockedFlagship"
+	dock_anchor.add_child(pivot)
+	_flagship_mesh = pivot
+
+	var mesh_scene: PackedScene = DINGHY_FALLBACK_MESH
+	var scale_mult: float = 0.45
+
+	if Engine.has_singleton("GameState"):
+		var gs: Node = Engine.get_singleton("GameState")
+		if gs and gs.has_method("get_active_ship_resource"):
+			var ship: Resource = gs.call("get_active_ship_resource") as Resource
+			if ship and "model_scene" in ship and ship.get("model_scene"):
+				mesh_scene = ship.get("model_scene") as PackedScene
+
+	if mesh_scene:
+		var ship_inst: Node3D = mesh_scene.instantiate() as Node3D
+		if ship_inst:
+			ship_inst.name = "ShipInstance"
+			ship_inst.scale = Vector3(scale_mult, scale_mult, scale_mult)
+			pivot.add_child(ship_inst)
+
+	_start_dock_bobbing(pivot)
+
+func _start_dock_bobbing(pivot_node: Node3D) -> void:
+	var base_y: float = pivot_node.position.y
+	_dock_bob_tween = create_tween().set_loops()
+	_dock_bob_tween.tween_property(pivot_node, "position:y", base_y + 0.04, 1.8).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_dock_bob_tween.tween_property(pivot_node, "position:y", base_y - 0.04, 2.2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 func _on_plot_clicked(plot: BuildingPlot) -> void:
 	print("[CoveHub] Clicked plot: %s ('%s', unlocked=%s)" % [plot.plot_id, plot.display_name, plot.is_unlocked])
