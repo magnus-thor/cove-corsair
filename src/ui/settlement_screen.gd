@@ -440,7 +440,7 @@ func _on_primary_pressed() -> void:
 			map_requested.emit()
 			GameState.should_auto_start = false
 			GameState.should_open_map = true
-			GameState.change_scene_with_loading("res://src/features/hub/pirate_lair_hub.tscn", "Pirate Lair")
+			GameState.change_scene_with_loading("res://scenes/cove_hub/cove_main_hub.tscn", "Pirate Lair")
 		else:
 			next_level_requested.emit()
 			GameState.should_auto_start = true
@@ -499,7 +499,7 @@ func _on_map_pressed() -> void:
 	else:
 		GameState.should_open_map = true
 	GameState.reset_level()
-	GameState.change_scene_with_loading("res://src/features/hub/pirate_lair_hub.tscn", "Smuggler's Cove")
+	GameState.change_scene_with_loading("res://scenes/cove_hub/cove_main_hub.tscn", "Smuggler's Cove")
 
 func _check_tutorial_guidance() -> void:
 	if not GameState or not GameState.is_tutorial_in_progress() or not _is_victory:

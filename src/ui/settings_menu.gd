@@ -302,7 +302,7 @@ func _on_reset_pressed() -> void:
 		await get_tree().create_timer(0.35, true, false, true).timeout
 		var err: Error = get_tree().reload_current_scene()
 		if err != OK:
-			get_tree().change_scene_to_file("res://src/features/hub/pirate_lair_hub.tscn")
+			get_tree().change_scene_to_file("res://scenes/cove_hub/cove_main_hub.tscn")
 
 func _on_close_pressed() -> void:
 	if AudioManager and AudioManager.has_method("play_sfx"):

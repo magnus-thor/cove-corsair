@@ -28,7 +28,7 @@ var elapsed_load_time: float = 0.0
 var bob_time: float = 0.0
 var base_boat_y: float = -40.0
 
-const DEFAULT_STARTUP_SCENE: String = "res://src/features/hub/pirate_lair_hub.tscn"
+const DEFAULT_STARTUP_SCENE: String = "res://scenes/cove_hub/cove_main_hub.tscn"
 const STARTUP_LOAD_DURATION: float = 2.0
 const LEVEL_LOAD_DURATION: float = 0.9
 

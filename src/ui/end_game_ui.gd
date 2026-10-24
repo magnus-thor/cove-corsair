@@ -78,4 +78,4 @@ func _on_start_screen_button_pressed() -> void:
 		AudioManager.play_sfx("gate_passes")
 	get_tree().paused = false
 	GameState.should_auto_start = false
-	GameState.change_scene_with_loading("res://src/features/hub/pirate_lair_hub.tscn", "Pirate Lair")
+	GameState.change_scene_with_loading("res://scenes/cove_hub/cove_main_hub.tscn", "Pirate Lair")
