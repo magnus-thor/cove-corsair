@@ -233,8 +233,12 @@ func _on_input_event(_camera: Camera3D, event: InputEvent, _position: Vector3, _
 	if event is InputEventMouseButton:
 		var mouse_event: InputEventMouseButton = event as InputEventMouseButton
 		if mouse_event.button_index == MOUSE_BUTTON_LEFT and mouse_event.pressed:
-			_animate_click()
-			plot_clicked.emit(self)
+			press()
+
+## Registers a tap on this lot (from 3D picking or the screen-space pin): click feedback + signal.
+func press() -> void:
+	_animate_click()
+	plot_clicked.emit(self)
 
 func _animate_hover(hovered: bool) -> void:
 	if _hover_tween and _hover_tween.is_valid():
@@ -254,3 +258,50 @@ func _animate_click() -> void:
 func set_unlocked_state(unlocked: bool) -> void:
 	is_unlocked = unlocked
 	refresh_visuals()
+
+## Raises the building on its (empty) lot with a squash-and-stretch pop and a dust puff.
+## Returns the duration of the animation in seconds so callers can wait for it.
+func play_build_animation() -> float:
+	const BUILD_DURATION: float = 1.0
+	set_unlocked_state(true)
+	if not mesh_root:
+		return 0.0
+
+	mesh_root.scale = Vector3(1.0, 0.02, 1.0)
+	var build_tween: Tween = create_tween()
+	build_tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	build_tween.tween_property(mesh_root, "scale", Vector3.ONE, BUILD_DURATION)
+	_spawn_dust_puff()
+	return BUILD_DURATION
+
+func _spawn_dust_puff() -> void:
+	var dust: CPUParticles3D = CPUParticles3D.new()
+	dust.name = "BuildDust"
+	dust.one_shot = true
+	dust.explosiveness = 0.9
+	dust.amount = 36
+	dust.lifetime = 1.1
+	dust.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
+	dust.emission_sphere_radius = 0.9
+	dust.direction = Vector3.UP
+	dust.spread = 70.0
+	dust.initial_velocity_min = 0.6
+	dust.initial_velocity_max = 1.6
+	dust.gravity = Vector3(0.0, -0.8, 0.0)
+	dust.scale_amount_min = 0.6
+	dust.scale_amount_max = 1.4
+
+	var puff_mesh: SphereMesh = SphereMesh.new()
+	puff_mesh.radius = 0.16
+	puff_mesh.height = 0.32
+	var puff_mat: StandardMaterial3D = StandardMaterial3D.new()
+	puff_mat.albedo_color = Color(0.78, 0.68, 0.52, 0.8)
+	puff_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	puff_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	puff_mesh.material = puff_mat
+	dust.mesh = puff_mesh
+
+	add_child(dust)
+	dust.position = Vector3(0.0, 0.2, 0.0)
+	dust.emitting = true
+	get_tree().create_timer(1.6).timeout.connect(dust.queue_free)

@@ -16,9 +16,8 @@ func _ready() -> void:
 		print("Saved initial mobile hub preview to res://hub_mobile_initial.png")
 
 	# Now unlock buildings to verify their placement
-	hub.set_plot_unlocked("forge", true)
-	hub.set_plot_unlocked("tavern", true)
-	hub.set_plot_unlocked("chart_house", true)
+	hub.set_plot_unlocked("shipyard", true)
+	hub.set_plot_unlocked("skull_outpost", true)
 
 	await get_tree().process_frame
 	await get_tree().process_frame

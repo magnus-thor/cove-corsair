@@ -69,8 +69,67 @@ func _ready() -> void:
 		if "is_game_active" in GameState and not GameState.is_game_active:
 			_set_run_hud_visible(false)
 
+var _tutorial_swipe_prompt: Control = null
+
 func on_game_started() -> void:
 	_set_run_hud_visible(true, true)
+	_setup_level_1_tutorial_prompt()
+
+## Teaches steering during the very first run (River Level 1 while the tutorial is at its first steps).
+func _setup_level_1_tutorial_prompt() -> void:
+	if GameState.current_level != 1 or GameState.tutorial_step > GameState.TutorialStep.LEVEL_1_IN_PROGRESS:
+		return
+	if _tutorial_swipe_prompt and is_instance_valid(_tutorial_swipe_prompt):
+		return
+
+	var prompt_container: PanelContainer = PanelContainer.new()
+	prompt_container.name = "TutorialSwipePrompt"
+	prompt_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	var style: StyleBoxFlat = StyleBoxFlat.new()
+	style.bg_color = Color(0.10, 0.07, 0.04, 0.90)
+	style.set_border_width_all(2)
+	style.border_color = Color(0.96, 0.72, 0.22, 0.95)
+	style.set_corner_radius_all(14)
+	style.content_margin_left = 24
+	style.content_margin_right = 24
+	style.content_margin_top = 10
+	style.content_margin_bottom = 10
+	style.shadow_color = Color(0, 0, 0, 0.6)
+	style.shadow_size = 6
+	prompt_container.add_theme_stylebox_override("panel", style)
+
+	var label: Label = Label.new()
+	label.text = "◀  DRAG / SWERVE TO STEER  ▶"
+	label.add_theme_font_override("font", preload("res://assets/fonts/CarterOne.ttf"))
+	label.add_theme_font_size_override("font_size", 16)
+	label.add_theme_color_override("font_color", Color(1.0, 0.88, 0.35, 1.0))
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	prompt_container.add_child(label)
+
+	add_child(prompt_container)
+	_tutorial_swipe_prompt = prompt_container
+
+	var vp_size: Vector2 = get_viewport().get_visible_rect().size
+	prompt_container.custom_minimum_size = Vector2(340, 46)
+	prompt_container.position = Vector2((vp_size.x - 340.0) * 0.5, vp_size.y * 0.68)
+	prompt_container.pivot_offset = Vector2(170, 23)
+
+	var pulse: Tween = prompt_container.create_tween().set_loops().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	pulse.tween_property(prompt_container, "scale", Vector2(1.05, 1.05), 0.55)
+	pulse.tween_property(prompt_container, "scale", Vector2.ONE, 0.55)
+
+	if EventBus and EventBus.has_signal("player_swerved"):
+		EventBus.player_swerved.connect(_dismiss_swipe_prompt, CONNECT_ONE_SHOT)
+
+func _dismiss_swipe_prompt() -> void:
+	if not _tutorial_swipe_prompt or not is_instance_valid(_tutorial_swipe_prompt):
+		return
+	var target: Control = _tutorial_swipe_prompt
+	_tutorial_swipe_prompt = null
+	var fade: Tween = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	fade.tween_property(target, "modulate:a", 0.0, 0.3)
+	fade.tween_callback(target.queue_free)
 
 func _set_run_hud_visible(vis: bool, animate: bool = false) -> void:
 	if not progress_container or not multiplier_panel:

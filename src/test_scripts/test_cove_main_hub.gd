@@ -1,97 +1,133 @@
-@tool
-# Turn off untyped warnings specifically for test harness:
-@warning_ignore("untyped_declaration")
-@warning_ignore("unsafe_property_access")
-@warning_ignore("unsafe_method_access")
-@warning_ignore("unsafe_cast")
 extends Node
+
+## Cove Main Hub regression test: empty lots, build-on-first-direction, Quartermaster guidance,
+## 3D click picking, pier -> river map, hub HUD and persistence of built houses.
+
+var _fail_count: int = 0
+var _last_selected_plot: String = ""
+
+func _check(condition: bool, label: String) -> void:
+	if condition:
+		print("  [PASS] %s" % label)
+	else:
+		_fail_count += 1
+		push_error("  [FAIL] %s" % label)
+		print("  [FAIL] %s" % label)
+
+func _wait(seconds: float) -> void:
+	await get_tree().create_timer(seconds).timeout
+
+func _spawn_hub() -> CoveMainHub:
+	var hub_scene: PackedScene = load("res://scenes/cove_hub/cove_main_hub.tscn") as PackedScene
+	var hub: CoveMainHub = hub_scene.instantiate() as CoveMainHub
+	add_child(hub)
+	return hub
 
 func _ready() -> void:
 	print("==================================================")
-	print("   TESTING COVE MAIN HUB DYNAMIC FEATURE UNLOCKS  ")
+	print("   TESTING COVE MAIN HUB (TUTORIAL-DRIVEN BUILD)  ")
 	print("==================================================")
+	await _run_tests()
 
-	if has_node("/root/GameState"):
-		var gs: Node = get_node("/root/GameState")
-		gs.call("reset_tutorial")
-		gs.set("highest_unlocked_level", 1)
+	# Never leave test progression in the player's save.
+	if FileAccess.file_exists(GameState.SAVE_PATH):
+		DirAccess.remove_absolute(GameState.SAVE_PATH)
 
-	var hub_scene: PackedScene = preload("res://scenes/cove_hub/cove_main_hub.tscn")
-	assert(hub_scene != null, "cove_main_hub.tscn must load successfully")
+	if _fail_count == 0:
+		print("ALL COVE HUB TESTS PASSED!")
+		get_tree().quit(0)
+	else:
+		print("COVE HUB TESTS FAILED: %d" % _fail_count)
+		get_tree().quit(1)
 
-	var hub: CoveMainHub = hub_scene.instantiate() as CoveMainHub
-	assert(hub != null, "cove_main_hub must instantiate cleanly")
-	add_child(hub)
+func _run_tests() -> void:
+	GameState.reset_save_data()
+	GameState.tutorial_step = GameState.TutorialStep.NOT_STARTED
 
+	var hub: CoveMainHub = _spawn_hub()
 	await get_tree().process_frame
 	await get_tree().process_frame
 
-	print("[STEP 1] Verifying Clean Cove Frustum Backdrop...")
-	assert(hub.hub_camera != null, "HubCamera must exist")
-	assert(hub.hub_camera.current, "HubCamera must be active/current")
-	assert(is_equal_approx(hub.hub_camera.fov, 36.0), "HubCamera FOV must be 36 degrees")
-	assert(hub.background_quad != null, "BackgroundQuad must exist")
-	assert(hub.background_quad.mesh != null, "BackgroundQuad must have a Mesh")
+	print("[STEP 1] Scene, backdrop, HUD and empty lots on a fresh game")
+	_check(hub.hub_camera != null and hub.hub_camera.current, "HubCamera is current")
+	_check(is_equal_approx(hub.hub_camera.fov, 36.0), "HubCamera FOV is 36")
 	var mat: StandardMaterial3D = hub.background_quad.mesh.material as StandardMaterial3D
-	assert(mat != null and mat.albedo_texture != null, "Backdrop must have albedo texture")
-	assert(mat.albedo_texture.resource_path.ends_with("cove_background_clean.png"), "Backdrop must point to cove_background_clean.png")
-	print("[PASS] Clean cove backdrop verified.")
+	_check(mat != null and mat.albedo_texture != null and mat.albedo_texture.resource_path.ends_with("cove_background_clean.png"), "Backdrop uses the clean cove plate")
+	_check(hub.hud != null, "Hub HUD exists")
+	_check(hub.hud != null and hub.hud.settings_button != null, "Settings button exists")
+	_check(hub.hud != null and hub.hud.doubloons_label != null and hub.hud.doubloons_label.text.contains("DOUBLOONS"), "Doubloon balance is shown")
+	_check(hub.hud != null and hub.hud.vessel_label != null and hub.hud.vessel_label.text.contains("TIER"), "Vessel badge is shown")
+	for plot: BuildingPlot in hub.all_plots:
+		_check(not plot.is_unlocked and plot.mesh_root.get_child_count() == 0, "Lot '%s' starts empty" % plot.plot_id)
+	_check(hub.get_guidance_config().get("target", "") == "dock", "First-run guidance points at the pier/vessel")
+	_check(hub._tutorial_overlay != null and hub._tutorial_overlay.visible, "Guidance overlay is visible on a fresh hub")
 
-	print("[STEP 2] Verifying Barren Plots on Initial State (No premature buildings)...")
-	# In a fresh game, locked plots should NOT have buildings spawned on screen
-	assert(hub.plot_forge.is_unlocked == false, "Plot_Forge must start locked")
-	assert(hub.plot_tavern.is_unlocked == false, "Plot_Tavern must start locked")
-	assert(hub.plot_expansion.is_unlocked == false, "Plot_Expansion must start locked")
-	assert(hub.plot_forge.mesh_root.get_child_count() == 0, "Plot_Forge must have no meshes cluttering barren clearing")
-	assert(hub.plot_tavern.mesh_root.get_child_count() == 0, "Plot_Tavern must have no meshes cluttering barren clearing")
-	print("[PASS] Initial cove state is clean and barren with empty plots.")
-
-	print("[STEP 3] Verifying Dynamic Building Addition upon Feature Unlock...")
-	# Unlock Forge (Simulating Level 2 completion / Shipyard open)
-	hub.set_plot_unlocked("forge", true)
+	print("[STEP 2] Shipyard is built when the tutorial directs the player to it")
+	GameState.highest_unlocked_level = 3
+	GameState.advance_tutorial_to(GameState.TutorialStep.LEVEL_2_COMPLETED)
 	await get_tree().process_frame
-	assert(hub.plot_forge.is_unlocked == true, "Plot_Forge should now be unlocked")
-	var forge_mesh: Node = hub.plot_forge.mesh_root.get_node_or_null("BuildingMesh")
-	assert(forge_mesh != null, "Plot_Forge must now have 3D BuildingMesh added to clearing")
+	_check(not hub.plot_shipyard.is_unlocked, "Lots are still empty right after the level is won")
+	await _wait(0.95)
+	_check(hub.plot_shipyard.is_unlocked, "Shipyard house is built")
+	_check(hub.plot_shipyard.mesh_root.get_node_or_null("BuildingMesh") != null, "Shipyard has its 3D model")
+	_check(GameState.is_hub_building_built("shipyard"), "Shipyard build is persisted")
+	_check(not hub.plot_skull_outpost.is_unlocked, "Skull Outpost is still an empty lot")
+	_check(not hub.plot_future.is_unlocked, "Future lot is still an empty lot")
+	await _wait(1.4)
+	_check(hub._active_guidance_key.contains("shipyard"), "Quartermaster now directs the player into the shipyard")
+	_check(hub._tutorial_overlay.visible, "Guidance overlay is visible for the shipyard")
 
-	# Unlock Tavern (Simulating Level 5 reach / Endless open)
-	hub.set_plot_unlocked("tavern", true)
+	print("[STEP 3] Tapping the shipyard in 3D enters it")
+	_last_selected_plot = ""
+	hub.plot_selected.connect(func(id: String, _name: String) -> void: _last_selected_plot = id)
+	for i: int in range(3):
+		await get_tree().physics_frame
+	var click_pos: Vector2 = hub._pins["shipyard"].get_global_rect().get_center()
+	var press: InputEventMouseButton = InputEventMouseButton.new()
+	press.button_index = MOUSE_BUTTON_LEFT
+	press.pressed = true
+	press.position = click_pos
+	press.global_position = click_pos
+	# Headless windows are tiny and stretched, so inject the click in viewport (local) coordinates.
+	get_viewport().push_input(press, true)
 	await get_tree().process_frame
-	assert(hub.plot_tavern.is_unlocked == true, "Plot_Tavern should now be unlocked")
-	var tavern_mesh: Node = hub.plot_tavern.mesh_root.get_node_or_null("BuildingMesh")
-	assert(tavern_mesh != null, "Plot_Tavern must now have 3D BuildingMesh added to clearing")
-
-	# Unlock Chart House (Campaign embarkation)
-	hub.set_plot_unlocked("chart_house", true)
 	await get_tree().process_frame
-	assert(hub.plot_chart_house.is_unlocked == true, "Plot_ChartHouse should now be unlocked")
-	var harbor_mesh: Node = hub.plot_chart_house.mesh_root.get_node_or_null("BuildingMesh")
-	assert(harbor_mesh != null, "Plot_ChartHouse must have 3D BuildingMesh added to clearing")
+	_check(_last_selected_plot == "shipyard", "Tapping the shipyard is registered")
+	var shipyard_open: bool = false
+	for child: Node in hub.get_children():
+		if child is ShipyardUI:
+			shipyard_open = true
+			child.queue_free()
+	_check(shipyard_open, "Shipyard UI opens from the house")
+	await get_tree().process_frame
 
-	print("[STEP 4] Testing Click & Hover Interactions on Plots & Clearings...")
-	var clicked_plot: Array[String] = [""]
-	hub.plot_selected.connect(func(id: String, _name: String) -> void: clicked_plot[0] = id)
+	print("[STEP 4] The pier starts river levels")
+	hub._on_dock_activated()
+	await get_tree().process_frame
+	_check(hub._river_map_layer != null, "Tapping the pier opens the river map")
+	hub._close_river_map()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	_check(hub._river_map_layer == null, "River map closes back to the cove")
 
-	# Simulate click on empty/locked plot
-	hub.plot_expansion.plot_clicked.emit(hub.plot_expansion)
-	assert(clicked_plot[0] == "expansion", "Clicking empty expansion clearing must propagate signal")
+	print("[STEP 5] Skull Outpost is built when the tutorial completes; future lot stays empty")
+	GameState.highest_unlocked_level = 6
+	GameState.advance_tutorial_to(GameState.TutorialStep.COMPLETED)
+	await _wait(0.95)
+	_check(hub.plot_skull_outpost.is_unlocked, "Skull Outpost is built")
+	_check(GameState.is_hub_building_built("skull_outpost"), "Skull Outpost build is persisted")
+	_check(not hub.plot_future.is_unlocked, "Future lot is never built")
+	await _wait(1.4)
+	_check(hub._active_guidance_key.contains("skull_outpost"), "Quartermaster directs the player to the Skull Outpost")
 
-	# Simulate click on unlocked forge
-	hub.plot_forge.plot_clicked.emit(hub.plot_forge)
-	assert(clicked_plot[0] == "forge", "Clicking unlocked forge must propagate signal")
-
-	print("[PASS] All plot interactions and transitions verified.")
-
-	print("[STEP 5] Testing Dock Flagship & Maiden Voyage Affordance...")
-	assert(hub.dock_area != null, "DockArea must exist on dock anchor")
-	var dock_clicked: Array[bool] = [false]
-	hub.dock_selected.connect(func() -> void: dock_clicked[0] = true)
-	hub.dock_selected.emit()
-	assert(dock_clicked[0] == true, "Dock interaction signal must work")
-	print("[PASS] Dock interaction and maiden voyage affordance verified.")
-
-	print("==================================================")
-	print("   ALL COVE HUB DYNAMIC UNLOCK TESTS PASSED!      ")
-	print("==================================================")
+	print("[STEP 6] Built houses reappear instantly on the next visit")
 	hub.queue_free()
-	get_tree().quit(0)
+	await get_tree().process_frame
+	var hub2: CoveMainHub = _spawn_hub()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	_check(hub2.plot_shipyard.is_unlocked and hub2.plot_skull_outpost.is_unlocked, "Built houses are restored")
+	_check(hub2.plot_shipyard.mesh_root.scale.is_equal_approx(Vector3.ONE), "Restored houses skip the build animation")
+	_check(not hub2.plot_future.is_unlocked, "Future lot still empty")
+	hub2.queue_free()
+	await get_tree().process_frame

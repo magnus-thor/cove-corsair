@@ -36,6 +36,19 @@ enum TutorialStep {
 
 var tutorial_step: int = TutorialStep.NOT_STARTED
 
+## Cove hub houses ("shipyard", "skull_outpost") that have already been built for the player.
+## A house is raised with a build animation the first time the player is directed to it.
+var hub_buildings_built: Array[String] = []
+
+func is_hub_building_built(building_id: String) -> bool:
+	return hub_buildings_built.has(building_id)
+
+func mark_hub_building_built(building_id: String) -> void:
+	if hub_buildings_built.has(building_id):
+		return
+	hub_buildings_built.append(building_id)
+	save_game()
+
 # Legacy cross-boundary lifecycle signals (retained for backward compatibility).
 # Canonical cross-boundary events route through EventBus.
 @warning_ignore("unused_signal")
@@ -1126,6 +1139,7 @@ func reset_save_data() -> void:
 	level_high_scores = {}
 	level_stars = {}
 	tutorial_step = TutorialStep.NOT_STARTED
+	hub_buildings_built = []
 	should_open_map = false
 	should_auto_start = false
 	should_auto_start_endless = false
@@ -1172,6 +1186,7 @@ func save_game() -> void:
 		"level_stars": level_stars,
 		"unlocked_levels": highest_unlocked_level,
 		"tutorial_step": tutorial_step,
+		"hub_buildings_built": hub_buildings_built,
 		"master_volume": master_volume,
 		"music_volume": music_volume,
 		"sfx_volume": sfx_volume,
@@ -1206,6 +1221,7 @@ func load_game() -> void:
 	master_muted = false
 	music_muted = false
 	sfx_muted = false
+	hub_buildings_built = []
 
 	if not FileAccess.file_exists(SAVE_PATH):
 		return
@@ -1346,6 +1362,12 @@ func load_game() -> void:
 			else:
 				tutorial_step = TutorialStep.NOT_STARTED
 
+		if data.has("hub_buildings_built") and data["hub_buildings_built"] is Array:
+			for b: Variant in (data["hub_buildings_built"] as Array):
+				var b_str: String = str(b)
+				if not hub_buildings_built.has(b_str):
+					hub_buildings_built.append(b_str)
+
 		# Self-healing / Fast-forward checks on loaded tutorial_step:
 		check_and_fast_forward_tutorial()
 
@@ -1424,6 +1446,7 @@ func reset_tutorial() -> void:
 		vessel_tiers["sloop"] = 1
 	unlocked_crew = {}
 	equipped_crew = {}
+	hub_buildings_built = []
 	save_game()
 	active_vessel_changed.emit(active_vessel)
 	doubloons_changed.emit(doubloons)

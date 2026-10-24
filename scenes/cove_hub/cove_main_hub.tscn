@@ -13,7 +13,6 @@ ambient_light_source = 2
 ambient_light_color = Color(0.45, 0.5, 0.58, 1)
 ambient_light_energy = 0.45
 tonemap_mode = 2
-glow_enabled = false
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_backdrop"]
 shading_mode = 0
@@ -71,48 +70,39 @@ mesh = SubResource("QuadMesh_backdrop")
 
 [node name="BuildingPlots" type="Node3D" parent="."]
 
-[node name="Plot_Forge" parent="BuildingPlots" instance=ExtResource("3_plot_scene")]
+[node name="Plot_Shipyard" parent="BuildingPlots" instance=ExtResource("3_plot_scene")]
 unique_name_in_owner = true
 transform = Transform3D(0.329, 0, -0.19, 0, 0.38, 0, 0.19, 0, 0.329, -1.18, 0.08, 0.15)
-plot_id = "forge"
-display_name = "Blacksmith & Forge"
+plot_id = "shipyard"
+display_name = "Drydock & Shipyard"
 is_unlocked = false
 building_scene = ExtResource("5_forge_model")
 foundation_scene = ExtResource("4_foundation_model")
 show_foundation_when_locked = false
 
-[node name="Plot_Tavern" parent="BuildingPlots" instance=ExtResource("3_plot_scene")]
+[node name="Plot_SkullOutpost" parent="BuildingPlots" instance=ExtResource("3_plot_scene")]
 unique_name_in_owner = true
 transform = Transform3D(0.269, 0, -0.269, 0, 0.38, 0, 0.269, 0, 0.269, 1.35, 0.95, -1.4)
-plot_id = "tavern"
-display_name = "Tavern & Inn"
+plot_id = "skull_outpost"
+display_name = "Skull Outpost"
 is_unlocked = false
 building_scene = ExtResource("6_tavern_model")
 foundation_scene = ExtResource("4_foundation_model")
 show_foundation_when_locked = false
 
-[node name="Plot_ChartHouse" parent="BuildingPlots" instance=ExtResource("3_plot_scene")]
+[node name="Plot_Future" parent="BuildingPlots" instance=ExtResource("3_plot_scene")]
 unique_name_in_owner = true
 transform = Transform3D(0.367, 0, -0.098, 0, 0.38, 0, 0.098, 0, 0.367, -0.62, 2.5, -4.7)
-plot_id = "chart_house"
-display_name = "Harbor Master"
+plot_id = "future"
+display_name = "Future Building Lot"
 is_unlocked = false
 building_scene = ExtResource("7_harbor_model")
 foundation_scene = ExtResource("4_foundation_model")
 show_foundation_when_locked = false
 
-[node name="Plot_Expansion" parent="BuildingPlots" instance=ExtResource("3_plot_scene")]
-unique_name_in_owner = true
-transform = Transform3D(0.45, 0, 0, 0, 0.45, 0, 0, 0, 0.45, -1.25, 0.75, -1.5)
-plot_id = "expansion"
-display_name = "Plot Foundation"
-is_unlocked = false
-foundation_scene = ExtResource("4_foundation_model")
-show_foundation_when_locked = false
-
 [node name="DockAnchor" type="Marker3D" parent="."]
 unique_name_in_owner = true
-transform = Transform3D(0.819, 0.114, 0.562, 0, 0.98, -0.199, -0.574, 0.163, 0.803, 0.45, -0.98, 1.7)
+transform = Transform3D(0.819, 0.114, 0.562, 0, 0.98, -0.199, -0.574, 0.163, 0.803, 0.3, -0.92, 1.65)
 
 [node name="DockArea" type="Area3D" parent="DockAnchor"]
 unique_name_in_owner = true
