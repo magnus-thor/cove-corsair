@@ -34,6 +34,8 @@ signal plot_hover_changed(plot: BuildingPlot, is_hovered: bool)
 		if is_node_ready():
 			_update_collision_shape()
 
+@export var auto_fit_collision_to_mesh: bool = true
+
 @onready var interaction_area: Area3D = $InteractionArea as Area3D
 @onready var collision_shape: CollisionShape3D = $InteractionArea/CollisionShape3D as CollisionShape3D
 @onready var mesh_root: Node3D = $MeshRoot as Node3D
@@ -62,13 +64,48 @@ func _setup_interaction() -> void:
 func _update_collision_shape() -> void:
 	if not collision_shape:
 		return
-	var box: BoxShape3D = collision_shape.shape as BoxShape3D
-	if not box:
-		box = BoxShape3D.new()
-		collision_shape.shape = box
+	var box := BoxShape3D.new()
 	box.size = collision_box_size
+	collision_shape.shape = box
 	# Center box so bottom is at ground level
 	collision_shape.position = Vector3(0.0, collision_box_size.y * 0.5, 0.0)
+
+func _update_collision_shape_with_center(size: Vector3, center_pos: Vector3) -> void:
+	if not collision_shape:
+		return
+	var box := BoxShape3D.new()
+	box.size = size
+	collision_shape.shape = box
+	collision_shape.position = center_pos
+
+func _calculate_node_aabb(root_node: Node3D) -> AABB:
+	var total_aabb := AABB()
+	var has_mesh: bool = false
+	var stack: Array[Node] = [root_node]
+	while not stack.is_empty():
+		var curr: Node = stack.pop_back() as Node
+		if curr is MeshInstance3D:
+			var mi: MeshInstance3D = curr as MeshInstance3D
+			if mi.mesh:
+				var mesh_aabb: AABB = mi.get_aabb()
+				var xform: Transform3D = root_node.global_transform.affine_inverse() * mi.global_transform
+				var transformed_aabb: AABB = xform * mesh_aabb
+				if not has_mesh:
+					total_aabb = transformed_aabb
+					has_mesh = true
+				else:
+					total_aabb = total_aabb.merge(transformed_aabb)
+		for child: Node in curr.get_children():
+			stack.append(child)
+	return total_aabb
+
+func _fit_collision_to_active_model(model_node: Node3D) -> void:
+	if not model_node or not auto_fit_collision_to_mesh:
+		return
+	var computed_aabb: AABB = _calculate_node_aabb(model_node)
+	if computed_aabb.size.length_squared() > 0.01:
+		collision_box_size = computed_aabb.size
+		_update_collision_shape_with_center(computed_aabb.size, computed_aabb.get_center())
 
 func refresh_visuals() -> void:
 	if not mesh_root:
@@ -88,14 +125,17 @@ func refresh_visuals() -> void:
 			model.name = "BuildingMesh"
 			mesh_root.add_child(model)
 			_current_instantiated_model = model
+			_fit_collision_to_active_model(model)
 	elif foundation_scene:
 		var foundation: Node3D = foundation_scene.instantiate() as Node3D
 		if foundation:
 			foundation.name = "FoundationMesh"
 			mesh_root.add_child(foundation)
 			_current_instantiated_model = foundation
+			_fit_collision_to_active_model(foundation)
 	else:
 		_create_placeholder_fallback_mesh()
+		_update_collision_shape()
 
 func _create_placeholder_fallback_mesh() -> void:
 	# Fallback visual: small rustic wooden/stone marker base if no scene is assigned yet
