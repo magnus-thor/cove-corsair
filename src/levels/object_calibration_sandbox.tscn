@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://src/levels/object_calibration_sandbox.gd" id="1_script"]
 [ext_resource type="Shader" path="res://src/shaders/water_stylized.gdshader" id="2_water_shader"]
+[ext_resource type="Material" path="res://assets/materials/mat_sand_stylized.tres" id="3_sand_mat"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 sky_top_color = Color(0.53, 0.81, 0.98, 1)
@@ -38,11 +39,8 @@ shader_parameter/refraction_strength = 0.04
 shader_parameter/uv1_scale = Vector3(0.15, 0.15, 0.15)
 shader_parameter/flow_speed = Vector2(0, -0.6)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bank"]
-albedo_color = Color(0.85, 0.72, 0.48, 1)
-
 [sub_resource type="PlaneMesh" id="PlaneMesh_bank"]
-material = SubResource("StandardMaterial3D_bank")
+material = ExtResource("3_sand_mat")
 size = Vector2(200, 120)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_river"]

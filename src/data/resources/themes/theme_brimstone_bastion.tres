@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://src/data/resources/theme_scenery_data.gd" id="1_script"]
 [ext_resource type="Shader" path="res://src/shaders/harmonized_scenery.gdshader" id="2_shader"]
+[ext_resource type="Material" path="res://assets/materials/mat_brimstone_ash_stylized.tres" id="3_brimstone_mat"]
 [ext_resource type="PackedScene" path="res://assets/models/scenery/Molten_Crown.glb" id="near_1"]
 [ext_resource type="PackedScene" path="res://assets/models/scenery/Obsidian_Crystal_Clus.glb" id="near_2"]
 [ext_resource type="PackedScene" path="res://assets/models/scenery/Rustbound_Anchor.glb" id="near_3"]
@@ -26,5 +27,6 @@ midground_props = Array[PackedScene]([ExtResource("mid_1"), ExtResource("mid_2")
 far_backdrop_props = Array[PackedScene]([ExtResource("mid_2"), ExtResource("near_2"), ExtResource("far_1"), ExtResource("far_2"), ExtResource("near_6")])
 water_albedo = Color(0.24, 0.06, 0.06, 0.96)
 bank_color = Color(0.22, 0.20, 0.22, 1.0)
+bank_material = ExtResource("3_brimstone_mat")
 fog_color = Color(0.40, 0.16, 0.14, 1.0)
 fog_density = 0.026

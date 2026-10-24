@@ -20,6 +20,7 @@ extends Resource
 @export_group("Atmospheric & Biome Aesthetics")
 @export var water_albedo: Color = Color(0.08, 0.58, 0.82, 0.88)
 @export var bank_color: Color = Color(0.85, 0.72, 0.48, 1.0)
+@export var bank_material: Material = null
 @export var fog_color: Color = Color(0.48, 0.76, 0.94, 1.0)
 @export var fog_density: float = 0.002
 
@@ -55,6 +56,15 @@ func ensure_populated() -> void:
 	if scenery_shader == null:
 		scenery_shader = preload("res://src/shaders/harmonized_scenery.gdshader")
 
+	var key: String = theme_name.to_lower().strip_edges()
+	if bank_material == null:
+		if "bayou" in key:
+			bank_material = preload("res://assets/materials/mat_bayou_mud_stylized.tres")
+		elif "brimstone" in key or "inferno" in key or "volcanic" in key:
+			bank_material = preload("res://assets/materials/mat_brimstone_ash_stylized.tres")
+		else:
+			bank_material = preload("res://assets/materials/mat_sand_stylized.tres")
+
 	near_lane_props = ThemeSceneryData._sanitize_pool(near_lane_props)
 	midground_props = ThemeSceneryData._sanitize_pool(midground_props)
 	far_backdrop_props = ThemeSceneryData._sanitize_pool(far_backdrop_props)
@@ -62,7 +72,6 @@ func ensure_populated() -> void:
 	if not near_lane_props.is_empty() and not midground_props.is_empty() and not far_backdrop_props.is_empty():
 		return
 
-	var key: String = theme_name.to_lower().strip_edges()
 	var fallback: ThemeSceneryData = null
 	if "bayou" in key:
 		fallback = ThemeSceneryData.create_black_tide_bayou_theme()
@@ -123,6 +132,7 @@ static func create_tropical_bay_theme() -> ThemeSceneryData:
 	theme.theme_name = "tropical"
 	theme.water_albedo = Color(0.08, 0.58, 0.82, 0.88)
 	theme.bank_color = Color(0.85, 0.72, 0.48, 1.0)
+	theme.bank_material = preload("res://assets/materials/mat_sand_stylized.tres")
 	theme.fog_color = Color(0.48, 0.76, 0.94, 1.0)
 	theme.fog_density = 0.002
 	theme.scenery_shader = preload("res://src/shaders/harmonized_scenery.gdshader")
@@ -161,6 +171,7 @@ static func create_black_tide_bayou_theme() -> ThemeSceneryData:
 	theme.theme_name = "bayou"
 	theme.water_albedo = Color(0.07, 0.18, 0.14, 0.95)
 	theme.bank_color = Color(0.28, 0.35, 0.25, 1.0)
+	theme.bank_material = preload("res://assets/materials/mat_bayou_mud_stylized.tres")
 	theme.fog_color = Color(0.15, 0.28, 0.22, 1.0)
 	theme.fog_density = 0.024
 	theme.scenery_shader = preload("res://src/shaders/harmonized_scenery.gdshader")
@@ -196,6 +207,7 @@ static func create_brimstone_bastion_theme() -> ThemeSceneryData:
 	theme.theme_name = "brimstone"
 	theme.water_albedo = Color(0.24, 0.06, 0.06, 0.96)
 	theme.bank_color = Color(0.22, 0.20, 0.22, 1.0)
+	theme.bank_material = preload("res://assets/materials/mat_brimstone_ash_stylized.tres")
 	theme.fog_color = Color(0.40, 0.16, 0.14, 1.0)
 	theme.fog_density = 0.026
 	theme.scenery_shader = preload("res://src/shaders/harmonized_scenery.gdshader")

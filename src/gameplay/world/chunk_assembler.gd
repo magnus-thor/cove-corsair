@@ -16,6 +16,9 @@ signal boss_arena_reached(boss_chunk: BaseTrackChunk)
 @export var camera_activation_distance: float = 55.0
 
 const BOSS_BUFFER_CHUNK_SCENE: PackedScene = preload("res://src/gameplay/chunks/chunk_boss_intro_buffer.tscn")
+const TROPICAL_SAND_BANK_MAT: StandardMaterial3D = preload("res://assets/materials/mat_sand_stylized.tres")
+const BAYOU_MUD_BANK_MAT: StandardMaterial3D = preload("res://assets/materials/mat_bayou_mud_stylized.tres")
+const BRIMSTONE_ASH_BANK_MAT: StandardMaterial3D = preload("res://assets/materials/mat_brimstone_ash_stylized.tres")
 
 var active_chunks: Array[BaseTrackChunk] = []
 var total_track_distance: float = 0.0
@@ -82,11 +85,14 @@ func _setup_persistent_water() -> void:
 		_persistent_water = water_mesh
 
 	# Setup persistent bank ground underlays outside the wide river corridor
-	# Solid untextured sand/earth material at Y = 0.02m starting at |X| = 6.0m
-	_bank_mat = StandardMaterial3D.new()
-	_bank_mat.shading_mode = BaseMaterial3D.SHADING_MODE_PER_PIXEL
-	_bank_mat.roughness = 0.95
-	_bank_mat.albedo_color = Color(0.85, 0.72, 0.48) # Warm sand/shoreline tone
+	# Stylized textured sand/earth material at Y = 0.02m starting at |X| = 6.0m
+	if TROPICAL_SAND_BANK_MAT != null:
+		_bank_mat = TROPICAL_SAND_BANK_MAT.duplicate() as StandardMaterial3D
+	else:
+		_bank_mat = StandardMaterial3D.new()
+		_bank_mat.shading_mode = BaseMaterial3D.SHADING_MODE_PER_PIXEL
+		_bank_mat.roughness = 0.85
+		_bank_mat.albedo_color = Color(0.85, 0.72, 0.48) # Warm sand/shoreline tone
 	_bank_mat.cull_mode = BaseMaterial3D.CULL_BACK
 	
 	for b_side: float in [-1.0, 1.0]:
@@ -124,7 +130,10 @@ func update_water_color(color: Color) -> void:
 		if active_level_data:
 			var effective_theme: ThemeSceneryData = active_level_data.get_effective_theme()
 			if effective_theme:
-				_bank_mat.albedo_color = effective_theme.bank_color
+				if effective_theme.bank_material is StandardMaterial3D:
+					_apply_bank_material_from_source(effective_theme.bank_material as StandardMaterial3D)
+				else:
+					_apply_flat_bank_color(effective_theme.bank_color)
 				return
 
 		var b_name: String = "tropical"
@@ -136,11 +145,42 @@ func update_water_color(color: Color) -> void:
 				
 		match b_name.to_lower():
 			"bayou", "black_tide_bayou":
-				_bank_mat.albedo_color = Color(0.28, 0.35, 0.25) # Mossy swamp bank
+				if BAYOU_MUD_BANK_MAT != null:
+					_apply_bank_material_from_source(BAYOU_MUD_BANK_MAT)
+				else:
+					_apply_flat_bank_color(Color(0.28, 0.35, 0.25)) # Mossy swamp bank
 			"brimstone", "brimstone_bastion":
-				_bank_mat.albedo_color = Color(0.22, 0.20, 0.22) # Volcanic basalt bank
+				if BRIMSTONE_ASH_BANK_MAT != null:
+					_apply_bank_material_from_source(BRIMSTONE_ASH_BANK_MAT)
+				else:
+					_apply_flat_bank_color(Color(0.22, 0.20, 0.22)) # Volcanic basalt bank
 			_:
-				_bank_mat.albedo_color = Color(0.85, 0.72, 0.48) # Tropical sand bank
+				if TROPICAL_SAND_BANK_MAT != null:
+					_apply_bank_material_from_source(TROPICAL_SAND_BANK_MAT)
+				else:
+					_apply_flat_bank_color(Color(0.85, 0.72, 0.48)) # Tropical sand bank
+
+func _apply_bank_material_from_source(src_mat: StandardMaterial3D) -> void:
+	if not _bank_mat or not src_mat:
+		return
+	_bank_mat.albedo_color = src_mat.albedo_color
+	_bank_mat.albedo_texture = src_mat.albedo_texture
+	_bank_mat.roughness = src_mat.roughness
+	_bank_mat.roughness_texture = src_mat.roughness_texture
+	_bank_mat.normal_enabled = src_mat.normal_enabled
+	_bank_mat.normal_scale = src_mat.normal_scale
+	_bank_mat.normal_texture = src_mat.normal_texture
+	_bank_mat.uv1_scale = src_mat.uv1_scale
+
+func _apply_flat_bank_color(flat_color: Color) -> void:
+	if not _bank_mat:
+		return
+	_bank_mat.albedo_color = flat_color
+	_bank_mat.albedo_texture = null
+	_bank_mat.roughness = 0.95
+	_bank_mat.roughness_texture = null
+	_bank_mat.normal_enabled = false
+	_bank_mat.normal_texture = null
 
 ## Assembles the level dynamically from chunk_scenes in LevelData.
 func assemble_level(data: LevelData = null) -> void:

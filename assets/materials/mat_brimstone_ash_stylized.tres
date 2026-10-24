@@ -1,0 +1,60 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[sub_resource type="Gradient" id="Gradient_brimstone_albedo"]
+offsets = PackedFloat32Array(0, 0.45, 0.8, 1)
+colors = PackedColorArray(0.14, 0.13, 0.15, 1, 0.21, 0.19, 0.21, 1, 0.27, 0.24, 0.26, 1, 0.34, 0.28, 0.27, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_brimstone_albedo"]
+noise_type = 2
+seed = 5091
+frequency = 0.05
+fractal_type = 1
+fractal_octaves = 4
+fractal_lacunarity = 2.15
+fractal_gain = 0.52
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_brimstone_albedo"]
+width = 512
+height = 512
+seamless = true
+color_ramp = SubResource("Gradient_brimstone_albedo")
+noise = SubResource("FastNoiseLite_brimstone_albedo")
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_brimstone_normal"]
+noise_type = 2
+seed = 6203
+frequency = 0.07
+fractal_type = 1
+fractal_octaves = 3
+fractal_lacunarity = 2.2
+fractal_gain = 0.55
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_brimstone_normal"]
+width = 512
+height = 512
+seamless = true
+as_normal_map = true
+bump_strength = 5.0
+noise = SubResource("FastNoiseLite_brimstone_normal")
+
+[sub_resource type="Gradient" id="Gradient_brimstone_roughness"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(0.86, 0.86, 0.86, 1, 1, 1, 1, 1)
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_brimstone_roughness"]
+width = 256
+height = 256
+seamless = true
+color_ramp = SubResource("Gradient_brimstone_roughness")
+noise = SubResource("FastNoiseLite_brimstone_albedo")
+
+[resource]
+resource_name = "MatBrimstoneAshStylized"
+albedo_color = Color(0.95, 0.92, 0.94, 1)
+albedo_texture = SubResource("NoiseTexture2D_brimstone_albedo")
+roughness = 0.88
+roughness_texture = SubResource("NoiseTexture2D_brimstone_roughness")
+normal_enabled = true
+normal_scale = 0.18
+normal_texture = SubResource("NoiseTexture2D_brimstone_normal")
+uv1_scale = Vector3(16, 48, 16)

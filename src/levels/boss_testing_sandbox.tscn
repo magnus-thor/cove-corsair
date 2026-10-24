@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://src/levels/boss_testing_sandbox.gd" id="1_script"]
 [ext_resource type="Shader" path="res://src/shaders/water_stylized.gdshader" id="2_water_shader"]
+[ext_resource type="Material" path="res://assets/materials/mat_sand_stylized.tres" id="3_sand_mat"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 sky_top_color = Color(0.38, 0.65, 0.88, 1)
@@ -42,12 +43,8 @@ shader_parameter/flow_speed = Vector2(0, -0.5)
 material = SubResource("ShaderMaterial_water")
 size = Vector2(40, 90)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bank"]
-albedo_color = Color(0.72, 0.60, 0.42, 1)
-roughness = 0.85
-
 [sub_resource type="BoxMesh" id="BoxMesh_bank"]
-material = SubResource("StandardMaterial3D_bank")
+material = ExtResource("3_sand_mat")
 size = Vector3(6, 1.2, 90)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lane"]

@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dksgm6ou6oyo1" path="res://src/data/resources/theme_scenery_data.gd" id="1_script"]
 [ext_resource type="Shader" uid="uid://b6ppaj15cdn1n" path="res://src/shaders/harmonized_scenery.gdshader" id="2_shader"]
+[ext_resource type="Material" path="res://assets/materials/mat_sand_stylized.tres" id="3_sand_mat"]
 [ext_resource type="PackedScene" uid="uid://caew2iehybpfv" path="res://assets/models/scenery/Low_Poly_Palm_Island.glb" id="far_1"]
 [ext_resource type="PackedScene" uid="uid://ci3hl1uao0tcc" path="res://assets/models/ship-wreck.glb" id="far_2"]
 [ext_resource type="PackedScene" uid="uid://tfe2ng830lfx" path="res://assets/models/tower-complete-large.glb" id="far_3"]
@@ -27,6 +28,10 @@
 
 [resource]
 script = ExtResource("1_script")
+theme_name = "tropical"
+scenery_shader = ExtResource("2_shader")
 near_lane_props = Array[PackedScene]([ExtResource("near_1"), ExtResource("near_2"), ExtResource("near_3"), ExtResource("near_4"), ExtResource("near_5"), ExtResource("near_6"), ExtResource("near_7"), ExtResource("near_8"), ExtResource("near_9")])
 midground_props = Array[PackedScene]([ExtResource("mid_1"), ExtResource("mid_2"), ExtResource("mid_3"), ExtResource("mid_4"), ExtResource("mid_5"), ExtResource("mid_6"), ExtResource("mid_7"), ExtResource("mid_8")])
 far_backdrop_props = Array[PackedScene]([ExtResource("far_1"), ExtResource("far_2"), ExtResource("far_3"), ExtResource("far_4"), ExtResource("far_5")])
+bank_color = Color(0.85, 0.72, 0.48, 1)
+bank_material = ExtResource("3_sand_mat")
