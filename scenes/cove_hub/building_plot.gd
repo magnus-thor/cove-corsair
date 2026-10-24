@@ -28,6 +28,12 @@ signal plot_hover_changed(plot: BuildingPlot, is_hovered: bool)
 		if is_node_ready():
 			refresh_visuals()
 
+@export var show_foundation_when_locked: bool = false:
+	set(value):
+		show_foundation_when_locked = value
+		if is_node_ready():
+			refresh_visuals()
+
 @export var collision_box_size: Vector3 = Vector3(2.5, 2.5, 2.5):
 	set(value):
 		collision_box_size = value
@@ -129,7 +135,7 @@ func refresh_visuals() -> void:
 			mesh_root.add_child(model)
 			_current_instantiated_model = model
 			_fit_collision_to_active_model(model)
-	elif foundation_scene:
+	elif show_foundation_when_locked and foundation_scene:
 		var foundation: Node3D = foundation_scene.instantiate() as Node3D
 		if foundation:
 			foundation.name = "FoundationMesh"
@@ -137,7 +143,6 @@ func refresh_visuals() -> void:
 			_current_instantiated_model = foundation
 			_fit_collision_to_active_model(foundation)
 	else:
-		_create_placeholder_fallback_mesh()
 		_update_collision_shape()
 
 func _create_placeholder_fallback_mesh() -> void:
