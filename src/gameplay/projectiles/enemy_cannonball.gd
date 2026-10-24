@@ -133,10 +133,12 @@ func _on_hit(target: Node) -> void:
 				elif follower.has_method("destroy_follower"):
 					follower.call("destroy_follower")
 			else:
-				if player.has_method("leak_threat"):
+				var cur_lvl: int = GameState.current_level if GameState else 1
+				var dmg: int = 1 if cur_lvl <= 5 else 2
+				if player.has_method("take_hit"):
+					player.call("take_hit", dmg, "enemy_cannonball")
+				elif player.has_method("leak_threat"):
 					player.call("leak_threat", player)
-				elif player.has_method("take_hit"):
-					player.call("take_hit", 1, "enemy_cannonball")
 						
 		var splash_scene := preload("res://src/vfx/hit_splash.tscn")
 		if splash_scene:

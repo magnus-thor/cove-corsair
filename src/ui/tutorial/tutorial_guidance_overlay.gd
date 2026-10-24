@@ -87,6 +87,14 @@ func guide_to(
 	title_text: String = "QUARTERMASTER",
 	voice_id: String = ""
 ) -> void:
+	# Debounce guard: if already showing or actively typing this exact dialogue line,
+	# do not cut off the audio/typewriter to restart it from scratch.
+	if visible and _full_text == text_content:
+		_target_node = target
+		_point_dir = point_direction.normalized() if point_direction != Vector2.ZERO else Vector2.UP
+		_update_positions()
+		return
+
 	if _dismiss_tween and _dismiss_tween.is_valid():
 		_dismiss_tween.kill()
 		_dismiss_tween = null

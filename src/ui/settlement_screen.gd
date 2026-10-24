@@ -89,6 +89,9 @@ func show_defeat(coins_collected: int, _distance_reached: float, banked_total: i
 	_banked_this_run = coins_collected
 	_total_banked = banked_total
 	_stars_earned = 0
+	if GameState:
+		GameState.first_loss_occurred = true
+		GameState.save_game()
 	print("[LEVEL END] River Level %d DEFEAT | In-Run Coins Saved: %d 🪙 | Vault Total: %d 🪙" % [
 		GameState.current_level,
 		coins_collected,
@@ -221,7 +224,10 @@ func _present_modal() -> void:
 		if bonus_claim_button:
 			bonus_claim_button.visible = true
 			bonus_claim_button.disabled = false
-			bonus_claim_button.text = "✦ CLAIM 2X BONUS DOUBLOONS"
+			if GameState and not GameState.has_used_free_double:
+				bonus_claim_button.text = "✦ CLAIM FREE 2X BONUS DOUBLOONS"
+			else:
+				bonus_claim_button.text = "🎬 WATCH AD FOR 2X DOUBLOONS"
 		if map_button:
 			if GameState.is_tutorial_in_progress() and GameState.last_cleared_level in [2, 3, 4]:
 				map_button.text = "RETURN TO COVE"
@@ -390,6 +396,7 @@ func _on_bonus_claim_pressed() -> void:
 		
 	var bonus_amount: int = _run_doubloons + _completion_bonus
 	if GameState:
+		GameState.has_used_free_double = true
 		GameState.is_game_active = false
 		GameState.doubloons += bonus_amount
 		GameState.save_game()
@@ -518,16 +525,17 @@ func _check_tutorial_guidance() -> void:
 		if map_button:
 			map_button.text = "RETURN TO COVE"
 
-	# 1. First action on victory: Claim 2X bonus gold!
+	# 1. First action on victory: Free 2X tutorial double ONLY on Level 1 if not yet claimed!
 	if not _bonus_claimed and bonus_claim_button and bonus_claim_button.visible and not bonus_claim_button.disabled:
-		_tutorial_overlay.guide_to(
-			bonus_claim_button,
-			"A true corsair always doubles their haul! Claim yer bonus gold!",
-			Vector2.UP,
-			"QUARTERMASTER",
-			"tut_settle_claim_2x"
-		)
-		return
+		if GameState and not GameState.has_used_free_double and cleared_lvl == 1:
+			_tutorial_overlay.guide_to(
+				bonus_claim_button,
+				"A true corsair always doubles their haul! Claim yer free bonus gold!",
+				Vector2.UP,
+				"QUARTERMASTER",
+				"tut_settle_claim_2x"
+			)
+			return
 
 	# 2. After bonus is claimed, guide to the next navigation step:
 	if cleared_lvl == 1:

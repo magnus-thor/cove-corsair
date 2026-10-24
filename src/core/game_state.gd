@@ -145,6 +145,13 @@ var master_muted: bool = false
 var music_muted: bool = false
 var sfx_muted: bool = false
 
+## Settlement & Loss Progression State
+## Only the very first settlement screen (Level 1) offers a free 2X doubloons claim with tutorial guidance.
+## Subsequent settlements require watching an ad and are never guided.
+var has_used_free_double: bool = false
+## Skull Outpost is unlocked and raised only after the player experiences their first sinking/loss (levels 6/7).
+var first_loss_occurred: bool = false
+
 # In-Run Transient State
 var run_doubloons: int = 0
 var run_doubloons_banked: bool = false
@@ -525,10 +532,18 @@ func _setup_event_bus_bridges() -> void:
 			_bridging_event = false
 	)
 	EventBus.run_failed.connect(func(c: int, d: float) -> void:
+		if not first_loss_occurred:
+			first_loss_occurred = true
+			save_game()
 		if not _bridging_event:
 			_bridging_event = true
 			run_failed.emit(c, d)
 			_bridging_event = false
+	)
+	EventBus.player_sunk.connect(func() -> void:
+		if not first_loss_occurred:
+			first_loss_occurred = true
+			save_game()
 	)
 	# GameState -> EventBus (for legacy emitters calling GameState.<signal>.emit)
 	level_completed.connect(func(d: int, t: int) -> void:
@@ -1140,6 +1155,8 @@ func reset_save_data() -> void:
 	level_stars = {}
 	tutorial_step = TutorialStep.NOT_STARTED
 	hub_buildings_built = []
+	has_used_free_double = false
+	first_loss_occurred = false
 	should_open_map = false
 	should_auto_start = false
 	should_auto_start_endless = false
@@ -1187,6 +1204,8 @@ func save_game() -> void:
 		"unlocked_levels": highest_unlocked_level,
 		"tutorial_step": tutorial_step,
 		"hub_buildings_built": hub_buildings_built,
+		"has_used_free_double": has_used_free_double,
+		"first_loss_occurred": first_loss_occurred,
 		"master_volume": master_volume,
 		"music_volume": music_volume,
 		"sfx_volume": sfx_volume,
@@ -1222,6 +1241,8 @@ func load_game() -> void:
 	music_muted = false
 	sfx_muted = false
 	hub_buildings_built = []
+	has_used_free_double = false
+	first_loss_occurred = false
 
 	if not FileAccess.file_exists(SAVE_PATH):
 		return
@@ -1368,6 +1389,11 @@ func load_game() -> void:
 				if not hub_buildings_built.has(b_str):
 					hub_buildings_built.append(b_str)
 
+		if data.has("has_used_free_double"):
+			has_used_free_double = (data["has_used_free_double"] == true)
+		if data.has("first_loss_occurred"):
+			first_loss_occurred = (data["first_loss_occurred"] == true)
+
 		# Self-healing / Fast-forward checks on loaded tutorial_step:
 		check_and_fast_forward_tutorial()
 
@@ -1395,6 +1421,8 @@ func load_game() -> void:
 		unlocked_levels = 1
 		current_level = 1
 		tutorial_step = TutorialStep.NOT_STARTED
+		has_used_free_double = false
+		first_loss_occurred = false
 
 # --- Tutorial State Management ---
 
@@ -1447,6 +1475,8 @@ func reset_tutorial() -> void:
 	unlocked_crew = {}
 	equipped_crew = {}
 	hub_buildings_built = []
+	has_used_free_double = false
+	first_loss_occurred = false
 	save_game()
 	active_vessel_changed.emit(active_vessel)
 	doubloons_changed.emit(doubloons)

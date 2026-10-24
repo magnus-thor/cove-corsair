@@ -132,6 +132,33 @@ func _ready() -> void:
 	mob.queue_free()
 	await get_tree().process_frame
 
+	# ── 6. Economy, 2X Bonus, and Skull Outpost Sinking Gate ───────────────
+	print("\n--- 6. Economy, 2X Bonus, and Skull Outpost Sinking Gate ---")
+	GameState.reset_tutorial()
+	_check(GameState.has_used_free_double == false, "Fresh game has_used_free_double starts false")
+	_check(GameState.first_loss_occurred == false, "Fresh game first_loss_occurred starts false")
+
+	var hub_scene: PackedScene = load("res://scenes/cove_hub/cove_main_hub.tscn") as PackedScene
+	var hub: CoveMainHub = hub_scene.instantiate() as CoveMainHub
+	add_child(hub)
+	await get_tree().process_frame
+
+	# Level 5 beaten with 0 losses
+	GameState.highest_unlocked_level = 6
+	_check(hub.is_feature_unlocked("skull_outpost") == false, "Skull Outpost is NOT unlocked after beating Level 5 if player has not lost a vessel")
+
+	# Sinking on Level 6 triggers first loss
+	EventBus.player_sunk.emit()
+	_check(GameState.first_loss_occurred == true, "EventBus.player_sunk sets GameState.first_loss_occurred = true")
+	_check(hub.is_feature_unlocked("skull_outpost") == true, "Skull Outpost is unlocked once first loss occurs at Level 5+")
+	hub.queue_free()
+	await get_tree().process_frame
+
+	# Endless Mode configuration
+	var endless: EndlessMode = EndlessMode.new()
+	_check(endless.wager_interval_meters == 350.0, "Endless mode first wager checkpoint interval is 350m (was 1000m)")
+	endless.queue_free()
+
 	# Cleanup save if created during test
 	if FileAccess.file_exists(GameState.SAVE_PATH):
 		DirAccess.remove_absolute(GameState.SAVE_PATH)

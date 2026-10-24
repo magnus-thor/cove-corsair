@@ -677,7 +677,9 @@ func _on_area_entered(area: Area3D) -> void:
 				area.call("die")
 			else:
 				area.queue_free()
-			take_hit(1, "Collision with Sea Mine")
+			var cur_lvl: int = GameState.current_level if GameState else 1
+			var mine_dmg: int = 1 if cur_lvl <= 5 else 2
+			take_hit(mine_dmg, "Collision with Sea Mine")
 			return
 
 		if GameState and GameState.get_active_plating() == "spiked_iron_prow" and ram_absorb_charges_remaining > 0 and not area.is_in_group("boss"):

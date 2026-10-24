@@ -14,7 +14,7 @@ signal doubloons_updated(new_amount: int)
 @export var base_speed: float = 7.0
 @export var max_speed: float = 24.0
 @export var speed_boost_per_push: float = 2.0
-@export var wager_interval_meters: float = 1000.0
+@export var wager_interval_meters: float = 350.0
 
 var distance_traveled: float = 0.0
 var current_speed: float = 7.0
@@ -25,7 +25,7 @@ var is_active: bool = false
 var has_cashed_out: bool = false
 
 # Checkpoint tracking
-var next_checkpoint_distance: float = 1000.0
+var next_checkpoint_distance: float = 350.0
 var _checkpoint_chunk_spawned_for_distance: float = -1.0
 var chunks_spawned_count: int = 0
 var furthest_chunk_end_z: float = 0.0
@@ -65,6 +65,8 @@ var reef_slalom_scene: PackedScene = preload("res://src/gameplay/chunks/chunk_re
 var fodder_scene: PackedScene = preload("res://src/gameplay/enemies/enemy_fodder_skiff.tscn")
 var doubloon_scene: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
 var barrel_scene: PackedScene = preload("res://src/gameplay/obstacles/destructible_barrel.tscn")
+var mine_scene: PackedScene = preload("res://src/gameplay/obstacles/hazard_sea_mine.tscn")
+var barricade_scene: PackedScene = preload("res://src/gameplay/obstacles/barricade_segment.tscn")
 
 var boss_scenes: Array[PackedScene] = [
 	preload("res://src/gameplay/enemies/boss_war_barge.tscn"),
@@ -400,15 +402,31 @@ func _populate_chunk_lane_content(chunk: BaseTrackChunk) -> void:
 					break
 		if not has_object_in_zone:
 			var lane_x: float = lanes[randi() % lanes.size()]
+			# Periodically force an obstacle into the center lane (lane_x = 0.0) so players cannot idle at x=0
+			if randf() < 0.40:
+				lane_x = 0.0
+
 			var roll: float = randf()
-			if roll < 0.55 and doubloon_scene:
+			if roll < 0.28 and doubloon_scene:
 				# Spawn a cluster of 3 floating doubloons in an open lane
 				for offset_z: float in [-2.5, 0.0, 2.5]:
 					var coin: Node3D = doubloon_scene.instantiate() as Node3D
 					if coin:
 						entities.add_child(coin)
 						coin.position = Vector3(lane_x, 0.1, zone_z + offset_z)
-			elif roll < 0.80 and barrel_scene:
+			elif roll < 0.48 and mine_scene:
+				# Spawn a contact sea mine - lethal danger requiring swerving
+				var mine: Node3D = mine_scene.instantiate() as Node3D
+				if mine:
+					entities.add_child(mine)
+					mine.position = Vector3(lane_x, 0.05, zone_z)
+			elif roll < 0.68 and barricade_scene:
+				# Spawn a timber barricade segment requiring steering or heavy firepower
+				var barricade: Node3D = barricade_scene.instantiate() as Node3D
+				if barricade:
+					entities.add_child(barricade)
+					barricade.position = Vector3(lane_x, 0.0, zone_z)
+			elif roll < 0.84 and barrel_scene:
 				# Spawn a floating destructible barrel
 				var barrel: Node3D = barrel_scene.instantiate() as Node3D
 				if barrel:
@@ -421,7 +439,7 @@ func _populate_chunk_lane_content(chunk: BaseTrackChunk) -> void:
 					entities.add_child(skiff)
 					skiff.position = Vector3(lane_x, 0.1, zone_z)
 
-func _enforce_start_clearance(chunk: BaseTrackChunk, min_clearance: float = 40.0) -> void:
+func _enforce_start_clearance(chunk: BaseTrackChunk, min_clearance: float = 25.0) -> void:
 	if not chunk or not is_instance_valid(chunk):
 		return
 	var entities: Node = chunk.find_child("Entities", true, false)

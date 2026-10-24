@@ -177,8 +177,8 @@ func is_feature_unlocked(feature_id: String) -> bool:
 			# Raised right after River Level 2, when the tutorial sends the player to buy the Sloop.
 			return step >= GameState.TutorialStep.LEVEL_2_COMPLETED or highest_lvl >= 3
 		"skull_outpost", "endless":
-			# Raised when the tutorial is finished (after the River Level 5 boss).
-			return step >= GameState.TutorialStep.COMPLETED
+			# Raised when the player suffers their first sinking/loss (guaranteed on Level 6/7).
+			return GameState.first_loss_occurred and GameState.highest_unlocked_level >= 5
 		_:
 			# "future" and anything unknown stays an empty lot.
 			return false
@@ -289,7 +289,7 @@ func get_guidance_config() -> Dictionary:
 			if _fresh_house_id == "skull_outpost":
 				return {
 					"target": "skull_outpost",
-					"text": "The Dreadnought is sunk! We raised a Skull Outpost on the cliffs. Tap it to test your mettle in endless waters!",
+					"text": "Yer vessel was sunk by cutthroat corsairs! We need more coin and hull upgrades to survive ahead. We raised the Skull Outpost on the cliffs—venture into endless waters to plunder the gold we need!",
 					"voice": "",
 				}
 	return {}
@@ -452,7 +452,7 @@ func _show_locked_hint(plot: BuildingPlot) -> void:
 		"shipyard":
 			hint = "The Drydock & Shipyard will be built after River Level 2!"
 		"skull_outpost":
-			hint = "The Skull Outpost will be built once the tutorial voyage is complete!"
+			hint = "The Skull Outpost will be built once you test your mettle against tougher waters!"
 		"future":
 			hint = "This lot is reserved for a future building."
 	if hud and not hint.is_empty():
@@ -469,9 +469,6 @@ func _open_shipyard() -> void:
 		_setup_docked_flagship()
 		if hud:
 			hud.refresh()
-		call_deferred("_check_tutorial_guidance")
-	)
-	shipyard_inst.tree_exited.connect(func() -> void:
 		call_deferred("_check_tutorial_guidance")
 	)
 

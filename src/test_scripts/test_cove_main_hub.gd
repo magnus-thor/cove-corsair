@@ -110,9 +110,16 @@ func _run_tests() -> void:
 	await get_tree().process_frame
 	_check(hub._river_map_layer == null, "River map closes back to the cove")
 
-	print("[STEP 5] Skull Outpost is built when the tutorial completes; future lot stays empty")
+	print("[STEP 5] Skull Outpost is built when first loss occurs at L5+; future lot stays empty")
 	GameState.highest_unlocked_level = 6
 	GameState.advance_tutorial_to(GameState.TutorialStep.COMPLETED)
+	await _wait(0.5)
+	_check(not hub.plot_skull_outpost.is_unlocked, "Skull Outpost is not yet built before first loss")
+
+	# Sinking triggers first loss
+	EventBus.player_sunk.emit()
+	hub._build_pending_houses()
+	hub._check_tutorial_guidance()
 	await _wait(0.95)
 	_check(hub.plot_skull_outpost.is_unlocked, "Skull Outpost is built")
 	_check(GameState.is_hub_building_built("skull_outpost"), "Skull Outpost build is persisted")
