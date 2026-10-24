@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/test_scripts/render_hub_frame.gd" id="1_render_script"]
+
+[node name="RenderHubFrame" type="Node"]
+script = ExtResource("1_render_script")

@@ -54,14 +54,19 @@ func _connect_plot_signals() -> void:
 		if not plot.plot_hover_changed.is_connected(_on_plot_hover_changed):
 			plot.plot_hover_changed.connect(_on_plot_hover_changed)
 
+func _get_game_state() -> Node:
+	if has_node("/root/GameState"):
+		return get_node("/root/GameState")
+	return null
+
 func _listen_to_game_state() -> void:
-	if Engine.has_singleton("GameState"):
-		var gs: Node = Engine.get_singleton("GameState")
-		if gs.has_signal("tutorial_step_changed"):
+	var gs: Node = _get_game_state()
+	if gs:
+		if gs.has_signal("tutorial_step_changed") and not gs.is_connected("tutorial_step_changed", Callable(self, "_on_progression_changed")):
 			gs.connect("tutorial_step_changed", Callable(self, "_on_progression_changed"))
-		if gs.has_signal("level_completed"):
+		if gs.has_signal("level_completed") and not gs.is_connected("level_completed", Callable(self, "_on_level_completed")):
 			gs.connect("level_completed", Callable(self, "_on_level_completed"))
-		if gs.has_signal("active_vessel_changed"):
+		if gs.has_signal("active_vessel_changed") and not gs.is_connected("active_vessel_changed", Callable(self, "_on_active_vessel_changed")):
 			gs.connect("active_vessel_changed", Callable(self, "_on_active_vessel_changed"))
 
 func _on_progression_changed(_step: int) -> void:
@@ -87,10 +92,7 @@ func refresh_feature_unlocks() -> void:
 
 ## Returns true only if the user has progressed far enough to open the given feature.
 func is_feature_unlocked(feature_id: String) -> bool:
-	if not Engine.has_singleton("GameState"):
-		return false
-
-	var gs: Node = Engine.get_singleton("GameState")
+	var gs: Node = _get_game_state()
 	if not gs:
 		return false
 
@@ -104,20 +106,24 @@ func is_feature_unlocked(feature_id: String) -> bool:
 	var tut_step: int = 0
 	if gs.has_method("is_tutorial_in_progress"):
 		is_tut = bool(gs.call("is_tutorial_in_progress"))
-	if "current_tutorial_step" in gs:
+	if "tutorial_step" in gs:
+		tut_step = int(gs.get("tutorial_step"))
+	elif "current_tutorial_step" in gs:
 		tut_step = int(gs.get("current_tutorial_step"))
 
 	match feature_id:
 		"chart_house", "campaign":
-			# Chart House / Campaign River is the initial embarkation point
-			return true
-		"forge", "drydock", "shipyard":
-			# Drydock & Forge unlocks after Level 2 is completed!
+			# Chart House / Campaign River unlocks after Level 1 is beaten
 			if is_tut:
-				return tut_step >= 4
+				return tut_step >= 2 or highest_lvl >= 2
+			return highest_lvl >= 2
+		"forge", "drydock", "shipyard":
+			# Drydock & Forge unlocks after Level 2 is completed
+			if is_tut:
+				return tut_step >= 4 or highest_lvl >= 3
 			return highest_lvl >= 3
 		"tavern", "endless", "skull_outpost":
-			# Tavern / Endless mode unlocks at Level 5!
+			# Tavern / Endless mode unlocks after Level 4 / Tier 2 upgrade or Level 5
 			if is_tut:
 				return tut_step >= 11 or highest_lvl >= 5
 			return highest_lvl >= 5
@@ -146,12 +152,11 @@ func _setup_docked_flagship() -> void:
 	var mesh_scene: PackedScene = DINGHY_FALLBACK_MESH
 	var scale_mult: float = 0.55
 
-	if Engine.has_singleton("GameState"):
-		var gs: Node = Engine.get_singleton("GameState")
-		if gs and gs.has_method("get_active_ship_resource"):
-			var ship: Resource = gs.call("get_active_ship_resource") as Resource
-			if ship and "model_scene" in ship and ship.get("model_scene"):
-				mesh_scene = ship.get("model_scene") as PackedScene
+	var gs: Node = _get_game_state()
+	if gs and gs.has_method("get_active_ship_resource"):
+		var ship: Resource = gs.call("get_active_ship_resource") as Resource
+		if ship and "model_scene" in ship and ship.get("model_scene"):
+			mesh_scene = ship.get("model_scene") as PackedScene
 
 	if mesh_scene:
 		var ship_inst: Node3D = mesh_scene.instantiate() as Node3D

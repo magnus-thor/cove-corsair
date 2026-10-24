@@ -24,7 +24,7 @@ depth_draw_mode = 1
 
 [sub_resource type="QuadMesh" id="QuadMesh_backdrop"]
 material = SubResource("StandardMaterial3D_backdrop")
-size = Vector2(23.29, 13)
+size = Vector2(7.31, 13)
 
 [node name="CoveMainHub" type="Node3D"]
 script = ExtResource("1_hub_script")
@@ -72,7 +72,7 @@ mesh = SubResource("QuadMesh_backdrop")
 
 [node name="Plot_Forge" parent="BuildingPlots" instance=ExtResource("3_plot_scene")]
 unique_name_in_owner = true
-transform = Transform3D(0.48, 0, 0, 0, 0.48, 0, 0, 0, 0.48, -1.5, -0.35, 1.2)
+transform = Transform3D(0.3988, 0, 0.1859, 0, 0.44, 0, -0.1859, 0, 0.3988, -1.45, 0.12, -0.05)
 plot_id = "forge"
 display_name = "Blacksmith & Forge"
 is_unlocked = false
@@ -82,7 +82,7 @@ show_foundation_when_locked = false
 
 [node name="Plot_Tavern" parent="BuildingPlots" instance=ExtResource("3_plot_scene")]
 unique_name_in_owner = true
-transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 1.5, 0.85, -1.1)
+transform = Transform3D(0.4323, 0, -0.1573, 0, 0.46, 0, 0.1573, 0, 0.4323, 1.25, 0.7, -1)
 plot_id = "tavern"
 display_name = "Tavern & Inn"
 is_unlocked = false
@@ -92,7 +92,7 @@ show_foundation_when_locked = false
 
 [node name="Plot_ChartHouse" parent="BuildingPlots" instance=ExtResource("3_plot_scene")]
 unique_name_in_owner = true
-transform = Transform3D(0.52, 0, 0, 0, 0.52, 0, 0, 0, 0.52, -0.55, 2.05, -3.6)
+transform = Transform3D(0.4333, 0, 0.0764, 0, 0.44, 0, -0.0764, 0, 0.4333, -0.7, 2.65, -5)
 plot_id = "chart_house"
 display_name = "Harbor Master"
 is_unlocked = false
@@ -102,7 +102,7 @@ show_foundation_when_locked = false
 
 [node name="Plot_Expansion" parent="BuildingPlots" instance=ExtResource("3_plot_scene")]
 unique_name_in_owner = true
-transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, -1.1, 0.75, -1.6)
+transform = Transform3D(0.45, 0, 0, 0, 0.45, 0, 0, 0, 0.45, -1.25, 0.75, -1.5)
 plot_id = "expansion"
 display_name = "Plot Foundation"
 is_unlocked = false
@@ -111,4 +111,4 @@ show_foundation_when_locked = false
 
 [node name="DockAnchor" type="Marker3D" parent="."]
 unique_name_in_owner = true
-transform = Transform3D(0.951057, 0.0766327, 0.300062, 0, 0.968912, -0.247404, -0.309017, 0.235295, 0.921495, 1.75, -0.95, 2.6)
+transform = Transform3D(0.819, 0.114, 0.562, 0, 0.98, -0.199, -0.574, 0.163, 0.803, 0.45, -0.98, 1.7)
