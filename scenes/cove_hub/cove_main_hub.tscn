@@ -26,6 +26,9 @@ depth_draw_mode = 1
 material = SubResource("StandardMaterial3D_backdrop")
 size = Vector2(7.31, 13)
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_dock"]
+size = Vector3(1.8, 1.2, 2.4)
+
 [node name="CoveMainHub" type="Node3D"]
 script = ExtResource("1_hub_script")
 
@@ -112,3 +115,10 @@ show_foundation_when_locked = false
 [node name="DockAnchor" type="Marker3D" parent="."]
 unique_name_in_owner = true
 transform = Transform3D(0.819, 0.114, 0.562, 0, 0.98, -0.199, -0.574, 0.163, 0.803, 0.45, -0.98, 1.7)
+
+[node name="DockArea" type="Area3D" parent="DockAnchor"]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DockAnchor/DockArea"]
+shape = SubResource("BoxShape3D_dock")

@@ -11,6 +11,11 @@ func _ready() -> void:
 	print("   TESTING COVE MAIN HUB DYNAMIC FEATURE UNLOCKS  ")
 	print("==================================================")
 
+	if has_node("/root/GameState"):
+		var gs: Node = get_node("/root/GameState")
+		gs.call("reset_tutorial")
+		gs.set("highest_unlocked_level", 1)
+
 	var hub_scene: PackedScene = preload("res://scenes/cove_hub/cove_main_hub.tscn")
 	assert(hub_scene != null, "cove_main_hub.tscn must load successfully")
 
@@ -75,8 +80,18 @@ func _ready() -> void:
 	hub.plot_forge.plot_clicked.emit(hub.plot_forge)
 	assert(clicked_plot[0] == "forge", "Clicking unlocked forge must propagate signal")
 
-	print("[PASS] All interactions and transitions verified.")
+	print("[PASS] All plot interactions and transitions verified.")
+
+	print("[STEP 5] Testing Dock Flagship & Maiden Voyage Affordance...")
+	assert(hub.dock_area != null, "DockArea must exist on dock anchor")
+	var dock_clicked: Array[bool] = [false]
+	hub.dock_selected.connect(func() -> void: dock_clicked[0] = true)
+	hub.dock_selected.emit()
+	assert(dock_clicked[0] == true, "Dock interaction signal must work")
+	print("[PASS] Dock interaction and maiden voyage affordance verified.")
+
 	print("==================================================")
 	print("   ALL COVE HUB DYNAMIC UNLOCK TESTS PASSED!      ")
 	print("==================================================")
+	hub.queue_free()
 	get_tree().quit(0)

@@ -70,16 +70,28 @@ func _ready() -> void:
 	assert(screen.dinghy_sprite.position.y <= -30.0, "Dinghy must remain elevated after animation tick")
 	print("[PASS] Boat elevation and procedural water bobbing verified.")
 
-	print("[STEP 4] Verifying Boot Splash Screen Mode Defaults...")
-	# Verify boot splash configuration when loaded without a scene
+	print("[STEP 4] Verifying Boot Splash Screen Mode Defaults & First-Time Tutorial Launch...")
+	# Verify boot splash configuration for established returning player (post-tutorial)
+	GameState.tutorial_step = GameState.TutorialStep.COMPLETED
 	var splash_screen: CanvasLayer = loading_scene.instantiate() as CanvasLayer
 	add_child(splash_screen)
 	await get_tree().process_frame
-	assert(splash_screen.target_scene_path == LoadingScreenScript.DEFAULT_STARTUP_SCENE, "Default target scene must be pirate_lair_hub")
+	assert(splash_screen.target_scene_path == LoadingScreenScript.DEFAULT_STARTUP_SCENE, "Default target scene must be cove_main_hub for returning players")
 	assert(splash_screen.is_startup_splash == true, "Startup splash mode must be activated")
 	assert(splash_screen.destination_label.text == "SETTING SAIL FOR SMUGGLER'S COVE", "Destination label must show setting sail for Smuggler's Cove")
 	splash_screen.queue_free()
-	print("[PASS] Boot splash mode correctly targets pirate lair hub.")
+
+	# Verify boot splash configuration for first-time player (starts tutorial)
+	GameState.tutorial_step = GameState.TutorialStep.NOT_STARTED
+	var first_time_splash: CanvasLayer = loading_scene.instantiate() as CanvasLayer
+	add_child(first_time_splash)
+	await get_tree().process_frame
+	assert(first_time_splash.target_scene_path == "res://src/core/main_game.tscn", "First-time player startup must target Level 1 Tutorial")
+	assert(first_time_splash.is_startup_splash == true, "Startup splash mode must be activated")
+	assert(GameState.tutorial_step == GameState.TutorialStep.LEVEL_1_IN_PROGRESS, "Tutorial step must advance to LEVEL_1_IN_PROGRESS")
+	assert(GameState.should_auto_start == true, "should_auto_start must be true for tutorial launch")
+	first_time_splash.queue_free()
+	print("[PASS] Boot splash mode correctly targets tutorial on first launch and cove hub for returning players.")
 
 	print("[STEP 5] Verifying Destination Title & GameState Helper...")
 	screen.set_destination("res://src/ui/river_map.tscn", "Smuggler's Run")
@@ -103,4 +115,6 @@ func _ready() -> void:
 	print("==================================================")
 	print("   ALL LOADING SCREEN TESTS PASSED!               ")
 	print("==================================================")
+	screen.queue_free()
+	await get_tree().process_frame
 	get_tree().quit(0)

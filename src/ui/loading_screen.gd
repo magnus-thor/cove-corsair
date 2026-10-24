@@ -78,9 +78,24 @@ func _ready() -> void:
 			GameState.pending_loading_title = ""
 		else:
 			# Game launch boot splash mode
-			target_scene_path = DEFAULT_STARTUP_SCENE
-			destination_name = "Smuggler's Cove"
-			is_boot = true
+			var is_first_time: bool = false
+			if GameState and "tutorial_step" in GameState:
+				is_first_time = (int(GameState.tutorial_step) == int(GameState.TutorialStep.NOT_STARTED))
+
+			if is_first_time:
+				# First time startup: directly launch into River Level 1 Tutorial
+				GameState.select_level(1)
+				GameState.should_auto_start = true
+				GameState.should_auto_start_endless = false
+				GameState.reset_level()
+				GameState.advance_tutorial_to(GameState.TutorialStep.LEVEL_1_IN_PROGRESS)
+				target_scene_path = "res://src/core/main_game.tscn"
+				destination_name = "Smuggler's Run (Tutorial)"
+				is_boot = true
+			else:
+				target_scene_path = DEFAULT_STARTUP_SCENE
+				destination_name = "Smuggler's Cove"
+				is_boot = true
 
 	if target_scene_path != "":
 		start_loading(target_scene_path, destination_name, is_boot)
@@ -105,7 +120,10 @@ func start_loading(path: String, dest_title: String = "", is_startup: bool = fal
 		current_flavor_stages = STARTUP_FLAVOR_STAGES
 		current_load_duration = STARTUP_LOAD_DURATION
 		if destination_label:
-			destination_label.text = "SETTING SAIL FOR SMUGGLER'S COVE"
+			if destination_name != "" and destination_name != "Smuggler's Cove":
+				destination_label.text = "SETTING SAIL: %s" % destination_name.to_upper()
+			else:
+				destination_label.text = "SETTING SAIL FOR SMUGGLER'S COVE"
 	else:
 		current_flavor_stages = LEVEL_FLAVOR_STAGES
 		current_load_duration = LEVEL_LOAD_DURATION

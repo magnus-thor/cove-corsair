@@ -7,6 +7,9 @@ extends Node3D
 ## and a dedicated vessel dock anchor.
 
 const BuildingPlot = preload("res://scenes/cove_hub/building_plot.gd")
+const RIVER_MAP_SCENE: PackedScene = preload("res://src/ui/river_map.tscn")
+const SHIPYARD_SCENE: PackedScene = preload("res://src/ui/shipyard/shipyard_ui.tscn")
+const MAIN_GAME_PATH: String = "res://src/core/main_game.tscn"
 
 signal plot_selected(plot_id: String, plot_name: String)
 signal dock_selected()
@@ -15,6 +18,7 @@ signal dock_selected()
 @onready var background_quad: MeshInstance3D = %BackgroundQuad as MeshInstance3D
 @onready var moonlight: DirectionalLight3D = %Moonlight as DirectionalLight3D
 @onready var dock_anchor: Marker3D = %DockAnchor as Marker3D
+@onready var dock_area: Area3D = %DockArea as Area3D
 
 @onready var plot_forge: BuildingPlot = %Plot_Forge as BuildingPlot
 @onready var plot_tavern: BuildingPlot = %Plot_Tavern as BuildingPlot
@@ -24,15 +28,18 @@ signal dock_selected()
 var all_plots: Array[BuildingPlot] = []
 var _flagship_mesh: Node3D = null
 var _dock_bob_tween: Tween = null
+var _maiden_voyage_prompt: CanvasLayer = null
 
 const DINGHY_FALLBACK_MESH: PackedScene = preload("res://assets/models/user/vessels/dinghy.glb")
 
 func _ready() -> void:
 	_collect_plots()
 	_connect_plot_signals()
+	_setup_dock_interaction()
 	_setup_docked_flagship()
 	refresh_feature_unlocks()
 	_listen_to_game_state()
+	_check_maiden_voyage_prompt()
 
 func _collect_plots() -> void:
 	all_plots.clear()
@@ -71,6 +78,7 @@ func _listen_to_game_state() -> void:
 
 func _on_progression_changed(_step: int) -> void:
 	refresh_feature_unlocks()
+	_check_maiden_voyage_prompt()
 
 func _on_level_completed(_doubloons: int, _targets: int) -> void:
 	refresh_feature_unlocks()
@@ -173,11 +181,168 @@ func _start_dock_bobbing(pivot_node: Node3D) -> void:
 	_dock_bob_tween.tween_property(pivot_node, "position:y", base_y + 0.04, 1.8).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	_dock_bob_tween.tween_property(pivot_node, "position:y", base_y - 0.04, 2.2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
+func _setup_dock_interaction() -> void:
+	if not dock_area:
+		return
+	if not dock_area.input_event.is_connected(_on_dock_input_event):
+		dock_area.input_event.connect(_on_dock_input_event)
+
+func _on_dock_input_event(_camera: Camera3D, event: InputEvent, _pos: Vector3, _norm: Vector3, _shape_idx: int) -> void:
+	var activated: bool = false
+	if event is InputEventMouseButton:
+		var mouse_ev: InputEventMouseButton = event as InputEventMouseButton
+		if mouse_ev.button_index == MOUSE_BUTTON_LEFT and mouse_ev.pressed:
+			activated = true
+	elif event is InputEventScreenTouch:
+		var touch_ev: InputEventScreenTouch = event as InputEventScreenTouch
+		if touch_ev.pressed:
+			activated = true
+
+	if activated:
+		_on_dock_activated()
+
+func _on_dock_activated() -> void:
+	dock_selected.emit()
+	var gs: Node = _get_game_state()
+	var tut_step: int = 0
+	if gs and "tutorial_step" in gs:
+		tut_step = int(gs.get("tutorial_step"))
+
+	if tut_step <= 1:
+		# Start maiden voyage / tutorial
+		if gs:
+			gs.call("select_level", 1)
+			gs.set("should_auto_start", true)
+			gs.set("should_auto_start_endless", false)
+			gs.call("reset_level")
+			gs.call("advance_tutorial_to", 1)
+			gs.call("change_scene_with_loading", MAIN_GAME_PATH, "Smuggler's Run (Tutorial)")
+	else:
+		_open_river_map()
+
+func _check_maiden_voyage_prompt() -> void:
+	var gs: Node = _get_game_state()
+	var tut_step: int = int(gs.get("tutorial_step")) if gs and "tutorial_step" in gs else 0
+	if tut_step > 0:
+		if _maiden_voyage_prompt and is_instance_valid(_maiden_voyage_prompt):
+			_maiden_voyage_prompt.queue_free()
+			_maiden_voyage_prompt = null
+		return
+
+	if _maiden_voyage_prompt and is_instance_valid(_maiden_voyage_prompt):
+		return
+
+	var canvas := CanvasLayer.new()
+	canvas.name = "MaidenVoyagePromptLayer"
+	canvas.layer = 20
+	add_child(canvas)
+
+	var prompt_container := PanelContainer.new()
+	prompt_container.name = "MaidenVoyagePrompt"
+	prompt_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.10, 0.07, 0.04, 0.90)
+	style.border_width_left = 2
+	style.border_width_top = 2
+	style.border_width_right = 2
+	style.border_width_bottom = 2
+	style.border_color = Color(0.96, 0.72, 0.22, 0.95)
+	style.corner_radius_top_left = 14
+	style.corner_radius_top_right = 14
+	style.corner_radius_bottom_right = 14
+	style.corner_radius_bottom_left = 14
+	style.content_margin_left = 24
+	style.content_margin_right = 24
+	style.content_margin_top = 10
+	style.content_margin_bottom = 10
+	style.shadow_color = Color(0, 0, 0, 0.6)
+	style.shadow_size = 6
+	prompt_container.add_theme_stylebox_override("panel", style)
+
+	var label := Label.new()
+	label.text = "⚓ TAP DINGHY TO EMBARK ON YER MAIDEN VOYAGE! ⚓"
+	label.add_theme_font_override("font", preload("res://assets/fonts/CarterOne.ttf"))
+	label.add_theme_font_size_override("font_size", 14)
+	label.add_theme_color_override("font_color", Color(1.0, 0.88, 0.35, 1.0))
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	prompt_container.add_child(label)
+
+	canvas.add_child(prompt_container)
+	_maiden_voyage_prompt = canvas
+
+	var vp_size: Vector2 = get_viewport().get_visible_rect().size
+	prompt_container.custom_minimum_size = Vector2(360, 46)
+	prompt_container.position = Vector2((vp_size.x - 360.0) * 0.5, vp_size.y * 0.76)
+	prompt_container.pivot_offset = Vector2(180, 23)
+
+	var t: Tween = create_tween().set_loops().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	t.tween_property(prompt_container, "scale", Vector2(1.04, 1.04), 0.6)
+	t.tween_property(prompt_container, "scale", Vector2.ONE, 0.6)
+
+func _open_river_map() -> void:
+	if has_node("RiverMapLayer"):
+		var existing: CanvasLayer = get_node("RiverMapLayer") as CanvasLayer
+		if existing:
+			existing.visible = true
+			return
+
+	var layer := CanvasLayer.new()
+	layer.name = "RiverMapLayer"
+	layer.layer = 50
+	add_child(layer)
+
+	var map_inst: RiverMap = RIVER_MAP_SCENE.instantiate() as RiverMap
+	layer.add_child(map_inst)
+	map_inst.sail_requested.connect(_on_sail_requested)
+	map_inst.cove_requested.connect(func() -> void:
+		layer.queue_free()
+	)
+
+func _open_shipyard() -> void:
+	for child: Node in get_children():
+		if child is ShipyardUI and not child.is_queued_for_deletion():
+			return
+
+	var shipyard_inst: ShipyardUI = SHIPYARD_SCENE.instantiate() as ShipyardUI
+	add_child(shipyard_inst)
+	shipyard_inst.shipyard_closed.connect(func() -> void:
+		_setup_docked_flagship()
+		refresh_feature_unlocks()
+	)
+
+func _launch_endless_mode() -> void:
+	var gs: Node = _get_game_state()
+	if gs:
+		gs.set("should_auto_start", false)
+		gs.set("should_auto_start_endless", true)
+		gs.call("reset_level")
+		gs.call("change_scene_with_loading", MAIN_GAME_PATH, "Endless Skull Outpost")
+
+func _on_sail_requested(level_num: int) -> void:
+	var gs: Node = _get_game_state()
+	if gs:
+		gs.call("select_level", level_num)
+		gs.set("should_auto_start", true)
+		gs.set("should_auto_start_endless", false)
+		gs.call("reset_level")
+		var lvl_name: String = str(gs.call("get_level_display_name", level_num))
+		gs.call("change_scene_with_loading", MAIN_GAME_PATH, lvl_name)
+
 func _on_plot_clicked(plot: BuildingPlot) -> void:
 	print("[CoveHub] Clicked plot: %s ('%s', unlocked=%s)" % [plot.plot_id, plot.display_name, plot.is_unlocked])
 	plot_selected.emit(plot.plot_id, plot.display_name)
 	if not plot.is_unlocked:
 		_show_locked_hint(plot)
+		return
+
+	match plot.plot_id:
+		"chart_house":
+			_open_river_map()
+		"forge":
+			_open_shipyard()
+		"tavern":
+			_launch_endless_mode()
 
 func _show_locked_hint(plot: BuildingPlot) -> void:
 	match plot.plot_id:
