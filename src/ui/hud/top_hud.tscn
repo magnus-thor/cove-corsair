@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://c56j382mkw601"]
+[gd_scene load_steps=18 format=3 uid="uid://c56j382mkw601"]
 
 [ext_resource type="Script" path="res://src/ui/hud/top_hud.gd" id="1_tophud_script"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ui/coin_icon.svg" id="2_coin_icon"]
@@ -92,6 +92,53 @@ corner_radius_bottom_left = 12
 shadow_color = Color(1, 0.5, 0, 0.25)
 shadow_size = 5
 shadow_offset = Vector2(0, 2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pause_normal"]
+bg_color = Color(0.12, 0.16, 0.24, 0.85)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.95, 0.82, 0.25, 0.9)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(0, 0, 0, 0.35)
+shadow_size = 4
+shadow_offset = Vector2(0, 2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pause_hover"]
+bg_color = Color(0.18, 0.24, 0.35, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.9, 0.4, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(0, 0, 0, 0.45)
+shadow_size = 6
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pause_pressed"]
+bg_color = Color(0.08, 0.11, 0.18, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.85, 0.7, 0.2, 0.9)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(0, 0, 0, 0.2)
+shadow_size = 2
+shadow_offset = Vector2(0, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_pause_focus"]
 
 [node name="TopHUD" type="CanvasLayer"]
 layer = 10
@@ -323,3 +370,22 @@ theme_override_font_sizes/font_size = 22
 text = "1x"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="PauseButton" type="Button" parent="MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(42, 42)
+layout_mode = 2
+size_flags_vertical = 0
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.4, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 0.8, 1)
+theme_override_colors/font_pressed_color = Color(0.9, 0.75, 0.2, 1)
+theme_override_colors/font_outline_color = Color(0.15, 0.1, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_pause_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_pause_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_pause_pressed")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_pause_focus")
+text = "⏸"

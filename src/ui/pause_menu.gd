@@ -71,19 +71,19 @@ func _connect_signals() -> void:
 func _animate_open() -> void:
 	if backdrop:
 		backdrop.color.a = 0.0
-		var t1 = create_tween()
+		var t1: Tween = create_tween()
 		t1.tween_property(backdrop, "color:a", 0.7, 0.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		
 	if panel_container:
 		panel_container.pivot_offset = panel_container.size * 0.5
 		panel_container.scale = Vector2(0.85, 0.85)
 		panel_container.modulate.a = 0.0
-		var t2 = create_tween().set_parallel(true).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		var t2: Tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		t2.tween_property(panel_container, "scale", Vector2.ONE, 0.28)
 		t2.tween_property(panel_container, "modulate:a", 1.0, 0.2)
 
 func _on_master_slider_changed(val: float) -> void:
-	var linear_vol = val / 100.0
+	var linear_vol: float = val / 100.0
 	GameState.master_volume = linear_vol
 	if AudioManager and AudioManager.has_method("set_bus_volume"):
 		AudioManager.set_bus_volume("Master", linear_vol)
@@ -91,7 +91,7 @@ func _on_master_slider_changed(val: float) -> void:
 	GameState.save_game()
 
 func _on_music_slider_changed(val: float) -> void:
-	var linear_vol = val / 100.0
+	var linear_vol: float = val / 100.0
 	GameState.music_volume = linear_vol
 	if AudioManager and AudioManager.has_method("set_bus_volume"):
 		AudioManager.set_bus_volume("BGM", linear_vol)
@@ -99,7 +99,7 @@ func _on_music_slider_changed(val: float) -> void:
 	GameState.save_game()
 
 func _on_sfx_slider_changed(val: float) -> void:
-	var linear_vol = val / 100.0
+	var linear_vol: float = val / 100.0
 	GameState.sfx_volume = linear_vol
 	if AudioManager and AudioManager.has_method("set_bus_volume"):
 		AudioManager.set_bus_volume("SFX", linear_vol)
@@ -162,7 +162,7 @@ func _on_continue_pressed() -> void:
 		
 	if panel_container:
 		panel_container.pivot_offset = panel_container.size * 0.5
-		var t = create_tween().set_parallel(true).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		var t: Tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 		t.tween_property(panel_container, "scale", Vector2(0.85, 0.85), 0.15)
 		t.tween_property(panel_container, "modulate:a", 0.0, 0.15)
 		if backdrop:

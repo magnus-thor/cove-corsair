@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://dp7198pausesys"]
+
+[ext_resource type="Script" path="res://src/test_scripts/test_pause_system.gd" id="1_test_script"]
+
+[node name="TestPauseSystem" type="Node"]
+script = ExtResource("1_test_script")

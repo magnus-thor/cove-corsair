@@ -8,6 +8,7 @@ extends CanvasLayer
 @onready var level_progress_bar: ProgressBar = $MarginContainer/HBoxContainer/ProgressContainer/HBoxContainer/LevelProgressBar
 @onready var multiplier_panel: Control = $MarginContainer/HBoxContainer/MultiplierPanel
 @onready var multiplier_label: Label = $MarginContainer/HBoxContainer/MultiplierPanel/MarginContainer/MultiplierLabel
+@onready var pause_button: Button = %PauseButton
 
 # Boss HUD components
 @onready var boss_health_panel: PanelContainer = $MarginContainer/HBoxContainer/ProgressContainer/BossHealthPanel
@@ -21,9 +22,13 @@ var _displayed_gold: int = 0
 var _boss_segments: Array[ProgressBar] = []
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	add_to_group("top_hud")
 	_update_pivots()
 	get_viewport().size_changed.connect(_update_pivots)
+	
+	if pause_button:
+		pause_button.pressed.connect(_on_pause_button_pressed)
 	
 	# Cache boss progress bars
 	if segments_container:
@@ -37,9 +42,9 @@ func _ready() -> void:
 		boss_health_panel.modulate.a = 0.0
 		
 	# Instantiate celebratory Fire Frenzy / Overdrive vignette
-	var vignette_scene := preload("res://src/ui/hud/frenzy_vignette.tscn")
+	var vignette_scene: PackedScene = preload("res://src/ui/hud/frenzy_vignette.tscn")
 	if vignette_scene:
-		var vig := vignette_scene.instantiate()
+		var vig: Node = vignette_scene.instantiate()
 		add_child(vig)
 
 	# Connect to GameState for economy signals (stay in GameState)
@@ -52,6 +57,16 @@ func _ready() -> void:
 	if get_node_or_null("/root/EventBus"):
 		EventBus.boss_spawned_event.connect(_on_boss_spawned)
 		EventBus.boss_health_changed.connect(_on_boss_health_changed)
+		if EventBus.has_signal("level_completed"):
+			EventBus.level_completed.connect(func(_d: int, _t: int) -> void:
+				if pause_button:
+					pause_button.visible = false
+			)
+		if EventBus.has_signal("run_failed"):
+			EventBus.run_failed.connect(func(_c: int, _dist: float) -> void:
+				if pause_button:
+					pause_button.visible = false
+			)
 		
 		# Set initial state
 		_displayed_gold = GameState.doubloons
@@ -68,6 +83,30 @@ func _ready() -> void:
 		# If game hasn't started yet, hide distance progress and multiplier
 		if "is_game_active" in GameState and not GameState.is_game_active:
 			_set_run_hud_visible(false)
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not GameState.is_game_active or get_tree().paused:
+		return
+	var is_p_pressed: bool = false
+	if event is InputEventKey:
+		var key_ev: InputEventKey = event as InputEventKey
+		is_p_pressed = key_ev.pressed and not key_ev.echo and key_ev.keycode == KEY_P
+	if event.is_action_pressed("ui_cancel") or is_p_pressed:
+		get_viewport().set_input_as_handled()
+		_on_pause_button_pressed()
+
+func _on_pause_button_pressed() -> void:
+	if not GameState.is_game_active or get_tree().paused:
+		return
+	if get_tree().root.find_child("PauseMenu", true, false) != null:
+		return
+	if AudioManager and AudioManager.has_method("play_sfx"):
+		AudioManager.play_sfx("gate_passes")
+	var pause_scene: PackedScene = preload("res://src/ui/pause_menu.tscn")
+	if pause_scene:
+		var pause_menu: Node = pause_scene.instantiate()
+		var parent_node: Node = get_parent() if get_parent() else self
+		parent_node.add_child(pause_menu)
 
 var _tutorial_swipe_prompt: Control = null
 
@@ -136,6 +175,8 @@ func _set_run_hud_visible(vis: bool, animate: bool = false) -> void:
 		return
 	if gold_container:
 		gold_container.visible = vis
+	if pause_button:
+		pause_button.visible = vis
 	if vis:
 		progress_container.visible = true
 		multiplier_panel.visible = true
@@ -144,25 +185,35 @@ func _set_run_hud_visible(vis: bool, animate: bool = false) -> void:
 			multiplier_panel.modulate.a = 0.0
 			if gold_container:
 				gold_container.modulate.a = 0.0
-			var t := create_tween().set_parallel(true)
+			if pause_button:
+				pause_button.modulate.a = 0.0
+			var t: Tween = create_tween().set_parallel(true)
 			t.tween_property(progress_container, "modulate:a", 1.0, 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 			t.tween_property(multiplier_panel, "modulate:a", 1.0, 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 			if gold_container:
 				t.tween_property(gold_container, "modulate:a", 1.0, 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+			if pause_button:
+				t.tween_property(pause_button, "modulate:a", 1.0, 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		else:
 			progress_container.modulate.a = 1.0
 			multiplier_panel.modulate.a = 1.0
 			if gold_container:
 				gold_container.modulate.a = 1.0
+			if pause_button:
+				pause_button.modulate.a = 1.0
 	else:
 		progress_container.visible = false
 		multiplier_panel.visible = false
+		if pause_button:
+			pause_button.visible = false
 
 func _update_pivots() -> void:
 	if gold_container:
 		gold_container.pivot_offset = gold_container.size * 0.5
 	if multiplier_panel:
 		multiplier_panel.pivot_offset = multiplier_panel.size * 0.5
+	if pause_button:
+		pause_button.pivot_offset = pause_button.size * 0.5
 
 func _on_doubloons_changed(new_amount: int) -> void:
 	if not gold_label:
@@ -176,12 +227,12 @@ func _on_doubloons_changed(new_amount: int) -> void:
 	# Punch scale on gold panel
 	if gold_container:
 		gold_container.pivot_offset = gold_container.size * 0.5
-		var scale_tween := create_tween().set_parallel(false)
+		var scale_tween: Tween = create_tween().set_parallel(false)
 		scale_tween.tween_property(gold_container, "scale", Vector2(1.2, 1.2), 0.08).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		scale_tween.tween_property(gold_container, "scale", Vector2.ONE, 0.15).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
 		
 	# Smooth count-up / count-down tween
-	var start_gold := _displayed_gold
+	var start_gold: int = _displayed_gold
 	_gold_tween.tween_method(func(val: int) -> void:
 		_displayed_gold = val
 		gold_label.text = str(val)
@@ -226,35 +277,35 @@ func _on_boss_spawned(boss_name: String, _max_hp: int) -> void:
 		
 	if boss_health_panel:
 		boss_health_panel.visible = true
-		var tween := create_tween()
+		var tween: Tween = create_tween()
 		tween.tween_property(boss_health_panel, "modulate:a", 1.0, 0.5).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 
 func _on_boss_health_changed(current: int, max_hp: int) -> void:
 	if _boss_segments.is_empty():
 		return
-	var seg_count := _boss_segments.size()
-	var segment_max := float(max_hp) / float(seg_count) if max_hp > 0 else 10.0
+	var seg_count: int = _boss_segments.size()
+	var segment_max: float = float(max_hp) / float(seg_count) if max_hp > 0 else 10.0
 	
 	for i in range(seg_count):
-		var segment := _boss_segments[i]
+		var segment: ProgressBar = _boss_segments[i]
 		if not is_instance_valid(segment):
 			continue
-		var min_hp := float(i) * segment_max
+		var min_hp: float = float(i) * segment_max
 		var segment_val: float = clampf(float(current) - min_hp, 0.0, segment_max) / segment_max * 10.0
 		
 		# Tween individual segment value smoothly
-		var tween := create_tween()
+		var tween: Tween = create_tween()
 		tween.tween_property(segment, "value", float(segment_val), 0.15).set_trans(Tween.TRANS_SINE)
 
 func show_warning_alert(text: String) -> void:
-	var label := get_node_or_null("MarginContainer/HBoxContainer/ProgressContainer/WarningLabel") as Label
+	var label: Label = get_node_or_null("MarginContainer/HBoxContainer/ProgressContainer/WarningLabel") as Label
 	if label and is_instance_valid(label):
 		label.text = text
 		label.visible = true
 		label.modulate = Color.WHITE
 		label.modulate.a = 1.0
 		
-		var tween := create_tween()
+		var tween: Tween = create_tween()
 		tween.tween_property(label, "modulate", Color(1.5, 1.5, 1.5, 1.0), 0.1)
 		tween.tween_property(label, "modulate", Color.WHITE, 0.1)
 		tween.tween_property(label, "modulate", Color(1.5, 1.5, 1.5, 1.0), 0.1)
@@ -268,16 +319,16 @@ func show_warning_alert(text: String) -> void:
 
 
 func trigger_red_flash() -> void:
-	var flash := get_node_or_null("VignetteAlert")
+	var flash: Node = get_node_or_null("VignetteAlert")
 	if flash:
 		flash.queue_free()
 		
-	var panel := Panel.new()
+	var panel: Panel = Panel.new()
 	panel.name = "VignetteAlert"
 	panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
-	var style := StyleBoxFlat.new()
+	var style: StyleBoxFlat = StyleBoxFlat.new()
 	style.bg_color = Color(0, 0, 0, 0) # Transparent center
 	style.border_color = Color(0.8, 0.1, 0.1, 0.45) # Red border
 	style.border_width_left = 60
@@ -290,6 +341,6 @@ func trigger_red_flash() -> void:
 	panel.add_theme_stylebox_override("panel", style)
 	add_child(panel)
 	
-	var tween := create_tween()
+	var tween: Tween = create_tween()
 	tween.tween_property(panel, "modulate:a", 0.0, 0.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tween.tween_callback(panel.queue_free)

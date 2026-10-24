@@ -65,7 +65,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	var is_p_pressed: bool = false
 	if event is InputEventKey:
-		var key_ev := event as InputEventKey
+		var key_ev: InputEventKey = event as InputEventKey
 		is_p_pressed = key_ev.pressed and not key_ev.echo and key_ev.keycode == KEY_P
 	if event.is_action_pressed("ui_cancel") or is_p_pressed:
 		get_viewport().set_input_as_handled()
@@ -74,12 +74,15 @@ func _unhandled_input(event: InputEvent) -> void:
 func _on_pause_button_pressed() -> void:
 	if not GameState.is_game_active or get_tree().paused:
 		return
+	if get_tree().root.find_child("PauseMenu", true, false) != null:
+		return
 	if AudioManager and AudioManager.has_method("play_sfx"):
 		AudioManager.play_sfx("gate_passes")
 	var pause_scene: PackedScene = preload("res://src/ui/pause_menu.tscn")
 	if pause_scene:
 		var pause_menu: Node = pause_scene.instantiate()
-		get_parent().add_child(pause_menu)
+		var parent_node: Node = get_parent() if get_parent() else self
+		parent_node.add_child(pause_menu)
 
 func _on_boss_spawned(boss_name: String, max_hp: int) -> void:
 	is_boss_mode = true
