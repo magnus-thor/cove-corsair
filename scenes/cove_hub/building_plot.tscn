@@ -1,0 +1,19 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/cove_hub/building_plot.gd" id="1_plot_script"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_default"]
+size = Vector3(2.5, 2.5, 2.5)
+
+[node name="BuildingPlot" type="Node3D"]
+script = ExtResource("1_plot_script")
+
+[node name="InteractionArea" type="Area3D" parent="."]
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="InteractionArea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+shape = SubResource("BoxShape3D_default")
+
+[node name="MeshRoot" type="Node3D" parent="."]

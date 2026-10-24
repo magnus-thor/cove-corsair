@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://src/test_scripts/test_cove_main_hub.gd" id="1_test_script"]
+
+[node name="TestCoveMainHub" type="Node"]
+script = ExtResource("1_test_script")
