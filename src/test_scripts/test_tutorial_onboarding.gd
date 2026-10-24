@@ -40,9 +40,17 @@ func _ready() -> void:
 
 	if _fail_count == 0:
 		print("ALL TUTORIAL ONBOARDING TESTS COMPLETED SUCCESSFULLY! ✓\n")
+		# Ensure test save state is cleanly removed so local player save is fresh:
+		if FileAccess.file_exists(GameState.SAVE_PATH):
+			DirAccess.remove_absolute(GameState.SAVE_PATH)
+		GameState.reset_save_data()
+		if FileAccess.file_exists(GameState.SAVE_PATH):
+			DirAccess.remove_absolute(GameState.SAVE_PATH)
 		get_tree().quit(0)
 	else:
 		push_error("Tutorial tests encountered failures!")
+		if FileAccess.file_exists(GameState.SAVE_PATH):
+			DirAccess.remove_absolute(GameState.SAVE_PATH)
 		get_tree().quit(1)
 
 func _test_dinghy_nerf_and_weapon_resources() -> void:

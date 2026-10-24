@@ -132,6 +132,7 @@ func refresh_visuals() -> void:
 		var model: Node3D = building_scene.instantiate() as Node3D
 		if model:
 			model.name = "BuildingMesh"
+			_harmonize_materials(model)
 			mesh_root.add_child(model)
 			_current_instantiated_model = model
 			_fit_collision_to_active_model(model)
@@ -139,11 +140,69 @@ func refresh_visuals() -> void:
 		var foundation: Node3D = foundation_scene.instantiate() as Node3D
 		if foundation:
 			foundation.name = "FoundationMesh"
+			_harmonize_materials(foundation)
 			mesh_root.add_child(foundation)
 			_current_instantiated_model = foundation
 			_fit_collision_to_active_model(foundation)
 	else:
 		_update_collision_shape()
+
+func _harmonize_materials(model_node: Node3D) -> void:
+	var stack: Array[Node] = [model_node]
+	while not stack.is_empty():
+		var curr: Node = stack.pop_back() as Node
+		if curr is MeshInstance3D:
+			var mi: MeshInstance3D = curr as MeshInstance3D
+			if mi.mesh:
+				for i: int in range(mi.mesh.get_surface_count()):
+					var mat: Material = mi.get_surface_override_material(i)
+					if not mat:
+						mat = mi.mesh.surface_get_material(i)
+					if not mat:
+						continue
+					if mat is StandardMaterial3D:
+						var sm: StandardMaterial3D = mat.duplicate() as StandardMaterial3D
+						var modified: bool = false
+						match sm.resource_name:
+							"MAT_Plaster_Wall":
+								# Warm hand-painted Mediterranean cream plaster
+								sm.albedo_color = Color(0.76, 0.71, 0.62)
+								sm.roughness = 0.88
+								modified = true
+							"MAT_Stone_Base", "MAT_Stone_Dark":
+								# Earthy coastal slate
+								sm.albedo_color = Color(0.44, 0.42, 0.40)
+								sm.roughness = 0.85
+								modified = true
+							"MAT_Stone_Light":
+								# Soft sandstone
+								sm.albedo_color = Color(0.55, 0.52, 0.48)
+								sm.roughness = 0.80
+								modified = true
+							"MAT_Wood_Plank", "MAT_Wood_Light":
+								# Warm oak timber
+								sm.albedo_color = Color(0.50, 0.36, 0.22)
+								sm.roughness = 0.78
+								modified = true
+							"MAT_Wood_Dark":
+								# Dark aged support timber
+								sm.albedo_color = Color(0.30, 0.20, 0.12)
+								sm.roughness = 0.82
+								modified = true
+							"MAT_Roof_Terracotta":
+								# Warm terracotta shingles
+								sm.albedo_color = Color(0.68, 0.35, 0.24)
+								sm.roughness = 0.72
+								modified = true
+							"MAT_Roof_Tile_Teal":
+								# Weathered coastal teal slate
+								sm.albedo_color = Color(0.26, 0.46, 0.52)
+								sm.roughness = 0.68
+								modified = true
+						if modified:
+							mi.set_surface_override_material(i, sm)
+		for c: Node in curr.get_children():
+			stack.append(c)
 
 func _create_placeholder_fallback_mesh() -> void:
 	# Fallback visual: small rustic wooden/stone marker base if no scene is assigned yet

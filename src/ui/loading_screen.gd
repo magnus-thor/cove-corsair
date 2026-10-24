@@ -80,7 +80,7 @@ func _ready() -> void:
 			# Game launch boot splash mode
 			var is_first_time: bool = false
 			if GameState and "tutorial_step" in GameState:
-				is_first_time = (int(GameState.tutorial_step) == int(GameState.TutorialStep.NOT_STARTED))
+				is_first_time = (int(GameState.tutorial_step) <= int(GameState.TutorialStep.LEVEL_1_IN_PROGRESS))
 
 			if is_first_time:
 				# First time startup: directly launch into River Level 1 Tutorial
