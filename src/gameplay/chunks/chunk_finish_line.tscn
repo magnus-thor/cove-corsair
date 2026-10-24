@@ -21,7 +21,7 @@ chunk_id = "finish_line"
 [node name="ChunkStart" type="Marker3D" parent="." unique_id=9812402]
 
 [node name="ChunkEnd" type="Marker3D" parent="." unique_id=9812403]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -50)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -65)
 
 [node name="Banks" type="Node3D" parent="." unique_id=9812404]
 
@@ -57,24 +57,24 @@ transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, -8.8, 0, -24)
 transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 8.8, 0, -24)
 
 [node name="FinishBarricade" parent="Entities" unique_id=9812415 instance=ExtResource("7_barricade")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -22)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -14)
 
 [node name="GuardRower_Left" type="Area3D" parent="Entities" unique_id=9812416 groups=["destructible", "enemies"] instance=ExtResource("8_enemy")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0.1, -16)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0.1, -8)
 script = ExtResource("9_enemy_script")
 max_hp = 3
 current_hp = 3
 forward_speed = 1.0
 
 [node name="GuardRower_Right" type="Area3D" parent="Entities" unique_id=9812417 groups=["destructible", "enemies"] instance=ExtResource("8_enemy")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.1, -16)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.1, -8)
 script = ExtResource("9_enemy_script")
 max_hp = 3
 current_hp = 3
 forward_speed = 1.0
 
 [node name="FinishTrigger" type="Area3D" parent="." unique_id=9812421]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -34)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -20)
 collision_layer = 0
 collision_mask = 3
 

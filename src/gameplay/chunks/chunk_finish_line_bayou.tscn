@@ -21,7 +21,7 @@ chunk_id = "finish_line_bayou"
 [node name="ChunkStart" type="Marker3D" parent="." unique_id=9812502]
 
 [node name="ChunkEnd" type="Marker3D" parent="." unique_id=9812503]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -50)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -65)
 
 [node name="Banks" type="Node3D" parent="." unique_id=9812504]
 
@@ -66,16 +66,16 @@ transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -6.6, 0.8, -26)
 transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 6.6, 0.8, -26)
 
 [node name="FinishBarricade" parent="Entities" unique_id=9812519 instance=ExtResource("8_barricade")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -22)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -14)
 
 [node name="GuardSkiff_Left" type="Area3D" parent="Entities" unique_id=9812520 groups=["destructible", "enemies"] instance=ExtResource("9_grave_skiff")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0.1, -16)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0.1, -8)
 
 [node name="GuardSkiff_Right" type="Area3D" parent="Entities" unique_id=9812521 groups=["destructible", "enemies"] instance=ExtResource("9_grave_skiff")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.1, -16)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.1, -8)
 
 [node name="FinishTrigger" type="Area3D" parent="." unique_id=9812522]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -34)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -20)
 collision_layer = 0
 collision_mask = 3
 

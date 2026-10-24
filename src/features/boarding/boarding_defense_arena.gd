@@ -40,7 +40,7 @@ const APPROACH_DURATION_SEC: float = 1.8
 			else:
 				_setup_crew_from_gamestate()
 
-@export var show_editor_planks: bool = true:
+@export var show_editor_planks: bool = false:
 	set(value):
 		show_editor_planks = value
 		if Engine.is_editor_hint():
@@ -880,7 +880,7 @@ func clear_all_planks_and_boarders() -> void:
 	clear_all_boarders()
 
 func _update_editor_preview_planks() -> void:
-	if not is_inside_tree():
+	if not is_inside_tree() or not Engine.is_editor_hint():
 		return
 
 	var container: Node3D = get_node_or_null("EditorPreviewPlanks") as Node3D
@@ -1282,7 +1282,7 @@ func launch_plank_to_zone(zone_index: int, wave_num: int = 1, spawn_delay_sec: f
 	plank.plank_thickness = plank_thickness
 	add_child(plank)
 	var anchor_pos: Vector3 = target_zone.plank_anchor.global_position if is_instance_valid(target_zone.plank_anchor) else target_zone.grapple_anchor.global_position
-	plank.setup_plank(start_marker.global_position, anchor_pos, target_zone)
+	plank.drop_plank(start_marker.global_position, anchor_pos, target_zone)
 	total_planks_launched += 1
 
 	_spawn_plank_swarm(plank, target_zone, count, wave_num, spawn_delay_sec)
@@ -1309,6 +1309,11 @@ func _spawn_plank_swarm(plank: BoardingPlank, zone: BoardingZone, count: int, wa
 	if disable_enemies or debug_disable_spawns:
 		return
 	active_spawners_count += 1
+
+	# Wait for plank to finish dropping and latch onto deck before deploying boarders
+	while is_instance_valid(plank) and not plank.is_latched and is_encounter_active:
+		await get_tree().process_frame
+
 	if initial_delay_sec > 0.0:
 		await get_tree().create_timer(initial_delay_sec).timeout
 

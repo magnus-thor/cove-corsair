@@ -31,6 +31,7 @@ const BOMBARD_SCENE: PackedScene = preload("res://src/gameplay/enemies/enemy_min
 const THERMAL_GEYSER_SCENE: PackedScene = preload("res://src/gameplay/obstacles/hazard_thermal_geyser.tscn")
 
 const SHIP_WRECK_MODEL: PackedScene = preload("res://assets/models/ship-wreck.glb")
+const ROCKS_MODEL: PackedScene = preload("res://assets/models/rocks-a.glb")
 const TOWER_WATCH_MODEL: PackedScene = preload("res://assets/models/tower-watch.glb")
 const TOWER_LARGE_MODEL: PackedScene = preload("res://assets/models/tower-complete-large.glb")
 const MANGROVE_MODEL: PackedScene = preload("res://assets/models/scenery/Emerald_Mangrove_Grov.glb")
@@ -94,6 +95,7 @@ func _ready() -> void:
 			finish_trigger.body_entered.connect(_on_finish_body_entered)
 
 	_configure_finish_arch_for_level(cur_lvl, theme_name)
+	_spawn_headland_scenery()
 	_spawn_finish_wave()
 
 func _configure_finish_arch_for_level(cur_lvl: int, biome: String) -> void:
@@ -530,6 +532,34 @@ func _on_finish_body_entered(body: Node3D) -> void:
 	if body.is_in_group("player") or (body.get_parent() and body.get_parent().is_in_group("player")):
 		_trigger_victory()
 
+func _spawn_headland_scenery() -> void:
+	var entities: Node3D = get_node_or_null("Entities") as Node3D
+	if not entities:
+		return
+
+	var headlands: Node3D = Node3D.new()
+	headlands.name = "HeadlandsBehindArch"
+	headlands.add_to_group("finish_landmark")
+	entities.add_child(headlands)
+
+	# Flank channel behind the arch with coastal rock headlands and watchtowers (Z from -36 to -68)
+	var z_slots: Array[float] = [-38.0, -48.0, -58.0, -66.0]
+	for z_pos: float in z_slots:
+		for side: float in [-1.0, 1.0]:
+			if ROCKS_MODEL:
+				var rock: Node3D = ROCKS_MODEL.instantiate() as Node3D
+				if rock:
+					headlands.add_child(rock)
+					rock.position = Vector3(side * 10.0, 0.0, z_pos)
+					rock.rotation_degrees = Vector3(0.0, randf_range(0.0, 360.0), 0.0)
+					rock.scale = Vector3.ONE * 2.0
+			if TOWER_WATCH_MODEL and absf(z_pos - (-48.0)) < 1.0:
+				var tower: Node3D = TOWER_WATCH_MODEL.instantiate() as Node3D
+				if tower:
+					headlands.add_child(tower)
+					tower.position = Vector3(side * 12.0, 0.0, z_pos)
+					tower.scale = Vector3.ONE * 1.25
+
 func _trigger_victory() -> void:
 	if _is_finished:
 		return
@@ -546,17 +576,31 @@ func _trigger_victory() -> void:
 		
 	_spawn_celebration_effects()
 	
-	# Smoothly decelerate scrolling as vessel sails into the harbor
-	var assembler := get_tree().get_first_node_in_group("chunk_assembler") as ChunkAssembler
-	var track_mgr := get_tree().get_first_node_in_group("track_manager") as Node3D
-	var tween: Tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	# Stop track scrolling immediately so the arch stops sinking down towards the player
+	var assembler: Node = get_tree().get_first_node_in_group("chunk_assembler")
+	var track_mgr: Node = get_tree().get_first_node_in_group("track_manager")
 	if assembler and "scroll_speed" in assembler:
-		tween.tween_property(assembler, "scroll_speed", 0.0, 1.2)
+		assembler.set("scroll_speed", 0.0)
 	if track_mgr and "scroll_speed" in track_mgr:
-		tween.tween_property(track_mgr, "scroll_speed", 0.0, 1.2)
+		track_mgr.set("scroll_speed", 0.0)
+
+	# Animate the player vessel sailing FORWARD (up the screen) through the arch
+	var player: Node3D = get_tree().get_first_node_in_group("player") as Node3D
+	if is_instance_valid(player):
+		if "is_shooting_enabled" in player:
+			player.set("is_shooting_enabled", false)
+		var move_comp: Node = player.get_node_or_null("PlayerMovement")
+		if move_comp and "process_mode" in move_comp:
+			move_comp.process_mode = Node.PROCESS_MODE_DISABLED
+
+		var sail_tween: Tween = player.create_tween().set_parallel(true).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		sail_tween.tween_property(player, "position:x", 0.0, 1.2)
+		var arch_z: float = global_position.z - 34.0
+		var target_z: float = arch_z - 8.0
+		sail_tween.tween_property(player, "global_position:z", target_z, 1.5)
 	
-	# Small delay for fireworks before victory settlement
-	get_tree().create_timer(1.2, true, false, true).timeout.connect(func() -> void:
+	# Delay for fireworks & celebratory sail before victory settlement
+	get_tree().create_timer(1.5, true, false, true).timeout.connect(func() -> void:
 		EventBus.level_completed.emit(GameState.doubloons, GameState.targets_destroyed)
 	)
 

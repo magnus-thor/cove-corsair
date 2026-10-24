@@ -116,6 +116,9 @@ func guide_to(
 	_start_pointer_bob()
 	_start_highlight_pulse()
 	_start_voice_and_typewriter(voice_id, text_content)
+	var audio: Node = get_node_or_null("/root/AudioManager")
+	if audio and audio.has_method("duck_music"):
+		audio.call("duck_music", true)
 
 func dismiss() -> void:
 	if _bounce_tween and _bounce_tween.is_valid():
@@ -142,6 +145,9 @@ func dismiss() -> void:
 		visible = false
 		if root_control:
 			root_control.modulate.a = 1.0
+		var audio: Node = get_node_or_null("/root/AudioManager")
+		if audio and audio.has_method("duck_music"):
+			audio.call("duck_music", false)
 		guidance_dismissed.emit()
 	)
 

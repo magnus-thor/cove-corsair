@@ -62,9 +62,12 @@ var _last_coin_time: float = 0.0
 const COIN_STREAK_WINDOW: float = 0.75
 const COIN_PITCH_STEPS: Array[float] = [1.0, 1.06, 1.125, 1.19, 1.26, 1.335, 1.415, 1.50]
 
-# Low HP adrenaline audio tension
 var _low_hp_active: bool = false
 var _lpf_effect_idx: int = -1
+
+# Dialogue / voiceover audio ducking
+var _is_music_ducked: bool = false
+var _duck_tween: Tween = null
 
 func _init() -> void:
 	if instance == null:
@@ -91,11 +94,39 @@ func _setup_buses() -> void:
 		var bgm_idx := AudioServer.bus_count - 1
 		AudioServer.set_bus_name(bgm_idx, "BGM")
 		AudioServer.set_bus_send(bgm_idx, "Master")
+		AudioServer.set_bus_volume_db(bgm_idx, linear_to_db(0.55))
 	if AudioServer.get_bus_index("SFX") == -1:
 		AudioServer.add_bus()
 		var sfx_idx := AudioServer.bus_count - 1
 		AudioServer.set_bus_name(sfx_idx, "SFX")
 		AudioServer.set_bus_send(sfx_idx, "Master")
+
+## Smoothly ducks or restores music volume during dialogue or voiceover speech
+func duck_music(duck: bool, duration: float = 0.35) -> void:
+	if _is_music_ducked == duck:
+		return
+	_is_music_ducked = duck
+
+	var bgm_idx := AudioServer.get_bus_index("BGM")
+	if bgm_idx == -1:
+		return
+
+	var base_vol: float = 0.55
+	var gs: Node = get_node_or_null("/root/GameState")
+	if gs and "music_volume" in gs:
+		base_vol = float(gs.get("music_volume"))
+
+	var target_vol: float = base_vol * (0.32 if duck else 1.0)
+	var target_db: float = linear_to_db(clampf(target_vol, 0.0001, 1.0))
+
+	if _duck_tween and _duck_tween.is_valid():
+		_duck_tween.kill()
+
+	_duck_tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_duck_tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	_duck_tween.tween_method(func(val: float) -> void:
+		AudioServer.set_bus_volume_db(bgm_idx, val)
+	, AudioServer.get_bus_volume_db(bgm_idx), target_db, duration)
 
 func set_bus_volume(bus_name: String, linear_vol: float) -> void:
 	var idx := AudioServer.get_bus_index(bus_name)

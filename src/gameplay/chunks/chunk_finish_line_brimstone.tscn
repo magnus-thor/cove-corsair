@@ -19,7 +19,7 @@ chunk_id = "finish_line_brimstone"
 [node name="ChunkStart" type="Marker3D" parent="." unique_id=9812602]
 
 [node name="ChunkEnd" type="Marker3D" parent="." unique_id=9812603]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -50)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -65)
 
 [node name="Banks" type="Node3D" parent="." unique_id=9812604]
 
@@ -55,16 +55,16 @@ transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, -8.4, 1.0, -32)
 transform = Transform3D(-1.4, 0, 0, 0, 1.4, 0, 0, 0, -1.4, 8.4, 1.0, -32)
 
 [node name="FinishBarricade" parent="Entities" unique_id=9812619 instance=ExtResource("8_barricade")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -22)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -14)
 
 [node name="GuardGunner_Left" type="Area3D" parent="Entities" unique_id=9812620 groups=["destructible", "enemies"] instance=ExtResource("9_gunner")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0.1, -16)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0.1, -8)
 
 [node name="GuardGunner_Right" type="Area3D" parent="Entities" unique_id=9812621 groups=["destructible", "enemies"] instance=ExtResource("9_gunner")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.1, -16)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.1, -8)
 
 [node name="FinishTrigger" type="Area3D" parent="." unique_id=9812622]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -34)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -20)
 collision_layer = 0
 collision_mask = 3
 

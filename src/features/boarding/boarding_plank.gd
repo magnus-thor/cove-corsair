@@ -53,6 +53,45 @@ func setup_plank(start_point: Vector3, end_point: Vector3, zone: BoardingZone) -
 	
 	_update_visual_and_collision()
 
+## Lowers and slams the boarding plank down from the enemy vessel onto the player ship deck
+func drop_plank(start_point: Vector3, end_point: Vector3, zone: BoardingZone) -> void:
+	origin_pos = start_point
+	target_pos = end_point
+	target_zone = zone
+	current_health = max_health
+	is_latched = false
+
+	# Calculate upright initial position tilted against the enemy gunwale
+	var length: float = start_point.distance_to(end_point)
+	var flat_dir: Vector3 = (Vector3(end_point.x, start_point.y, end_point.z) - start_point).normalized()
+	var raised_tip: Vector3 = start_point + (flat_dir * length * 0.28) + Vector3(0.0, length * 0.90, 0.0)
+
+	_apply_endpoints(start_point, raised_tip)
+
+	var drop_tween: Tween = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	drop_tween.tween_method(func(t: float) -> void:
+		var cur_tip: Vector3 = raised_tip.lerp(end_point, t)
+		_apply_endpoints(start_point, cur_tip)
+	, 0.0, 1.0, 0.38)
+
+	drop_tween.tween_callback(func() -> void:
+		_apply_endpoints(start_point, end_point)
+		is_latched = true
+		if target_zone:
+			if target_zone.has_method("register_plank"):
+				target_zone.call("register_plank", self)
+			elif target_zone.has_method("register_grapple"):
+				target_zone.call("register_grapple", self)
+		var audio: Node = _get_audio_manager()
+		if audio and audio.has_method("play_sfx"):
+			audio.call("play_sfx", "sfx_wood_smash", 0.9, 1.1)
+	)
+
+func _apply_endpoints(p_start: Vector3, p_end: Vector3) -> void:
+	origin_pos = p_start
+	target_pos = p_end
+	_update_visual_and_collision()
+
 # Backward-compatibility alias
 func setup_grapple(start_point: Vector3, end_point: Vector3, zone: BoardingZone) -> void:
 	setup_plank(start_point, end_point, zone)

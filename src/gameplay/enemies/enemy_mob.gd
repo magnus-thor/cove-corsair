@@ -98,11 +98,11 @@ func apply_enemy_data(data: EnemyData) -> void:
 	var cur_lvl: int = GameState.current_level if GameState else 1
 	var hp_mult: float = 1.0
 	if cur_lvl > 30:
-		hp_mult = 2.4
+		hp_mult = 2.6
 	elif cur_lvl > 15:
-		hp_mult = 1.6
+		hp_mult = 2.0
 	elif cur_lvl > 5:
-		hp_mult = 1.25
+		hp_mult = 1.6
 	elif cur_lvl <= 2:
 		hp_mult = 0.5
 	elif cur_lvl <= 4:

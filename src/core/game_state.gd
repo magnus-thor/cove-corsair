@@ -139,7 +139,7 @@ var unlocked_levels: int = 1 # Backwards compatibility alias for highest_unlocke
 
 # Persistent Audio Preferences
 var master_volume: float = 1.0
-var music_volume: float = 1.0
+var music_volume: float = 0.55
 var sfx_volume: float = 1.0
 var master_muted: bool = false
 var music_muted: bool = false
@@ -191,18 +191,18 @@ const VESSEL_CATALOG: Dictionary = {
 		"resource_path": "res://src/data/resources/user_vessels/sloop_ship.tres",
 		"purchase_price": 400,
 		"max_level": 10,
-		"tier_prices": { 2: 250, 3: 550, 4: 1200, 5: 2400, 6: 4200, 7: 7000, 8: 11000, 9: 16500, 10: 25000 },
+		"tier_prices": { 2: 250, 3: 350, 4: 650, 5: 1800, 6: 3500, 7: 6000, 8: 9500, 9: 14000, 10: 20000 },
 		"tier_descriptions": {
 			1: "Standard Oak (4 HP, Twin Bow Chasers)",
 			2: "Tuned Rigging (4 HP, 11.8 m/s, +Mid Crew Socket)",
-			3: "Reinforced Planks (5 HP, 12.1 m/s, +10% Firepower)",
-			4: "Copper Fasteners (5 HP, 12.4 m/s, +15% Firepower)",
-			5: "Hardened Gunwales (5 HP, 12.8 m/s, +20% Firepower)",
-			6: "Broadside Carronades (6 HP, 13.2 m/s, +Dual Swivel Mounts)",
-			7: "Storm Sails (6 HP, 13.6 m/s, +30% Firepower)",
-			8: "Reinforced Keel (6 HP, 14.0 m/s, +35% Firepower)",
-			9: "Flagship Quarters (7 HP, 14.3 m/s, +Aft Crew Socket)",
-			10: "Fleet Flagship (7 HP, 14.5 m/s, All Sockets Maxed)"
+			3: "Reinforced Planks (5 HP, 12.2 m/s, +12% Firepower)",
+			4: "Heavy Copper Sheathing (6 HP, 12.6 m/s, +25% Firepower, Reinforced Hull)",
+			5: "Hardened Gunwales (6 HP, 13.0 m/s, +30% Firepower)",
+			6: "Broadside Carronades (7 HP, 13.4 m/s, +Dual Swivel Mounts)",
+			7: "Storm Sails (7 HP, 13.7 m/s, +35% Firepower)",
+			8: "Reinforced Keel (7 HP, 14.0 m/s, +40% Firepower)",
+			9: "Flagship Quarters (8 HP, 14.3 m/s, +Aft Crew Socket)",
+			10: "Fleet Flagship (8 HP, 14.5 m/s, All Sockets Maxed)"
 		},
 		"base_hp": 4,
 		"base_speed": 11.5,
@@ -1216,7 +1216,7 @@ func load_game() -> void:
 	level_high_scores = {}
 	level_stars = {}
 	master_volume = 1.0
-	music_volume = 1.0
+	music_volume = 0.55
 	sfx_volume = 1.0
 	master_muted = false
 	music_muted = false

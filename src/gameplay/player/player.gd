@@ -348,13 +348,27 @@ func apply_tier(tier_level: int) -> void:
 	var progress_ratio: float = float(clampi(tier_level, 1, max_lvl) - 1) / float(maxi(1, max_lvl - 1))
 
 	# Incremental stat scaling up to max ceilings (e.g. Sloop +3.0 m/s at L10 = 14.5 m/s ceiling)
-	var hp_gain: int = int(round(progress_ratio * (2.0 if ship_data.ship_id == "dinghy" else (3.0 if ship_data.ship_id == "sloop" else 2.0))))
+	var hp_gain: int = 0
+	if ship_data.ship_id == "dinghy":
+		hp_gain = int(round(progress_ratio * 2.0))
+	elif ship_data.ship_id == "sloop":
+		if tier_level >= 4:
+			hp_gain = 2 + int(round(float(clampi(tier_level, 4, max_lvl) - 4) / float(maxi(1, max_lvl - 4)) * 2.0))
+		elif tier_level == 3:
+			hp_gain = 1
+		else:
+			hp_gain = 0
+	else:
+		hp_gain = int(round(progress_ratio * 2.0))
+
 	max_health = ship_data.max_health + hp_gain
 	current_health = max_health
 	
 	var speed_bonus_max: float = 1.0 if ship_data.ship_id == "dinghy" else 3.0
 	var tier_speed: float = ship_data.move_speed + progress_ratio * speed_bonus_max
 	tier_fire_rate_multiplier = 1.0 + progress_ratio * 0.35
+	if ship_data.ship_id == "sloop" and tier_level >= 4:
+		tier_fire_rate_multiplier = maxf(tier_fire_rate_multiplier, 1.25)
 	if _movement:
 		_movement.sync_from_ship_data(tier_speed, tier_speed * 1.3)
 	health_changed.emit(current_health, max_health)

@@ -290,6 +290,12 @@ func _on_arena_won() -> void:
 		active_arena.queue_free()
 		active_arena = null
 
+	# Keep defeated enemy vessel alongside the player where broadside combat concluded
+	if is_instance_valid(boss) and is_instance_valid(active_player):
+		var p_pos: Vector3 = active_player.global_position
+		boss.global_position = Vector3(p_pos.x + 3.8, p_pos.y, p_pos.z)
+		boss.rotation_degrees = Vector3(0.0, 0.0, 8.0)
+
 	_restore_runner()
 	boarding_completed.emit(boss)
 
