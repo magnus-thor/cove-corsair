@@ -16,7 +16,13 @@ extends Area3D
 		if is_node_ready() and not enemy_data:
 			_apply_mob_type_fallback()
 
-@export var max_hp: int = 3
+@export var max_hp: int = 3:
+	set(val):
+		max_hp = val
+		if health_component:
+			health_component.max_health = val
+			health_component._current_health = val
+			_update_health_bar()
 @export var forward_speed: float = 2.0
 @export var doubloons_drop: int = 2
 
@@ -45,10 +51,14 @@ var _current_base_y: float = 1.25
 var shoot_cooldown_timer: float = 0.0
 var _hits_received: int = 0
 
-## Read-only passthrough for legacy current_hp reads (e.g. hazard_sea_mine.gd).
+## Passthrough for legacy current_hp reads and writes.
 var current_hp: int:
 	get:
 		return health_component._current_health if health_component else max_hp
+	set(val):
+		if health_component:
+			health_component._current_health = val
+			_update_health_bar()
 
 func _ready() -> void:
 	_clean_shadow_nodes(self)
@@ -157,12 +167,16 @@ func _physics_process(delta: float) -> void:
 		
 	_time += delta
 	
-	# Constant downward river movement
-	global_position.z += forward_speed * delta
-	
 	# Gentle floating bobbing
 	if enemy_sprite:
 		enemy_sprite.position.y = _current_base_y + sin(_time * 3.0) * 0.04
+		
+	# Wait until this individual vessel enters engagement range before advancing relative to the chunk
+	if global_position.z < -55.0:
+		return
+		
+	# Constant downward river movement
+	global_position.z += forward_speed * delta
 		
 	var player := get_tree().get_first_node_in_group("player") as Node3D
 	var player_z: float = player.global_position.z if player else 0.0

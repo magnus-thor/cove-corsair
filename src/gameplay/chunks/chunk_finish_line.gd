@@ -71,6 +71,9 @@ func _resolve_active_biome(cur_lvl: int) -> String:
 		return "bayou"
 	return theme_name.to_lower()
 
+var _finish_setup_done: bool = false
+var _l1_coin_mobs_spawned: int = 0
+
 func _ready() -> void:
 	var cur_lvl: int = _resolve_active_level()
 	var resolved_biome: String = _resolve_active_biome(cur_lvl)
@@ -79,6 +82,9 @@ func _ready() -> void:
 		theme_name = resolved_biome
 
 	super._ready()
+	if _finish_setup_done:
+		return
+	_finish_setup_done = true
 	if not custom_chunk_id.is_empty():
 		chunk_id = custom_chunk_id
 	elif theme_name == "bayou":
@@ -121,16 +127,16 @@ func _configure_finish_arch_for_level(cur_lvl: int, biome: String) -> void:
 			var w_l: Node3D = finish_arch.get_node_or_null("WillowArch_Left") as Node3D
 			var w_r: Node3D = finish_arch.get_node_or_null("WillowArch_Right") as Node3D
 			if w_l:
-				w_l.position = Vector3(-6.4, 1.5, -35.0)
+				w_l.position = Vector3(-6.4, 1.5, -51.0)
 			if w_r:
-				w_r.position = Vector3(6.4, 1.5, -35.0)
+				w_r.position = Vector3(6.4, 1.5, -51.0)
 			for side: float in [-1.0, 1.0]:
 				if SHIP_WRECK_MODEL:
 					var wreck: Node3D = SHIP_WRECK_MODEL.instantiate() as Node3D
 					if wreck:
 						wreck.name = "FinishWreck_%s" % ("L" if side < 0.0 else "R")
 						finish_arch.add_child(wreck)
-						wreck.position = Vector3(side * 5.6, 0.2, -34.0)
+						wreck.position = Vector3(side * 5.6, 0.2, -50.0)
 						wreck.rotation_degrees = Vector3(12.0, 35.0 * side, -26.0 * side)
 						wreck.scale = Vector3.ONE * 1.35
 		else:
@@ -142,7 +148,7 @@ func _configure_finish_arch_for_level(cur_lvl: int, biome: String) -> void:
 					if grove:
 						grove.name = "MangroveArch_%s" % ("L" if side < 0.0 else "R")
 						finish_arch.add_child(grove)
-						grove.position = Vector3(side * 5.5, 1.4, -33.5)
+						grove.position = Vector3(side * 5.5, 1.4, -49.5)
 						grove.rotation_degrees = Vector3(0.0, 90.0 * side, -20.0 * side)
 						grove.scale = Vector3.ONE * 2.1
 				if TOTEM_MODEL:
@@ -150,7 +156,7 @@ func _configure_finish_arch_for_level(cur_lvl: int, biome: String) -> void:
 					if extra_totem:
 						extra_totem.name = "RitualTotemOuter_%s" % ("L" if side < 0.0 else "R")
 						finish_arch.add_child(extra_totem)
-						extra_totem.position = Vector3(side * 6.5, 1.2, -29.0)
+						extra_totem.position = Vector3(side * 6.5, 1.2, -45.0)
 						extra_totem.scale = Vector3.ONE * 1.65
 
 	elif biome == "brimstone":
@@ -164,33 +170,33 @@ func _configure_finish_arch_for_level(cur_lvl: int, biome: String) -> void:
 			# Variant 2 (e.g. Level 34): Towering Volcanic Spire Hellgate & Floating Molten Crown Apex
 			active_arch_style = "brimstone_spire_crown_hellgate"
 			if spire_l:
-				spire_l.position = Vector3(-5.7, 1.9, -34.0)
+				spire_l.position = Vector3(-5.7, 1.9, -50.0)
 				spire_l.rotation_degrees = Vector3(0.0, 0.0, -22.0)
 				spire_l.scale = Vector3(2.5, 3.1, 2.5)
 			if spire_r:
-				spire_r.position = Vector3(5.7, 1.9, -34.0)
+				spire_r.position = Vector3(5.7, 1.9, -50.0)
 				spire_r.rotation_degrees = Vector3(0.0, 180.0, 22.0)
 				spire_r.scale = Vector3(2.5, 3.1, 2.5)
 			if crown_apex:
-				crown_apex.position = Vector3(0.0, 5.2, -34.0)
+				crown_apex.position = Vector3(0.0, 5.2, -50.0)
 				crown_apex.scale = Vector3.ONE * 2.1
 		elif arch_var == 1:
 			# Variant 1 (e.g. Level 43): Abyssal Obsidian Crystal Rift Arch (Overarching Crystal Fangs)
 			active_arch_style = "brimstone_obsidian_crystal_rift"
 			if spire_l:
-				spire_l.position = Vector3(-8.2, 1.6, -35.5)
+				spire_l.position = Vector3(-8.2, 1.6, -51.5)
 				spire_l.rotation_degrees = Vector3(0.0, 15.0, -8.0)
 				spire_l.scale = Vector3(1.8, 2.2, 1.8)
 			if spire_r:
-				spire_r.position = Vector3(8.2, 1.6, -35.5)
+				spire_r.position = Vector3(8.2, 1.6, -51.5)
 				spire_r.rotation_degrees = Vector3(0.0, -165.0, 8.0)
 				spire_r.scale = Vector3(1.8, 2.2, 1.8)
 			if obs_l:
-				obs_l.position = Vector3(-5.2, 2.2, -34.0)
+				obs_l.position = Vector3(-5.2, 2.2, -50.0)
 				obs_l.rotation_degrees = Vector3(0.0, 0.0, -34.0)
 				obs_l.scale = Vector3(2.6, 3.0, 2.4)
 			if obs_r:
-				obs_r.position = Vector3(5.2, 2.2, -34.0)
+				obs_r.position = Vector3(5.2, 2.2, -50.0)
 				obs_r.rotation_degrees = Vector3(0.0, 180.0, 34.0)
 				obs_r.scale = Vector3(2.6, 3.0, 2.4)
 			if crown_apex:
@@ -202,14 +208,14 @@ func _configure_finish_arch_for_level(cur_lvl: int, biome: String) -> void:
 					if upper_crys:
 						upper_crys.name = "RiftCrystalUpper_%s" % ("L" if side < 0.0 else "R")
 						finish_arch.add_child(upper_crys)
-						upper_crys.position = Vector3(side * 2.4, 4.8, -34.0)
+						upper_crys.position = Vector3(side * 2.4, 4.8, -50.0)
 						upper_crys.rotation_degrees = Vector3(0.0, 0.0, -115.0 * side)
 						upper_crys.scale = Vector3(1.9, 2.3, 1.9)
 		else:
 			# Variant 0 (e.g. Level 33, 36, 39, 42): Dreadflame Iron Bastion & Triple Molten Crown Gate
 			active_arch_style = "brimstone_dreadflame_bastion"
 			if crown_apex:
-				crown_apex.position = Vector3(0.0, 4.8, -34.0)
+				crown_apex.position = Vector3(0.0, 4.8, -50.0)
 				crown_apex.scale = Vector3.ONE * 1.75
 			for side: float in [-1.0, 1.0]:
 				if TOWER_LARGE_MODEL:
@@ -217,7 +223,7 @@ func _configure_finish_arch_for_level(cur_lvl: int, biome: String) -> void:
 					if d_tower:
 						d_tower.name = "DreadBastionTower_%s" % ("L" if side < 0.0 else "R")
 						finish_arch.add_child(d_tower)
-						d_tower.position = Vector3(side * 6.4, 0.0, -34.0)
+						d_tower.position = Vector3(side * 6.4, 0.0, -50.0)
 						d_tower.scale = Vector3(1.3, 1.6, 1.3)
 
 	else:
@@ -235,7 +241,7 @@ func _configure_finish_arch_for_level(cur_lvl: int, biome: String) -> void:
 					if w_tower:
 						w_tower.name = "WatchTower_%s" % ("L" if side < 0.0 else "R")
 						finish_arch.add_child(w_tower)
-						w_tower.position = Vector3(side * 5.8, 0.0, -33.0)
+						w_tower.position = Vector3(side * 5.8, 0.0, -49.0)
 						w_tower.scale = Vector3(1.5, 1.7, 1.5)
 		else:
 			active_arch_style = "tropical_shipwreck_citadel_gate"
@@ -245,7 +251,7 @@ func _configure_finish_arch_for_level(cur_lvl: int, biome: String) -> void:
 					if t_wreck:
 						t_wreck.name = "HarborWreck_%s" % ("L" if side < 0.0 else "R")
 						finish_arch.add_child(t_wreck)
-						t_wreck.position = Vector3(side * 6.4, 0.1, -29.0)
+						t_wreck.position = Vector3(side * 6.4, 0.1, -45.0)
 						t_wreck.rotation_degrees = Vector3(8.0, -25.0 * side, 18.0 * side)
 						t_wreck.scale = Vector3.ONE * 1.25
 
@@ -275,60 +281,123 @@ func _spawn_finish_wave() -> void:
 
 func _spawn_tropical_finish_wave(entities: Node, finish_barricade: BarricadeWall, cur_lvl: int, wave_var: int) -> void:
 	var base_hp: int = 2 if cur_lvl <= 2 else (3 if cur_lvl <= 6 else (5 if cur_lvl <= 11 else 7))
-	var base_spd: float = 1.2 if cur_lvl <= 2 else 1.5
+	var base_spd: float = 1.6 if cur_lvl <= 2 else 2.2
+	var hp_cap: int = 4 if cur_lvl <= 3 else 999
 
 	if cur_lvl <= 1:
 		active_wave_style = "tropical_intro_rowers"
-		for lx: float in [-1.8, 0.0, 1.8]:
-			_spawn_enemy_mob(entities, ROWER_DATA, Vector3(lx, 0.1, -12.0), 2, 1.1, 1)
+		# Wave 1 (Z = -4 to -8): Immediate opening vanguard so there is zero empty space
+		for lx: float in [-2.4, 0.0, 2.4]:
+			_spawn_enemy_mob(entities, ROWER_DATA, Vector3(lx, 0.1, -5.0), 2, 1.6, 1)
+		# Wave 2 (Z = -13 to -17): Staggered flanker line
+		for lx2: float in [-3.0, -1.0, 1.0, 3.0]:
+			_spawn_enemy_mob(entities, ROWER_DATA, Vector3(lx2, 0.1, -14.5), 1, 1.8, 0)
+		# Wave 3 (Z = -21 to -25): Barricade vanguard before FinishBarricade at Z = -26
+		for lx3: float in [-2.2, 0.0, 2.2]:
+			_spawn_enemy_mob(entities, RAIDER_DATA, Vector3(lx3, 0.1, -22.0), 2, 2.0, 0)
+		# Wave 4 (Z = -31 to -36): Final arch blockade right in front of FinishTrigger at Z = -38
+		for lx4: float in [-2.8, -1.4, 0.0, 1.4, 2.8]:
+			_spawn_enemy_mob(entities, ROWER_DATA, Vector3(lx4, 0.1, -33.5), 2, 1.8, 0)
 		return
+
+	# Wave 1 (Z = -4.0 to -9.5): Immediate Entry Swarm across all tropical finish variants (zero empty start!)
+	var w1_lanes: Array[float] = [-3.0, -1.5, 0.0, 1.5, 3.0]
+	if wave_var % 2 != 0:
+		w1_lanes = [-3.2, -1.8, -0.6, 0.6, 1.8, 3.2]
+	for i: int in range(w1_lanes.size()):
+		var w1_z: float = -4.5 - float(i % 3) * 1.6
+		var w1_data: Resource = ROWER_DATA if i % 2 == 0 else RAIDER_DATA
+		_spawn_enemy_mob(entities, w1_data, Vector3(w1_lanes[i], 0.1, w1_z), mini(base_hp, hp_cap), base_spd + 0.4, 1 if i < 2 else 0)
 
 	match wave_var:
 		0:
-			# Variant 0 (e.g. L4, L8, L12): Harbor Barricade + 2 Raider Skiffs + 2 Skeleton Rowers
+			# Variant 0 (e.g. L4, L8, L12): Harbor Barricade + 4-Wave Raider & Rower Assault
 			active_wave_style = "tropical_barricade_raiders"
-			for rx: float in [-2.6, 2.6]:
-				_spawn_enemy_mob(entities, RAIDER_DATA, Vector3(rx, 0.1, -16.0), base_hp + 1, base_spd + 0.3, 2)
-			for sx: float in [-1.1, 1.1]:
-				_spawn_enemy_mob(entities, ROWER_DATA, Vector3(sx, 0.1, -10.5), base_hp, base_spd, 1)
+			# Wave 2 (Z = -13 to -18): Raider Flank Pincer
+			for rx: float in [-2.8, -1.0, 1.0, 2.8]:
+				_spawn_enemy_mob(entities, RAIDER_DATA, Vector3(rx, 0.1, -15.0 - (1.5 if absf(rx) > 2.0 else 0.0)), mini(base_hp + 1, hp_cap), base_spd + 0.5, 1)
+			# Wave 3 (Z = -21 to -24, in front of FinishBarricade at -26): Heavy Shield Line
+			for sx: float in [-2.2, 0.0, 2.2]:
+				_spawn_enemy_mob(entities, TURTLE_DATA if cur_lvl >= 6 else RAIDER_DATA, Vector3(sx, 0.1, -22.0), mini(base_hp + 2, hp_cap), base_spd, 1)
+			# Wave 4 (Z = -31 to -36.5, behind FinishBarricade right before Arch): Final Arch Swarm
+			var w4_x0: Array[float] = [-3.2, -1.6, 0.0, 1.6, 3.2]
+			for j: int in range(w4_x0.size()):
+				_spawn_enemy_mob(entities, RAIDER_DATA if j % 2 == 0 else ROWER_DATA, Vector3(w4_x0[j], 0.1, -32.0 - float(j % 2) * 2.2), mini(base_hp, hp_cap), base_spd + 0.6, 0)
 		1:
 			# Variant 1 (e.g. L9, L13): Open-Channel Raider V-Spearhead + Explosive Kegs (No Barricade Wall)
 			active_wave_style = "tropical_raider_v_spearhead"
 			if finish_barricade:
 				entities.remove_child(finish_barricade)
 				finish_barricade.queue_free()
+			# Wave 2 (Z = -12 to -19): V-Spearhead
 			var v_spawns: Array[Vector3] = [
-				Vector3(0.0, 0.1, -11.0),
-				Vector3(-1.6, 0.1, -14.5),
-				Vector3(1.6, 0.1, -14.5),
-				Vector3(-3.0, 0.1, -18.0),
-				Vector3(3.0, 0.1, -18.0),
+				Vector3(0.0, 0.1, -12.5),
+				Vector3(-1.6, 0.1, -15.5),
+				Vector3(1.6, 0.1, -15.5),
+				Vector3(-3.0, 0.1, -18.5),
+				Vector3(3.0, 0.1, -18.5),
 			]
 			for pos: Vector3 in v_spawns:
-				_spawn_enemy_mob(entities, RAIDER_DATA, pos, base_hp, base_spd + 0.4, 2)
+				_spawn_enemy_mob(entities, RAIDER_DATA, pos, mini(base_hp, hp_cap), base_spd + 0.5, 1)
 			for kx: float in [-1.8, 1.8]:
 				_spawn_barrel(entities, Vector3(kx, 0.05, -22.0), DestructibleObstacle.ObstacleType.FUSE_BARREL, 2)
+			# Wave 3 (Z = -24 to -29): Tide Cutter & Raider Rush
+			for cx1: float in [-2.4, 2.4]:
+				var cutter1: Area3D = TIDE_CUTTER_SCENE.instantiate() as Area3D
+				if cutter1:
+					entities.add_child(cutter1)
+					cutter1.position = Vector3(cx1, 0.1, -25.5)
+			for mx: float in [-1.0, 0.0, 1.0]:
+				_spawn_enemy_mob(entities, RAIDER_DATA, Vector3(mx * 1.4, 0.1, -28.0), mini(base_hp + 1, hp_cap), base_spd + 0.6, 0)
+			# Wave 4 (Z = -32 to -36.5): Final Arch Blitz
+			for ax: float in [-3.3, -2.2, -1.1, 0.0, 1.1, 2.2, 3.3]:
+				_spawn_enemy_mob(entities, RAIDER_DATA, Vector3(ax, 0.1, -33.0 - (2.0 if absf(ax) < 1.5 else 0.0)), mini(base_hp, hp_cap), base_spd + 0.7, 0)
 		2:
 			# Variant 2 (e.g. L2, L6, L14): Armored Turtle Prow + Fast Tide Cutter Flankers
 			active_wave_style = "tropical_turtle_and_cutters"
 			if finish_barricade and cur_lvl > 3:
 				finish_barricade.x_points = [-0.8, 0.8]
-			_spawn_enemy_mob(entities, TURTLE_DATA, Vector3(0.0, 0.1, -14.0), base_hp + 3, 1.2, 3)
+			# Wave 2 (Z = -13 to -19): Armored Prow + Cutter Escorts
+			_spawn_enemy_mob(entities, TURTLE_DATA, Vector3(0.0, 0.1, -14.0), mini(base_hp + 2, hp_cap), 1.5, 2)
 			for cx: float in [-2.4, 2.4]:
 				var cutter: Area3D = TIDE_CUTTER_SCENE.instantiate() as Area3D
 				if cutter:
 					entities.add_child(cutter)
-					cutter.position = Vector3(cx, 0.1, -19.0)
+					cutter.position = Vector3(cx, 0.1, -17.5)
+			for rx2: float in [-1.2, 1.2]:
+				_spawn_enemy_mob(entities, RAIDER_DATA, Vector3(rx2, 0.1, -21.0), mini(base_hp, hp_cap), base_spd + 0.4, 0)
+			# Wave 3 & 4 (Z = -29 to -36.5): Post-barricade swarm in front of Arch
+			var w4_x2: Array[float] = [-3.0, -1.8, -0.6, 0.6, 1.8, 3.0]
+			for k: int in range(w4_x2.size()):
+				var z_k: float = -30.5 - float(k % 3) * 2.2
+				_spawn_enemy_mob(entities, RAIDER_DATA if k % 2 == 0 else ROWER_DATA, Vector3(w4_x2[k], 0.1, z_k), mini(base_hp, hp_cap), base_spd + 0.5, 0)
 		_:
 			# Variant 3 (e.g. L3, L7, L11): Corsair Flagship & Escort Line
 			active_wave_style = "tropical_flagship_escort"
-			_spawn_enemy_mob(entities, ELITE_IRONCLAD_DATA if cur_lvl >= 7 else TURTLE_DATA, Vector3(0.0, 0.1, -17.0), base_hp + 4, 1.3, 4)
-			for rx: float in [-2.2, 2.2]:
-				_spawn_enemy_mob(entities, RAIDER_DATA, Vector3(rx, 0.1, -12.0), base_hp, base_spd + 0.2, 2)
+			# Wave 2 (Z = -12 to -18): Escort Line + Flagship
+			for rx: float in [-2.6, -1.0, 1.0, 2.6]:
+				_spawn_enemy_mob(entities, RAIDER_DATA, Vector3(rx, 0.1, -13.0 - (2.0 if absf(rx) < 1.5 else 0.0)), mini(base_hp, hp_cap), base_spd + 0.3, 1)
+			_spawn_enemy_mob(entities, ELITE_IRONCLAD_DATA if cur_lvl >= 7 else TURTLE_DATA, Vector3(0.0, 0.1, -20.5), mini(base_hp + 3, hp_cap), 1.5, 2)
+			# Wave 3 & 4 (Z = -29 to -36.5): Final Arch Guard Armada
+			var w4_x3: Array[float] = [-3.2, -2.0, -0.8, 0.8, 2.0, 3.2]
+			for m: int in range(w4_x3.size()):
+				var z_m: float = -30.5 - float(m % 2) * 3.5
+				_spawn_enemy_mob(entities, RAIDER_DATA, Vector3(w4_x3[m], 0.1, z_m), mini(base_hp, hp_cap), base_spd + 0.5, 0)
 
 func _spawn_bayou_finish_wave(entities: Node, finish_barricade: BarricadeWall, cur_lvl: int, wave_var: int) -> void:
 	var ghost_hp: int = 8 + int((cur_lvl - 15) * 0.6)
 	var skiff_hp: int = 12 + int((cur_lvl - 15) * 0.8)
+
+	# Wave 1 (Z = -4.0 to -9.5): Immediate Bayou Swarm at chunk start (eliminates empty space!)
+	var w1_lanes: Array[float] = [-3.2, -1.6, 0.0, 1.6, 3.2]
+	if wave_var % 2 != 0:
+		w1_lanes = [-3.0, -1.8, -0.6, 0.6, 1.8, 3.0]
+	for i: int in range(w1_lanes.size()):
+		var z1: float = -4.5 - float(i % 3) * 1.8
+		if i % 2 == 1:
+			_spawn_grave_skiff(entities, Vector3(w1_lanes[i], 0.1, z1), skiff_hp, 2.6)
+		else:
+			_spawn_enemy_mob(entities, GHOST_DATA, Vector3(w1_lanes[i], 0.1, z1), ghost_hp, 2.5, 1)
 
 	match wave_var:
 		1:
@@ -337,64 +406,108 @@ func _spawn_bayou_finish_wave(entities: Node, finish_barricade: BarricadeWall, c
 			if finish_barricade:
 				entities.remove_child(finish_barricade)
 				finish_barricade.queue_free()
+			# Wave 2 (Z = -12.5 to -18.5): Spectral Ghost Armada
 			var ghost_positions: Array[Vector3] = [
-				Vector3(0.0, 0.1, -12.0),
+				Vector3(0.0, 0.1, -12.5),
 				Vector3(-2.6, 0.1, -15.5),
 				Vector3(2.6, 0.1, -15.5),
+				Vector3(-1.3, 0.1, -18.0),
+				Vector3(1.3, 0.1, -18.0),
 			]
 			for g_pos: Vector3 in ghost_positions:
-				_spawn_enemy_mob(entities, GHOST_DATA, g_pos, ghost_hp, 2.1, 3)
-			for cx: float in [-1.6, 1.6]:
-				var cutter: Area3D = TIDE_CUTTER_SCENE.instantiate() as Area3D
-				if cutter:
-					entities.add_child(cutter)
-					cutter.position = Vector3(cx, 0.1, -22.0)
+				_spawn_enemy_mob(entities, GHOST_DATA, g_pos, ghost_hp, 2.4, 2)
 			for bx: float in [-3.2, 0.0, 3.2]:
 				if BIOGAS_POD_SCENE:
 					var pod: Node3D = BIOGAS_POD_SCENE.instantiate() as Node3D
 					if pod:
 						entities.add_child(pod)
-						pod.position = Vector3(bx, 0.05, -19.0)
+						pod.position = Vector3(bx, 0.05, -21.0)
+			# Wave 3 (Z = -23.5 to -28.5): Tide Cutters & Grave Skiffs
+			for cx: float in [-2.2, 2.2]:
+				var cutter: Area3D = TIDE_CUTTER_SCENE.instantiate() as Area3D
+				if cutter:
+					entities.add_child(cutter)
+					cutter.position = Vector3(cx, 0.1, -24.5)
+			for gx1: float in [-1.2, 0.0, 1.2]:
+				_spawn_grave_skiff(entities, Vector3(gx1 * 1.5, 0.1, -28.0), skiff_hp, 2.6)
+			# Wave 4 (Z = -32.0 to -36.5): Final Arch Spectral Wall
+			for ax1: float in [-3.3, -2.0, -0.7, 0.7, 2.0, 3.3]:
+				_spawn_enemy_mob(entities, GHOST_DATA, Vector3(ax1, 0.1, -33.0 - (2.2 if absf(ax1) < 1.5 else 0.0)), ghost_hp, 2.8, 0)
 		2:
 			# Variant 2 (e.g. Level 18, 22, 26): Bayou Harvester Dread-Guard & Grave Skiffs
 			active_wave_style = "bayou_harvester_dread_guard"
 			if finish_barricade:
 				entities.remove_child(finish_barricade)
 				finish_barricade.queue_free()
+			# Wave 2 (Z = -13 to -19): Grave Skiff Escort Screen
+			for gx: float in [-3.0, -1.2, 1.2, 3.0]:
+				_spawn_grave_skiff(entities, Vector3(gx, 0.1, -14.0 - (2.0 if absf(gx) < 2.0 else 0.0)), skiff_hp, 2.4)
+			# Wave 3 (Z = -22 to -27): Harvester Dread-Guard + Ghost Flankers
 			if HARVESTER_SCENE:
 				var harv: Area3D = HARVESTER_SCENE.instantiate() as Area3D
 				if harv:
 					entities.add_child(harv)
-					harv.position = Vector3(0.0, 0.1, -17.0)
+					harv.position = Vector3(0.0, 0.1, -23.5)
 					harv.set("max_hp", 42 + (cur_lvl - 15) * 2)
 					harv.set("current_hp", 42 + (cur_lvl - 15) * 2)
-			for gx: float in [-2.8, 2.8]:
-				_spawn_grave_skiff(entities, Vector3(gx, 0.1, -13.0), skiff_hp, 2.2)
+			for fx: float in [-2.8, 2.8]:
+				_spawn_enemy_mob(entities, GHOST_DATA, Vector3(fx, 0.1, -26.5), ghost_hp, 2.5, 1)
+			# Wave 4 (Z = -31.5 to -36.5): Final Arch Swamp Blitz
+			for ax2: float in [-3.2, -1.8, -0.6, 0.6, 1.8, 3.2]:
+				_spawn_grave_skiff(entities, Vector3(ax2, 0.1, -32.5 - (2.5 if absf(ax2) > 2.0 else 0.0)), skiff_hp, 2.8)
 		0:
 			# Variant 0 (e.g. Level 16, 24, 28): Split Bayou Barricade + Grave Skiff Dart Battery + Biogas Spores
 			active_wave_style = "bayou_grave_skiff_battery"
-			for gx: float in [-2.8, 0.0, 2.8]:
-				_spawn_grave_skiff(entities, Vector3(gx, 0.1, -14.0), skiff_hp, 2.0)
+			# Wave 2 (Z = -13 to -18): Grave Skiff Battery
+			for gx: float in [-2.8, -1.0, 1.0, 2.8]:
+				_spawn_grave_skiff(entities, Vector3(gx, 0.1, -14.5 - (1.8 if absf(gx) < 1.5 else 0.0)), skiff_hp, 2.3)
+			# Wave 3 (Z = -21 to -24, in front of FinishBarricade at -26): Ghost Sloops + Biogas
+			for g0: float in [-2.2, 0.0, 2.2]:
+				_spawn_enemy_mob(entities, GHOST_DATA, Vector3(g0, 0.1, -21.5), ghost_hp, 2.2, 1)
 			for bx: float in [-1.8, 1.8]:
 				if BIOGAS_POD_SCENE:
 					var pod: Node3D = BIOGAS_POD_SCENE.instantiate() as Node3D
 					if pod:
 						entities.add_child(pod)
-						pod.position = Vector3(bx, 0.05, -25.0)
+						pod.position = Vector3(bx, 0.05, -29.0)
+			# Wave 4 (Z = -31.5 to -36.5, behind FinishBarricade): Final Arch Blockade
+			for ax0: float in [-3.0, -1.5, 0.0, 1.5, 3.0]:
+				_spawn_grave_skiff(entities, Vector3(ax0, 0.1, -33.0 - (2.0 if absf(ax0) < 1.0 else 0.0)), skiff_hp, 2.6)
 		_:
 			# Variant 3 (e.g. Level 19, 23, 27): Twin Ghost Sloops & Grave Skiff Pincer
 			active_wave_style = "bayou_ghost_and_grave_pincer"
 			if finish_barricade:
 				entities.remove_child(finish_barricade)
 				finish_barricade.queue_free()
-			for gx: float in [-2.0, 2.0]:
-				_spawn_enemy_mob(entities, GHOST_DATA, Vector3(gx, 0.1, -13.0), ghost_hp, 2.2, 3)
+			# Wave 2 (Z = -13 to -18): Ghost Sloop Line
+			for gx: float in [-2.8, -0.9, 0.9, 2.8]:
+				_spawn_enemy_mob(entities, GHOST_DATA, Vector3(gx, 0.1, -14.0 - (2.0 if absf(gx) < 1.5 else 0.0)), ghost_hp, 2.4, 2)
+			# Wave 3 (Z = -22 to -27): Grave Skiff Pincer + Cutters
 			for sx: float in [-3.2, 0.0, 3.2]:
-				_spawn_grave_skiff(entities, Vector3(sx, 0.1, -19.0), skiff_hp, 2.4)
+				_spawn_grave_skiff(entities, Vector3(sx, 0.1, -23.0), skiff_hp, 2.5)
+			for cx3: float in [-1.8, 1.8]:
+				var cutter3: Area3D = TIDE_CUTTER_SCENE.instantiate() as Area3D
+				if cutter3:
+					entities.add_child(cutter3)
+					cutter3.position = Vector3(cx3, 0.1, -27.0)
+			# Wave 4 (Z = -31.5 to -36.5): Final Arch Horde
+			for ax3: float in [-3.3, -2.2, -1.1, 0.0, 1.1, 2.2, 3.3]:
+				_spawn_enemy_mob(entities, GHOST_DATA, Vector3(ax3, 0.1, -32.5 - (2.5 if absf(ax3) < 1.5 else 0.0)), ghost_hp, 2.7, 0)
 
 func _spawn_brimstone_finish_wave(entities: Node, finish_barricade: BarricadeWall, cur_lvl: int, wave_var: int) -> void:
 	var gunner_hp: int = 24 + (cur_lvl - 30) * 2
 	var raft_hp: int = 12 + int((cur_lvl - 30) * 0.8)
+
+	# Wave 1 (Z = -4.0 to -9.5): Immediate Brimstone Blitz at chunk start (zero empty space!)
+	var w1_lanes: Array[float] = [-3.3, -1.8, -0.5, 0.5, 1.8, 3.3]
+	if wave_var % 2 != 0:
+		w1_lanes = [-3.2, -1.6, 0.0, 1.6, 3.2]
+	for i: int in range(w1_lanes.size()):
+		var z1: float = -4.5 - float(i % 3) * 1.8
+		if i % 2 == 0:
+			_spawn_brimstone_raft(entities, Vector3(w1_lanes[i], 0.1, z1), raft_hp, 4.4)
+		else:
+			_spawn_iron_gunner(entities, Vector3(w1_lanes[i], 0.1, z1), gunner_hp, 2.4)
 
 	match wave_var:
 		2:
@@ -403,60 +516,92 @@ func _spawn_brimstone_finish_wave(entities: Node, finish_barricade: BarricadeWal
 			if finish_barricade:
 				entities.remove_child(finish_barricade)
 				finish_barricade.queue_free()
+			# Wave 2 (Z = -13 to -18): Iron Gunner & Raft Screen
+			for gx: float in [-2.8, 2.8]:
+				_spawn_iron_gunner(entities, Vector3(gx, 0.1, -13.5), gunner_hp, 2.2)
+			for rx2: float in [-1.2, 0.0, 1.2]:
+				_spawn_brimstone_raft(entities, Vector3(rx2 * 1.3, 0.1, -16.5), raft_hp, 4.5)
+			# Wave 3 (Z = -21 to -27): Heavy Bombard Siege + Thermal Geysers
 			if BOMBARD_SCENE:
 				var bombard: Area3D = BOMBARD_SCENE.instantiate() as Area3D
 				if bombard:
 					entities.add_child(bombard)
-					bombard.position = Vector3(0.0, 0.1, -18.0)
+					bombard.position = Vector3(0.0, 0.1, -22.5)
 					bombard.set("max_hp", 55 + (cur_lvl - 30) * 3)
 					bombard.set("current_hp", 55 + (cur_lvl - 30) * 3)
-			for gx: float in [-2.8, 2.8]:
-				_spawn_iron_gunner(entities, Vector3(gx, 0.1, -13.5), gunner_hp, 2.0)
-			for tx: float in [-1.8, 1.8]:
+			for tx: float in [-2.2, 2.2]:
 				if THERMAL_GEYSER_SCENE:
 					var geyser: Node3D = THERMAL_GEYSER_SCENE.instantiate() as Node3D
 					if geyser:
 						entities.add_child(geyser)
-						geyser.position = Vector3(tx, 0.0, -24.0)
+						geyser.position = Vector3(tx, 0.0, -25.0)
+			for gx3: float in [-3.0, 3.0]:
+				_spawn_iron_gunner(entities, Vector3(gx3, 0.1, -27.5), gunner_hp, 2.3)
+			# Wave 4 (Z = -31.5 to -36.5): Final Arch Kamikaze Wall
+			for ax2: float in [-3.3, -2.0, -0.7, 0.7, 2.0, 3.3]:
+				_spawn_brimstone_raft(entities, Vector3(ax2, 0.1, -32.5 - (2.5 if absf(ax2) < 1.5 else 0.0)), raft_hp, 4.8)
 		3:
 			# Variant 3 (e.g. Level 43, 31, 39): Abyssal Rift Brimstone Kamikaze Blitz & Dreadnought Flagship
 			active_wave_style = "brimstone_kamikaze_diamond_blitz"
 			if finish_barricade:
 				entities.remove_child(finish_barricade)
 				finish_barricade.queue_free()
-			_spawn_enemy_mob(entities, ELITE_IRONCLAD_DATA, Vector3(0.0, 0.1, -21.0), 38 + (cur_lvl - 30) * 2, 1.6, 5)
+			# Wave 2 (Z = -12.5 to -18.5): Kamikaze Diamond Blitz
 			var raft_coords: Array[Vector3] = [
-				Vector3(-1.3, 0.1, -11.5),
-				Vector3(1.3, 0.1, -11.5),
-				Vector3(-3.0, 0.1, -16.0),
-				Vector3(3.0, 0.1, -16.0),
+				Vector3(-1.3, 0.1, -12.5),
+				Vector3(1.3, 0.1, -12.5),
+				Vector3(0.0, 0.1, -15.0),
+				Vector3(-3.0, 0.1, -17.5),
+				Vector3(3.0, 0.1, -17.5),
 			]
 			for r_pos: Vector3 in raft_coords:
 				_spawn_brimstone_raft(entities, r_pos, raft_hp, 4.6)
-			for kx: float in [-2.2, 2.2]:
-				_spawn_barrel(entities, Vector3(kx, 0.05, -24.5), DestructibleObstacle.ObstacleType.FUSE_BARREL, 3)
+			# Wave 3 (Z = -21.5 to -27.5): Dreadnought Flagship + Gunner Escorts + Kegs
+			_spawn_enemy_mob(entities, ELITE_IRONCLAD_DATA, Vector3(0.0, 0.1, -22.5), 38 + (cur_lvl - 30) * 2, 1.8, 5)
+			for gx3: float in [-2.6, 2.6]:
+				_spawn_iron_gunner(entities, Vector3(gx3, 0.1, -25.5), gunner_hp, 2.3)
+			for kx: float in [-1.8, 1.8]:
+				_spawn_barrel(entities, Vector3(kx, 0.05, -28.0), DestructibleObstacle.ObstacleType.FUSE_BARREL, 3)
+			# Wave 4 (Z = -31.5 to -36.5): Final Arch Hellgate Swarm
+			for ax3: float in [-3.4, -2.3, -1.2, 0.0, 1.2, 2.3, 3.4]:
+				_spawn_brimstone_raft(entities, Vector3(ax3, 0.1, -32.5 - (2.2 if absf(ax3) < 1.5 else 0.0)), raft_hp, 4.9)
 		0:
 			# Variant 0 (e.g. Level 32, 36, 44): Volcanic Barricade + Twin Iron Gunners + Brimstone Outriders
 			active_wave_style = "brimstone_gunner_fortress_wall"
-			for gx: float in [-2.4, 2.4]:
-				_spawn_iron_gunner(entities, Vector3(gx, 0.1, -15.0), gunner_hp, 2.2)
-			_spawn_brimstone_raft(entities, Vector3(0.0, 0.1, -11.5), raft_hp, 4.2)
+			# Wave 2 (Z = -13 to -18): Twin Iron Gunners + Brimstone Outriders
+			for gx: float in [-2.6, 2.6]:
+				_spawn_iron_gunner(entities, Vector3(gx, 0.1, -14.0), gunner_hp, 2.2)
+			for rx0: float in [-1.2, 0.0, 1.2]:
+				_spawn_brimstone_raft(entities, Vector3(rx0 * 1.4, 0.1, -17.5), raft_hp, 4.4)
+			# Wave 3 (Z = -21 to -24, in front of FinishBarricade at -26): Armored Guard Line
+			for gx0: float in [-2.2, 0.0, 2.2]:
+				_spawn_enemy_mob(entities, ELITE_IRONCLAD_DATA, Vector3(gx0, 0.1, -22.0), 28 + (cur_lvl - 30) * 2, 2.0, 2)
+			# Wave 4 (Z = -31.5 to -36.5, behind FinishBarricade): Final Arch Blockade
+			for ax0: float in [-3.2, -1.8, -0.6, 0.6, 1.8, 3.2]:
+				_spawn_brimstone_raft(entities, Vector3(ax0, 0.1, -32.5 - (2.2 if absf(ax0) > 1.5 else 0.0)), raft_hp, 4.6)
 		_:
 			# Variant 1 (e.g. Level 33, 37, 41): Magma Artillery Triangle & Geyser Vent
 			active_wave_style = "brimstone_artillery_triangle"
 			if finish_barricade:
 				entities.remove_child(finish_barricade)
 				finish_barricade.queue_free()
+			# Wave 2 (Z = -13 to -18.5): Magma Artillery Triangle
 			for gx: float in [-2.8, 0.0, 2.8]:
-				var z_off: float = -18.0 if absf(gx) < 0.1 else -13.5
-				_spawn_iron_gunner(entities, Vector3(gx, 0.1, z_off), gunner_hp, 2.1)
-			for rx: float in [-1.6, 1.6]:
-				_spawn_brimstone_raft(entities, Vector3(rx, 0.1, -22.5), raft_hp, 4.4)
+				var z_off: float = -17.5 if absf(gx) < 0.1 else -13.5
+				_spawn_iron_gunner(entities, Vector3(gx, 0.1, z_off), gunner_hp, 2.2)
+			# Wave 3 (Z = -21.5 to -27.5): Brimstone Outriders + Geyser Vent
+			for rx: float in [-2.8, -1.4, 1.4, 2.8]:
+				_spawn_brimstone_raft(entities, Vector3(rx, 0.1, -23.0 - (2.0 if absf(rx) > 2.0 else 0.0)), raft_hp, 4.5)
 			if THERMAL_GEYSER_SCENE:
 				var geyser: Node3D = THERMAL_GEYSER_SCENE.instantiate() as Node3D
 				if geyser:
 					entities.add_child(geyser)
-					geyser.position = Vector3(0.0, 0.0, -25.0)
+					geyser.position = Vector3(0.0, 0.0, -25.5)
+			# Wave 4 (Z = -31.5 to -36.5): Final Arch Inferno Swarm
+			for ax1: float in [-3.2, -1.6, 0.0, 1.6, 3.2]:
+				_spawn_iron_gunner(entities, Vector3(ax1, 0.1, -32.5) if absf(ax1) > 2.0 else Vector3(ax1, 0.1, -35.0), gunner_hp, 2.4)
+			for rx_end: float in [-2.4, -0.8, 0.8, 2.4]:
+				_spawn_brimstone_raft(entities, Vector3(rx_end, 0.1, -36.0), raft_hp, 4.7)
 
 func _spawn_enemy_mob(entities: Node, data: Resource, pos: Vector3, hp_val: int, spd: float, drop_val: int) -> void:
 	if not ENEMY_MOB_SCENE:
@@ -471,7 +616,13 @@ func _spawn_enemy_mob(entities: Node, data: Resource, pos: Vector3, hp_val: int,
 	mob.set("max_hp", hp_val)
 	mob.set("current_hp", hp_val)
 	mob.set("forward_speed", spd)
-	mob.set("doubloons_drop", drop_val)
+	var final_drop: int = drop_val
+	if _resolve_active_level() == 1 and final_drop > 0:
+		if _l1_coin_mobs_spawned >= 5:
+			final_drop = 0
+		else:
+			_l1_coin_mobs_spawned += 1
+	mob.set("doubloons_drop", final_drop)
 
 func _spawn_grave_skiff(entities: Node, pos: Vector3, hp_val: int, spd: float) -> void:
 	if not GRAVE_SKIFF_SCENE:
@@ -542,8 +693,8 @@ func _spawn_headland_scenery() -> void:
 	headlands.add_to_group("finish_landmark")
 	entities.add_child(headlands)
 
-	# Flank channel behind the arch with coastal rock headlands and watchtowers (Z from -36 to -68)
-	var z_slots: Array[float] = [-38.0, -48.0, -58.0, -66.0]
+	# Flank channel behind the arch with coastal rock headlands and watchtowers (Z from -54 to -82)
+	var z_slots: Array[float] = [-54.0, -62.0, -70.0, -78.0]
 	for z_pos: float in z_slots:
 		for side: float in [-1.0, 1.0]:
 			if ROCKS_MODEL:
@@ -553,7 +704,7 @@ func _spawn_headland_scenery() -> void:
 					rock.position = Vector3(side * 10.0, 0.0, z_pos)
 					rock.rotation_degrees = Vector3(0.0, randf_range(0.0, 360.0), 0.0)
 					rock.scale = Vector3.ONE * 2.0
-			if TOWER_WATCH_MODEL and absf(z_pos - (-48.0)) < 1.0:
+			if TOWER_WATCH_MODEL and absf(z_pos - (-62.0)) < 1.0:
 				var tower: Node3D = TOWER_WATCH_MODEL.instantiate() as Node3D
 				if tower:
 					headlands.add_child(tower)
@@ -595,7 +746,7 @@ func _trigger_victory() -> void:
 
 		var sail_tween: Tween = player.create_tween().set_parallel(true).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		sail_tween.tween_property(player, "position:x", 0.0, 1.2)
-		var arch_z: float = global_position.z - 34.0
+		var arch_z: float = global_position.z - 50.0
 		var target_z: float = arch_z - 8.0
 		sail_tween.tween_property(player, "global_position:z", target_z, 1.5)
 	
@@ -618,7 +769,7 @@ func _spawn_celebration_effects() -> void:
 			if vfx:
 				spawn_parent.add_child(vfx)
 				var spread_y: float = randf_range(2.0, 6.0) if theme_name != "brimstone" else randf_range(2.5, 7.5)
-				var offset := Vector3(randf_range(-5.5, 5.5), spread_y, global_position.z - 34.0 + randf_range(-1.5, 1.5))
+				var offset := Vector3(randf_range(-5.5, 5.5), spread_y, global_position.z - 50.0 + randf_range(-1.5, 1.5))
 				vfx.global_position = offset
 			
 	if doubloon_scene:
@@ -626,5 +777,5 @@ func _spawn_celebration_effects() -> void:
 			var d := doubloon_scene.instantiate() as CollectibleDoubloon
 			if d:
 				spawn_parent.add_child(d)
-				d.global_position = Vector3(randf_range(-4.5, 4.5), 0.2, global_position.z - 34.0)
+				d.global_position = Vector3(randf_range(-4.5, 4.5), 0.2, global_position.z - 50.0)
 				d._trigger_spawn_bounce(Vector2(randf_range(-2.5, 2.5), randf_range(-2.5, 2.5)))

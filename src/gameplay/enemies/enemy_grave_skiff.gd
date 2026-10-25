@@ -39,10 +39,13 @@ func _physics_process(delta: float) -> void:
 		return
 		
 	_time += delta
-	global_position.z += forward_speed * delta
-	
 	if sprite_node:
 		sprite_node.position.y = 1.0 + sin(_time * 4.0) * 0.05
+		
+	if global_position.z < -55.0:
+		return
+		
+	global_position.z += forward_speed * delta
 		
 	# Shooting logic - only if can_shoot is enabled and not during boss fight
 	var is_boss_active: bool = GameState.boss_spawned or get_tree().get_first_node_in_group("boss") != null

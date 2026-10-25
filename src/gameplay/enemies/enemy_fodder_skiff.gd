@@ -77,6 +77,10 @@ func _physics_process(delta: float) -> void:
 	if _is_dead or not GameState.is_game_active:
 		return
 		
+	# Wait until this individual skiff enters engagement range so rear waves don't bunch up early
+	if global_position.z < -55.0:
+		return
+		
 	# Move steadily down-channel toward the player
 	global_position.z += forward_speed * delta
 

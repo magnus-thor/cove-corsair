@@ -21,7 +21,7 @@ chunk_id = "finish_line_bayou"
 [node name="ChunkStart" type="Marker3D" parent="." unique_id=9812502]
 
 [node name="ChunkEnd" type="Marker3D" parent="." unique_id=9812503]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -65)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -75)
 
 [node name="Banks" type="Node3D" parent="." unique_id=9812504]
 
@@ -30,52 +30,52 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -65)
 [node name="FinishArch" type="Node3D" parent="Entities" unique_id=9812530 groups=["finish_landmark"]]
 
 [node name="WillowArch_Left" type="Node3D" parent="Entities/FinishArch" unique_id=9812505 instance=ExtResource("2_willow")]
-transform = Transform3D(2.01, 0.90, 0, -0.98, 2.18, 0, 0, 0, 2.2, -5.8, 1.5, -34)
+transform = Transform3D(2.01, 0.90, 0, -0.98, 2.18, 0, 0, 0, 2.2, -5.8, 1.5, -50)
 
 [node name="WillowArch_Right" type="Node3D" parent="Entities/FinishArch" unique_id=9812506 instance=ExtResource("2_willow")]
-transform = Transform3D(-2.01, -0.90, 0, -0.98, 2.18, 0, 0, 0, -2.2, 5.8, 1.5, -34)
+transform = Transform3D(-2.01, -0.90, 0, -0.98, 2.18, 0, 0, 0, -2.2, 5.8, 1.5, -50)
 
 [node name="Mournwood_Left" type="Node3D" parent="Entities/FinishArch" unique_id=9812507 instance=ExtResource("5_mournwood")]
-transform = Transform3D(1.6, 0.4, 0, -0.4, 1.6, 0, 0, 0, 1.6, -7.8, 1.1, -34)
+transform = Transform3D(1.6, 0.4, 0, -0.4, 1.6, 0, 0, 0, 1.6, -7.8, 1.1, -50)
 
 [node name="Mournwood_Right" type="Node3D" parent="Entities/FinishArch" unique_id=9812508 instance=ExtResource("5_mournwood")]
-transform = Transform3D(-1.6, -0.4, 0, -0.4, 1.6, 0, 0, 0, -1.6, 7.8, 1.1, -34)
+transform = Transform3D(-1.6, -0.4, 0, -0.4, 1.6, 0, 0, 0, -1.6, 7.8, 1.1, -50)
 
 [node name="Totem_Left" type="Node3D" parent="Entities/FinishArch" unique_id=9812515 instance=ExtResource("3_totem")]
-transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -5.4, 1.1, -33)
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -5.4, 1.1, -49)
 
 [node name="Totem_Right" type="Node3D" parent="Entities/FinishArch" unique_id=9812516 instance=ExtResource("3_totem")]
-transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 5.4, 1.1, -33)
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 5.4, 1.1, -49)
 
 [node name="Dock_Left" type="Node3D" parent="Entities/FinishArch" unique_id=9812509 instance=ExtResource("6_dock")]
-transform = Transform3D(1.3, 0, 0, 0, 1.3, 0, 0, 0, 1.3, -7.2, 0, -33)
+transform = Transform3D(1.3, 0, 0, 0, 1.3, 0, 0, 0, 1.3, -7.2, 0, -49)
 
 [node name="Dock_Right" type="Node3D" parent="Entities/FinishArch" unique_id=9812510 instance=ExtResource("6_dock")]
-transform = Transform3D(-1.3, 0, 0, 0, 1.3, 0, 0, 0, -1.3, 7.2, 0, -33)
+transform = Transform3D(-1.3, 0, 0, 0, 1.3, 0, 0, 0, -1.3, 7.2, 0, -49)
 
 [node name="Anchor_Left" type="Node3D" parent="Entities/FinishArch" unique_id=9812517 instance=ExtResource("7_anchor")]
-transform = Transform3D(1.3, 0, 0, 0, 1.3, 0, 0, 0, 1.3, -6.4, 0.6, -30)
+transform = Transform3D(1.3, 0, 0, 0, 1.3, 0, 0, 0, 1.3, -6.4, 0.6, -46)
 
 [node name="Anchor_Right" type="Node3D" parent="Entities/FinishArch" unique_id=9812518 instance=ExtResource("7_anchor")]
-transform = Transform3D(-1.3, 0, 0, 0, 1.3, 0, 0, 0, -1.3, 6.4, 0.6, -30)
+transform = Transform3D(-1.3, 0, 0, 0, 1.3, 0, 0, 0, -1.3, 6.4, 0.6, -46)
 
 [node name="Cattails_Left" type="Node3D" parent="Entities/FinishArch" unique_id=9812511 instance=ExtResource("4_cattails")]
-transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -6.6, 0.8, -26)
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -6.6, 0.8, -42)
 
 [node name="Cattails_Right" type="Node3D" parent="Entities/FinishArch" unique_id=9812512 instance=ExtResource("4_cattails")]
-transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 6.6, 0.8, -26)
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 6.6, 0.8, -42)
 
 [node name="FinishBarricade" parent="Entities" unique_id=9812519 instance=ExtResource("8_barricade")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -14)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -26)
 
 [node name="GuardSkiff_Left" type="Area3D" parent="Entities" unique_id=9812520 groups=["destructible", "enemies"] instance=ExtResource("9_grave_skiff")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0.1, -8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0.1, -6)
 
 [node name="GuardSkiff_Right" type="Area3D" parent="Entities" unique_id=9812521 groups=["destructible", "enemies"] instance=ExtResource("9_grave_skiff")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.1, -8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.1, -6)
 
 [node name="FinishTrigger" type="Area3D" parent="." unique_id=9812522]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -20)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -38)
 collision_layer = 0
 collision_mask = 3
 

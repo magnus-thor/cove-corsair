@@ -59,7 +59,7 @@ func _spawn_dynamic_swarm_climax() -> void:
 	var swarm_hp: int = 2 if cur_lvl <= 4 else (3 if cur_lvl <= 12 else 4)
 	var rush_speed: float = 3.6 + minf(1.8, float(escalation_tier) * 0.35 + float(cur_lvl) * 0.04)
 
-	# ── Wave 1: Vanguard Skiff Swarm (Z: -6 to -14) ──
+	# ── Wave 1: Vanguard Skiff Swarm (Z: -4 to -12) ──
 	var wave_1_lanes: Array[float] = [-3.3, -2.2, -1.1, 0.0, 1.1, 2.2, 3.3]
 	if variant == 1:
 		wave_1_lanes = [-3.6, -2.6, -1.6, 0.0, 1.6, 2.6, 3.6]
@@ -73,7 +73,7 @@ func _spawn_dynamic_swarm_climax() -> void:
 		var mob: EnemyMob = ENEMY_MOB_SCENE.instantiate() as EnemyMob
 		if mob:
 			entities.add_child(mob)
-			var z_offset: float = -7.5 - float(i % 3) * 1.8
+			var z_offset: float = -4.0 - float(i % 3) * 2.2
 			mob.position = Vector3(lx, 0.1, z_offset)
 			if mob.has_method("apply_enemy_data"):
 				mob.call("apply_enemy_data", primary_data)
@@ -82,7 +82,7 @@ func _spawn_dynamic_swarm_climax() -> void:
 			mob.forward_speed = rush_speed
 			mob.doubloons_drop = 1
 
-	# ── Wave 2: Fast Raider Flotilla (Z: -18 to -26) ──
+	# ── Wave 2: Fast Raider Flotilla (Z: -15 to -23) ──
 	var wave_2_lanes: Array[float] = [-3.0, -1.8, -0.6, 0.6, 1.8, 3.0]
 	if variant == 1:
 		wave_2_lanes = [-3.4, -2.2, -1.0, 1.0, 2.2, 3.4]
@@ -96,7 +96,7 @@ func _spawn_dynamic_swarm_climax() -> void:
 		var mob: EnemyMob = ENEMY_MOB_SCENE.instantiate() as EnemyMob
 		if mob:
 			entities.add_child(mob)
-			var z_offset: float = -19.0 - float((i + variant) % 3) * 2.0
+			var z_offset: float = -15.5 - float((i + variant) % 3) * 2.2
 			mob.position = Vector3(lx, 0.1, z_offset)
 			if mob.has_method("apply_enemy_data"):
 				mob.call("apply_enemy_data", secondary_data)
@@ -160,7 +160,7 @@ func _spawn_dynamic_swarm_climax() -> void:
 			escort.current_hp = swarm_hp
 			escort.forward_speed = rush_speed
 
-	# ── Wave 4: Final Breakthrough Swarm (Z: -41 to -47) ──
+	# ── Wave 4: Final Breakthrough Swarm (Z: -39 to -48) ──
 	var wave_4_lanes: Array[float] = [-3.4, -2.5, -1.7, -0.8, 0.0, 0.8, 1.7, 2.5, 3.4]
 	if variant == 1:
 		wave_4_lanes = [-3.6, -2.7, -1.8, -0.9, 0.9, 1.8, 2.7, 3.6]
@@ -174,7 +174,7 @@ func _spawn_dynamic_swarm_climax() -> void:
 		var mob: EnemyMob = ENEMY_MOB_SCENE.instantiate() as EnemyMob
 		if mob:
 			entities.add_child(mob)
-			var z_offset: float = -42.0 - float((i + variant) % 3) * 1.6
+			var z_offset: float = -39.5 - float((i + variant) % 4) * 2.5
 			mob.position = Vector3(lx, 0.1, z_offset)
 			if mob.has_method("apply_enemy_data"):
 				mob.call("apply_enemy_data", primary_data if i % 2 == 0 else secondary_data)

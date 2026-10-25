@@ -72,10 +72,13 @@ func _physics_process(delta: float) -> void:
 		return
 		
 	_time += delta
-	global_position.z += forward_speed * delta
-	
 	if sprite_node:
 		sprite_node.position.y = 0.9 + sin(_time * 2.8) * 0.04
+		
+	if global_position.z < -55.0:
+		return
+		
+	global_position.z += forward_speed * delta
 		
 	# Shooting logic: only shoot if explicitly marked as gunner vanguard and not in boss fight
 	var is_boss_active: bool = GameState.boss_spawned or get_tree().get_first_node_in_group("boss") != null

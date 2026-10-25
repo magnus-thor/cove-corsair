@@ -55,6 +55,9 @@ func _physics_process(delta: float) -> void:
 	if _is_dead or not GameState.is_game_active:
 		return
 		
+	if global_position.z < -55.0:
+		return
+		
 	# High-speed rush
 	global_position.z += forward_speed * delta
 	

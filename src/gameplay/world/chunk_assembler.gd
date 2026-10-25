@@ -258,11 +258,9 @@ func assemble_level(data: LevelData = null) -> void:
 		current_z_offset -= c_len
 		active_chunks.append(chunk_instance)
 
-		# Enforce safe settle-in clearance runway (>= 50.0m in Chunk 0, plus >= 12.0m into Chunk 1 = 62m total, well beyond 38m bullet range)
+		# Enforce safe settle-in clearance runway (42.0m in Chunk 0 for practice barrels + first gate, then enemies begin at Z <= -43m)
 		if active_chunks.size() == 1:
-			_enforce_start_clearance_in_chunk(chunk_instance, 50.0)
-		elif active_chunks.size() == 2 and not chunk_instance.is_boss_chunk:
-			_enforce_start_clearance_in_chunk(chunk_instance, 12.0)
+			_enforce_start_clearance_in_chunk(chunk_instance, 42.0)
 		
 	# Calculate total track distance (distance until boss arena is reached)
 	total_track_distance = 0.0

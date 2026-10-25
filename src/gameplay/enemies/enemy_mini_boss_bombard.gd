@@ -35,10 +35,13 @@ func _physics_process(delta: float) -> void:
 		return
 		
 	_time += delta
-	global_position.z += forward_speed * delta
-	
 	if sprite_node:
 		sprite_node.position.y = 1.2 + sin(_time * 2.5) * 0.05
+		
+	if global_position.z < -55.0:
+		return
+		
+	global_position.z += forward_speed * delta
 		
 	_bombard_timer += delta
 	if _bombard_timer >= bombard_interval:

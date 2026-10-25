@@ -9,6 +9,10 @@ const CHUNK_LENGTH: float = 50.0
 const MIN_NAVIGABLE_CLEARANCE: float = 6.8
 const DEFAULT_COLORMAP_PATH: String = "res://assets/models/Textures/colormap.png"
 
+const BOMBARD_OR_OBSTACLE_LEVELS: Array[int] = [
+	4, 6, 8, 12, 14, 16, 18, 20, 24, 26, 28, 32, 34, 36, 37, 38, 40, 42, 43, 44
+]
+
 signal chunk_activated(chunk: BaseTrackChunk)
 @warning_ignore("unused_signal")
 signal chunk_completed(chunk: BaseTrackChunk)
@@ -50,6 +54,26 @@ func resolve_chunk_biome(cur_lvl: int = -1) -> String:
 		return "bayou"
 	return "tropical"
 
+## Returns true if the level favors the Bombard Skiff or is a Hazard Navigation / Obstacle Gauntlet level.
+func is_bombard_or_obstacle_level(cur_lvl: int = -1) -> bool:
+	var gs: Node = get_node_or_null("/root/GameState")
+	if cur_lvl <= 0:
+		if gs and "current_level" in gs:
+			cur_lvl = int(gs.get("current_level"))
+		else:
+			cur_lvl = 1
+	if cur_lvl in BOMBARD_OR_OBSTACLE_LEVELS:
+		return true
+	if gs and "LEVEL_SHIPS" in gs:
+		var ships_dict: Dictionary = gs.get("LEVEL_SHIPS") as Dictionary
+		if ships_dict.has(cur_lvl) and "bombard_skiff" in str(ships_dict[cur_lvl]):
+			return true
+	if gs and gs.has_method("get_current_level_resource"):
+		var res: LevelData = gs.call("get_current_level_resource") as LevelData
+		if res and res.level_id == cur_lvl and "hazard" in res.level_title.to_lower():
+			return true
+	return false
+
 ## Static material cache keyed by "<biome>|<tex_key>|<col_key>|<wind>" to share ShaderMaterial instances
 ## across all Kenney meshes (sharing colormap.png) and Meshy models (each sharing its baked diffuse map).
 static var _material_cache: Dictionary[String, ShaderMaterial] = {}
@@ -59,10 +83,168 @@ func _ready() -> void:
 	add_to_group("track_chunks")
 	_ensure_markers()
 	_ensure_scenery_anchors()
+	_apply_base_chunk_pacing()
 	
 	# Keep entities dormant until entering camera frustum
 	if not is_active:
 		_set_entities_dormant(true)
+
+var _base_pacing_applied: bool = false
+
+func _apply_base_chunk_pacing() -> void:
+	if _base_pacing_applied:
+		return
+	_base_pacing_applied = true
+	var entities: Node = get_node_or_null("Entities")
+	if not entities:
+		return
+	var cur_lvl: int = 1
+	var gs: Node = get_node_or_null("/root/GameState")
+	if gs and "current_level" in gs:
+		cur_lvl = int(gs.get("current_level"))
+	var active_biome: String = resolve_chunk_biome(cur_lvl)
+
+	# 1. Opener chunks: keep first 42m gentle (barrels + first gate), then spawn first light enemy wave at Z = -43.5 to -48.0
+	if chunk_id in ["warmup", "opener_slalom", "opener_ambush", "opener_gauntlet"]:
+		var tail_spawns: Array[Vector3] = [
+			Vector3(-2.2, 0.1, -43.5),
+			Vector3(2.2, 0.1, -44.5),
+			Vector3(0.0, 0.1, -47.5),
+		]
+		var intro_hp: int = 1 if cur_lvl <= 1 else (2 if cur_lvl <= 4 else 3)
+		var intro_spd: float = 1.6 if cur_lvl <= 2 else 2.2
+		var intro_data_path: String = "res://src/data/resources/enemy_vessels/skeleton_rower.tres"
+		if active_biome == "bayou" or active_biome == "brimstone":
+			intro_data_path = "res://src/data/resources/enemy_vessels/ghost_sloop.tres"
+		var intro_data: Resource = load(intro_data_path)
+		var mob_scene: PackedScene = load("res://src/gameplay/enemies/enemy_mob.tscn") as PackedScene
+		for i: int in range(tail_spawns.size()):
+			if mob_scene:
+				var mob: Area3D = mob_scene.instantiate() as Area3D
+				if mob:
+					mob.name = "OpenerTailWave_%d" % (i + 1)
+					entities.add_child(mob)
+					mob.position = tail_spawns[i]
+					if mob.has_method("apply_enemy_data") and intro_data:
+						mob.call("apply_enemy_data", intro_data)
+					mob.set("max_hp", intro_hp)
+					mob.set("current_hp", intro_hp)
+					mob.set("forward_speed", intro_spd)
+					mob.set("doubloons_drop", 0)
+		return
+
+	# 2. Mine Gauntlet chunk: either dense obstacles (for Bombard Skiff / Hazard Nav levels) or continuous enemy waves (standard levels)
+	if chunk_id == "mine_gauntlet":
+		if is_bombard_or_obstacle_level(cur_lvl):
+			# Bombard Skiff / Obstacle-Heavy level: pack extra obstacles between mine gates (Z = -6, -18, -30, -41)
+			var obs_positions: Array[Vector3] = [
+				Vector3(1.8, 0.05, -6.5),
+				Vector3(-2.2, 0.05, -18.0),
+				Vector3(2.2, 0.05, -18.0),
+				Vector3(-1.8, 0.05, -30.0),
+				Vector3(1.8, 0.05, -30.0),
+				Vector3(-2.6, 0.05, -41.5),
+				Vector3(2.6, 0.05, -41.5),
+			]
+			var biogas_scene: PackedScene = load("res://src/gameplay/obstacles/hazard_biogas_pod.tscn") as PackedScene
+			var geyser_scene: PackedScene = load("res://src/gameplay/obstacles/hazard_thermal_geyser.tscn") as PackedScene
+			var mine_scene: PackedScene = load("res://src/gameplay/obstacles/hazard_sea_mine.tscn") as PackedScene
+			var barrel_scene: PackedScene = load("res://src/gameplay/obstacles/destructible_barrel.tscn") as PackedScene
+			for idx: int in range(obs_positions.size()):
+				var opos: Vector3 = obs_positions[idx]
+				if active_biome == "bayou" and idx % 2 == 1 and biogas_scene:
+					var pod: Node3D = biogas_scene.instantiate() as Node3D
+					if pod:
+						pod.name = "BombardHazardPod_%d" % (idx + 1)
+						entities.add_child(pod)
+						pod.position = opos
+				elif active_biome == "brimstone" and idx % 2 == 1 and geyser_scene:
+					var geyser: Node3D = geyser_scene.instantiate() as Node3D
+					if geyser:
+						geyser.name = "BombardHazardGeyser_%d" % (idx + 1)
+						entities.add_child(geyser)
+						geyser.position = Vector3(opos.x, 0.0, opos.z)
+				elif idx % 3 == 0 and mine_scene:
+					var mine: Node3D = mine_scene.instantiate() as Node3D
+					if mine:
+						mine.name = "BombardExtraMine_%d" % (idx + 1)
+						entities.add_child(mine)
+						mine.position = Vector3(opos.x, 0.0, opos.z)
+				elif barrel_scene:
+					var keg: Area3D = barrel_scene.instantiate() as Area3D
+					if keg:
+						keg.name = "BombardFuseKeg_%d" % (idx + 1)
+						entities.add_child(keg)
+						keg.position = opos
+						keg.set("hp", 2)
+						keg.set("doubloons_drop", 0)
+						keg.set("obstacle_type", 2)
+		else:
+			# Standard level: continuous enemy waves through the mine gauntlet from Z = -4.5 to -44.0 (zero downtime!)
+			var wave_coords: Array[Vector3] = [
+				Vector3(1.6, 0.1, -4.5),
+				Vector3(3.0, 0.1, -6.5),
+				Vector3(-2.4, 0.1, -9.0),
+				Vector3(1.8, 0.1, -16.5),
+				Vector3(-1.8, 0.1, -18.5),
+				Vector3(0.0, 0.1, -21.0),
+				Vector3(-2.8, 0.1, -29.0),
+				Vector3(2.8, 0.1, -31.0),
+				Vector3(-1.6, 0.1, -33.5),
+				Vector3(1.8, 0.1, -40.5),
+				Vector3(-2.2, 0.1, -43.0),
+				Vector3(2.2, 0.1, -44.5),
+			]
+			var mob_hp: int = 2 if cur_lvl <= 3 else (3 if cur_lvl <= 10 else 5)
+			var mob_spd: float = 2.0 if cur_lvl <= 3 else 2.8
+			var g_skiff_scene: PackedScene = load("res://src/gameplay/enemies/enemy_grave_skiff.tscn") as PackedScene
+			var b_raft_scene: PackedScene = load("res://src/gameplay/enemies/enemy_brimstone_raft.tscn") as PackedScene
+			var mob_scene: PackedScene = load("res://src/gameplay/enemies/enemy_mob.tscn") as PackedScene
+			var rower_res: Resource = load("res://src/data/resources/enemy_vessels/skeleton_rower.tres")
+			var raider_res: Resource = load("res://src/data/resources/enemy_vessels/raider_skiff.tres")
+			var ghost_res: Resource = load("res://src/data/resources/enemy_vessels/ghost_sloop.tres")
+			var ironclad_res: Resource = load("res://src/data/resources/enemy_vessels/enemy_elite_ironclad.tres")
+			for w_idx: int in range(wave_coords.size()):
+				var w_pos: Vector3 = wave_coords[w_idx]
+				if active_biome == "bayou" and w_idx % 3 == 1 and g_skiff_scene:
+					var g_skiff: Area3D = g_skiff_scene.instantiate() as Area3D
+					if g_skiff:
+						g_skiff.name = "GauntletWaveSkiff_%d" % (w_idx + 1)
+						entities.add_child(g_skiff)
+						g_skiff.position = w_pos
+						g_skiff.set("max_hp", mob_hp + 2)
+						g_skiff.set("current_hp", mob_hp + 2)
+						g_skiff.set("forward_speed", mob_spd)
+						g_skiff.set("doubloons_drop", 0)
+					continue
+				elif active_biome == "brimstone" and w_idx % 3 == 1 and b_raft_scene:
+					var b_raft: Area3D = b_raft_scene.instantiate() as Area3D
+					if b_raft:
+						b_raft.name = "GauntletWaveRaft_%d" % (w_idx + 1)
+						entities.add_child(b_raft)
+						b_raft.position = w_pos
+						b_raft.set("max_hp", mob_hp + 2)
+						b_raft.set("current_hp", mob_hp + 2)
+						b_raft.set("forward_speed", mob_spd + 1.0)
+						b_raft.set("doubloons_drop", 0)
+					continue
+				if mob_scene:
+					var mob: Area3D = mob_scene.instantiate() as Area3D
+					if mob:
+						mob.name = "GauntletWaveMob_%d" % (w_idx + 1)
+						entities.add_child(mob)
+						mob.position = w_pos
+						var v_res: Resource = rower_res if (w_idx % 2 == 0 or cur_lvl <= 3) else raider_res
+						if active_biome == "bayou":
+							v_res = ghost_res
+						elif active_biome == "brimstone":
+							v_res = ironclad_res if w_idx % 4 == 0 else ghost_res
+						if mob.has_method("apply_enemy_data") and v_res:
+							mob.call("apply_enemy_data", v_res)
+						mob.set("max_hp", mob_hp)
+						mob.set("current_hp", mob_hp)
+						mob.set("forward_speed", mob_spd)
+						mob.set("doubloons_drop", 0)
 
 func _ensure_markers() -> void:
 	chunk_start = get_node_or_null("ChunkStart") as Marker3D

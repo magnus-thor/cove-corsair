@@ -19,7 +19,7 @@ chunk_id = "finish_line_brimstone"
 [node name="ChunkStart" type="Marker3D" parent="." unique_id=9812602]
 
 [node name="ChunkEnd" type="Marker3D" parent="." unique_id=9812603]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -65)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -75)
 
 [node name="Banks" type="Node3D" parent="." unique_id=9812604]
 
@@ -28,43 +28,43 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -65)
 [node name="FinishArch" type="Node3D" parent="Entities" unique_id=9812630 groups=["finish_landmark"]]
 
 [node name="VolcanicSpire_ArchLeft" type="Node3D" parent="Entities/FinishArch" unique_id=9812605 instance=ExtResource("2_spire")]
-transform = Transform3D(2.25, 0.85, 0, -0.95, 2.75, 0, 0, 0, 2.4, -5.8, 1.8, -34)
+transform = Transform3D(2.25, 0.85, 0, -0.95, 2.75, 0, 0, 0, 2.4, -5.8, 1.8, -50)
 
 [node name="VolcanicSpire_ArchRight" type="Node3D" parent="Entities/FinishArch" unique_id=9812606 instance=ExtResource("2_spire")]
-transform = Transform3D(-2.25, -0.85, 0, -0.95, 2.75, 0, 0, 0, -2.4, 5.8, 1.8, -34)
+transform = Transform3D(-2.25, -0.85, 0, -0.95, 2.75, 0, 0, 0, -2.4, 5.8, 1.8, -50)
 
 [node name="MoltenCrown_Apex" type="Node3D" parent="Entities/FinishArch" unique_id=9812616 instance=ExtResource("4_crown")]
-transform = Transform3D(1.85, 0, 0, 0, 1.85, 0, 0, 0, 1.85, 0, 5.0, -34)
+transform = Transform3D(1.85, 0, 0, 0, 1.85, 0, 0, 0, 1.85, 0, 5.0, -50)
 
 [node name="Obsidian_Left" type="Node3D" parent="Entities/FinishArch" unique_id=9812607 instance=ExtResource("3_crystal")]
-transform = Transform3D(1.75, 0.55, 0, -0.55, 1.75, 0, 0, 0, 1.8, -5.3, 1.3, -34)
+transform = Transform3D(1.75, 0.55, 0, -0.55, 1.75, 0, 0, 0, 1.8, -5.3, 1.3, -50)
 
 [node name="Obsidian_Right" type="Node3D" parent="Entities/FinishArch" unique_id=9812608 instance=ExtResource("3_crystal")]
-transform = Transform3D(-1.75, -0.55, 0, -0.55, 1.75, 0, 0, 0, -1.8, 5.3, 1.3, -34)
+transform = Transform3D(-1.75, -0.55, 0, -0.55, 1.75, 0, 0, 0, -1.8, 5.3, 1.3, -50)
 
 [node name="MoltenCrown_Left" type="Node3D" parent="Entities/FinishArch" unique_id=9812609 instance=ExtResource("4_crown")]
-transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, -7.2, 0.6, -29)
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, -7.2, 0.6, -45)
 
 [node name="MoltenCrown_Right" type="Node3D" parent="Entities/FinishArch" unique_id=9812610 instance=ExtResource("4_crown")]
-transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 7.2, 0.6, -29)
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 7.2, 0.6, -45)
 
 [node name="MoltenTree_Left" type="Node3D" parent="Entities/FinishArch" unique_id=9812611 instance=ExtResource("5_tree")]
-transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, -8.4, 1.0, -32)
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, -8.4, 1.0, -48)
 
 [node name="MoltenTree_Right" type="Node3D" parent="Entities/FinishArch" unique_id=9812612 instance=ExtResource("5_tree")]
-transform = Transform3D(-1.4, 0, 0, 0, 1.4, 0, 0, 0, -1.4, 8.4, 1.0, -32)
+transform = Transform3D(-1.4, 0, 0, 0, 1.4, 0, 0, 0, -1.4, 8.4, 1.0, -48)
 
 [node name="FinishBarricade" parent="Entities" unique_id=9812619 instance=ExtResource("8_barricade")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -14)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -26)
 
 [node name="GuardGunner_Left" type="Area3D" parent="Entities" unique_id=9812620 groups=["destructible", "enemies"] instance=ExtResource("9_gunner")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0.1, -8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0.1, -6)
 
 [node name="GuardGunner_Right" type="Area3D" parent="Entities" unique_id=9812621 groups=["destructible", "enemies"] instance=ExtResource("9_gunner")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.1, -8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0.1, -6)
 
 [node name="FinishTrigger" type="Area3D" parent="." unique_id=9812622]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -20)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -38)
 collision_layer = 0
 collision_mask = 3
 
