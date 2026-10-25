@@ -540,6 +540,22 @@ func _eject_mine() -> void:
 			if "forward_speed" in mine:
 				mine.set("forward_speed", 4.0)
 
+static var _boiler_glow_mat: StandardMaterial3D = null
+
+static func _get_boiler_glow_material() -> StandardMaterial3D:
+	if not _boiler_glow_mat:
+		_boiler_glow_mat = StandardMaterial3D.new()
+		_boiler_glow_mat.albedo_color = Color(2.5, 0.5, 0.1) # Bright glowing orange/red
+		_boiler_glow_mat.emission_enabled = true
+		_boiler_glow_mat.emission = Color(1.5, 0.3, 0.0)
+	return _boiler_glow_mat
+
+func _exit_tree() -> void:
+	if is_instance_valid(boiler_node):
+		var mesh: MeshInstance3D = boiler_node.get_node_or_null("LogMesh") as MeshInstance3D
+		if mesh and is_instance_valid(mesh):
+			mesh.material_override = null
+
 # Steam Venting
 func _start_steam_venting() -> void:
 	is_venting_steam = true
@@ -548,13 +564,9 @@ func _start_steam_venting() -> void:
 	
 	# Glow boiler core red
 	if is_instance_valid(boiler_node):
-		var mesh := boiler_node.get_node_or_null("LogMesh") as MeshInstance3D
+		var mesh: MeshInstance3D = boiler_node.get_node_or_null("LogMesh") as MeshInstance3D
 		if mesh and is_instance_valid(mesh):
-			var mat := StandardMaterial3D.new()
-			mat.albedo_color = Color(2.5, 0.5, 0.1) # Bright glowing orange/red
-			mat.emission_enabled = true
-			mat.emission = Color(1.5, 0.3, 0.0)
-			mesh.material_override = mat
+			mesh.material_override = _get_boiler_glow_material()
 
 func _stop_steam_venting() -> void:
 	is_venting_steam = false
@@ -562,7 +574,7 @@ func _stop_steam_venting() -> void:
 	
 	# Reset boiler color
 	if is_instance_valid(boiler_node):
-		var mesh := boiler_node.get_node_or_null("LogMesh") as MeshInstance3D
+		var mesh: MeshInstance3D = boiler_node.get_node_or_null("LogMesh") as MeshInstance3D
 		if mesh and is_instance_valid(mesh):
 			mesh.material_override = null
 

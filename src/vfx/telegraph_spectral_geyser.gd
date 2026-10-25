@@ -108,6 +108,17 @@ func _physics_process(delta: float) -> void:
 		countdown_finished.emit(global_position)
 		queue_free()
 
+func _exit_tree() -> void:
+	if outer_ring:
+		outer_ring.material_override = null
+	if fill_disc:
+		fill_disc.material_override = null
+	if pulse_ring:
+		pulse_ring.material_override = null
+	_fill_mat = null
+	_ring_mat = null
+	_pulse_mat = null
+
 func cancel_and_cleanup() -> void:
 	_is_active = false
 	queue_free()

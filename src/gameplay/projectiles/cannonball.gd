@@ -773,7 +773,12 @@ func _trigger_lingering_napalm() -> void:
 		)
 		napalm_tween.tween_interval(0.5)
 	napalm_tween.tween_property(mat, "albedo_color:a", 0.0, 0.4)
-	napalm_tween.tween_callback(puddle.queue_free)
+	napalm_tween.tween_callback(func() -> void:
+		if is_instance_valid(mesh_inst):
+			mesh_inst.material_override = null
+		if is_instance_valid(puddle):
+			puddle.queue_free()
+	)
 
 func apply_gate_glow() -> void:
 	var sprite_node := get_node_or_null("Sprite3D") as Sprite3D

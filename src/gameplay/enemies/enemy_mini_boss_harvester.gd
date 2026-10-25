@@ -94,7 +94,11 @@ func _launch_toxic_mortar() -> void:
 	var tree := get_tree()
 	tween.tween_property(mat, "albedo_color:a", 0.8, 1.2).set_trans(Tween.TRANS_SINE)
 	tween.tween_callback(Callable(EnemyMiniBossHarvester, "execute_toxic_mortar_detonation").bind(reticle.global_position, vfx_scene, tree))
-	tween.tween_callback(reticle.queue_free)
+	tween.tween_callback(func() -> void:
+		if is_instance_valid(reticle):
+			reticle.material_override = null
+			reticle.queue_free()
+	)
 
 static func execute_toxic_mortar_detonation(pos: Vector3, vfx_prefab: PackedScene, tree: SceneTree) -> void:
 	if not tree:

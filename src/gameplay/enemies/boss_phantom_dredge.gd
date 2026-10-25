@@ -281,6 +281,7 @@ func _telegraph_and_strike_mortar(pos: Vector3, is_last: bool = false) -> void:
 		var vfx_scene := explosion_scene
 		tween.chain().tween_callback(func() -> void:
 			if is_instance_valid(marker):
+				marker.material_override = null
 				marker.queue_free()
 			BossPhantomDredge.execute_poison_mortar_detonation(pos, vfx_scene, tree)
 			if is_last:
@@ -383,7 +384,9 @@ func _emit_water_shockwave() -> void:
 	tween.tween_property(shockwave, "scale", Vector3(5.5, 1.0, 5.5), 1.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tween.tween_property(mat, "albedo_color:a", 0.0, 1.2)
 	tween.chain().tween_callback(func() -> void:
-		shockwave.queue_free()
+		if is_instance_valid(shockwave):
+			shockwave.material_override = null
+			shockwave.queue_free()
 	)
 	
 	var camera := get_tree().get_first_node_in_group("game_camera") as GameCamera

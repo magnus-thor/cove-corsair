@@ -37,6 +37,12 @@ func _ready() -> void:
 	_trail_material.vertex_color_use_as_albedo = true
 	material_override = _trail_material
 
+func _exit_tree() -> void:
+	material_override = null
+	if _immediate_mesh:
+		_immediate_mesh.clear_surfaces()
+	_trail_material = null
+
 func _process(delta: float) -> void:
 	if _is_emitting and is_instance_valid(_target_parent):
 		var cur_pos = _target_parent.global_position

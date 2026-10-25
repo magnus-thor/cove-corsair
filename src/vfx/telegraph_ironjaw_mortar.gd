@@ -142,6 +142,22 @@ func _physics_process(delta: float) -> void:
 		countdown_finished.emit(global_position)
 		queue_free()
 
+func _exit_tree() -> void:
+	if outer_ring:
+		outer_ring.material_override = null
+	if contracting_ring:
+		contracting_ring.material_override = null
+	if water_churn:
+		water_churn.material_override = null
+	if crosshair_h:
+		crosshair_h.material_override = null
+	if crosshair_v:
+		crosshair_v.material_override = null
+	_outer_mat = null
+	_contract_mat = null
+	_churn_mat = null
+	_crosshair_mat = null
+
 func cancel_and_cleanup() -> void:
 	_is_active = false
 	queue_free()

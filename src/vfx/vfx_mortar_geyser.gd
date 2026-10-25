@@ -6,6 +6,13 @@ extends Node3D
 
 signal finished
 
+var _mat: StandardMaterial3D = null
+
+func _exit_tree() -> void:
+	if shockwave_ring:
+		shockwave_ring.material_override = null
+	_mat = null
+
 func _ready() -> void:
 	top_level = true
 	if water_column:
@@ -17,13 +24,13 @@ func _ready() -> void:
 	if shockwave_ring:
 		shockwave_ring.position = Vector3(0.0, 0.05, 0.0)
 		shockwave_ring.scale = Vector3(0.2, 1.0, 0.2)
-		var base_mat = shockwave_ring.get_active_material(0)
+		var base_mat: Material = shockwave_ring.get_active_material(0)
 		if base_mat is StandardMaterial3D:
-			var mat: StandardMaterial3D = base_mat.duplicate()
-			shockwave_ring.material_override = mat
-			var tween = create_tween().set_parallel(true)
+			_mat = (base_mat as StandardMaterial3D).duplicate() as StandardMaterial3D
+			shockwave_ring.material_override = _mat
+			var tween: Tween = create_tween().set_parallel(true)
 			tween.tween_property(shockwave_ring, "scale", Vector3(3.5, 1.0, 3.5), 0.55).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-			tween.tween_property(mat, "albedo_color:a", 0.0, 0.55).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+			tween.tween_property(_mat, "albedo_color:a", 0.0, 0.55).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 
 func _on_particles_finished() -> void:
 	emit_signal("finished")

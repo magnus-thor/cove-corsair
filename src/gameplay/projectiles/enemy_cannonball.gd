@@ -99,6 +99,14 @@ func set_color(color: Color) -> void:
 		glow.material_override = mat
 
 
+func _exit_tree() -> void:
+	var core: MeshInstance3D = get_node_or_null("FireCore") as MeshInstance3D
+	if core:
+		core.material_override = null
+	var glow: MeshInstance3D = get_node_or_null("FireGlow") as MeshInstance3D
+	if glow:
+		glow.material_override = null
+
 var _time: float = 0.0
 
 func _physics_process(delta: float) -> void:

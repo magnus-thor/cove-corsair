@@ -122,6 +122,8 @@ func _spawn_gas_cloud_area() -> void:
 		_damage_enemies_in_cloud(cloud_root.global_position, cloud_radius)
 		if tracker["elapsed"] >= cloud_duration:
 			timer.stop()
+			if is_instance_valid(cloud_mesh):
+				cloud_mesh.material_override = null
 			cloud_root.queue_free()
 	)
 	

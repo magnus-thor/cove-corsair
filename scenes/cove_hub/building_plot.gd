@@ -119,12 +119,15 @@ func refresh_visuals() -> void:
 
 	# Immediately detach and free prior instantiated child
 	if _current_instantiated_model and is_instance_valid(_current_instantiated_model):
+		_clear_harmonized_materials(_current_instantiated_model)
 		if _current_instantiated_model.get_parent() == mesh_root:
 			mesh_root.remove_child(_current_instantiated_model)
 		_current_instantiated_model.queue_free()
 		_current_instantiated_model = null
 
 	for child: Node in mesh_root.get_children():
+		if child is Node3D:
+			_clear_harmonized_materials(child as Node3D)
 		mesh_root.remove_child(child)
 		child.queue_free()
 
@@ -201,6 +204,20 @@ func _harmonize_materials(model_node: Node3D) -> void:
 								modified = true
 						if modified:
 							mi.set_surface_override_material(i, sm)
+		for c: Node in curr.get_children():
+			stack.append(c)
+
+func _clear_harmonized_materials(model_node: Node3D) -> void:
+	if not model_node or not is_instance_valid(model_node):
+		return
+	var stack: Array[Node] = [model_node]
+	while not stack.is_empty():
+		var curr: Node = stack.pop_back() as Node
+		if curr is MeshInstance3D:
+			var mi: MeshInstance3D = curr as MeshInstance3D
+			mi.material_override = null
+			for i: int in range(mi.get_surface_override_material_count()):
+				mi.set_surface_override_material(i, null)
 		for c: Node in curr.get_children():
 			stack.append(c)
 
