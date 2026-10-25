@@ -34,6 +34,7 @@ var _point_dir: Vector2 = Vector2.UP
 var _base_pointer_pos: Vector2 = Vector2.ZERO
 var _is_typing: bool = false
 var _full_text: String = ""
+var shields_block_input: bool = true
 
 const VOICE_BASE_PATH: String = "res://assets/audio/voice/tutorial/"
 
@@ -73,8 +74,13 @@ func _on_banner_gui_input(ev: InputEvent) -> void:
 			# Fail-safe: Tapping banner dismisses overlay if target is hidden or missing
 			dismiss()
 
+func set_shields_blocking_enabled(enabled: bool) -> void:
+	shields_block_input = enabled
+	_set_shields_blocking(enabled)
+
 func _set_shields_blocking(blocking: bool) -> void:
-	var filter: Control.MouseFilter = Control.MOUSE_FILTER_STOP if blocking else Control.MOUSE_FILTER_IGNORE
+	var effective_blocking: bool = blocking and shields_block_input
+	var filter: Control.MouseFilter = Control.MOUSE_FILTER_STOP if effective_blocking else Control.MOUSE_FILTER_IGNORE
 	if shield_top: shield_top.mouse_filter = filter
 	if shield_bottom: shield_bottom.mouse_filter = filter
 	if shield_left: shield_left.mouse_filter = filter
@@ -170,7 +176,7 @@ func _update_positions() -> void:
 		if pointer_container: pointer_container.visible = false
 		return
 
-	_set_shields_blocking(true)
+	_set_shields_blocking(shields_block_input)
 	if target_highlight: target_highlight.visible = true
 	if pointer_container: pointer_container.visible = true
 

@@ -207,6 +207,18 @@ func _test_settlement_and_hub_routing() -> void:
 	assert_test(map_btn != null and map_btn.text == "RETURN TO COVE", "Settlement map_button text is 'RETURN TO COVE' after Level 3")
 	assert_test(primary_btn != null and not primary_btn.visible, "Settlement primary_button is hidden after Level 3 to prevent bypassing tutorial")
 
+	# Verify ad button is clickable and shields do NOT block ad button during Cove redirection
+	var bonus_btn: Button = settle_node.bonus_claim_button
+	assert_test(bonus_btn != null and bonus_btn.visible and not bonus_btn.disabled, "Bonus claim ad button is visible and active on settlement screen")
+	assert_test(settle_node._tutorial_overlay != null and not settle_node._tutorial_overlay.shields_block_input, "Tutorial overlay shields do NOT block input while ad is available during Cove redirect")
+	assert_test(settle_node._tutorial_overlay.shield_top.mouse_filter == Control.MOUSE_FILTER_IGNORE, "Shield mouse_filter is MOUSE_FILTER_IGNORE so player can tap the ad button")
+
+	# Simulate claiming 2X ad bonus
+	settle_node._on_bonus_claim_pressed()
+	assert_test(bonus_btn.disabled, "Bonus claim button is disabled after claiming")
+	assert_test(settle_node._tutorial_overlay.shields_block_input, "Tutorial overlay shields re-enable blocking after ad is claimed")
+	assert_test(settle_node._tutorial_overlay.shield_top.mouse_filter == Control.MOUSE_FILTER_STOP, "Shield mouse_filter restores MOUSE_FILTER_STOP to focus on Return to Cove")
+
 	# Test hotspot lock states at LEVEL_3_COMPLETED
 	var hotspot_scene: PackedScene = load("res://src/features/hub/lair_hotspot_area.tscn") as PackedScene
 	var drydock_hotspot: LairHotspotArea = hotspot_scene.instantiate() as LairHotspotArea

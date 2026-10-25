@@ -525,9 +525,12 @@ func _check_tutorial_guidance() -> void:
 		if map_button:
 			map_button.text = "RETURN TO COVE"
 
+	var can_claim_ad: bool = not _bonus_claimed and bonus_claim_button != null and bonus_claim_button.visible and not bonus_claim_button.disabled
+
 	# 1. First action on victory: Free 2X tutorial double ONLY on Level 1 if not yet claimed!
-	if not _bonus_claimed and bonus_claim_button and bonus_claim_button.visible and not bonus_claim_button.disabled:
+	if can_claim_ad:
 		if GameState and not GameState.has_used_free_double and cleared_lvl == 1:
+			_tutorial_overlay.shields_block_input = true
 			_tutorial_overlay.guide_to(
 				bonus_claim_button,
 				"A true corsair always doubles their haul! Claim yer free bonus gold!",
@@ -536,6 +539,10 @@ func _check_tutorial_guidance() -> void:
 				"tut_settle_claim_2x"
 			)
 			return
+
+	# When guiding navigation buttons (Return to Cove, Next Level) while an ad bonus is available,
+	# ensure the tutorial overlay shields do not block player input on the ad claim button!
+	_tutorial_overlay.shields_block_input = not can_claim_ad
 
 	# 2. After bonus is claimed, guide to the next navigation step:
 	if cleared_lvl == 1:
