@@ -8,6 +8,7 @@ extends Area3D
 @export var tick_interval: float = 0.4
 
 @export var forward_speed: float = 3.0
+@export var biogas_vfx_scene: PackedScene = preload("res://src/vfx/vfx_biogas_cloud.tscn")
 
 var _is_popped: bool = false
 var _pulse_time: float = 0.0
@@ -82,32 +83,29 @@ func explode_corrosive_cloud() -> void:
 	_spawn_gas_cloud_area()
 
 func _spawn_gas_cloud_area() -> void:
-	var cloud_root := Node3D.new()
-	var root := get_tree().current_scene
-	if root:
-		root.add_child(cloud_root)
-	else:
-		get_parent().add_child(cloud_root)
-	cloud_root.global_position = global_position
+	var cloud_root: Node3D = null
+	if VFXManager and VFXManager.has_method("spawn_biogas_cloud"):
+		cloud_root = VFXManager.spawn_biogas_cloud(global_position, cloud_duration, cloud_radius)
+	elif biogas_vfx_scene:
+		cloud_root = biogas_vfx_scene.instantiate() as Node3D
+		var root: Node = get_tree().current_scene
+		if root:
+			root.add_child(cloud_root)
+		else:
+			get_parent().add_child(cloud_root)
+		cloud_root.global_position = global_position
+		if cloud_root.has_method("start_cloud"):
+			cloud_root.call("start_cloud", cloud_duration, cloud_radius)
+	if not cloud_root:
+		cloud_root = Node3D.new()
+		var root: Node = get_tree().current_scene
+		if root:
+			root.add_child(cloud_root)
+		else:
+			get_parent().add_child(cloud_root)
+		cloud_root.global_position = global_position
 
-	# Toxic Green Cloud Visual Sphere
-	var cloud_mesh := MeshInstance3D.new()
-	var sphere := SphereMesh.new()
-	sphere.radius = cloud_radius
-	sphere.height = cloud_radius * 1.6
-	cloud_mesh.mesh = sphere
-	
-	var mat := StandardMaterial3D.new()
-	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.albedo_color = Color(0.15, 0.85, 0.25, 0.4)
-	cloud_mesh.material_override = mat
-	cloud_root.add_child(cloud_mesh)
-	
-	# Cloud pulse animation
-	var tween := cloud_root.create_tween()
-	tween.tween_property(cloud_mesh, "scale", Vector3(1.1, 0.9, 1.1), cloud_duration * 0.5).set_trans(Tween.TRANS_SINE)
-	tween.tween_property(mat, "albedo_color:a", 0.0, cloud_duration * 0.5)
+	var cloud_center: Vector3 = global_position
 
 	# Active ticking damage timer
 	var tracker: Dictionary = {"elapsed": 0.0}
@@ -119,16 +117,15 @@ func _spawn_gas_cloud_area() -> void:
 	timer.timeout.connect(func() -> void:
 		tracker["elapsed"] += tick_interval
 		_player_damage_cooldown = max(0.0, _player_damage_cooldown - tick_interval)
-		_damage_enemies_in_cloud(cloud_root.global_position, cloud_radius)
+		_damage_enemies_in_cloud(cloud_center, cloud_radius)
 		if tracker["elapsed"] >= cloud_duration:
 			timer.stop()
-			if is_instance_valid(cloud_mesh):
-				cloud_mesh.material_override = null
-			cloud_root.queue_free()
+			if not cloud_root.has_method("start_cloud"):
+				cloud_root.queue_free()
 	)
 	
 	# Initial tick
-	_damage_enemies_in_cloud(cloud_root.global_position, cloud_radius)
+	_damage_enemies_in_cloud(cloud_center, cloud_radius)
 	
 	queue_free()
 

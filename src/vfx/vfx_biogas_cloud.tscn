@@ -1,0 +1,79 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://src/vfx/vfx_biogas_cloud.gd" id="1_cloud_script"]
+
+[sub_resource type="Gradient" id="Gradient_fumes"]
+offsets = PackedFloat32Array(0, 0.35, 0.75, 1)
+colors = PackedColorArray(0.48, 0.72, 0.16, 0.65, 0.35, 0.58, 0.14, 0.55, 0.22, 0.40, 0.12, 0.3, 0.12, 0.24, 0.08, 0)
+
+[sub_resource type="Curve" id="Curve_fumes_scale"]
+_data = [Vector2(0, 0.35), 0.0, 1.8, 0, 0, Vector2(0.5, 1.0), 0.0, 0.0, 0, 0, Vector2(1, 1.4), 0.4, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fumes"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.85, 1.0, 0.65, 0.75)
+billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_fumes"]
+material = SubResource("StandardMaterial3D_fumes")
+size = Vector2(1.2, 1.2)
+
+[sub_resource type="Gradient" id="Gradient_bubbles"]
+offsets = PackedFloat32Array(0, 0.6, 1)
+colors = PackedColorArray(0.65, 0.95, 0.25, 0.9, 0.45, 0.8, 0.18, 0.7, 0.25, 0.55, 0.1, 0)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bubbles"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.8, 1.0, 0.5, 0.85)
+
+[sub_resource type="SphereMesh" id="SphereMesh_bubble"]
+material = SubResource("StandardMaterial3D_bubbles")
+radius = 0.08
+height = 0.16
+
+[node name="VFXBiogasCloud" type="Node3D"]
+top_level = true
+script = ExtResource("1_cloud_script")
+
+[node name="FumesParticles" type="CPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+local_coords = false
+emitting = false
+amount = 22
+lifetime = 1.3
+mesh = SubResource("QuadMesh_fumes")
+emission_shape = 1
+emission_sphere_radius = 2.1
+direction = Vector3(0, 1, 0)
+spread = 60.0
+gravity = Vector3(0, 0.35, 0)
+initial_velocity_min = 0.6
+initial_velocity_max = 1.6
+angular_velocity_min = -45.0
+angular_velocity_max = 45.0
+scale_amount_curve = SubResource("Curve_fumes_scale")
+color_ramp = SubResource("Gradient_fumes")
+
+[node name="BubbleParticles" type="CPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+local_coords = false
+emitting = false
+amount = 16
+lifetime = 0.75
+mesh = SubResource("SphereMesh_bubble")
+emission_shape = 1
+emission_sphere_radius = 2.4
+direction = Vector3(0, 1, 0)
+spread = 35.0
+gravity = Vector3(0, 0.6, 0)
+initial_velocity_min = 0.8
+initial_velocity_max = 1.8
+color_ramp = SubResource("Gradient_bubbles")

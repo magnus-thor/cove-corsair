@@ -7,6 +7,8 @@ const SCENE_IRON_SPARKS: PackedScene = preload("res://src/vfx/vfx_iron_sparks.ts
 const SCENE_MORTAR_GEYSER: PackedScene = preload("res://src/vfx/vfx_mortar_geyser.tscn")
 const SCENE_MINE_EXPLOSION: PackedScene = preload("res://src/vfx/vfx_mine_explosion.tscn")
 const SCENE_COIN_BURST: PackedScene = preload("res://src/vfx/vfx_coin_burst.tscn")
+const SCENE_BIOGAS_CLOUD: PackedScene = preload("res://src/vfx/vfx_biogas_cloud.tscn")
+const SCENE_FIRE_POOL: PackedScene = preload("res://src/vfx/vfx_fire_pool.tscn")
 
 ## Water surface constant
 const WATER_SURFACE_MIN_Y: float = 0.0
@@ -120,6 +122,20 @@ func spawn_coin_burst(world_pos: Vector3) -> Node3D:
 ## Spawns fiery metal spark burst upon hitting armored vessels or obstacles.
 func spawn_iron_sparks(world_pos: Vector3) -> Node3D:
 	return _spawn_effect(SCENE_IRON_SPARKS, world_pos, 0.35)
+
+## Spawns stylized billowing toxic marsh gas fumes and bubbling water surface particles.
+func spawn_biogas_cloud(world_pos: Vector3, duration: float = 2.5, radius: float = 4.2) -> Node3D:
+	var effect: Node3D = _spawn_effect(SCENE_BIOGAS_CLOUD, world_pos, duration + 0.5)
+	if effect and effect.has_method("start_cloud"):
+		effect.call("start_cloud", duration, radius)
+	return effect
+
+## Spawns stylized lingering fire pool with licking flames and embers on water surface.
+func spawn_fire_pool(world_pos: Vector3, duration: float = 2.0, radius: float = 2.4) -> Node3D:
+	var effect: Node3D = _spawn_effect(SCENE_FIRE_POOL, world_pos, duration + 0.5)
+	if effect and effect.has_method("start_fire_pool"):
+		effect.call("start_fire_pool", duration, radius)
+	return effect
 
 var _is_hit_stopping: bool = false
 

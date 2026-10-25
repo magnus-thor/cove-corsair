@@ -199,6 +199,15 @@ func die() -> void:
 			VFXManager.spawn_explosion(explosion_pos)
 		else:
 			_spawn_explosion()
+	elif obstacle_type == ObstacleType.FUSE_BARREL:
+		explosion_pos.y = 0.05
+		if VFXManager and VFXManager.has_method("hit_stop"):
+			VFXManager.hit_stop(0.04)
+		AudioManager.play_sfx("barrel_breaks")
+		if VFXManager and VFXManager.has_method("spawn_mine_explosion"):
+			VFXManager.spawn_mine_explosion(explosion_pos)
+		if VFXManager and VFXManager.has_method("spawn_wood_debris"):
+			VFXManager.spawn_wood_debris(explosion_pos)
 	else:
 		if is_in_group("barricade") or obstacle_type == ObstacleType.WOODEN_BARREL:
 			if VFXManager and VFXManager.has_method("spawn_wood_debris"):

@@ -636,7 +636,10 @@ func _on_hit(target: Node) -> void:
 		queue_free()
 
 func _spawn_splash(at_water_level: bool = false) -> void:
-	if at_water_level and VFXManager and VFXManager.has_method("spawn_mortar_splash"):
+	var is_bomb_or_fire: bool = has_meta("is_incendiary") or (ammo_data != null and ("fire" in ammo_data.ammo_name.to_lower() or "bomb" in ammo_data.ammo_name.to_lower() or "napalm" in ammo_data.ammo_name.to_lower()))
+	if is_bomb_or_fire and VFXManager and VFXManager.has_method("spawn_mine_explosion"):
+		VFXManager.spawn_mine_explosion(global_position)
+	elif at_water_level and VFXManager and VFXManager.has_method("spawn_mortar_splash"):
 		VFXManager.spawn_mortar_splash(global_position)
 	if hit_splash_scene:
 		var splash := hit_splash_scene.instantiate() as Node3D
@@ -747,19 +750,18 @@ func _trigger_lingering_napalm() -> void:
 	col.shape = shape
 	puddle.add_child(col)
 	
-	# Visual fire pool
-	var mesh_inst := MeshInstance3D.new()
-	var disc := CylinderMesh.new()
-	disc.top_radius = 2.4
-	disc.bottom_radius = 2.4
-	disc.height = 0.02
-	mesh_inst.mesh = disc
-	var mat := StandardMaterial3D.new()
-	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.albedo_color = Color(1.0, 0.4, 0.05, 0.6)
-	mesh_inst.material_override = mat
-	puddle.add_child(mesh_inst)
+	# Visual fire pool replaces flat geometric red cylinder disc
+	var fire_pool_node: Node3D = null
+	if VFXManager and VFXManager.has_method("spawn_fire_pool"):
+		fire_pool_node = VFXManager.spawn_fire_pool(puddle.global_position, 2.0, 2.4)
+	else:
+		var pool_scene := load("res://src/vfx/vfx_fire_pool.tscn") as PackedScene
+		if pool_scene:
+			fire_pool_node = pool_scene.instantiate() as Node3D
+			root.add_child(fire_pool_node)
+			fire_pool_node.global_position = puddle.global_position
+			if fire_pool_node.has_method("start_fire_pool"):
+				fire_pool_node.call("start_fire_pool", 2.0, 2.4)
 	
 	# Napalm damage ticks over 2 seconds
 	var napalm_tween := puddle.create_tween()
@@ -772,10 +774,7 @@ func _trigger_lingering_napalm() -> void:
 							body.call("take_damage", 2)
 		)
 		napalm_tween.tween_interval(0.5)
-	napalm_tween.tween_property(mat, "albedo_color:a", 0.0, 0.4)
 	napalm_tween.tween_callback(func() -> void:
-		if is_instance_valid(mesh_inst):
-			mesh_inst.material_override = null
 		if is_instance_valid(puddle):
 			puddle.queue_free()
 	)
