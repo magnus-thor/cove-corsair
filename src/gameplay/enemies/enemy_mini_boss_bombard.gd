@@ -4,7 +4,7 @@ extends Area3D
 @export var max_hp: int = 120
 @export var current_hp: int = 120
 @export var forward_speed: float = 1.3
-@export var doubloons_drop: int = 22
+@export var doubloons_drop: int = 12
 @export var bombard_interval: float = 2.6
 
 @export var doubloon_scene: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
@@ -150,6 +150,11 @@ func _update_health_bar() -> void:
 func die() -> void:
 	if _is_dead:
 		return
+	_is_dead = true
+	collision_layer = 0
+	collision_mask = 0
+	set_deferred("monitoring", false)
+	set_deferred("monitorable", false)
 	# ── Engagement telemetry ─────────────────────────────────────────────────
 	if EventBus and EventBus.has_signal("mob_killed"):
 		var player_node: Node3D = get_tree().get_first_node_in_group("player") as Node3D
@@ -166,7 +171,7 @@ func die() -> void:
 	if camera:
 		camera.shake(0.38, 0.32)
 		
-	for i in range(5):
+	for i: int in range(5):
 		get_tree().create_timer(i * 0.1).timeout.connect(func() -> void:
 			if explosion_scene:
 				var vfx: Node3D = explosion_scene.instantiate() as Node3D
@@ -178,7 +183,7 @@ func die() -> void:
 		)
 		
 	if doubloon_scene:
-		for i in range(doubloons_drop):
+		for i: int in range(doubloons_drop):
 			var d: CollectibleDoubloon = doubloon_scene.instantiate() as CollectibleDoubloon
 			var root: Node = get_tree().current_scene
 			if root:

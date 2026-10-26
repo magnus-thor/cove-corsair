@@ -8,8 +8,10 @@ static func get_tier_hp(level: int) -> int:
 		return 1
 	elif level <= 3:
 		return 2
-	elif level <= 10:
+	elif level <= 5:
 		return 6
+	elif level <= 10:
+		return 8
 	elif level <= 25:
 		return 12
 	else:

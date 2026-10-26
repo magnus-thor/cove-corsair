@@ -69,18 +69,19 @@ func _apply_level_tuning() -> void:
 		var z_pos: float = enemy.position.z
 		# Enemy is trailing behind the barricade (more negative Z)
 		if z_pos < barricade_z:
-			var saved_drop: int = int(enemy.get("doubloons_drop")) if "doubloons_drop" in enemy else 2
+			var saved_drop: int = 1 if (trailing_index % 2 == 0) else 0
 			if cur_level <= 1:
 				saved_drop = 0
-			elif cur_level <= 2:
-				saved_drop = 1 if trailing_index < 6 else 0
-			var tuned_trail_hp: int = 2 if cur_level <= 3 else (int(enemy.get("max_hp")) if "max_hp" in enemy else 5)
+			elif cur_level <= 4:
+				saved_drop = 1 if trailing_index < 3 else 0
+			var tuned_trail_hp: int = 2 if cur_level <= 3 else (3 if cur_level <= 5 else (5 if cur_level <= 10 else 8))
 			if enemy.has_method("apply_enemy_data"):
 				var use_secondary: bool = (trailing_index + variant) % 2 == 1 and cur_level > 2
 				enemy.call("apply_enemy_data", secondary_data if use_secondary else primary_data)
 				enemy.set("doubloons_drop", saved_drop)
-				enemy.set("max_hp", tuned_trail_hp)
-				enemy.set("current_hp", tuned_trail_hp)
+				var scaled_hp: int = maxi(tuned_trail_hp, int(enemy.get("max_hp")) if cur_level > 10 else tuned_trail_hp)
+				enemy.set("max_hp", scaled_hp)
+				enemy.set("current_hp", scaled_hp)
 				if cur_level <= 3:
 					enemy.set("forward_speed", 1.8)
 
@@ -91,19 +92,29 @@ func _apply_level_tuning() -> void:
 			trailing_index += 1
 		else:
 			# Enemy is in front of the barricade (Z = -12 to -14)
-			var saved_drop_f: int = int(enemy.get("doubloons_drop")) if "doubloons_drop" in enemy else 3
+			var is_turtle: bool = enemy.name.contains("Turtle")
+			var saved_drop_f: int = 2 if is_turtle else 1
 			if cur_level <= 1:
 				saved_drop_f = 0
-			elif cur_level <= 2:
-				saved_drop_f = 2
-			var saved_hp_f: int = int(enemy.get("max_hp")) if "max_hp" in enemy else 5
+			elif cur_level <= 3:
+				saved_drop_f = 1
 			if enemy.has_method("apply_enemy_data"):
-				var front_data: Resource = ROWER_DATA if cur_level <= 2 else (secondary_data if enemy.name.contains("Turtle") else primary_data)
+				var front_data: Resource = ROWER_DATA if cur_level <= 2 else (secondary_data if is_turtle else primary_data)
 				enemy.call("apply_enemy_data", front_data)
 				enemy.set("doubloons_drop", saved_drop_f)
 				var em := enemy as EnemyMob
 				if em:
-					var tuned_hp: int = 2 if cur_level <= 2 else (3 if cur_level == 3 else (10 if (cur_level <= 10 and saved_hp_f > 15) else saved_hp_f))
+					var tuned_hp: int = 2
+					if cur_level <= 2:
+						tuned_hp = 2
+					elif cur_level == 3:
+						tuned_hp = 3
+					elif cur_level <= 5:
+						tuned_hp = 6 if is_turtle else 4
+					elif cur_level <= 10:
+						tuned_hp = 12 if is_turtle else 6
+					else:
+						tuned_hp = maxi(14 if is_turtle else 8, em.max_hp)
 					em.max_hp = tuned_hp
 					em.current_hp = tuned_hp
 					if cur_level <= 3:

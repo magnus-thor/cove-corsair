@@ -414,6 +414,7 @@ func _populate_chunk_lane_content(chunk: BaseTrackChunk) -> void:
 					if coin:
 						entities.add_child(coin)
 						coin.position = Vector3(lane_x, 0.1, zone_z + offset_z)
+						coin.set("value", 3)
 			elif roll < 0.48 and mine_scene:
 				# Spawn a contact sea mine - lethal danger requiring swerving
 				var mine: Node3D = mine_scene.instantiate() as Node3D
@@ -432,6 +433,7 @@ func _populate_chunk_lane_content(chunk: BaseTrackChunk) -> void:
 				if barrel:
 					entities.add_child(barrel)
 					barrel.position = Vector3(lane_x, 0.05, zone_z)
+					barrel.set("doubloons_drop", 3)
 			elif fodder_scene:
 				# Spawn a fodder patrol skiff
 				var skiff: Node3D = fodder_scene.instantiate() as Node3D

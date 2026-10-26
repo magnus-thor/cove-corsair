@@ -56,7 +56,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0, 0, -38)
 [node name="ExplosiveKeg" type="Area3D" parent="Entities" unique_id=9834113 groups=["destructible"] instance=ExtResource("8_barrel")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 0.05, -38)
 script = ExtResource("9_barrel_script")
-obstacle_type = 2
+obstacle_type = 1
+doubloons_drop = 1
 
 [node name="BrimstoneRaft_Rear" type="Area3D" parent="Entities" unique_id=9834117 groups=["destructible", "enemies"] instance=ExtResource("6_raft")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.1, -44)

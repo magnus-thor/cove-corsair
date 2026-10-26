@@ -280,7 +280,7 @@ func _spawn_finish_wave() -> void:
 		_spawn_tropical_finish_wave(entities, finish_barricade, cur_lvl, wave_var)
 
 func _spawn_tropical_finish_wave(entities: Node, finish_barricade: BarricadeWall, cur_lvl: int, wave_var: int) -> void:
-	var base_hp: int = 2 if cur_lvl <= 2 else (3 if cur_lvl <= 6 else (5 if cur_lvl <= 11 else 7))
+	var base_hp: int = 2 if cur_lvl <= 2 else (3 if cur_lvl <= 4 else (5 if cur_lvl <= 11 else 7))
 	var base_spd: float = 1.6 if cur_lvl <= 2 else 2.2
 	var hp_cap: int = 4 if cur_lvl <= 3 else 999
 
@@ -616,9 +616,9 @@ func _spawn_enemy_mob(entities: Node, data: Resource, pos: Vector3, hp_val: int,
 	mob.set("max_hp", hp_val)
 	mob.set("current_hp", hp_val)
 	mob.set("forward_speed", spd)
-	var final_drop: int = drop_val
-	if _resolve_active_level() == 1 and final_drop > 0:
-		if _l1_coin_mobs_spawned >= 5:
+	var final_drop: int = mini(drop_val, 1)
+	if final_drop > 0:
+		if _l1_coin_mobs_spawned >= 3:
 			final_drop = 0
 		else:
 			_l1_coin_mobs_spawned += 1
@@ -635,6 +635,7 @@ func _spawn_grave_skiff(entities: Node, pos: Vector3, hp_val: int, spd: float) -
 	skiff.set("max_hp", hp_val)
 	skiff.set("current_hp", hp_val)
 	skiff.set("forward_speed", spd)
+	skiff.set("doubloons_drop", 0)
 
 func _spawn_iron_gunner(entities: Node, pos: Vector3, hp_val: int, spd: float) -> void:
 	if not IRON_GUNNER_SCENE:
@@ -647,6 +648,7 @@ func _spawn_iron_gunner(entities: Node, pos: Vector3, hp_val: int, spd: float) -
 	gunner.set("max_hp", hp_val)
 	gunner.set("current_hp", hp_val)
 	gunner.set("forward_speed", spd)
+	gunner.set("doubloons_drop", 0)
 
 func _spawn_brimstone_raft(entities: Node, pos: Vector3, hp_val: int, spd: float) -> void:
 	if not BRIMSTONE_RAFT_SCENE:
@@ -659,6 +661,7 @@ func _spawn_brimstone_raft(entities: Node, pos: Vector3, hp_val: int, spd: float
 	raft.set("max_hp", hp_val)
 	raft.set("current_hp", hp_val)
 	raft.set("forward_speed", spd)
+	raft.set("doubloons_drop", 0)
 
 func _spawn_barrel(entities: Node, pos: Vector3, obs_type: int, hp_val: int) -> void:
 	if not BARREL_SCENE:
@@ -776,6 +779,11 @@ func _spawn_celebration_effects() -> void:
 		for d_i: int in range(coin_count):
 			var d := doubloon_scene.instantiate() as CollectibleDoubloon
 			if d:
+				d.value = 0
+				d.collision_layer = 0
+				d.collision_mask = 0
+				d.set_deferred("monitoring", false)
+				d.set_deferred("monitorable", false)
 				spawn_parent.add_child(d)
 				d.global_position = Vector3(randf_range(-4.5, 4.5), 0.2, global_position.z - 50.0)
 				d._trigger_spawn_bounce(Vector2(randf_range(-2.5, 2.5), randf_range(-2.5, 2.5)))

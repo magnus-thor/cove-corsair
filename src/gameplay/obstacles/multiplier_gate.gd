@@ -104,10 +104,12 @@ func _trigger_gate_collect(node: Node) -> void:
 	# Balanced fleet reward: 1 gate gives +1 ship (+2 and overdrive if major gate or add_fleet_2)
 	var is_major_gate: bool = final_value >= 25 or gate_action == "add_fleet_2" or final_value >= 100
 	var ships_to_add: int = 2 if is_major_gate else 1
-	var doubloons_to_add: int = 15 if final_value >= 100 else clampi(int(round(final_value * 0.1)), 2, 8)
+	var doubloons_to_add: int = 5 if final_value >= 100 else clampi(int(round(final_value * 0.04)), 1, 3)
 	
 	if GameState:
 		GameState.add_doubloons(doubloons_to_add, "multiplier_gate")
+		if GameState.is_endless_mode and EventBus and EventBus.has_signal("gold_collected"):
+			EventBus.gold_collected.emit(doubloons_to_add)
 
 	if player_node:
 		if "doubloons" in player_node:
@@ -206,11 +208,11 @@ func _detonate_overcharged_gate() -> void:
 	if camera and camera.has_method("shake"):
 		camera.call("shake", 0.25, 0.35)
 
-	# 3. Award Player Rewards (+2 escorts, Overdrive 2x fire rate for 6s, +25 doubloons)
+	# 3. Award Player Rewards (+2 escorts, Overdrive 2x fire rate for 6s, +5 doubloons)
 	var player_node: Node = get_tree().get_first_node_in_group("player")
 	if player_node:
 		if "doubloons" in player_node:
-			player_node.set("doubloons", int(player_node.get("doubloons")) + 25)
+			player_node.set("doubloons", int(player_node.get("doubloons")) + 5)
 		if player_node.has_method("add_follower_ships"):
 			player_node.call("add_follower_ships", 2)
 		if player_node.has_method("trigger_armada_overdrive"):
@@ -219,7 +221,9 @@ func _detonate_overcharged_gate() -> void:
 			player_node.call("spawn_floating_text_at_position", "💥 GATE DETONATED! OVERDRIVE UNLEASHED! 💥", Color(1.0, 0.85, 0.1))
 
 	if GameState:
-		GameState.add_doubloons(25, "multiplier_gate")
+		GameState.add_doubloons(5, "multiplier_gate")
+		if GameState.is_endless_mode and EventBus and EventBus.has_signal("gold_collected"):
+			EventBus.gold_collected.emit(5)
 
 	# 4. AoE Shockwave: Clear immediate frontline mines or fodder in front of the gate (radius 4.5m)
 	var space_state: PhysicsDirectSpaceState3D = get_world_3d().direct_space_state

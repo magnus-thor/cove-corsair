@@ -3,7 +3,7 @@ level_id: 5
 level_title: "Level 5: Captain Ironjaw (Boss Threat)"
 biome_name: "tropical"
 base_scroll_speed: 7.5
-completion_doubloon_reward: 234
+completion_doubloon_reward: 120
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_05.tres"
 ---

@@ -5,7 +5,7 @@ extends Area3D
 @export var current_hp: int = 18
 @export var forward_speed: float = 7.8
 @export var steer_speed: float = 4.5
-@export var doubloons_drop: int = 3
+@export var doubloons_drop: int = 2
 
 @export var doubloon_scene: PackedScene = preload("res://src/gameplay/collectibles/collectible_doubloon.tscn")
 @export var explosion_scene: PackedScene = preload("res://src/vfx/barrel_explosion.tscn")
@@ -35,21 +35,25 @@ func _apply_level_tuning() -> void:
 		current_hp = 3
 		forward_speed = 2.5
 		steer_speed = 1.5
-	elif cur_lvl <= 6:
+		doubloons_drop = 1
+	elif cur_lvl <= 5:
 		max_hp = 4
 		current_hp = 4
 		forward_speed = 3.2
 		steer_speed = 2.0
+		doubloons_drop = 1
 	elif cur_lvl <= 10:
-		max_hp = 6
-		current_hp = 6
-		forward_speed = 4.0
-		steer_speed = 2.5
-	else:
 		max_hp = 8
 		current_hp = 8
+		forward_speed = 4.0
+		steer_speed = 2.5
+		doubloons_drop = 2
+	else:
+		max_hp = 12
+		current_hp = 12
 		forward_speed = 4.8
 		steer_speed = 3.0
+		doubloons_drop = 2
 
 func _physics_process(delta: float) -> void:
 	if _is_dead or not GameState.is_game_active:
@@ -120,6 +124,11 @@ func _update_health_bar() -> void:
 func die() -> void:
 	if _is_dead:
 		return
+	_is_dead = true
+	collision_layer = 0
+	collision_mask = 0
+	set_deferred("monitoring", false)
+	set_deferred("monitorable", false)
 	# ── Engagement telemetry ─────────────────────────────────────────────────
 	if EventBus and EventBus.has_signal("mob_killed"):
 		var player_node: Node3D = get_tree().get_first_node_in_group("player") as Node3D
@@ -147,7 +156,7 @@ func die() -> void:
 		camera.shake(0.25, 0.22)
 		
 	if doubloon_scene:
-		for i in range(doubloons_drop):
+		for i: int in range(doubloons_drop):
 			var d: CollectibleDoubloon = doubloon_scene.instantiate() as CollectibleDoubloon
 			var root: Node = get_tree().current_scene
 			if root:

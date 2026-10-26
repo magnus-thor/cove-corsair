@@ -259,13 +259,17 @@ func die() -> void:
 		var river_dist: float = GameState.distance_traveled if GameState else 0.0
 		EventBus.obstacle_destroyed_telemetry.emit(obs_label, _hits_taken, river_dist)
 		if has_meta("spawns_chest"):
-			var chest_scene := load("res://src/gameplay/collectibles/collectible_chest.tscn") as PackedScene
-			if chest_scene:
-				var chest := chest_scene.instantiate() as Area3D
-				var root := get_tree().current_scene
-				if root and chest:
-					root.add_child(chest)
-					chest.global_position = Vector3(global_position.x, 0.15, global_position.z)
+			var cur_lvl_meta: int = GameState.current_level if GameState else 1
+			if cur_lvl_meta >= 6:
+				var chest_scene := load("res://src/gameplay/collectibles/collectible_chest.tscn") as PackedScene
+				if chest_scene:
+					var chest := chest_scene.instantiate() as Area3D
+					if chest and "chest_value" in chest:
+						chest.set("chest_value", 15)
+					var root := get_tree().current_scene
+					if root and chest:
+						root.add_child(chest)
+						chest.global_position = Vector3(global_position.x, 0.15, global_position.z)
 	
 	# Trigger camera shake on death!
 	var camera := get_tree().get_first_node_in_group("game_camera") as GameCamera

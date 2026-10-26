@@ -12,8 +12,10 @@ static func get_tier_hp(level: int) -> int:
 		return 1
 	elif level <= 3:
 		return 2
-	elif level <= 10:
+	elif level <= 5:
 		return 6
+	elif level <= 10:
+		return 8
 	elif level <= 25:
 		return 12
 	else:
@@ -58,7 +60,7 @@ func _ready() -> void:
 	if cur_level <= 1 and active_points.has(0.0):
 		active_points.erase(0.0)
 		
-	for i in range(active_points.size()):
+	for i: int in range(active_points.size()):
 		var x_norm: float = float(active_points[i])
 		if segment_prefab:
 			var segment := segment_prefab.instantiate() as BarricadeSegment
@@ -68,6 +70,7 @@ func _ready() -> void:
 			if segment:
 				segment.hp = seg_hp
 				add_child(segment)
+				segment.doubloons_drop = 1 if i == int(active_points.size() / 2) else 0
 				var x_world: float = x_norm * (river_width / 2.0)
 				segment.position = Vector3(x_world, 0.0, 0.0)
 

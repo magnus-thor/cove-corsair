@@ -45,21 +45,21 @@ func _physics_process(delta: float) -> void:
 	rotation.y += rotation_speed * delta
 	
 	if _is_attracted and _target_attractor and is_instance_valid(_target_attractor):
-		var target_pos = _target_attractor.global_position
+		var target_pos: Vector3 = _target_attractor.global_position
 		global_position = global_position.move_toward(target_pos, magnet_pull_speed * delta)
 		if global_position.distance_to(target_pos) < 1.0:
 			collect_chest()
 	else:
-		var flow = 12.0
-		var track_mgr = get_tree().get_first_node_in_group("track_manager")
+		var flow: float = 12.0
+		var track_mgr: Node = get_tree().get_first_node_in_group("track_manager")
 		if track_mgr and "scroll_speed" in track_mgr:
-			flow = track_mgr.scroll_speed
+			flow = float(track_mgr.get("scroll_speed"))
 		global_position.z += flow * delta
 		
 		global_position.y = base_water_y + sin(_time * bob_speed) * bob_height
 
-	var player = get_tree().get_first_node_in_group("player")
-	var player_z = player.global_position.z if player else 0.0
+	var player: Node3D = get_tree().get_first_node_in_group("player") as Node3D
+	var player_z: float = player.global_position.z if player else 0.0
 	if global_position.z > (player_z + 12.0):
 		queue_free()
 
@@ -85,15 +85,15 @@ func collect_chest() -> void:
 	
 	set_deferred("monitoring", false)
 	set_deferred("monitorable", false)
-	for child in get_children():
+	for child: Node in get_children():
 		if child is CollisionShape3D:
-			child.set_deferred("disabled", true)
+			(child as CollisionShape3D).set_deferred("disabled", true)
 			
-	var visual_node = get_node_or_null("Visuals")
+	var visual_node: Node3D = get_node_or_null("Visuals") as Node3D
 	if visual_node:
 		visual_node.visible = false
 		
-	var spawn_pos = global_position
+	var spawn_pos: Vector3 = global_position
 	
 	# 1. Golden coin burst erupting upward
 	if VFXManager and VFXManager.has_method("spawn_coin_burst"):
@@ -108,6 +108,8 @@ func collect_chest() -> void:
 	# 4. Economy reward
 	if GameState:
 		GameState.add_doubloons(chest_value, "chest")
+		if GameState.is_endless_mode and EventBus and EventBus.has_signal("gold_collected"):
+			EventBus.gold_collected.emit(chest_value)
 	var player := get_tree().get_first_node_in_group("player") as Node
 	if player and player.has_method("add_doubloons"):
 		player.call("add_doubloons", chest_value)
@@ -118,8 +120,8 @@ func collect_chest() -> void:
 	queue_free()
 
 func _spawn_floating_score_label(pos: Vector3, amount: int) -> void:
-	var label = Label3D.new()
-	var font_file = load("res://assets/fonts/CarterOne.ttf")
+	var label: Label3D = Label3D.new()
+	var font_file: Font = load("res://assets/fonts/CarterOne.ttf") as Font
 	if font_file:
 		label.font = font_file
 	label.text = "+%d GOLD" % amount
@@ -132,16 +134,16 @@ func _spawn_floating_score_label(pos: Vector3, amount: int) -> void:
 	label.outline_size = 12
 	label.outline_modulate = Color(0.12, 0.08, 0.04, 1.0)
 		
-	var root = get_tree().current_scene
+	var root: Node = get_tree().current_scene
 	if not root:
 		root = get_tree().root
 	root.add_child(label)
 	
-	var start_pos = pos + Vector3(0, 0.5, 0)
+	var start_pos: Vector3 = pos + Vector3(0, 0.5, 0)
 	label.global_position = start_pos
 	label.scale = Vector3(0.7, 0.7, 0.7)
 	
-	var tween = label.create_tween().set_parallel(true)
+	var tween: Tween = label.create_tween().set_parallel(true)
 	tween.tween_property(label, "global_position:y", start_pos.y + 1.8, 0.7).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tween.tween_property(label, "scale", Vector3(1.35, 1.35, 1.35), 0.7).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tween.tween_property(label, "modulate:a", 0.0, 0.7).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)

@@ -367,8 +367,11 @@ func apply_tier(tier_level: int) -> void:
 	var speed_bonus_max: float = 1.0 if ship_data.ship_id == "dinghy" else 3.0
 	var tier_speed: float = ship_data.move_speed + progress_ratio * speed_bonus_max
 	tier_fire_rate_multiplier = 1.0 + progress_ratio * 0.35
-	if ship_data.ship_id == "sloop" and tier_level >= 4:
-		tier_fire_rate_multiplier = maxf(tier_fire_rate_multiplier, 1.25)
+	if ship_data.ship_id == "sloop":
+		if tier_level >= 4:
+			tier_fire_rate_multiplier = maxf(tier_fire_rate_multiplier, 1.28 + float(tier_level - 4) * 0.035)
+		elif tier_level == 3:
+			tier_fire_rate_multiplier = maxf(tier_fire_rate_multiplier, 1.20)
 	if _movement:
 		_movement.sync_from_ship_data(tier_speed, tier_speed * 1.3)
 	health_changed.emit(current_health, max_health)

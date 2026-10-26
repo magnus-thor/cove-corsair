@@ -2,8 +2,8 @@
 level_id: 7
 level_title: "Level 7: Bone Cay (Swarm Threat)"
 biome_name: "tropical"
-base_scroll_speed: 7.7
-completion_doubloon_reward: 126
+base_scroll_speed: 10.5
+completion_doubloon_reward: 85
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_07.tres"
 ---

@@ -56,7 +56,7 @@ func _spawn_dynamic_swarm_climax() -> void:
 		secondary_data = ELITE_IRONCLAD_DATA
 
 	# Mob HP and speed scaled by level and gate escalation
-	var swarm_hp: int = 2 if cur_lvl <= 4 else (3 if cur_lvl <= 12 else 4)
+	var swarm_hp: int = 2 if cur_lvl <= 4 else (4 if cur_lvl == 5 else (5 if cur_lvl <= 8 else (6 if cur_lvl <= 14 else 8)))
 	var rush_speed: float = 3.6 + minf(1.8, float(escalation_tier) * 0.35 + float(cur_lvl) * 0.04)
 
 	# ── Wave 1: Vanguard Skiff Swarm (Z: -4 to -12) ──
@@ -80,7 +80,7 @@ func _spawn_dynamic_swarm_climax() -> void:
 			mob.max_hp = swarm_hp
 			mob.current_hp = swarm_hp
 			mob.forward_speed = rush_speed
-			mob.doubloons_drop = 1
+			mob.doubloons_drop = 1 if i % 2 == 0 else 0
 
 	# ── Wave 2: Fast Raider Flotilla (Z: -15 to -23) ──
 	var wave_2_lanes: Array[float] = [-3.0, -1.8, -0.6, 0.6, 1.8, 3.0]
@@ -103,7 +103,7 @@ func _spawn_dynamic_swarm_climax() -> void:
 			mob.max_hp = swarm_hp + 1
 			mob.current_hp = swarm_hp + 1
 			mob.forward_speed = rush_speed + 0.4
-			mob.doubloons_drop = 2
+			mob.doubloons_drop = 1
 
 	# Biome-Themed Center Hazards in Wave 2
 	for hazard_x: float in [-1.2, 1.2]:
@@ -123,9 +123,10 @@ func _spawn_dynamic_swarm_climax() -> void:
 				entities.add_child(keg)
 				keg.position = Vector3(hazard_x, 0.05, -22.0)
 				keg.obstacle_type = DestructibleObstacle.ObstacleType.FUSE_BARREL
+				keg.doubloons_drop = 0
 
 	# ── Gatekeeper Reinforcements on Milestone Levels ──
-	if cur_lvl in [8, 15, 22, 30, 37, 44] or escalation_tier >= 2:
+	if cur_lvl in [6, 7, 8, 15, 22, 30, 37, 44] or escalation_tier >= 2:
 		_spawn_gatekeeper_wave(entities, cur_lvl, active_biome)
 
 	# ── Wave 3: Biome Heavy Prows + Flank Escorts (Z: -30 to -37) ──
@@ -159,6 +160,7 @@ func _spawn_dynamic_swarm_climax() -> void:
 			escort.max_hp = swarm_hp
 			escort.current_hp = swarm_hp
 			escort.forward_speed = rush_speed
+			escort.doubloons_drop = 1
 
 	# ── Wave 4: Final Breakthrough Swarm (Z: -39 to -48) ──
 	var wave_4_lanes: Array[float] = [-3.4, -2.5, -1.7, -0.8, 0.0, 0.8, 1.7, 2.5, 3.4]
@@ -181,7 +183,7 @@ func _spawn_dynamic_swarm_climax() -> void:
 			mob.max_hp = swarm_hp
 			mob.current_hp = swarm_hp
 			mob.forward_speed = rush_speed + 0.6
-			mob.doubloons_drop = 1
+			mob.doubloons_drop = 1 if i % 3 == 0 else 0
 
 func _spawn_gatekeeper_wave(entities: Node, _cur_lvl: int, active_biome: String = "tropical") -> void:
 	var gk_scene: PackedScene = GRAVE_SKIFF_SCENE if active_biome == "bayou" else GUNNER_SCENE
@@ -193,6 +195,8 @@ func _spawn_gatekeeper_wave(entities: Node, _cur_lvl: int, active_biome: String 
 			gk_l.set("is_gunner_vanguard", true)
 		if "can_shoot" in gk_l:
 			gk_l.set("can_shoot", true)
+		if "doubloons_drop" in gk_l:
+			gk_l.set("doubloons_drop", 1)
 
 	var gk_r: Node3D = gk_scene.instantiate() as Node3D
 	if gk_r:
@@ -202,3 +206,5 @@ func _spawn_gatekeeper_wave(entities: Node, _cur_lvl: int, active_biome: String 
 			gk_r.set("is_gunner_vanguard", true)
 		if "can_shoot" in gk_r:
 			gk_r.set("can_shoot", true)
+		if "doubloons_drop" in gk_r:
+			gk_r.set("doubloons_drop", 1)

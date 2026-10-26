@@ -90,7 +90,7 @@ func _spawn_continuous_slalom_enemies(cur_lvl: int) -> void:
 		Vector3(-2.2, 0.1, -43.0),
 		Vector3(2.2, 0.1, -44.5),
 	]
-	var mob_hp: int = 2 if cur_lvl <= 3 else (3 if cur_lvl <= 8 else 5)
+	var mob_hp: int = 2 if cur_lvl <= 3 else (3 if cur_lvl <= 5 else (5 if cur_lvl <= 10 else 7))
 	var mob_spd: float = 1.8 if cur_lvl <= 3 else 2.5
 	for i: int in range(extra_waves.size()):
 		if active_biome == "bayou" and i % 3 == 1 and GRAVE_SKIFF_SCENE:

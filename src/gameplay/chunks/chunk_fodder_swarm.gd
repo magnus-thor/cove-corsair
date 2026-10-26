@@ -149,7 +149,7 @@ func _apply_level_and_biome_swarm_variation() -> void:
 				geyser.position = Vector3(-1.8 if variant % 2 == 0 else 1.8, 0.0, -32.0)
 	else:
 		# Tropical levels: Raider/Rower swarm leaders at front (-12m) and rear (-36m)
-		var lead_hp: int = 2 if cur_lvl <= 3 else (3 if cur_lvl <= 5 else 4)
+		var lead_hp: int = 2 if cur_lvl <= 3 else (3 if cur_lvl <= 5 else 6)
 		var lead_data: Resource = ROWER_DATA if cur_lvl <= 2 else RAIDER_DATA
 		for l_z: float in [-12.0, -36.0]:
 			var leader: EnemyMob = ENEMY_MOB_SCENE.instantiate() as EnemyMob

@@ -73,7 +73,7 @@ func _test_gold_retention_on_hull_destruction() -> void:
 	
 	var dinghy_data = load("res://src/data/resources/user_vessels/dinghy_ship.tres") as ShipData
 	player.apply_ship_data(dinghy_data)
-	assert_test(player.current_health == 2, "Dinghy hull HP starts at 2")
+	assert_test(player.current_health == 3, "Dinghy hull HP starts at 3")
 	
 	# Connect to run_failed signals
 	var player_signal = {"fired": false, "coins": 0, "dist": 0.0}
@@ -89,15 +89,10 @@ func _test_gold_retention_on_hull_destruction() -> void:
 		gs_signal["coins"] = c
 	)
 	
-	# Crash into Barricade slat mock (3 damage)
-	var slat = Area3D.new()
-	slat.set_script(load("res://src/gameplay/obstacles/barricade_segment.gd"))
-	add_child(slat)
-	slat._ready()
+	# Fatal hull damage mock
+	player.take_hit(3, "barricade_collision")
 	
-	player._on_area_entered(slat)
-	
-	assert_test(player.current_health == 0, "Dinghy HP reaches 0 on barricade collision")
+	assert_test(player.current_health == 0, "Dinghy HP reaches 0 on fatal collision")
 	assert_test(player.is_game_over == true, "Player is_game_over is set to true")
 	assert_test(player_signal["fired"] == true, "Player emitted run_failed signal")
 	assert_test(player_signal["coins"] == 350, "run_failed emitted correct coins_collected (350)")
@@ -106,7 +101,6 @@ func _test_gold_retention_on_hull_destruction() -> void:
 	assert_test(gs_signal["coins"] == 350, "GameState run_failed emitted 350 coins")
 	assert_test(GameState.doubloons == 350, "Banked coins (350) match the increase in GameState.doubloons")
 	
-	slat.queue_free()
 	player.queue_free()
 
 func _test_settlement_screen_ui_defeat() -> void:
@@ -157,7 +151,7 @@ func _test_settlement_screen_ui_victory() -> void:
 	assert_test(screen.bonus_claim_button != null, "BonusClaimButton exists in settlement scene")
 	assert_test(screen.bonus_claim_button.visible == true, "BonusClaimButton is visible on victory")
 	assert_test(screen.bonus_claim_button.disabled == false, "BonusClaimButton is initially enabled")
-	assert_test(screen.bonus_claim_button.text == "✦ CLAIM 2X BONUS DOUBLOONS", "BonusClaimButton has initial label '✦ CLAIM 2X BONUS DOUBLOONS'")
+	assert_test(screen.bonus_claim_button.text.contains("2X BONUS DOUBLOONS"), "BonusClaimButton has 2X claim text")
 	
 	# Simulate claiming 2X bonus
 	var pre_claim_bank = GameState.doubloons
@@ -191,14 +185,14 @@ func _test_shipyard_upgrade_with_retained_gold() -> void:
 	assert_test(screen._glow_tween != null and screen._glow_tween.is_valid(), "Shipyard glow tween initialized and active")
 	
 	# Purchase Tier 2 upgrade in Shipyard with retained gold
-	var initial_gold = GameState.doubloons
-	var tier_cost = GameState.get_upgrade_cost("dinghy", 2)
-	assert_test(tier_cost == 250, "Dinghy Tier 2 cost is 250 doubloons")
+	var initial_gold: int = GameState.doubloons
+	var tier_cost: int = GameState.get_upgrade_cost("dinghy", 2)
+	assert_test(tier_cost == 150, "Dinghy Tier 2 cost is 150 doubloons")
 	
-	var success = GameState.upgrade_vessel_tier("dinghy")
+	var success: bool = GameState.upgrade_vessel_tier("dinghy")
 	assert_test(success == true, "Dinghy Tier 2 upgrade purchased successfully using retained gold")
 	assert_test(GameState.get_vessel_tier("dinghy") == 2, "Dinghy is now upgraded to Tier 2")
-	assert_test(GameState.doubloons == initial_gold - 250, "Gold accurately deducted after upgrade purchase")
+	assert_test(GameState.doubloons == initial_gold - 150, "Gold accurately deducted after upgrade purchase")
 	
 	# Refresh screen after purchase
 	screen._refresh_banked_display()

@@ -4,7 +4,7 @@ extends Area3D
 @export var max_hp: int = 14
 @export var current_hp: int = 14
 @export var forward_speed: float = 3.2
-@export var doubloons_drop: int = 3
+@export var doubloons_drop: int = 2
 @export var shoot_interval: float = 1.3
 @export var burst_count: int = 2
 @export var can_shoot: bool = false
@@ -141,6 +141,11 @@ func _update_health_bar() -> void:
 func die() -> void:
 	if _is_dead:
 		return
+	_is_dead = true
+	collision_layer = 0
+	collision_mask = 0
+	set_deferred("monitoring", false)
+	set_deferred("monitorable", false)
 	# ── Engagement telemetry ─────────────────────────────────────────────────
 	if EventBus and EventBus.has_signal("mob_killed"):
 		var player_node: Node3D = get_tree().get_first_node_in_group("player") as Node3D
@@ -161,7 +166,7 @@ func die() -> void:
 		vfx.global_position = global_position
 		
 	if doubloon_scene:
-		for i in range(doubloons_drop):
+		for i: int in range(doubloons_drop):
 			var d: CollectibleDoubloon = doubloon_scene.instantiate() as CollectibleDoubloon
 			var root: Node = get_tree().current_scene
 			if root:

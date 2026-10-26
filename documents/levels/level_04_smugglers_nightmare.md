@@ -3,7 +3,7 @@ level_id: 4
 level_title: "Level 4: Sunken Reefs (Hazard Gauntlet)"
 biome_name: "tropical"
 base_scroll_speed: 7.3
-completion_doubloon_reward: 86
+completion_doubloon_reward: 85
 river_width_world: 12.0
 resource_file: "res://src/data/resources/levels/level_04.tres"
 ---

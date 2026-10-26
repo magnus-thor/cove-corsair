@@ -43,7 +43,7 @@ script = ExtResource("5_41l2j")
 max_hp = 6
 current_hp = 6
 forward_speed = 1.6
-doubloons_drop = 4
+doubloons_drop = 2
 
 [node name="BarricadeWall" type="Node3D" parent="Entities" unique_id=359320593 instance=ExtResource("6_heufw")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -22)
@@ -118,6 +118,7 @@ script = ExtResource("5_41l2j")
 max_hp = 5
 current_hp = 5
 forward_speed = 1.8
+doubloons_drop = 1
 
 [node name="EnemyMob_RowerRight" type="Area3D" parent="Entities" unique_id=1188084211 groups=["destructible", "enemies"] instance=ExtResource("4_qdvtt")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0.1, -48)
@@ -125,6 +126,7 @@ script = ExtResource("5_41l2j")
 max_hp = 5
 current_hp = 5
 forward_speed = 1.8
+doubloons_drop = 1
 
 [node name="ChestSpawnMarker_HazardFlank" type="Marker3D" parent="Entities" unique_id=629956992]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.4, 0.05, -34)

@@ -176,9 +176,9 @@ func _apply_base_chunk_pacing() -> void:
 						keg.name = "BombardFuseKeg_%d" % (idx + 1)
 						entities.add_child(keg)
 						keg.position = opos
+						keg.set("obstacle_type", 1)
 						keg.set("hp", 2)
 						keg.set("doubloons_drop", 0)
-						keg.set("obstacle_type", 2)
 		else:
 			# Standard level: continuous enemy waves through the mine gauntlet from Z = -4.5 to -44.0 (zero downtime!)
 			var wave_coords: Array[Vector3] = [
@@ -195,7 +195,7 @@ func _apply_base_chunk_pacing() -> void:
 				Vector3(-2.2, 0.1, -43.0),
 				Vector3(2.2, 0.1, -44.5),
 			]
-			var mob_hp: int = 2 if cur_lvl <= 3 else (3 if cur_lvl <= 10 else 5)
+			var mob_hp: int = 2 if cur_lvl <= 3 else (3 if cur_lvl <= 5 else (5 if cur_lvl <= 10 else 7))
 			var mob_spd: float = 2.0 if cur_lvl <= 3 else 2.8
 			var g_skiff_scene: PackedScene = load("res://src/gameplay/enemies/enemy_grave_skiff.tscn") as PackedScene
 			var b_raft_scene: PackedScene = load("res://src/gameplay/enemies/enemy_brimstone_raft.tscn") as PackedScene

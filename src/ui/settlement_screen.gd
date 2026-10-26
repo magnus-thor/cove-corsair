@@ -239,7 +239,7 @@ func _present_modal() -> void:
 			header_label.add_theme_color_override("font_color", COLOR_DEFEAT_HEADER)
 		if subtitle_label:
 			var cur_lvl: int = GameState.current_level if GameState else 1
-			if cur_lvl in [8, 15, 22, 30, 37, 44]:
+			if cur_lvl in [6, 7, 8, 15, 22, 30, 37, 44]:
 				subtitle_label.text = "GATEKEEPER CHALLENGE • UPGRADE VESSEL AT SHIPYARD"
 			else:
 				subtitle_label.text = "HULL BREACHED - TREASURE RETAINED"

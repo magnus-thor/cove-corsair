@@ -24,7 +24,7 @@ func _ready() -> void:
 	print("\n--- 1. Testing ShipData Resources ---")
 	var dinghy_res: ShipData = load("res://src/data/resources/user_vessels/dinghy_ship.tres") as ShipData
 	assert_test(dinghy_res != null, "dinghy_ship.tres loads successfully")
-	assert_test(dinghy_res.max_health == 2, "Dinghy max_health is 2 HP (fragile starter)")
+	assert_test(dinghy_res.max_health == 3, "Dinghy max_health is 3 HP (fragile starter)")
 	assert_test(dinghy_res.move_speed == 10.5, "Dinghy move_speed is 10.5 m/s")
 
 	var sloop_res: ShipData = load("res://src/data/resources/user_vessels/sloop_ship.tres") as ShipData

@@ -4,79 +4,84 @@
 > **Economy Model**: Opt-in Doubled Payout (2X Settlement Bonus)
 
 ---
-## 1. Executive Summary & Economy Analysis
+## 1. Executive Summary & Economy Rebalance (Difficulty Walls & Endless Farming)
 
-### The Level 8 Payout Analysis (Why 272 + 140 = 412 -> 824 Doubloons?)
-When playing through **Level 8: Pelican Point**, players experience a noticeable inflection in gold velocity. This is intentional and stems from the combination of several key systems:
+### Preventing Hyper-Inflation & Pacing Upgrades
+In earlier builds, multi-kill bugs on mob groups, unintentional 50-coin chests dropping from low-level barrels, and uncapped multiplier gates flooded early gameplay with excessive coins, allowing players to upgrade and over-level the Sloop without facing any difficulty roadblocks.
 
-1. **Level 5+ Rune Barrel Milestone**: Prior to Level 5, destructible rune barrels drop 3 standard coins. Starting at Level 5 and beyond, every rune barrel drops an authentic **Collectible Chest worth 50 doubloons**.
-2. **Dual Barricade Siege Chunks**: Level 8 features two `chunk_barricade_siege.tscn` segments. Each contains a guaranteed Rune Barrel (50 doubloons) plus a hazard flank chest spawn marker (50 doubloons), yielding up to **200 doubloons** from high-value chests alone when steering aggressively into the danger zones.
-3. **Multiplier Gates & Target Combos**: Passing through +2/+3 or x1.5/x2 Multiplier Gates immediately multiplies floating coins and combat destruction spoils from escort rowers, gunners, and barricade timbers.
-4. **Clear Reward + 2X Settlement Claim**: The completion bonus is **140 doubloons**. Combined with a pristine run clearing all targets (~272 in-run), the base payout is **412 doubloons**. Doubling this with the opt-in bonus grants **824 doubloons** in a single run.
+The economy and combat pacing have been recalibrated under the core design premise that **players regularly claim the 2X settlement bonus**:
 
-> [!NOTE]
-> **Balancing Context**: Requiring a **Tier 3 Dinghy (4 HP)** and **Level 3 Monkey Bomber** for Level 8 matches our progression curve perfectly. Level 8's dense crossfire from twin armored barricades and flanking gunners demands 4 HP durability and secondary cluster bounces to survive. The generous 824 doubloon reward immediately funds the player's transition into The Sloop or the mid-game tactical outfittings.
+1. **Multi-Kill Bug Elimination**: Enemy hulls and raft segments now instantly mark dead and drop coins exactly once, eliminating duplicate payouts.
+2. **Early Rune Barrel Calibration**: Destructible barrels in early levels drop standard doubloons (1-3 coins); 50-coin Collectible Chests are strictly gated to Level 6+ and high-risk endless checkpoints.
+3. **Multiplier Gate & Sinking Tuning**: Gate pass bonuses and overcharge bursts are clamped to proportional doubloon tiers (+1 to +5).
+4. **Deliberate Difficulty Walls & Endless Mode Necessity**: Rather than passively affording every ship upgrade directly through standard campaign clears, intentional "Difficulty Walls" require players to engage with the **Corsair Gauntlet (Endless Mode)** to farm necessary doubloons for critical hull and firepower upgrades.
 
 ---
-## 2. Fleet Upgrade Catalog & 100% Master Completion Cost
+## 2. Fleet Upgrade Catalog & Vessel Pricing
 
-To completely unlock and maximize every vessel, crew member, tactical shot, and hull plating in the entire game, the player requires a grand total of **22,250 Doubloons**.
+### The Sloop Upgrade Matrix (10 Tiers)
+The Sloop serves as the player's primary flagship throughout the early and mid-campaign. Its upgrade pricing features steepening tiers that enforce farming checkpoints at key gatekeeper levels:
 
+| Tier | Upgrade Cost | Cumulative Cost | Hull HP | Fire Rate Multiplier | Combat Milestone / Wall Location |
+| :---: | :---: | :---: | :---: | :---: | :--- |
+| **T1** | 400 🪙 (Purchase) | 400 🪙 | 4 HP | 1.00x | Unlocked after Level 2 tutorial |
+| **T2** | 250 🪙 | 650 🪙 | 4 HP | 1.10x | Mid-Deck Crew Socket (Monkey Bomber) |
+| **T3** | **700 🪙** | 1,350 🪙 | **5 HP** | **1.20x** | 🛑 **WALL 1 (Level 6 / 7 Gatekeeper)** |
+| **T4** | **1,350 🪙** | 2,700 🪙 | **6 HP** | **1.28x** | 🛑 **WALL 2 (Level 9 / 10 Boss Dredge)** |
+| **T5** | **2,400 🪙** | 5,100 🪙 | **7 HP** | **1.35x** | 🛑 **WALL 3 (Level 13 / 14 Gatekeeper)** |
+| **T6** | **4,000 🪙** | 9,100 🪙 | **8 HP** | **1.45x** | 🛑 **WALL 4 (Dual Swivels Unlocked)** |
+| **T7** | 6,500 🪙 | 15,600 🪙 | 8 HP | 1.55x | Mid-Armada Heavy Flagship |
+| **T8** | 10,500 🪙 | 26,100 🪙 | 9 HP | 1.65x | End-Game Dreadnought Armor |
+| **T9** | 16,500 🪙 | 42,600 🪙 | 9 HP | 1.75x | Master Flagship Tuning |
+| **T10** | 25,000 🪙 | 67,600 🪙 | 10 HP | 1.90x | Ultimate Sloop Master Completion |
+
+### Other Vessels, Crew & Equipment
 | Category | Item Name | Purchase Cost | Tier 2 Cost | Tier 3 Cost | Total Cost | Key Benefit |
 | :--- | :--- | :---: | :---: | :---: | :---: | :--- |
-| **Vessel** | **The Dinghy** | 0 🪙 (Default) | 250 🪙 | 1,000 🪙 | **1,250 🪙** | Max Speed (12.0), 4 HP, 2 Crew Sockets. High agility skiff. |
-| **Vessel** | **The Sloop** | 500 🪙 | 700 🪙 | 1,600 🪙 | **2,800 🪙** | Balanced speed (11.0), 6 HP, 2 Crew Sockets, rapid cannon fire. |
-| **Vessel** | **The Bombard Skiff** | 1,000 🪙 | 1,200 🪙 | 2,200 🪙 | **4,400 🪙** | High damage artillery mortar, 5 HP, obliterates clustered barricades. |
-| **Vessel** | **The Ironclad** | 1,400 🪙 | 1,800 🪙 | 3,000 🪙 | **6,200 🪙** | Heavy battleship, 10 HP, 4 broadside cannons, ramming juggernaut. |
-| **Crew** | **Monkey Bomber** | 350 🪙 | 500 🪙 | 850 🪙 | **1,700 🪙** | 5 AoE damage + secondary mini-cluster bounce (1.0s cd). |
-| **Crew** | **Skeleton Tosser** | 550 🪙 | 750 🪙 | 1,200 🪙 | **2,500 🪙** | 6 Fire damage + lingering napalm surface burning (1.2s cd). |
-| **Ammo** | **Standard Iron** | 0 🪙 (Default) | — | — | **0 🪙** | Baseline balanced velocity kinetic damage. |
+| **Vessel** | **The Dinghy** | 0 🪙 (Default) | 150 🪙 | 450 🪙 | **600 🪙** | Max Agility (10.5 speed), 3-4 HP. Starter vessel. |
+| **Vessel** | **The Bombard Skiff** | 1,000 🪙 | 1,200 🪙 | 2,200 🪙 | **4,400 🪙** | High damage artillery mortar, 5 HP, area demolition. |
+| **Vessel** | **The Ironclad** | 1,400 🪙 | 1,800 🪙 | 3,000 🪙 | **6,200 🪙** | Heavy battleship, 10 HP, broadside cannons. |
+| **Crew** | **Monkey Bomber** | 350 🪙 | 500 🪙 | 850 🪙 | **1,700 🪙** | 5 AoE damage + secondary mini-cluster bounce. |
+| **Crew** | **Skeleton Tosser** | 550 🪙 | 750 🪙 | 1,200 🪙 | **2,500 🪙** | 6 Fire damage + lingering surface burning. |
 | **Ammo** | **Battering Shot** | 400 🪙 | — | — | **400 🪙** | +100% damage vs Barricade Walls and timber barriers. |
 | **Ammo** | **Chain Shot** | 500 🪙 | — | — | **500 🪙** | Wide sweep radius; detonates sea mines safely at range. |
-| **Ammo** | **Spectral Salt** | 650 🪙 | — | — | **650 🪙** | +50% damage vs Ghost craft; interrupts boss casting channels. |
-| **Plating** | **Standard Wood** | 0 🪙 (Default) | — | — | **0 🪙** | Baseline seasoned oak durability. |
+| **Ammo** | **Spectral Salt** | 650 🪙 | — | — | **650 🪙** | +50% damage vs Ghost craft; interrupts boss channels. |
 | **Plating** | **Spiked Iron Prow** | 500 🪙 | — | — | **500 🪙** | Absorbs 1 obstacle ram impact per level with 0 damage. |
 | **Plating** | **Spectral Ward** | 600 🪙 | — | — | **600 🪙** | Reduces spectral geyser damage by 60%; negates vortex slows. |
-| **Plating** | **Brimstone Fireproof** | 750 🪙 | — | — | **750 🪙** | Reduces volcanic magma and fire hazard damage by 50%. |
-| **TOTALS** | **100% Master Completion** | — | — | — | **22,250 🪙** | **Every ship, tier, crew, and outfitting fully owned & maxed.** |
+| **Plating** | **Brimstone Fireproof** | 750 🪙 | — | — | **750 🪙** | Reduces volcanic magma hazard damage by 50%. |
 
 ---
-## 3. Upgrade Milestone Roadmap (Assuming Max Coins & 2X Doubled Claim)
+## 3. Progression Flow & Difficulty Wall Analysis (Assuming 2X Doubled Claims)
 
-Here is the exact progression schedule detailing when each upgrade becomes affordable:
+### The Early Campaign & Onboarding Curve (Levels 1–5):
+- **Level 1 (The Dinghy T1)**: ~50 in-run + 45 bonus = 95 raw -> **190 🪙 (2X)**. Vault = 190.
+- **Level 2 (The Dinghy T1)**: ~55 in-run + 58 bonus = 113 raw -> **226 🪙 (2X)**. Vault = 416.
+  - *Tutorial Action*: Buy **The Sloop** (400 🪙) -> Vault = 16 🪙.
+- **Level 3 (The Sloop T1)**: ~80 in-run + 95 bonus = 175 raw -> **350 🪙 (2X)**. Vault = 366.
+  - *Tutorial Action*: Hire **Monkey Bomber** (350 🪙) -> Vault = 16 🪙.
+- **Level 4 (The Sloop T1 + Monkey Bomber)**: ~65 in-run + 60 bonus = 125 raw -> **250 🪙 (2X)**. Vault = 266.
+  - *Tutorial Action*: Upgrade **Sloop Tier 2** (250 🪙) -> Vault = 16 🪙.
+- **Level 5 (Boss Captain Ironjaw)**: ~75 in-run + 75 bonus = 150 raw -> **300 🪙 (2X)**. Vault entering Level 6 = **~316 🪙**.
 
-```mermaid
-graph LR
-    L2[Level 2: Dinghy T2 (250g)] --> L4[Level 4: Monkey Bomber Unlocked (350g)]
-    L4 --> L5[Level 5: Dinghy T3 Maxed (1000g)]
-    L5 --> L7[Level 7: Monkey Bomber L2 + Sloop Bought]
-    L7 --> L8[Level 8: Monkey Bomber L3 Maxed (850g)]
-    L8 --> L10[Level 10: Sloop T2 + Battering Shot]
-    L10 --> L13[Level 13: Sloop T3 Maxed + Spiked Prow]
-    L13 --> L16[Level 16: Skeleton Tosser Maxed + Bombard Skiff]
-    L16 --> L20[Level 20: Bombard Skiff Maxed + Chain Shot]
-    L20 --> L24[Level 24: Ironclad Bought + T2 + Spectral Set]
-    L24 --> L28[Level 28: Ironclad T3 Maxed - 100% COMPLETION!]
-    L28 --> L45[Levels 29-45: Fleet Master Victory Lap]
-```
+### Wall 1: Level 6 / Level 7 Gatekeeper (The Endless Gauntlet Requirement):
+- **Vault Status**: Entering Level 6, the player holds **~316 🪙** with **Sloop Tier 2 (4 HP)**.
+- **Upgrade Cost**: **Sloop Tier 3 costs 700 🪙** (Deficit: **~384 🪙**).
+- **Combat Reality**:
+  - Level 6 introduces Bayou mob swarms (5 HP skiffs) and reinforced barricade walls (8 HP timber slats).
+  - A Tier 2 Sloop without Tier 3 firepower and durability (+1 HP = 5 HP, 1.20x fire rate) experiences severe hull pressure and frequent sinking.
+- **The Endless Solution**:
+  - Unlocked Corsair Gauntlet (Endless Mode) provides an extraction gameplay loop.
+  - A standard 350m extraction run awards **~180–200 doubloons** (with 1.5x wager boost).
+  - Completing **1 to 2 Endless Gauntlet runs** bridges the ~384 🪙 gap, affording **Sloop Tier 3 (700 🪙)** and empowering the player to breach Level 6 and Level 7.
+- **Fallback Margin**: Even if an exceptionally skilled player manages to survive Level 6 on their very first attempt (+~240 🪙 doubled -> ~556 🪙 total), they remain **~144 🪙 short** of Sloop Tier 3 when confronting Level 7 ("Corsair Blockade"), still encountering the wall and taking 1 Endless run.
 
-### Step-by-Step Purchase Milestones:
-- **After Level 2 (~264 🪙 banked)**: Upgrade **Dinghy to Tier 2** (Cost: 250 🪙). HP increases from 2 to 3, unlocking the first crew socket.
-- **After Level 4 (~840 🪙 banked)**: Purchase & equip **Monkey Bomber** (Cost: 350 🪙). Grants automatic AoE bomb tosses every 1.2s.
-- **After Level 5 Boss Ironjaw (~1,700 🪙 cumulative)**: Upgrade **Dinghy to Tier 3** (Cost: 1,000 🪙). Dinghy reaches max level (4 HP, 2 Crew Sockets).
-- **After Level 6 (~2,200 🪙 cumulative)**: Upgrade **Monkey Bomber to Level 2** (Cost: 500 🪙, +5 AoE damage, 1.0s cd) and purchase **The Sloop** (Cost: 500 🪙).
-- **After Level 8 (~3,400 🪙 cumulative)**: Upgrade **Monkey Bomber to Level 3** (Cost: 850 🪙). Monkey Bomber reaches max level (mini-cluster bounces).
-  > *This confirms the user's exact play state: by Level 8, the player has maxed out The Dinghy and maxed out the Monkey Bomber!*
-- **After Level 10 Boss Dredge (~5,200 🪙 cumulative)**: Upgrade **The Sloop to Tier 2** (Cost: 700 🪙), purchase **Battering Shot** (Cost: 400 🪙), and unlock **Skeleton Tosser** (Cost: 550 🪙).
-- **After Level 12 (~7,000 🪙 cumulative)**: Upgrade **The Sloop to Tier 3** (Cost: 1,600 🪙, Max Sloop 6 HP) and purchase **Spiked Iron Prow** (Cost: 500 🪙).
-- **After Level 15 Siege Fortress (~10,000 🪙 cumulative)**: Purchase **The Bombard Skiff** (Cost: 1,000 🪙), upgrade **Skeleton Tosser to Level 2 & 3** (Cost: 750 + 1,200 = 1,950 🪙, Max Skeleton Tosser), and purchase **Chain Shot** (Cost: 500 🪙).
-- **After Level 18 (~13,500 🪙 cumulative)**: Upgrade **Bombard Skiff to Tier 2 & Tier 3** (Cost: 1,200 + 2,200 = 3,400 🪙, Max Bombard Skiff 5 HP).
-- **After Level 21 (~17,000 🪙 cumulative)**: Purchase **The Ironclad** (Cost: 1,400 🪙), upgrade to **Ironclad Tier 2** (Cost: 1,800 🪙), purchase **Spectral Salt Shot** (Cost: 650 🪙) and **Spectral Ward Plating** (Cost: 600 🪙).
-- **After Level 24 (~21,000 🪙 cumulative)**: Purchase **Brimstone Fireproof Plating** (Cost: 750 🪙).
-- **After Level 26 (~23,500 🪙 cumulative)**: Upgrade **The Ironclad to Tier 3** (Cost: 3,000 🪙, Max Ironclad 10 HP).
-- 🏆 **MILESTONE REACHED: 100% MASTER COMPLETION AT LEVEL 26–27!**
-  > Every single ship (Dinghy, Sloop, Bombard Skiff, Ironclad) is owned at Tier 3 max level. Both crew members (Monkey Bomber, Skeleton Tosser) are owned at Level 3 max rank. All 4 ammunition types and all 4 hull platings are unlocked and available.
-- **Levels 28–45 (Late Game & Endgame)**: The player can freely choose any flagship, socket any crew combination, and enjoy an armada with max stats across all high-difficulty Brimstone Bastion and Citadel channels.
+### Subsequent Difficulty Walls:
+- **Wall 2 (Level 9 / 10 - Boss Phantom Dredge)**:
+  - Sloop Tier 4 costs **1,350 🪙** (Grants 6 HP, 1.28x fire rate). Requires 1–2 Endless runs to afford prior to facing Dredge's phantom summons.
+- **Wall 3 (Level 13 / 14 - Coral Labyrinth)**:
+  - Sloop Tier 5 costs **2,400 🪙** (Grants 7 HP, 1.35x fire rate).
+- **Wall 4 (Level 18 / 19 - Citadel Approach)**:
+  - Sloop Tier 6 costs **4,000 🪙** (Unlocks Dual Swivel Mounts for multi-lane cannon sweeps).
 
 ---
 ## 4. Full 45-Level Master Table: Economy, Drops & Tactical Loadouts

@@ -57,6 +57,7 @@ var current_hp: int:
 		return health_component._current_health if health_component else max_hp
 	set(val):
 		if health_component:
+			health_component.max_health = maxi(max_hp, val)
 			health_component._current_health = val
 			_update_health_bar()
 
@@ -108,18 +109,20 @@ func apply_enemy_data(data: EnemyData) -> void:
 	var cur_lvl: int = GameState.current_level if GameState else 1
 	var hp_mult: float = 1.0
 	if cur_lvl > 30:
-		hp_mult = 2.6
+		hp_mult = 3.0
 	elif cur_lvl > 15:
-		hp_mult = 2.0
-	elif cur_lvl > 5:
-		hp_mult = 1.6
+		hp_mult = 2.4
+	elif cur_lvl > 10:
+		hp_mult = 2.1
+	elif cur_lvl >= 6:
+		hp_mult = 1.85
 	elif cur_lvl <= 2:
 		hp_mult = 0.5
 	elif cur_lvl <= 4:
 		hp_mult = 0.75
 	max_hp = int(ceil(float(data.max_hp) * hp_mult))
 	forward_speed = data.forward_speed
-	doubloons_drop = data.doubloon_drop_count
+	doubloons_drop = mini(data.doubloon_drop_count, 1 if cur_lvl <= 5 else 2)
 	_current_base_y = data.y_offset
 	
 	# Sync HealthComponent with EnemyData values
@@ -381,7 +384,7 @@ func _spawn_doubloons() -> void:
 		if spawn_parent == self or spawn_parent is EnemyMob:
 			return
 			
-	for i in range(doubloons_drop):
+	for i: int in range(doubloons_drop):
 		var doubloon := doubloon_scene.instantiate() as CollectibleDoubloon
 		if doubloon:
 			spawn_parent.add_child(doubloon)

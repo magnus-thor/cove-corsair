@@ -4,7 +4,7 @@ extends Area3D
 @export var max_hp: int = 22
 @export var current_hp: int = 22
 @export var forward_speed: float = 2.6
-@export var doubloons_drop: int = 4
+@export var doubloons_drop: int = 2
 @export var shoot_interval: float = 2.4
 @export var can_shoot: bool = false
 @export var is_gunner_vanguard: bool = false
@@ -41,31 +41,37 @@ func _apply_level_tuning() -> void:
 		current_hp = 4
 		forward_speed = 1.8
 		shoot_interval = 2.8
+		doubloons_drop = 1
 	elif cur_lvl <= 5:
 		max_hp = 5
 		current_hp = 5
 		forward_speed = 2.0
 		shoot_interval = 2.6
+		doubloons_drop = 1
 	elif cur_lvl <= 9:
-		max_hp = 10
-		current_hp = 10
-		forward_speed = 2.2
-		shoot_interval = 2.4
+		max_hp = 15
+		current_hp = 15
+		forward_speed = 2.3
+		shoot_interval = 2.1
+		doubloons_drop = 2
 	elif cur_lvl <= 15:
-		max_hp = 22
-		current_hp = 22
+		max_hp = 24
+		current_hp = 24
 		forward_speed = 2.6
-		shoot_interval = 2.2
+		shoot_interval = 2.0
+		doubloons_drop = 2
 	elif cur_lvl <= 30:
 		max_hp = 36
 		current_hp = 36
 		forward_speed = 3.0
 		shoot_interval = 1.9
+		doubloons_drop = 2
 	else:
 		max_hp = 52
 		current_hp = 52
 		forward_speed = 3.4
 		shoot_interval = 1.6
+		doubloons_drop = 3
 
 func _physics_process(delta: float) -> void:
 	if _is_dead or not GameState.is_game_active:
@@ -171,6 +177,11 @@ func _update_health_bar() -> void:
 func die() -> void:
 	if _is_dead:
 		return
+	_is_dead = true
+	collision_layer = 0
+	collision_mask = 0
+	set_deferred("monitoring", false)
+	set_deferred("monitorable", false)
 	# ── Engagement telemetry ─────────────────────────────────────────────────
 	if EventBus and EventBus.has_signal("mob_killed"):
 		var player_node: Node3D = get_tree().get_first_node_in_group("player") as Node3D
